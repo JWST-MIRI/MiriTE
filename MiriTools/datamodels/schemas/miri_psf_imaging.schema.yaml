@@ -1,0 +1,78 @@
+allOf:
+- $ref: miri_psf.schema.yaml
+- type: object
+  title: JWST/MIRI imaging point spread function
+  properties:
+    meta:
+      type: object
+      properties:
+        psf_lut:
+          type: object
+          title: Information about the psf_lut table
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: degrees
+              fits_hdu: PSF_LUT
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: degrees
+              fits_hdu: PSF_LUT
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: ''
+              fits_hdu: PSF_LUT
+              fits_keyword: TUNIT3
+            tunit4:
+              type: string
+              title: Column 4 units
+              default: pixels
+              fits_hdu: PSF_LUT
+              fits_keyword: TUNIT4
+            tunit5:
+              type: string
+              title: Column 5 units
+              default: pixels
+              fits_hdu: PSF_LUT
+              fits_keyword: TUNIT5
+            tunit6:
+              type: string
+              title: Column 6 units
+              default: arcmin
+              fits_hdu: PSF_LUT
+              fits_keyword: TUNIT6
+            tunit7:
+              type: string
+              title: Column 7 units
+              default: arcmin
+              fits_hdu: PSF_LUT
+              fits_keyword: TUNIT7
+    data:
+      title: PSF data
+      fits_hdu: SCI
+      comment: can we restrict ndim to 2 or 3?
+      axes: [stacks, rows, columns]
+      units: ''
+    psf_lut:
+      title: Imaging PSF lookup table
+      fits_hdu: PSF_LUT
+      datatype:
+      - name: XFIELD
+        datatype: float64
+      - name: YFIELD
+        datatype: float64
+      - name: STACK
+        datatype: int16
+      - name: COL_FIELD
+        datatype: float64
+      - name: ROW_FIELD
+        datatype: float64
+      - name: XAN_FIELD
+        datatype: float64
+      - name: YAN_FIELD
+        datatype: float64

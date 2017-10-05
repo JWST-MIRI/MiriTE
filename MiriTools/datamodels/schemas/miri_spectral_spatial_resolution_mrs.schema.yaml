@@ -1,0 +1,200 @@
+allOf:
+- $ref: miri_core.schema.yaml
+- type: object
+  title: MIRI MRS spectral and spatial resolution model
+  properties:
+    meta:
+      type: object
+      properties:
+        resolving_power:
+          type: object
+          title: Information about the spectral resolution table
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: ''
+              fits_hdu: RESOLVING_POWER
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: micron
+              fits_hdu: RESOLVING_POWER
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: ''
+              fits_hdu: RESOLVING_POWER
+              fits_keyword: TUNIT3
+            tunit4:
+              type: string
+              title: Column 4 units
+              default: 1/micron
+              fits_hdu: RESOLVING_POWER
+              fits_keyword: TUNIT4
+            tunit5:
+              type: string
+              title: Column 5 units
+              default: 1/micron**2
+              fits_hdu: RESOLVING_POWER
+              fits_keyword: TUNIT5
+            tunit6:
+              type: string
+              title: Column 6 units
+              default: ''
+              fits_hdu: RESOLVING_POWER
+              fits_keyword: TUNIT6
+            tunit7:
+              type: string
+              title: Column 7 units
+              default: 1/micron
+              fits_hdu: RESOLVING_POWER
+              fits_keyword: TUNIT7
+            tunit8:
+              type: string
+              title: Column 8 units
+              default: 1/micron**2
+              fits_hdu: RESOLVING_POWER
+              fits_keyword: TUNIT8
+            tunit9:
+              type: string
+              title: Column 9 units
+              default: ''
+              fits_hdu: RESOLVING_POWER
+              fits_keyword: TUNIT9
+            tunit10:
+              type: string
+              title: Column 10 units
+              default: 1/micron
+              fits_hdu: RESOLVING_POWER
+              fits_keyword: TUNIT10
+            tunit11:
+              type: string
+              title: Column 11 units
+              default: 1/micron**2
+              fits_hdu: RESOLVING_POWER
+              fits_keyword: TUNIT11
+        psf_fwhm_alpha:
+          type: object
+          title: Information about the spatial resolution in alpha table
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: micron
+              fits_hdu: PSF_FWHM_ALPHA
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: arcsec
+              fits_hdu: PSF_FWHM_ALPHA
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: arcsec/micron
+              fits_hdu: PSF_FWHM_ALPHA
+              fits_keyword: TUNIT3
+            tunit4:
+              type: string
+              title: Column 4 units
+              default: arcsec
+              fits_hdu: PSF_FWHM_ALPHA
+              fits_keyword: TUNIT4
+            tunit5:
+              type: string
+              title: Column 5 units
+              default: arcsec/micron
+              fits_hdu: PSF_FWHM_ALPHA
+              fits_keyword: TUNIT5
+        psf_fwhm_beta:
+          type: object
+          title: Information about the spatial resolution in beta table
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: micron
+              fits_hdu: PSF_FWHM_BETA
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: arcsec
+              fits_hdu: PSF_FWHM_BETA
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: arcsec/micron
+              fits_hdu: PSF_FWHM_BETA
+              fits_keyword: TUNIT3
+            tunit4:
+              type: string
+              title: Column 4 units
+              default: arcsec
+              fits_hdu: PSF_FWHM_BETA
+              fits_keyword: TUNIT4
+            tunit5:
+              type: string
+              title: Column 5 units
+              default: arcsec/micron
+              fits_hdu: PSF_FWHM_BETA
+              fits_keyword: TUNIT5
+    resolving_power:
+      title: Spectral resolution
+      fits_hdu: RESOLVING_POWER
+      datatype:
+      - name: SUB_BAND
+        datatype: [ascii, 16]
+      - name: R_CENTRE
+        datatype: float64
+      - name: R_A_LOW
+        datatype: float64
+      - name: R_B_LOW
+        datatype: float64
+      - name: R_C_LOW
+        datatype: float64
+      - name: R_A_HIGH
+        datatype: float64
+      - name: R_B_HIGH
+        datatype: float64
+      - name: R_C_HIGH
+        datatype: float64
+      - name: R_A_AVG
+        datatype: float64
+      - name: R_B_AVG
+        datatype: float64
+      - name: R_C_AVG
+        datatype: float64
+    psf_fwhm_alpha:
+      title: Spatial resolution in alpha
+      fits_hdu: PSF_FWHM_ALPHA
+      datatype:
+      - name: A_CUTOFF
+        datatype: float64
+      - name: A_A_SHORT
+        datatype: float64
+      - name: A_B_SHORT
+        datatype: float64
+      - name: A_A_LONG
+        datatype: float64
+      - name: A_B_LONG
+        datatype: float64
+    psf_fwhm_beta:
+      title: Spatial resolution in beta
+      fits_hdu: PSF_FWHM_BETA
+      datatype:
+      - name: B_CUTOFF
+        datatype: float64
+      - name: B_A_SHORT
+        datatype: float64
+      - name: B_B_SHORT
+        datatype: float64
+      - name: B_A_LONG
+        datatype: float64
+      - name: B_B_LONG
+        datatype: float64

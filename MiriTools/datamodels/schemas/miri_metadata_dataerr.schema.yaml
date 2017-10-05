@@ -1,0 +1,20 @@
+type: object
+properties:
+  data:
+    type: object
+    title: Information about the data array
+    properties:
+      units:
+        type: string
+        title: Units of the data array
+        fits_hdu: SCI
+        fits_keyword: BUNIT
+  err:
+    type: object
+    title: Information about the error array
+    properties:
+      units:
+        type: string
+        title: Units of the error array
+        fits_hdu: ERR
+        fits_keyword: BUNIT

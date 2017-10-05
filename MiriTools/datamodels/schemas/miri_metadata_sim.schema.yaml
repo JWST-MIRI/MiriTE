@@ -1,0 +1,194 @@
+type: object
+title: MIRI Simulation Metadata
+properties:
+  simulator:
+    type: object
+    title: Additional info for simulated data
+    properties:
+      cosmic_ray_method:
+        type: string
+        title: Method of cosmic ray simulation
+        fits_keyword: CRMETHOD
+      cosmic_ray_mode:
+        type: string
+        title: Cosmic ray mode
+        enum: [SOLAR_MIN, SOLAR_MIN, SOLAR_MAX, SOLAR_FLARE, NONE]
+        fits_keyword: CRMODE
+      cosmic_ray_variant:
+        type: string
+        title: Cosmic ray library variant
+        fits_keyword: CRVAR
+      cosmic_ray_flux:
+        type: number
+        title: Cosmic ray flux (per square micron per second)
+        fits_keyword: GCR_FLUX
+      cosmic_ray_events:
+        type: number
+        title: Number of cosmic ray events simulated (last integration)
+        fits_keyword: CRNUM
+      cosmic_ray_pixels:
+        type: number
+        title: Number of detector pixels affected by cosmic rays (last integration)
+        fits_keyword: CRNUMPIX
+      zemax_version:
+        type: string
+        title: Version of optical model used by simulator
+        fits_keyword: ZEMVER
+      dark_current:
+        type: number
+        title: Simulated dark current (electrons/s)
+        fits_keyword: DARKCURR
+      subarray_burst_mode:
+        type: boolean
+        title: Subarray simulated in burst mode?
+        fits_keyword: SUBBURST
+      detector_rows:
+        type: number
+        title: Number of illuminated detector rows (pixels)
+        fits_keyword: DETROWS
+      detector_columns:
+        type: number
+        title: Number of illuminated detector columns (pixels)
+        fits_keyword: DETCOLS
+      samples_discarded:
+        type: number
+        title: Simulated samples discarded per A/D cycle
+        fits_keyword: NDISCARD
+      well_depth:
+        type: number
+        title: Simulated detector well depth (electrons)
+        fits_keyword: WELL
+      requested_exposure:
+        type: number
+        title: Requested exposure time (seconds)
+        fits_keyword: REQTIME
+      actual_exposure:
+        type: number
+        title: Actual exposure time (seconds)
+        comment: Has this keyword been replaced by EFFEXPTM?
+        fits_keyword: EXPTIME
+      read_noise:
+        type: number
+        title: Mean simulated read noise (electrons)
+        fits_keyword: RDNOISE
+      read_noise1:
+        type: number
+        title: Simulated read noise for amplifier 1 (electrons)
+        fits_keyword: RDNOISE1
+      read_noise2:
+        type: number
+        title: Simulated read noise for amplifier 2 (electrons)
+        fits_keyword: RDNOISE2
+      read_noise3:
+        type: number
+        title: Simulated read noise for amplifier 3 (electrons)
+        fits_keyword: RDNOISE3
+      read_noise4:
+        type: number
+        title: Simulated read noise for amplifier 4 (electrons)
+        fits_keyword: RDNOISE4
+      read_noise5:
+        type: number
+        title: Simulated read noise for amplifier 5 (electrons)
+        fits_keyword: RDNOISE1
+      read_bias:
+        type: number
+        title: Mean simulated bias (electrons)
+        fits_keyword: RDBIAS1
+      read_bias1:
+        type: number
+        title: Simulated bias for amplifier 1 (electrons)
+        fits_keyword: RDBIAS1
+      read_bias2:
+        type: number
+        title: Simulated bias for amplifier 2 (electrons)
+        fits_keyword: RDBIAS2
+      read_bias3:
+        type: number
+        title: Simulated bias for amplifier 2 (electrons)
+        fits_keyword: RDBIAS3
+      read_bias4:
+        type: number
+        title: Simulated bias for amplifier 2 (electrons)
+        fits_keyword: RDBIAS4
+      read_bias5:
+        type: number
+        title: Simulated bias for amplifier 2 (electrons)
+        fits_keyword: RDBIAS5
+      amplifier_gain_function:
+        type: string
+        title: Function used to simulate amplifier gain
+        enum: [LINEAR, POLYNOMIAL, POLYCUBE, NONE]
+        fits_keyword: GAINFN
+      amplifier_gain:
+        type: number
+        title: Mean simulated gain coefficient (e/DN)
+        fits_keyword: GAINCF
+      amplifier_gain1:
+        type: number
+        title: Simulated gain coefficient for amplifier 1 (e/DN)
+        fits_keyword: GAINCF1
+      amplifier_gain2:
+        type: number
+        title: Simulated gain coefficient for amplifier 1 (e/DN)
+        fits_keyword: GAINCF2
+      amplifier_gain3:
+        type: number
+        title: Simulated gain coefficient for amplifier 1 (e/DN)
+        fits_keyword: GAINCF3
+      amplifier_gain4:
+        type: number
+        title: Simulated gain coefficient for amplifier 1 (e/DN)
+        fits_keyword: GAINCF4
+      amplifier_gain5:
+        type: number
+        title: Simulated gain coefficient for amplifier 1 (e/DN)
+        fits_keyword: GAINCF5
+      amplifier_dynamic_range:
+        title: Mean simulated dynamic range (DN)
+        type: number
+        fits_keyword: MAXDN
+      amplifier_dynamic_range1:
+        title: Simulated dynamic range for amplifier 1 (DN)
+        type: number
+        fits_keyword: MAXDN1
+      amplifier_dynamic_range2:
+        title: Simulated dynamic range for amplifier 2 (DN)
+        type: number
+        fits_keyword: MAXDN2
+      amplifier_dynamic_range3:
+        title: Simulated dynamic range for amplifier 3 (DN)
+        type: number
+        fits_keyword: MAXDN3
+      amplifier_dynamic_range4:
+        title: Simulated dynamic range for amplifier 4 (DN)
+        type: number
+        fits_keyword: MAXDN4
+      amplifier_dynamic_range5:
+        title: Simulated dynamic range for amplifier 5 (DN)
+        type: number
+        fits_keyword: MAXDN5
+      sensitivity_coeffs:
+        title: Simulated detector sensitivity coefficients
+        type: string
+        fits_keyword: SENCOFF
+      persistence_coeffs:
+        title: Simulated detector persistence coefficients
+        type: string
+        fits_keyword: PSCOFF
+      zp_coeffs_fast:
+        title: Simulated fast zeropoint drift coefficients
+        type: string
+        fits_keyword: ZPCOFFF
+      zp_coeffs_slow:
+        type: string
+        title: Simulated slow zeropoint drift coefficients
+        fits_keyword: ZPCOFFS
+      latent_coeffs_fast:
+        title: Simulated fast detector latent coefficients
+        type: string
+        fits_keyword: LTCOFFF
+      latent_coeffs_slow:
+        title: Simulated slow detector latent coefficients
+        type: string
+        fits_keyword: LTCOFFS

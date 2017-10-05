@@ -1,0 +1,120 @@
+allOf:
+- $ref: miri_core.schema.yaml
+- type: object
+  title: MIRI MRS wavelength correction model
+  properties:
+    meta:
+      type: object
+      properties:
+        wavcorr_optical:
+          type: object
+          title: Information about the wavelength optical parameters table
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: ''
+              fits_hdu: WAVCORR_OPTICAL
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: arcsec
+              fits_hdu: WAVCORR_OPTICAL
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: micron
+              fits_hdu: WAVCORR_OPTICAL
+              fits_keyword: TUNIT3
+            tunit4:
+              type: string
+              title: Column 4 units
+              default: micron
+              fits_hdu: WAVCORR_OPTICAL
+              fits_keyword: TUNIT4
+            tunit5:
+              type: string
+              title: Column 5 units
+              default: ''
+              fits_hdu: WAVCORR_OPTICAL
+              fits_keyword: TUNIT5
+            tunit6:
+              type: string
+              title: Column 6 units
+              default: ''
+              fits_hdu: WAVCORR_OPTICAL
+              fits_keyword: TUNIT6
+        wavcorr_xslice:
+          type: object
+          title: Information about the wavelength cross slice table
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: micron/arcsec
+              fits_hdu: WAVCORR_XSLICE
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: micron/arcsec
+              fits_hdu: WAVCORR_XSLICE
+              fits_keyword: TUNIT2
+        wavcorr_shift:
+          type: object
+          title: Information about the wavelength spectral shift table
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: slice
+              fits_hdu: WAVCORR_SHIFT
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: slice
+              fits_hdu: WAVCORR_SHIFT
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: slice
+              fits_hdu: WAVCORR_SHIFT
+              fits_keyword: TUNIT3
+    wavcorr_optical:
+      title: Wavelength correction optical parameters table
+      fits_hdu: WAVCORR_OPTICAL
+      datatype:
+      - name: SUB_BAND
+        datatype: [ascii, 16]
+      - name: BETA_SLICE
+        datatype: float64
+      - name: WAVE_MIN
+        datatype: float64
+      - name: WAVE_MAX
+        datatype: float64
+      - name: SRP_MIN
+        datatype: float64
+      - name: SRP_MAX
+        datatype: float64
+    wavcorr_xslice:
+      title: Wavelength correction cross slice table
+      fits_hdu: WAVCORR_XSLICE
+      datatype:
+      - name: XSLICE_MIN
+        datatype: float64
+      - name: XSLICE_MAX
+        datatype: float64
+    wavcorr_shift:
+      title: Wavelength correction spectral shift table
+      fits_hdu: WAVCORR_SHIFT
+      datatype:
+      - name: BETA_OFF
+        datatype: float64
+      - name: DS_MIN
+        datatype: float64
+      - name: DS_MAX
+        datatype: float64

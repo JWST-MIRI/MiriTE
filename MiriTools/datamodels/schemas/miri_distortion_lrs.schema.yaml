@@ -1,0 +1,124 @@
+allOf:
+- $ref: miri_core.schema.yaml
+- type: object
+  title: MIRI LRS distortion and wavelength calibration model
+  properties:
+    meta:
+      type: object
+      properties:
+        wavelength_table:
+          type: object
+          title: Information about distortion correction
+          properties:
+            imx:
+              type: number
+              title: x position of zero point for source in slit center
+              fits_hdu: WAVETABLE
+              fits_keyword: IMX
+            imy:
+              type: number
+              title: y position of zero point for source in slit center
+              fits_hdu: WAVETABLE
+              fits_keyword: IMY
+            imxsltl:
+              type: number
+              title: x position of zero point for source at default slitless position
+              fits_hdu: WAVETABLE
+              fits_keyword: IMXSLTL
+            imysltl:
+              type: number
+              title: y position of zero point for source at default slitless position
+              fits_hdu: WAVETABLE
+              fits_keyword: IMYSLTL
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: pixels
+              fits_hdu: WAVETABLE
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: pixels
+              fits_hdu: WAVETABLE
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: microns
+              fits_hdu: WAVETABLE
+              fits_keyword: TUNIT3
+            tunit4:
+              type: string
+              title: Column 4 units
+              default: pixels
+              fits_hdu: WAVETABLE
+              fits_keyword: TUNIT4
+            tunit5:
+              type: string
+              title: Column 5 units
+              default: pixels
+              fits_hdu: WAVETABLE
+              fits_keyword: TUNIT5
+            tunit6:
+              type: string
+              title: Column 6 units
+              default: pixels
+              fits_hdu: WAVETABLE
+              fits_keyword: TUNIT6
+            tunit7:
+              type: string
+              title: Column 7 units
+              default: pixels
+              fits_hdu: WAVETABLE
+              fits_keyword: TUNIT7
+            tunit8:
+              type: string
+              title: Column 8 units
+              default: pixels
+              fits_hdu: WAVETABLE
+              fits_keyword: TUNIT8
+            tunit9:
+              type: string
+              title: Column 9 units
+              default: pixels
+              fits_hdu: WAVETABLE
+              fits_keyword: TUNIT9
+            tunit10:
+              type: string
+              title: Column 10 units
+              default: pixels
+              fits_hdu: WAVETABLE
+              fits_keyword: TUNIT10
+            tunit11:
+              type: string
+              title: Column 11 units
+              default: pixels
+              fits_hdu: WAVETABLE
+              fits_keyword: TUNIT11
+    wavelength_table:
+      title: LRS distortion and wavelength calibration table
+      fits_hdu: WAVETABLE
+      datatype:
+      - name: X_CENTER
+        datatype: float64
+      - name: Y_CENTER
+        datatype: float64
+      - name: WAVELENGTH
+        datatype: float64
+      - name: X0
+        datatype: float64
+      - name: Y0
+        datatype: float64
+      - name: X1
+        datatype: float64
+      - name: Y1
+        datatype: float64
+      - name: X2
+        datatype: float64
+      - name: Y2
+        datatype: float64
+      - name: X3
+        datatype: float64
+      - name: Y3
+        datatype: float64

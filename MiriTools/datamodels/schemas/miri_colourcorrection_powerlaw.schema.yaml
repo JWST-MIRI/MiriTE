@@ -1,0 +1,46 @@
+allOf:
+- $ref: miri_core.schema.yaml
+- type: object
+  title: MIRI imaging power law colour correction model
+  properties:
+    meta:
+      type: object
+      properties:
+        flux_table:
+          type: object
+          title: Information about the flux_table table
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: ''
+              fits_hdu: CC
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: ''
+              fits_hdu: CC
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              fits_hdu: CC
+              fits_keyword: TUNIT3
+            tunit4:
+              type: string
+              title: Column 4 units
+              fits_hdu: CC
+              fits_keyword: TUNIT4
+    flux_table:
+      title: Imaging power law colour correction table
+      fits_hdu: CC
+      datatype:
+      - name: EXPONENT
+        datatype: float64
+      - name: FILTER
+        datatype: [ascii, 16]
+      - name: FACTOR
+        datatype: float64
+      - name: UNCERTAINTY
+        datatype: float64

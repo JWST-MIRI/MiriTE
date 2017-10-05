@@ -1,0 +1,6 @@
+allOf:
+- type: object
+  properties:
+    meta:
+      $ref: miri_metadata.schema.yaml
+- $ref: http://jwst.stsci.edu/schemas/lastframe.schema.yaml

@@ -1,0 +1,40 @@
+allOf:
+- $ref: miri_core.schema.yaml
+- type: object
+  title: MIRI LRS flux conversion (SRF) model
+  properties:
+    meta:
+      type: object
+      properties:
+        flux_table:
+          type: object
+          title: Information about the flux_table table
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: micron
+              fits_hdu: FLUX
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: DN/s/Jy/spaxel
+              fits_hdu: FLUX
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: DN/s/Jy/spaxel
+              fits_hdu: FLUX
+              fits_keyword: TUNIT3
+    flux_table:
+      title: LRS photometric spectral response table
+      fits_hdu: FLUX
+      datatype:
+      - name: WAVELENGTH
+        datatype: float64
+      - name: SRF
+        datatype: float64
+      - name: SRF_ERROR
+        datatype: float64

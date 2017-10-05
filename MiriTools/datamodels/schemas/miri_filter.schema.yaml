@@ -1,0 +1,46 @@
+allOf:
+- $ref: miri_core.schema.yaml
+- type: object
+  title: MIRI filter model
+  properties:
+    meta:
+      type: object
+      properties:
+        filter_table:
+          type: object
+          properties:
+            tunit1:
+              type: string
+              title: Units of column 1
+              fits_hdu: FILTER
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Units of column 2
+              fits_hdu: FILTER
+              fits_keyword: TUNIT2
+        instrument:
+          type: object
+          properties:
+            filter_type:
+              type: string
+              title: Type of filter
+              enum: [BandPass, LowPass, HighPass, PhaseMask, ShapeMask, Pinhole,
+                     Prism, Blocking, QE, ANY, '']
+              fits_keyword: FILTERTY
+            filter_wavecent:
+              type: number
+              title: Central wavelength of BP filter
+              fits_keyword: WAVECENT
+            filter_fwhm:
+              type: number
+              title: FWHM wavelength of BP filter
+              fits_keyword: FWHM
+    filter_table:
+      title: Filter transmission or efficiency table
+      fits_hdu: FILTER
+      datatype:
+      - name: WAVELENGTH
+        datatype: float64
+      - name: TRANSMISSION
+        datatype: float64

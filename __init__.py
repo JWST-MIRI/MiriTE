@@ -1,0 +1,48 @@
+#!/usr/bin/env/python
+
+"""
+MIRI Software
+=============
+
+Package miri contains the tools, utilities, data calibration and analysis
+software developed by the MIRI Software Team
+
+The entire miri software suite can be built by executing the setup.py
+script in the top level directory with the "install" argument.
+
+Available packages
+------------------
+miri.tools
+    Contained in MiriTools/tools
+    Common utilities for MIRI software.
+
+miri.datamodels
+    Contained in MiriTools/datamodels
+    Common data models for MIRI software.
+
+miri.simulators
+    Contained in MiriSimulators/simulators.
+    MIRI simulator packages.
+    
+24 Jun 2010: Created.
+27 Apr 2011: Add PACKAGES list
+28 Nov 2013: Major simplification. Removed PACKAGES list and automatic
+             test execution.
+28 Sep 2016: Removed sandbox and stpipeline packages. Renamed
+             miri.miritools.dataproduct to miri.datamodels.
+             Renamed miri.miritools to miri.tools.
+11 May 2017: Major update to new setup.py. Version number changed.
+12 May 2017: MIRI software split into 4 pieces: MiriTools, MiriCalibration,
+             MiriPipeline and MiriSimulators (V4.0)
+19 Jun 2017: MIRI software merged with build 7.1 utilities (V5.0)
+13 Sep 2017: MiriCalibration and MiriPipeline packages separated.
+
+@author: Steven Beard (UKATC)
+
+"""
+
+__author__ = 'MIRI Software Team'
+__version__ = '7.0'
+__svn_info__ = '$Id: __init__.py 4674 2017-09-14 13:47:02Z steven.beard@stfc.ac.uk $'
+
+

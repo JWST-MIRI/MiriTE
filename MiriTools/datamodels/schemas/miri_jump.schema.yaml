@@ -1,0 +1,37 @@
+allOf:
+- $ref: miri_core.schema.yaml
+- type: object
+  title: MIRI ramp jump correction model
+  properties:
+    meta:
+      type: object
+      properties:
+        finejump_table:
+          type: object
+          title: Information about fine jump correction
+          properties:
+            crthresh:
+              type: number
+              title: Count rate threshold
+              fits_hdu: FINE
+              fits_keyword: CRTHRESH
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: ''
+              fits_hdu: FINE
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: ''
+              fits_hdu: FINE
+              fits_keyword: TUNIT2
+    finejump_table:
+      title: Fine ramp jump thresholds table
+      fits_hdu: FINE
+      datatype:
+      - name: METHOD
+        datatype: [ascii, 16]
+      - name: REJ_THRESH
+        datatype: float64

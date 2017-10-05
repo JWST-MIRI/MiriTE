@@ -1,0 +1,188 @@
+allOf:
+- $ref: miri_core.schema.yaml
+- type: object
+  title: MIRI ramp data
+  properties:
+    meta:
+      type: object
+      properties:
+        wcsinfo:
+          title: WCS parameters
+          type: object
+          properties:
+            wcsaxes:
+              title: number of World Coordinate System axes
+              type: integer
+              fits_keyword: WCSAXES
+              fits_hdu: SCI
+            crpix1:
+              title: Axis 1 coordinate of the reference pixel
+              type: number
+              default: 0.0
+              fits_keyword: CRPIX1
+              fits_hdu: SCI
+            crpix2:
+              title: Axis 2 coordinate of the reference pixel
+              type: number
+              default: 0.0
+              fits_keyword: CRPIX2
+              fits_hdu: SCI
+            crpix3:
+              title: Axis 3 coordinate of the reference pixel
+              type: number
+              fits_keyword: CRPIX3
+              fits_hdu: SCI
+            crpix4:
+              title: Axis 4 coordinate of the reference pixel
+              type: number
+              fits_keyword: CRPIX4
+              fits_hdu: SCI
+            crval1:
+              title: Axis 1 value at the reference pixel
+              type: number
+              default: 0.0
+              fits_keyword: CRVAL1
+              fits_hdu: SCI
+            crval2:
+              title: Axis 2 value at the reference pixel
+              type: number
+              default: 0.0
+              fits_keyword: CRVAL2
+              fits_hdu: SCI
+            crval3:
+              title: Axis 3 value at the reference pixel
+              type: number
+              fits_keyword: CRVAL3
+              fits_hdu: SCI
+            crval4:
+              title: Axis 4 value at the reference pixel
+              type: number
+              fits_keyword: CRVAL4
+              fits_hdu: SCI
+            ctype1:
+              title: Axis 1 coordinate type
+              type: string
+              fits_keyword: CTYPE1
+              fits_hdu: SCI
+            ctype2:
+              title: Axis 2 coordinate type
+              type: string
+              fits_keyword: CTYPE2
+              fits_hdu: SCI
+            ctype3:
+              title: Axis 3 coordinate type
+              type: string
+              fits_keyword: CTYPE3
+              fits_hdu: SCI
+            ctype4:
+              title: Axis 4 coordinate type
+              type: string
+              fits_keyword: CTYPE4
+              fits_hdu: SCI
+            cunit1:
+              title: Axis 1 units
+              type: string
+              fits_keyword: CUNIT1
+              fits_hdu: SCI
+            cunit2:
+              title: Axis 2 units
+              type: string
+              fits_keyword: CUNIT2
+              fits_hdu: SCI
+            cunit3:
+              title: Axis 3 units
+              type: string
+              fits_keyword: CUNIT3
+              fits_hdu: SCI
+            cunit4:
+              title: Axis 4 units
+              type: string
+              fits_keyword: CUNIT4
+              fits_hdu: SCI
+            cdelt1:
+              title: Axis 1 increment per pixel
+              type: number
+              default: 1.0
+              fits_keyword: CDELT1
+              fits_hdu: SCI
+            cdelt2:
+              title: Axis 2 increment per pixel
+              type: number
+              default: 1.0
+              fits_keyword: CDELT2
+              fits_hdu: SCI
+            cdelt3:
+              title: Axis 3 increment per pixel
+              type: number
+              fits_keyword: CDELT3
+              fits_hdu: SCI
+            cdelt4:
+              title: Axis 4 increment per pixel
+              type: number
+              fits_keyword: CDELT4
+              fits_hdu: SCI
+        data:
+          type: object
+          title: Information about the data array
+          properties:
+            units:
+              type: string
+              title: Units of the data array
+              fits_hdu: SCI
+              fits_keyword: BUNIT
+        zeroframe:
+          type: object
+          title: Information about the zero frame array
+          properties:
+            units:
+              type: string
+              title: Units of the zero frame array
+              fits_hdu: ZEROFRAME
+              fits_keyword: BUNIT
+        refout:
+          type: object
+          title: Information about the reference output array
+          properties:
+            units:
+              type: string
+              title: Units of the reference output array
+              fits_hdu: REFOUT
+              fits_keyword: BUNIT
+    data:
+      title: The science data
+      fits_hdu: SCI
+      default: 0.0
+      ndim: 4
+      units: DN
+      axes: [integrations, groups, rows, columns]
+      datatype: float32
+    zeroframe:
+      title: Zeroframe array
+      fits_hdu: ZEROFRAME
+      default: 0.0
+      ndim: 3
+      datatype: float32
+    refout:
+      title: Reference Output
+      fits_hdu: REFOUT
+      default: 0.0
+      ndim: 4
+      datatype: float32
+    pixeldq:
+      title: 2-D data quality array for all planes
+      fits_hdu: PIXELDQ
+      default: 0
+      ndim: 2
+      units: ''
+      datatype: uint32
+    groupdq:
+      title: 4-D data quality array for each plane
+      fits_hdu: GROUPDQ
+      default: 0
+      ndim: 4
+      units: ''
+      datatype: uint8
+    pixeldq_def:
+      $ref: pixeldq_def.schema.yaml
+    groupdq_def:
+      $ref: groupdq_def.schema.yaml

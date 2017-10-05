@@ -1,0 +1,12 @@
+allOf:
+- $ref: miri_measured.schema.yaml
+- type: object
+  title: JWST/MIRI telescope emission model
+  properties:
+    meta:
+      type: object
+      properties:
+        telescope_temperature:
+          type: number
+          title: Telescope temperature (K) for which this emission is valid
+          fits_keyword: TELTEMP

@@ -1,0 +1,19 @@
+This directory contains the MIRI data models, miri.datamodels. These are
+based on the JWST data models, jwst.datamodels.
+
+YAML schemas describing each data model may be found in the "schemas"
+subdirectory.
+
+Documentation describing this software may be found within the "doc" 
+directory. The following commands will build a new set of documentation:
+
+cd doc
+make html
+make latex
+cd build/latex
+make all-pdf
+
+After executing these commands you will find a reference manual in 
+"build/latex/miri_datamodels.pdf".
+
+See the LICENCE file for terms and conditions of use.

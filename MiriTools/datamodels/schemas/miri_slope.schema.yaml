@@ -1,0 +1,90 @@
+allOf:
+- $ref: miri_measured.schema.yaml
+- type: object
+  title: MIRI slope data
+  properties:
+    meta:
+      type: object
+      properties:
+        zeropt:
+          type: object
+          title: Information about the zero point image
+          properties:
+            units:
+              type: string
+              title: Units of the zero point image
+              fits_hdu: ZEROPT
+              fits_keyword: BUNIT
+        fiterr:
+          type: object
+          title: Information about the fit error array
+          properties:
+            units:
+              type: string
+              title: Units of the fit error array
+              fits_hdu: FITERR
+              fits_keyword: BUNIT
+        fit:
+          type: object
+          title: Information about the slope fit
+          properties:
+            npint:
+              type: integer
+              title: Number of integrations processed
+              fits_keyword: NPINT
+            nsfits:
+              type: integer
+              title: Frame number used to start slope fit
+              fits_keyword: NSFITS
+            nsfite:
+              type: integer
+              title: Frame number used to end slope fit
+              fits_keyword: NSFITE
+            highsat:
+              type: number
+              title: High saturation value used in fit
+              fits_keyword: HIGHSAT
+    data:
+      fits_hdu: SCI
+      datatype: float32
+      ndim: 3
+      axes: [integrations, rows, columns]
+      units: DN/s
+    err:
+      fits_hdu: ERR
+      units: DN/s
+    zeropt:
+      title: Zero point of fit
+      fits_hdu: ZEROPT
+      default: 0
+      ndim: 3
+      units: DN
+      datatype: float32
+    nreads:
+      title: Number of good frames used in fit
+      fits_hdu: NREADS
+      default: 0
+      ndim: 3
+      units: ''
+      datatype: int32
+    readsat:
+      title: Frame number of first saturated frame (-1 if none)
+      fits_hdu: READSAT
+      default: -1
+      ndim: 3
+      units: ''
+      datatype: int32
+    ngoodseg:
+      title: Number of good segments
+      fits_hdu: NGOODSEG
+      default: 1
+      ndim: 3
+      units: ''
+      datatype: int32
+    fiterr:
+      title: RMS error on fit
+      fits_hdu: FITERR
+      default: 0
+      ndim: 3
+      units: DN/s
+      datatype: float32

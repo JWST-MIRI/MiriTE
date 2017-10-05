@@ -1,0 +1,24 @@
+allOf:
+- $ref: miri_illumination.schema.yaml
+- type: object
+  title: MIRI illumination description for fringing model
+  properties:
+    meta:
+      type: object
+      properties:
+        direction:
+          type: object
+          title: Information about the direction array
+          properties:
+            units:
+              type: string
+              title: Units of the direction array
+              fits_hdu: INTENSITY
+              fits_keyword: BUNIT
+    direction:
+      title: The direction of the illumination
+      fits_hdu: DIRECTION
+      default: 0
+      units: degrees
+      axes: [layers, angles, rows, columns]
+      datatype: float32

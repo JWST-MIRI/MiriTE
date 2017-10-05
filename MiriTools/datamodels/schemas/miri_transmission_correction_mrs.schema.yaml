@@ -1,0 +1,72 @@
+allOf:
+- $ref: miri_core.schema.yaml
+- type: object
+  title: MIRI MRS transmission correction model
+  properties:
+    meta:
+      type: object
+      properties:
+        tracorr_table:
+          type: object
+          title: Information about the transmission correction table
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: ''
+              fits_hdu: TRA_CORR
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: micron
+              fits_hdu: TRA_CORR
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: micron
+              fits_hdu: TRA_CORR
+              fits_keyword: TUNIT3
+            tunit4:
+              type: string
+              title: Column 4 units
+              default: percent
+              fits_hdu: TRA_CORR
+              fits_keyword: TUNIT4
+            tunit5:
+              type: string
+              title: Column 5 units
+              default: percent
+              fits_hdu: TRA_CORR
+              fits_keyword: TUNIT5
+            tunit6:
+              type: string
+              title: Column 6 units
+              default: percent
+              fits_hdu: TRA_CORR
+              fits_keyword: TUNIT6
+            tunit7:
+              type: string
+              title: Column 7 units
+              default: percent
+              fits_hdu: TRA_CORR
+              fits_keyword: TUNIT7
+    tracorr_table:
+      title: Transmission correction table
+      fits_hdu: TRA_CORR
+      datatype:
+      - name: CHANNEL
+        datatype: int32
+      - name: WAVE_MIN
+        datatype: float64
+      - name: WAVE_MAX
+        datatype: float64
+      - name: T_WMIN_CENTRE
+        datatype: float64
+      - name: T_WMIN_EDGE
+        datatype: float64
+      - name: T_WMAX_CENTRE
+        datatype: float64
+      - name: T_WMAX_EDGE
+        datatype: float64

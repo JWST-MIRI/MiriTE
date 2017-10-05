@@ -1,0 +1,77 @@
+# MIRI Sensor Chip Assembly 494 + Focal Plane Module FPM S/N 104.
+#
+# Detector quantum efficiency (as modified by the detector AR coating)
+# as a function of wavelength in microns.
+#
+# Sources:
+#
+# (1) JPL D-46944, "MIRI Flight Focal Plane Module End Item Data Package
+#     (FPM EIDP)", 10 May 2010.
+# (2) "Focal Plane System Performance Status" by Mike Ressler,
+#     presented at the MIRI Test Team meeting - 28 June 2010
+# (3) Data file for MIRI MRS created by Kevin Lindsay and Chris Hanley
+#     (STScI) for ETC prototype, Sept 2010.
+#
+# Column 1: Wavelength (microns)
+# Column 2: Quantum efficiency (0-1)
+ 0.00	0.001
+ 2.00	0.306
+ 2.50	0.363
+ 3.00	0.286
+ 3.50	0.392
+ 4.00	0.322
+ 4.50	0.333
+ 5.00	0.405
+ 5.50	0.496
+ 6.00	0.542
+ 6.50	0.536
+ 7.00	0.480
+ 7.50	0.454
+ 8.00	0.476
+ 8.50	0.487
+ 9.00	0.497
+ 9.50	0.496
+10.00	0.528
+10.50	0.539
+11.00	0.545
+11.50	0.555
+12.00	0.574
+12.50	0.600
+13.00	0.604
+13.50	0.597
+14.00	0.650
+14.40	0.725
+14.50	0.725
+15.00	0.719
+15.50	0.705
+16.00	0.672
+16.50	0.691
+17.00	0.722
+17.50	0.688
+18.00	0.643
+18.50	0.637
+19.00	0.605
+19.50	0.602
+20.00	0.564
+20.50	0.576
+21.00	0.581
+21.50	0.603
+22.00	0.590
+22.50	0.583
+23.00	0.560
+23.50	0.527
+24.00	0.514
+24.50	0.473
+25.00	0.422
+25.50	0.373
+26.00	0.325
+26.50	0.268
+27.00	0.189
+27.50	0.137
+28.00	0.084
+28.50	0.060
+29.00	0.043
+29.50	0.028
+30.00	0.018
+30.50	0.001
+31.00	0.001

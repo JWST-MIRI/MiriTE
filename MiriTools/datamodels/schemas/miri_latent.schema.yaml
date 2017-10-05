@@ -1,0 +1,288 @@
+allOf:
+- $ref: miri_core.schema.yaml
+- type: object
+  title: MIRI detector latent decay model
+  properties:
+    meta:
+      type: object
+      properties:
+        latent1:
+          type: object
+          title: Information about the latent decay measurement
+          properties:
+            regime:
+              type: string
+              title: Exposure regime analyzed
+              fits_hdu: LATENT1
+              fits_keyword: LTREGIME
+            exposure:
+              type: number
+              title: ID of exposure analyzed
+              fits_hdu: LATENT1
+              fits_keyword: LTEXPID
+            background:
+              type: number
+              title: Average background in e/s/pixel
+              fits_hdu: LATENT1
+              fits_keyword: LTBACK
+            use_flag:
+              type: string
+              title: Flag indicating if this latent table is used.
+              enum: [Y, N]
+              default: N
+              fits_hdu: LATENT1
+              fits_keyword: LTUSED
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: ''
+              fits_hdu: LATENT1
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: s
+              fits_hdu: LATENT1
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: e/s/pixel
+              fits_hdu: LATENT1
+              fits_keyword: TUNIT3
+            tunit4:
+              type: string
+              title: Column 4 units
+              default: 1/s
+              fits_hdu: LATENT1
+              fits_keyword: TUNIT4
+            tunit5:
+              type: string
+              title: Column 5 units
+              default: s
+              fits_hdu: LATENT1
+              fits_keyword: TUNIT5
+        latent2:
+          type: object
+          title: Information about the latent decay measurement
+          properties:
+            regime:
+              type: string
+              title: Exposure regime analyzed
+              fits_hdu: LATENT2
+              fits_keyword: LTREGIME
+            exposure:
+              type: number
+              title: ID of exposure analyzed
+              fits_hdu: LATENT2
+              fits_keyword: LTEXPID
+            background:
+              type: number
+              title: Average background in e/s/pixel
+              fits_hdu: LATENT2
+              fits_keyword: LTBACK
+            use_flag:
+              type: string
+              title: Flag indicating if this latent table is used.
+              enum: [Y, N]
+              default: N
+              fits_hdu: LATENT2
+              fits_keyword: LTUSED
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: ''
+              fits_hdu: LATENT2
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: s
+              fits_hdu: LATENT2
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: e/s/pixel
+              fits_hdu: LATENT2
+              fits_keyword: TUNIT3
+            tunit4:
+              type: string
+              title: Column 4 units
+              default: 1/s
+              fits_hdu: LATENT2
+              fits_keyword: TUNIT4
+            tunit5:
+              type: string
+              title: Column 5 units
+              default: s
+              fits_hdu: LATENT2
+              fits_keyword: TUNIT5
+        latent3:
+          type: object
+          title: Information about the latent decay measurement
+          properties:
+            regime:
+              type: string
+              title: Exposure regime analyzed
+              fits_hdu: LATENT3
+              fits_keyword: LTREGIME
+            exposure:
+              type: number
+              title: ID of exposure analyzed
+              fits_hdu: LATENT3
+              fits_keyword: LTEXPID
+            background:
+              type: number
+              title: Average background in e/s/pixel
+              fits_hdu: LATENT3
+              fits_keyword: LTBACK
+            use_flag:
+              type: string
+              title: Flag indicating if this latent table is used.
+              enum: [Y, N]
+              default: N
+              fits_hdu: LATENT3
+              fits_keyword: LTUSED
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: ''
+              fits_hdu: LATENT3
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: s
+              fits_hdu: LATENT3
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: e/s/pixel
+              fits_hdu: LATENT3
+              fits_keyword: TUNIT3
+            tunit4:
+              type: string
+              title: Column 4 units
+              default: 1/s
+              fits_hdu: LATENT3
+              fits_keyword: TUNIT4
+            tunit5:
+              type: string
+              title: Column 5 units
+              default: s
+              fits_hdu: LATENT3
+              fits_keyword: TUNIT5
+        latent4:
+          type: object
+          title: Information about the latent decay measurement
+          properties:
+            regime:
+              type: string
+              title: Exposure regime analyzed
+              fits_hdu: LATENT4
+              fits_keyword: LTREGIME
+            exposure:
+              type: number
+              title: ID of exposure analyzed
+              fits_hdu: LATENT4
+              fits_keyword: LTEXPID
+            background:
+              type: number
+              title: Average background in e/s/pixel
+              fits_hdu: LATENT4
+              fits_keyword: LTBACK
+            use_flag:
+              type: string
+              title: Flag indicating if this latent table is used.
+              enum: [Y, N]
+              default: N
+              fits_hdu: LATENT4
+              fits_keyword: LTUSED
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: ''
+              fits_hdu: LATENT4
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: s
+              fits_hdu: LATENT4
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: e/s/pixel
+              fits_hdu: LATENT4
+              fits_keyword: TUNIT3
+            tunit4:
+              type: string
+              title: Column 4 units
+              default: 1/s
+              fits_hdu: LATENT4
+              fits_keyword: TUNIT4
+            tunit5:
+              type: string
+              title: Column 5 units
+              default: s
+              fits_hdu: LATENT4
+              fits_keyword: TUNIT5
+    latent1:
+      title: Latent decay table
+      fits_hdu: LATENT1
+      datatype:
+      - name: TYPE
+        datatype: [ascii, 16]
+      - name: T_OFFSET
+        datatype: float64
+      - name: DECAY_PEAK
+        datatype: float64
+      - name: DECAY_FREQ
+        datatype: float64
+      - name: TAU
+        datatype: float64
+    latent2:
+      title: Latent decay table
+      fits_hdu: LATENT2
+      datatype:
+      - name: TYPE
+        datatype: [ascii, 16]
+      - name: T_OFFSET
+        datatype: float64
+      - name: DECAY_PEAK
+        datatype: float64
+      - name: DECAY_FREQ
+        datatype: float64
+      - name: TAU
+        datatype: float64
+    latent3:
+      title: Latent decay table
+      fits_hdu: LATENT3
+      datatype:
+      - name: TYPE
+        datatype: [ascii, 16]
+      - name: T_OFFSET
+        datatype: float64
+      - name: DECAY_PEAK
+        datatype: float64
+      - name: DECAY_FREQ
+        datatype: float64
+      - name: TAU
+        datatype: float64
+    latent4:
+      title: Latent decay table
+      fits_hdu: LATENT4
+      datatype:
+      - name: TYPE
+        datatype: [ascii, 16]
+      - name: T_OFFSET
+        datatype: float64
+      - name: DECAY_PEAK
+        datatype: float64
+      - name: DECAY_FREQ
+        datatype: float64
+      - name: TAU
+        datatype: float64

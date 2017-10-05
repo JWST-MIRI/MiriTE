@@ -1,0 +1,89 @@
+The teams/miri directory contains software developed by the MIRI 
+European Consortium software team. The software contained here is 
+designed to support the creation and management of the MIRI
+calibration data products, support the development of MIRI
+pipeline algorithms and support the development of STScI JWST
+pipeline software (while not being part of that pipeline software).
+
+The software depends on the JWST infrastructure libraries and STScI
+ASDF package.
+
+CONTENTS
+--------
+
+MiriTools
+~~~~~~~~~
+Tools and utilities which are used by many MIRI applications.
+
+miri.tools - A collection of general purpose tools and utilities
+
+miri.datamodels
+           - MIRI data models, including two collections
+   .cdp    - Data models supporting MIRI Calibration Data Products
+   .sim    - Data models supporting MIRI simulators
+
+MiriSimulators
+~~~~~~~~~~~~~~
+A collection of MIRI data simulators.
+
+miri.simulators
+             - A collection of miri simulators, including
+   .mirimsim - The MIRI imager simulator (MirImSim)
+   .scasim   - The MIRI Sensor Chip Assembly simulator (SCASim)
+
+
+The top-level folder contains the following top level tools, utilities
+and documents:
+
+README       - Read this file first.
+LICENCE      - Terms and conditions of use.
+setup.py     - Python setup file used to build the MIRI packages
+setup.cfg    - Configuration file for commonly used utilities.
+miri_installation_check.py
+             - Script which checks all packages are installed correctly.
+
+
+Each of the package directories also contain the following files:
+
+__init__.py    - Initialisation script for a Python source code
+                 directory. Also contains a package description.
+svn_version.py - Used by SVN to indicate the latest version numbers.
+
+The top level doc and lib directories contain documentation and 
+utilities connected with the installation of the MIRI software itself.
+
+Version control information within each package is shared between the
+_init__.py file and the documentation configuration file,
+doc/source/conf.py
+
+
+STANDARD DIRECTORY NAMES
+------------------------
+Software is stored within this repository in a standard directory tree 
+consisting of these directories:
+
+data     - Data used by the package
+doc      - Documentation for the package
+doc/source  - Source directory containing release notes etc...
+doc/source/reference  - Contains additional documents referenced from source
+scripts  - Scripts and application programs for the package
+tests    - Unit tests for the package
+
+
+INSTALLATION
+------------
+The MIRI software may be built and installed with the command
+
+   python setup.py install
+
+This is normally done as part of the MIRICLE installation script.
+
+
+TESTING
+-------
+The unit tests included with the MIRI software can be run from the
+teams/miri directory using nosetests or pytests by running either of
+the scripts
+
+   run_nosetests.sh
+   run_pytests.sh

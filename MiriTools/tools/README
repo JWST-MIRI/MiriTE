@@ -1,0 +1,17 @@
+The miri.tools package contains a collection of general purpose tools 
+and utilities software developed by the MIRI European Consortium 
+software team.
+
+Documentation describing this software may be found within the "doc" 
+directory. The following commands will build a new set of documentation:
+
+cd doc
+make html
+make latex
+cd build/latex
+make all-pdf
+
+After executing these commands you will find a reference manual in 
+"build/latex/miri_tools.pdf".
+
+See the LICENCE file for terms and conditions of use.

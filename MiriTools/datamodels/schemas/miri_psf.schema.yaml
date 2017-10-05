@@ -1,0 +1,40 @@
+allOf:
+- $ref: miri_measured.schema.yaml
+- type: object
+  title: JWST/MIRI point spread function
+  properties:
+    meta:
+      type: object
+      properties:
+        wavelength_center:
+          type: number
+          title: Central wavelength in microns
+          fits_keyword: WAVECENT
+        pixel_size:
+          type: number
+          title: Pixel size in microns
+          fits_keyword: PIXSIZE
+        xfield:
+          type: number
+          title: X field position (deg) at which all PSFs are valid
+          fits_keyword: XFIELD
+        yfield:
+          type: number
+          title: Y field position (deg) at which all PSFs are valid
+          fits_keyword: YFIELD
+        pupil_grid:
+          type: number
+          title: Pupil grid size
+          fits_keyword: PUP_GRID
+        pupil_diameter:
+          type: number
+          title: Entrance pupil diameter (mm)
+          fits_keyword: DIAM
+        image_grid_size:
+          type: number
+          title: Original image grid size
+          fits_keyword: IM_GRID
+        normalized:
+          type: string
+          title: Are these data normalized (Y/N)?
+          fits_keyword: NORM

@@ -1,0 +1,45 @@
+allOf:
+- $ref: miri_measured.schema.yaml
+- type: object
+  title: MIRI MRS flux conversion model
+  properties:
+    meta:
+      type: object
+      properties:
+        srf_at_reference:
+          type: number
+          title: Spectral response fn at ref wavelength in (DN/s)/Jy
+          fits_keyword: REFSRF
+        srf_error:
+          type: number
+          title: Uncertainty in REFSRF in (DN/s)/Jy
+          fits_keyword: REFERR
+        srf_wavelength:
+          type: number
+          title: Reference wavelength for REFSRF in microns
+          fits_keyword: REFWAVEL
+        pixsiz:
+          type: object
+          title: Information about the pixel size array
+          properties:
+            units:
+              type: string
+              title: Units of the pixel size array
+              fits_hdu: PIXSIZ
+              fits_keyword: BUNIT
+    data:
+      title: Flux conversion data
+      fits_hdu: SCI
+      axes: [wavelength, rows, columns]
+      units: DN/s/mJy/pixel
+    err:
+      fits_hdu: ERR
+      axes: [wavelength, rows, columns]
+      units: DN/s/mJy/pixel
+    pixsiz:
+      title: Pixel size data
+      fits_hdu: PIXSIZ
+      ndim: 2
+      axes: [rows, columns]
+      units: arcsec^2
+

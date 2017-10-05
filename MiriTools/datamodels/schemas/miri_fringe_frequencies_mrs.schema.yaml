@@ -1,0 +1,48 @@
+allOf:
+- $ref: miri_core.schema.yaml
+- type: object
+  title: MIRI MRS fringe frequencies model
+  properties:
+    meta:
+      type: object
+      properties:
+        fringefreq_table:
+          type: object
+          title: Information about the fringe frequencies table
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: ''
+              fits_hdu: FRINGE_FREQ
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: cm^-1
+              fits_hdu: FRINGE_FREQ
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: cm^-1
+              fits_hdu: FRINGE_FREQ
+              fits_keyword: TUNIT3
+            tunit4:
+              type: string
+              title: Column 4 units
+              default: ''
+              fits_hdu: FRINGE_FREQ
+              fits_keyword: TUNIT4
+    fringefreq_table:
+      title: Fringe frequencies table
+      fits_hdu: FRINGE_FREQ
+      datatype:
+      - name: sub_band
+        datatype: [ascii, 16]
+      - name: wavenumber
+        datatype: float64
+      - name: deltawavenumber
+        datatype: float64
+      - name: maxamplitude
+        datatype: float64

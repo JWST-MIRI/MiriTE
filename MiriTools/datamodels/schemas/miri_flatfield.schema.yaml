@@ -1,0 +1,10 @@
+allOf:
+- type: object
+  properties:
+    meta:
+      $ref: miri_metadata.schema.yaml
+- type: object
+  properties:
+    meta:
+      $ref: miri_metadata_dataerr.schema.yaml
+- $ref: http://jwst.stsci.edu/schemas/flat.schema.yaml

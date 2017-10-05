@@ -1,0 +1,39 @@
+allOf:
+- type: object
+  properties:
+    meta:
+      $ref: miri_metadata.schema.yaml
+- type: object
+  properties:
+    meta:
+      $ref: miri_metadata_dataerr.schema.yaml
+- $ref: dark3D4D.schema.yaml
+- type: object
+  title: MIRI dark calibration data
+  properties:
+    meta:
+      type: object
+      properties:
+        integration_number:
+          type: number
+          title: Integration for which this dark is valid
+          fits_keyword: INTNUM
+        fitted_after_frame:
+          type: number
+          title: Frame number beyond which the dark is fitted
+          fits_keyword: DARKFIT
+        fiterr:
+          type: object
+          title: Information about the total error on fit array
+          properties:
+            units:
+              type: string
+              title: Units of the fit error array
+              fits_hdu: FITERR
+              fits_keyword: BUNIT
+    fiterr:
+      title: Total error on fit
+      fits_hdu: FITERR
+      ndim: 2
+      units: DN
+      datatype: float32

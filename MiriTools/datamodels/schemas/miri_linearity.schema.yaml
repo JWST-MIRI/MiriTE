@@ -1,0 +1,50 @@
+allOf:
+- $ref: miri_measured.schema.yaml
+- type: object
+  title: MIRI nonlinearity measurement
+  properties:
+    meta:
+      type: object
+      properties:
+        data:
+          type: object
+          title: Information about the data array
+          properties:
+            units:
+              type: string
+              title: Units of the data array
+              fits_hdu: COEFFS
+              fits_keyword: BUNIT
+        fit:
+          type: object
+          title: Information about the fit used to make the calibration
+          properties:
+            reference:
+              type: string
+              title: Reference to description of fit
+              fits_keyword: FITREF
+            model:
+              type: string
+              title: Model for fit - c.f. jwst_lib.modeling
+              fits_keyword: FITMODEL
+            order:
+              type: integer
+              title: Order of fit
+              fits_keyword: ORDER
+            order_low:
+              type: integer
+              title: Order of fit for linear region
+              fits_keyword: LORDER
+            etolerance:
+              type: number
+              title: Error limit on Yerror plane
+              fits_keyword: ETOL
+            rejected_frames:
+              type: integer
+              title: Number of frames rejected
+              fits_keyword: IREJECT
+    data:
+      fits_hdu: COEFFS
+      ndim: 3
+      units: ''
+      datatype: float32

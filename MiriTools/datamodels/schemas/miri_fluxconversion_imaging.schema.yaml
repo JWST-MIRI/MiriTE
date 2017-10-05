@@ -1,0 +1,40 @@
+allOf:
+- $ref: miri_core.schema.yaml
+- type: object
+  title: MIRI imaging flux conversion model
+  properties:
+    meta:
+      type: object
+      properties:
+        flux_table:
+          type: object
+          title: Information about the flux_table table
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: ''
+              fits_hdu: FLUX
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: '(Jy/arcsec2)/(DN/s/pixel))'
+              fits_hdu: FLUX
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: '(Jy/arcsec2)/(DN/s/pixel))'
+              fits_hdu: FLUX
+              fits_keyword: TUNIT3
+    flux_table:
+      title: Imaging photometric flux conversion table
+      fits_hdu: FLUX
+      datatype:
+      - name: FILTER
+        datatype: [ascii, 16]
+      - name: FACTOR
+        datatype: float64
+      - name: UNCERTAINTY
+        datatype: float64

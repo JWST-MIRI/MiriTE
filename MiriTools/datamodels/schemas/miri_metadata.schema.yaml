@@ -1,0 +1,195 @@
+type: object
+title: Top Level MIRI Metadata
+properties:
+  date:
+    anyOf:
+      - $ref: http://stsci.edu/schemas/asdf/time/time-1.0.0
+      - type: string
+    title: Date this file was created (UTC)
+    fits_keyword: DATE
+  origin:
+    title: Organization responsible for creating file
+    type: string
+    fits_keyword: ORIGIN
+  flight_model_software_version:
+    type: string
+    title: Version of MIRI flight software used
+    fits_keyword: MSWVER
+  filename_original:
+    type: string
+    title: Original name of the file
+    fits_keyword: ORIGFILE
+  filetype:
+    title: Type of data in the file
+    type: string
+    fits_keyword: FILETYPE
+  model_type:
+    title: Type of data model
+    type: string
+    fits_keyword: DATAMODL
+  version:
+    type: string
+    title: Version number of data found in file
+    fits_keyword: VERSION
+  observer:
+    type: string
+    title: Person who acquired or requested the data
+    fits_keyword: OBSERVER
+  creator:
+    type: string
+    title: Software which created the data
+    fits_keyword: CREATOR
+  telescope:
+    type: string
+    title: The telescope used to acquire the data
+    default: JWST
+    enum: [JWST]
+    fits_keyword: TELESCOP
+  object:
+    type: string
+    title: Name of object being observed
+    comment: Parallels the TARGNAME keyword. Remove?
+    fits_keyword: OBJECT
+  coordinates:
+    type: object
+    title: Information about the coordinates in the file
+    properties:
+      reference_frame:
+        type: string
+        title: Name of the reference frame of equatorial or ecliptic coordinates
+        comment: Some MIRI CDPs have no coordinate frame.
+        fits_keyword: RADESYS
+        enum: [ICRS, '']
+  instrument:
+    type: object
+    title: Information about the instrument and detectors
+    properties:
+      name:
+        type: string
+        title: Instrument used to acquire data
+        default: MIRI
+        enum: [MIRI]
+        fits_keyword: INSTRUME
+      model:
+        type: string
+        title: Instrument model name
+        enum: [FM, VM, JPL, ANY]
+        fits_keyword: MODELNAM
+      filter:
+        type: string
+        title: Filter used by the instrument (imaging)
+        enum: [F560W, F770W, F1000W, F1130W, F1280W, F1500W, F1800W, F2100W,
+               F2550W, F2550WR, F1065C, F1140C, F1550C, F2300C, P750L, FND,
+               OPAQUE, ANY, N/A, '']
+        fits_keyword: FILTER
+      ccc_pos:
+        type: string
+        title: MIRI CCC position.
+        enum: [OPEN, CLOSED, LOCKED]
+        fits_keyword: CCC_POS
+      calibmode:
+        type: string
+        title: Calibration source operating mode
+        fits_keyword: CALMODE
+      channel:
+        type: string
+        title: MIRI channel relevant (MRS)
+        enum: ['1', '2', '3', '4', '12', '34', ANY, N/A, '']
+        fits_keyword: CHANNEL
+      band:
+        type: string
+        title: MIRI sub-channel relevant (MRS)
+        enum: [SHORT, MEDIUM, LONG, SHORT-MEDIUM, SHORT-LONG, MEDIUM-SHORT,
+               MEDIUM-LONG, LONG-SHORT, LONG-MEDIUM, ANY, N/A, '']
+        fits_keyword: BAND
+      ice_side_status:
+        type: string
+        title: MIRI ICE nominal side status
+        enum: ['ON', 'OFF']
+        fits_keyword: ICE_NOM
+      fpe_active_side:
+        type: string
+        title: MIRI FPE Active Side
+        enum: [A, B]
+        fits_keyword: FPE_SIDE
+      deck_temperature:
+        type: number
+        title: MIRI Deck Temperature (K)
+        fits_keyword: DECKTEMP
+      detector_temperature:
+        type: number
+        title: Detector temperature (K)
+        fits_keyword: DETTEMP
+      detector_settings:
+        type: string
+        title: Detector settings used
+        enum: [RAL1, JPL1, JPL2, JPL3, RUN1, RUN2, RUN3, RUN4, RUN5, RUN6,
+               ANY, N/A]
+      detector:
+        type: string
+        title: Name of detector used to acquire the data
+        comment: IM, LW, SW are for backwards compatibility
+        enum: [IC, MIRIMAGE, MIRIFULONG, MIRIFUSHORT,
+               IM, LW, SW, JPL, ANY]
+        fits_keyword: DETECTOR
+      sca_id:
+        type: string
+        title: Sensor chip assembly ID
+        fits_keyword: SCA_ID
+  subarray:
+    type: object
+    title: MIRI Subarray parameters
+    properties:
+      name:
+        type: string
+        title: Subarray used
+        enum: [FULL, MASK1140, MASK1550, MASK1065, MASKLYOT, BRIGHTSKY,
+               SUB256, SUB128, SUB64, SLITLESSPRISM, GENERIC, '']
+        fits_keyword: SUBARRAY
+      fastaxis:
+        type: integer
+        title: Fast readout axis direction
+        default: 1
+        fits_keyword: FASTAXIS
+      slowaxis:
+        type: integer
+        title: Slow readout axis direction
+        default: 2
+        fits_keyword: SLOWAXIS
+  exposure:
+    type: object
+    title: Information related to the exposure
+    properties:
+      type:
+        type: string
+        title: Type of data in the exposure
+        enum: [MIR_IMAGE, MIR_TACQ, MIR_LYOT, MIR_4QPM, MIR_LRS-FIXEDSLIT,
+               MIR_LRS-SLITLESS, MIR_MRS, MIR_DARK, MIR_FLAT-IMAGE,
+               MIR_FLATIMAGE, MIR_FLAT-MRS, MIR_FLATMRS, MIR_CORONCAL, N/A]
+        fits_keyword: EXP_TYPE
+      nframes:
+        type: integer
+        title: Number of frames coadded in a group
+        default: 1
+        fits_keyword: NFRAMES
+      reset_time:
+        type: number
+        title: Width of reset pulse for SCA (cycles)
+        fits_keyword: ROWRSETS
+      rpc_delay:
+        type: number
+        title: RPC delay time (cycles)
+        fits_keyword: RPCDELAY
+      frame_resets:
+        type: integer
+        title: Number of extra frame resets for SCA
+        comment: Has this keyword been replaced by NRESETS?
+        fits_keyword: FRMRSETS
+      groups_averaged:
+        type: integer
+        title: Number of groups averaged
+        fits_keyword: GRPAVG
+      integrations_averaged:
+        type: integer
+        title: Number of integrations averaged
+        fits_keyword: INTAVG

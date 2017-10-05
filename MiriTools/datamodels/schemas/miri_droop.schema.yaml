@@ -1,0 +1,32 @@
+allOf:
+- $ref: miri_core.schema.yaml
+- type: object
+  title: MIRI detector droop model
+  properties:
+    meta:
+      type: object
+      properties:
+        droop_table:
+          type: object
+          title: Information about the droop table
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: ''
+              fits_hdu: DROOP
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: ''
+              fits_hdu: DROOP
+              fits_keyword: TUNIT2
+    droop_table:
+      title: Droop coupling constants table
+      fits_hdu: DROOP
+      datatype:
+      - name: COUPLING_CONSTANT
+        datatype: float64
+      - name: UNCERTAINTY
+        datatype: float64

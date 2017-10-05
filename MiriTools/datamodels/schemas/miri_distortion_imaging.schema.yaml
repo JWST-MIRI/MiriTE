@@ -1,0 +1,180 @@
+allOf:
+- $ref: miri_core.schema.yaml
+- type: object
+  title: MIRI imaging distortion coefficients
+  properties:
+    meta:
+      type: object
+      properties:
+        fit:
+          type: object
+          title: Information about the fit used to make the calibration
+          properties:
+            reference:
+              type: string
+              title: Reference to description of fit
+              fits_keyword: FITREF
+            model:
+              type: string
+              title: Model for fit - c.f. jwst_lib.modeling
+              fits_keyword: FITMODEL
+        bmatrix:
+          type: object
+          title: Information about the B matrix
+          properties:
+            units:
+              type: string
+              title: Units of B coefficients
+              fits_hdu: B matrix
+              fits_keyword: BUNIT
+        amatrix:
+          type: object
+          title: Information about the A matrix
+          properties:
+            units:
+              type: string
+              title: Units of A coefficients
+              fits_hdu: A matrix
+              fits_keyword: BUNIT
+        tmatrix:
+          type: object
+          title: Information about the T matrix
+          properties:
+            units:
+              type: string
+              title: Units of T coefficients
+              fits_hdu: T matrix
+              fits_keyword: BUNIT
+        mmatrix:
+          type: object
+          title: Information about the M matrix
+          properties:
+            units:
+              type: string
+              title: Units of M coefficients
+              fits_hdu: M matrix
+              fits_keyword: BUNIT
+        bimatrix:
+          type: object
+          title: Information about the inverted B matrix
+          properties:
+            units:
+              type: string
+              title: Units of BI coefficients
+              fits_hdu: BI matrix
+              fits_keyword: BUNIT
+        aimatrix:
+          type: object
+          title: Information about the inverted A matrix
+          properties:
+            units:
+              type: string
+              title: Units of AI coefficients
+              fits_hdu: AI matrix
+              fits_keyword: BUNIT
+        timatrix:
+          type: object
+          title: Information about the inverted T matrix
+          properties:
+            units:
+              type: string
+              title: Units of TI coefficients
+              fits_hdu: TI matrix
+              fits_keyword: BUNIT
+        mimatrix:
+          type: object
+          title: Information about the inverted M matrix
+          properties:
+            units:
+              type: string
+              title: Units of MI coefficients
+              fits_hdu: MI matrix
+              fits_keyword: BUNIT
+        boresight_offsets:
+          type: object
+          title: Information about the Boresight offsets
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: ''
+              fits_hdu: Boresight offsets
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: pixels
+              fits_hdu: Boresight offsets
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: pixels
+              fits_hdu: Boresight offsets
+              fits_keyword: TUNIT3
+    bmatrix:
+      title: B matrix of distortion coefficients
+      fits_hdu: B matrix
+      default: 0
+      ndim: 2
+      units: mm^(1-ij)
+      datatype: float64
+    amatrix:
+      title: A matrix of distortion coefficients
+      fits_hdu: A matrix
+      default: 0
+      ndim: 2
+      units: mm^(1-ij)
+      datatype: float64
+    tmatrix:
+      title: T matrix of distortion coefficients
+      fits_hdu: T matrix
+      default: 0
+      ndim: 2
+      units: mm arcmin^-1
+      datatype: float64
+    mmatrix:
+      title: M matrix of distortion coefficients
+      fits_hdu: M matrix
+      default: 0
+      ndim: 2
+      units: pixel mm^-1
+      datatype: float64
+    bimatrix:
+      title: Inverted B matrix of distortion coefficients
+      fits_hdu: BI matrix
+      default: 0
+      ndim: 2
+      units: mm^-(1-ij)
+      datatype: float64
+    aimatrix:
+      title: Inverted A matrix of distortion coefficients
+      fits_hdu: AI matrix
+      default: 0
+      ndim: 2
+      units: mm^-(1-ij)
+      datatype: float64
+    timatrix:
+      title: Inverted T matrix of distortion coefficients
+      fits_hdu: TI matrix
+      default: 0
+      ndim: 2
+      units: arcmin mm^-1
+      datatype: float64
+    mimatrix:
+      title: Inverted M matrix of distortion coefficients
+      fits_hdu: MI matrix
+      default: 0
+      ndim: 2
+      units: mm pixel^-1
+      datatype: float64
+    boresight_offsets:
+      title: Boresight offsets table
+      fits_hdu: Boresight offsets
+      datatype:
+      - name: FILTER
+        datatype: [ascii, 16]
+      - name: COL_OFFSET
+        datatype: float64
+      - name: ROW_OFFSET
+        datatype: float64

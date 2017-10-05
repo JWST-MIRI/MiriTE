@@ -1,0 +1,89 @@
+allOf:
+- $ref: miri_psf.schema.yaml
+- type: object
+  title: JWST/MIRI MRS point spread function
+  properties:
+    meta:
+      type: object
+      properties:
+        crpix1:
+          type: number
+          title: Reference pixel for CRVAL1
+          fits_hdu: SCI
+          fits_keyword: CRPIX1
+        crval1:
+          type: number
+          title: Value at CRPIX1
+          fits_hdu: SCI
+          fits_keyword: CRVAL1
+        cdelt1:
+          type: number
+          title: X-axis step size
+          fits_hdu: SCI
+          fits_keyword: CDELT1
+        ctype1:
+          type: string
+          title: X-axis type
+          fits_hdu: SCI
+          fits_keyword: CTYPE1
+        cunit1:
+          type: string
+          title: X-axis unit
+          fits_hdu: SCI
+          fits_keyword: CUNIT1
+        crpix2:
+          type: number
+          title: Reference pixel for CRVAL2
+          fits_hdu: SCI
+          fits_keyword: CRPIX2
+        crval2:
+          type: number
+          title: Value at CRPIX2
+          fits_hdu: SCI
+          fits_keyword: CRVAL2
+        cdelt2:
+          type: number
+          title: Y-axis step size
+          fits_hdu: SCI
+          fits_keyword: CDELT2
+        ctype2:
+          type: string
+          title: Y-axis type
+          fits_hdu: SCI
+          fits_keyword: CTYPE2
+        cunit2:
+          type: string
+          title: Y-axis unit
+          fits_hdu: SCI
+          fits_keyword: CUNIT2
+        crpix3:
+          type: number
+          title: Reference pixel for CRVAL3
+          fits_hdu: SCI
+          fits_keyword: CRPIX3
+        crval3:
+          type: number
+          title: Value at CRPIX3
+          fits_hdu: SCI
+          fits_keyword: CRVAL3
+        cdelt3:
+          type: number
+          title: Z-axis step size
+          fits_hdu: SCI
+          fits_keyword: CDELT3
+        ctype3:
+          type: string
+          title: Z-axis type
+          fits_hdu: SCI
+          fits_keyword: CTYPE3
+        cunit3:
+          type: string
+          title: Z-axis unit
+          fits_hdu: SCI
+          fits_keyword: CUNIT3
+    data:
+      title: PSF data
+      fits_hdu: SCI
+      ndim: 3
+      axes: [wavelength, rows, columns]
+      units: ''

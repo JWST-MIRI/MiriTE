@@ -1,0 +1,88 @@
+allOf:
+- $ref: miri_core.schema.yaml
+- type: object
+  title: MIRI MRS aperture correction model
+  properties:
+    meta:
+      type: object
+      properties:
+        tracorr_table:
+          type: object
+          title: Information about the aperture correction table
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: micron
+              fits_hdu: APER_CORR
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: ''
+              fits_hdu: APER_CORR
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: arcsec
+              fits_hdu: APER_CORR
+              fits_keyword: TUNIT3
+            tunit4:
+              type: string
+              title: Column 4 units
+              default: arcsec
+              fits_hdu: APER_CORR
+              fits_keyword: TUNIT4
+            tunit5:
+              type: string
+              title: Column 5 units
+              default: arcsec
+              fits_hdu: APER_CORR
+              fits_keyword: TUNIT5
+            tunit6:
+              type: string
+              title: Column 6 units
+              default: ''
+              fits_hdu: APER_CORR
+              fits_keyword: TUNIT6
+            tunit7:
+              type: string
+              title: Column 7 units
+              default: deg
+              fits_hdu: APER_CORR
+              fits_keyword: TUNIT7
+            tunit8:
+              type: string
+              title: Column 8 units
+              default: ''
+              fits_hdu: APER_CORR
+              fits_keyword: TUNIT8
+            tunit9:
+              type: string
+              title: Column 9 units
+              default: ''
+              fits_hdu: APER_CORR
+              fits_keyword: TUNIT9
+    apercorr_table:
+      title: Aperture correction table
+      fits_hdu: APER_CORR
+      datatype:
+      - name: wavelength
+        datatype: float64
+      - name: solution
+        datatype: [ascii,16]
+      - name: a_aperture
+        datatype: float64
+      - name: a_annulus_in
+        datatype: float64
+      - name: a_annulus_out
+        datatype: float64
+      - name: a_over_b
+        datatype: float64
+      - name: pos_angle
+        datatype: float64
+      - name: aper_corr
+        datatype: float64
+      - name: aper_corr_err
+        datatype: float64

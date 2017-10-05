@@ -1,0 +1,49 @@
+# MIRI Focal Plane Module FPM S/N 106.
+#
+# Detector dark current in electrons per second as a function of
+# detector temperature in K.
+#
+# Sources:
+#
+# (1) JPL D-46944, "MIRI Flight Focal Plane Module End Item Data Package
+#     (FPM EIDP)", 10 May 2010.
+# (2) "Focal Plane System Performance Status" by Mike Ressler,
+#     presented at the MIRI Test Team meeting - 28 June 2010
+# NOTE: Readings were taken from the graphs presented. Please replace
+# with the actual values measured. Values at high temperatures are
+# extrapolated assuming log(dark current) scales linearly with -1/T.
+#
+# Column 1: Temperature (K)
+# Column 2: Dark current (electrons/s)
+ 5.00    0.08
+ 5.25    0.07
+ 5.50    0.055
+ 5.75    0.07
+ 6.00    0.08
+ 6.25    0.09
+ 6.50    0.1
+ 6.75    0.12
+ 7.00    0.46
+ 7.25    1.60
+ 7.50    4.94
+ 7.75   14.4
+ 8.00   39.0
+ 8.25  100.0
+ 8.50  245.0
+ 8.75  566.0
+ 9.00  1.25e3
+ 9.25  2.64e3
+ 9.50  5.35e3
+ 9.75  1.05e4
+10.00  1.98e4
+10.25  3.64e4
+10.50  6.49e4
+10.75  1.13e5
+11.00  1.91e5
+11.25  3.12e5
+11.50  5.10e5
+11.75  8.08e5
+12.00  1.26e6
+13.00  6.196e6
+14.00  2.433e7
+15.00  7.960e7

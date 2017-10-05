@@ -1,0 +1,22 @@
+allOf:
+- $ref: miri_core.schema.yaml
+- type: object
+  title: Basic MIRI data
+  properties:
+    meta:
+      data:
+        type: object
+        title: Information about the data array
+        properties:
+          units:
+            type: string
+            title: Units of the data array
+            fits_hdu: SCI
+            fits_keyword: BUNIT
+    data:
+      title: The science data
+      fits_hdu: SCI
+      default: 0
+      units: ''
+      axes: [hypercubes, cubes, planes, rows, columns]
+      datatype: float32

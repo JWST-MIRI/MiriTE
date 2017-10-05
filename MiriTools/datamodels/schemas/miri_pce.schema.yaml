@@ -1,0 +1,58 @@
+allOf:
+- $ref: miri_core.schema.yaml
+- type: object
+  title: MIRI photon conversion efficiency model
+  properties:
+    meta:
+      type: object
+      properties:
+        pce_table:
+          type: object
+          properties:
+            tunit1:
+              type: string
+              title: Units of column 1
+              default: micron
+              fits_hdu: DATA_TABLE
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Units of column 2
+              default: fraction
+              fits_hdu: DATA_TABLE
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Units of column 2
+              default: 'el/photon'
+              fits_hdu: DATA_TABLE
+              fits_keyword: TUNIT3
+        etc:
+          type: object
+          properties:
+            filename:
+              type: string
+              title: ETC file name
+              fits_keyword: ETCNAME
+            component:
+              type: string
+              title: ETC component name
+              fits_keyword: COMPNAME
+            litref:
+              type: string
+              title: ETC literary reference
+              fits_keyword: LITREF
+            system:
+              type: string
+              title: Is data intended for use in ETC?
+              fits_keyword: SYSTEM
+    pce_table:
+      title: Photon conversion efficiency table
+      fits_hdu: DATA_TABLE
+      datatype:
+      - name: WAVELENGTH
+        datatype: float64
+      - name: EFFICIENCY
+        datatype: float64
+      - name: CONVERSION
+        datatype: float64

@@ -1,0 +1,76 @@
+# An example of a MIRI quantum efficiency measuremnent.
+#
+# It is useful to include a reference for the source of the
+# measurements (e.g. manufacturer's data or published flight model
+# test) in this header.
+#
+# It is recommended that the file be named so as to identify the
+# SCA ID of the detector described (e.g. qe_measurement493.txt,
+# qe_measurement494.txt or qe_measurement495.txt).
+#
+# Column 1: Wavelength (microns)
+# Column 2: Quantum efficiency (0-1)
+ 0.00 0.110
+ 0.50 0.135
+ 1.00 0.169
+ 1.50 0.185
+ 2.00 0.271
+ 2.50 0.207
+ 3.00 0.191
+ 3.50 0.220
+ 4.00 0.270
+ 4.50 0.334
+ 5.00 0.387
+ 5.50 0.461
+ 6.00 0.501
+ 6.50 0.572
+ 7.00 0.567
+ 7.50 0.594
+ 8.00 0.613
+ 8.50 0.624
+ 9.00 0.618
+ 9.50 0.602
+10.00 0.611
+10.50 0.633
+11.00 0.585
+11.50 0.576
+12.00 0.568
+12.50 0.553
+13.00 0.582
+13.50 0.559
+14.00 0.580
+14.40 0.641
+14.50 0.636
+15.00 0.652
+15.50 0.620
+16.00 0.583
+16.50 0.622
+17.00 0.629
+17.50 0.635
+18.00 0.599
+18.50 0.608
+19.00 0.583
+19.50 0.575
+20.00 0.587
+20.50 0.578
+21.00 0.550
+21.50 0.584
+22.00 0.595
+22.50 0.586
+23.00 0.566
+23.50 0.537
+24.00 0.551
+24.50 0.502
+25.00 0.445
+25.50 0.407
+26.00 0.341
+26.50 0.283
+27.00 0.204
+27.50 0.149
+28.00 0.082
+28.50 0.039
+29.00 0.038
+29.50 0.020
+30.00 0.012
+30.50 0.001
+31.00 0.001

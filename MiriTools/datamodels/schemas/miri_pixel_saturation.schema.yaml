@@ -1,0 +1,34 @@
+allOf:
+- type: object
+  properties:
+    meta:
+      $ref: miri_metadata.schema.yaml
+- type: object
+  properties:
+    meta:
+      $ref: miri_metadata_dataerr.schema.yaml
+- $ref: http://jwst.stsci.edu/schemas/saturation.schema.yaml
+- type: object
+  title: MIRI pixel saturation calibration data
+  properties:
+    meta:
+      type: object
+      properties:
+        sat_tolerance:
+          type: number
+          title: Saturation tolerance for 2pt difference
+          fits_keyword: SATT2PT
+        sat_lower:
+          type: number
+          title: Lower limit on pixel saturation
+          fits_keyword: SATL
+        sat_median:
+          type: number
+          title: Median saturation
+          fits_keyword: SATMED
+    err:
+      title: Saturation threshold error
+      fits_hdu: ERR
+      default: 0.0
+      units: ''
+      datatype: float32
