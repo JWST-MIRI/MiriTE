@@ -36,6 +36,9 @@ cdplib:
 cdp:
     Contains all the MIRI Calibration Data products, as listed below.
 
+miri_aperture_correction_model:
+    MIRI aperture correction data.
+
 miri_badpixel_model:
     MIRI bad pixel data.
 
@@ -43,7 +46,7 @@ miri_dark_reference_model:
     MIRI dark reference data.
 
 miri_distortion_model:
-    MIRI distortion coefficients.
+    MIRI distortion models.
     
 miri_droop_model:
     MIRI droop calibration information.
@@ -54,32 +57,44 @@ miri_flatfield_model:
 miri_fluxconversion_model:
     MIRI flux conversion model.
     
+miri_fringe_frequencies_model:
+    MIRI fringe frequencies data.
+    
 miri_gain_model:
     MIRI amplifier gain information
     
 miri_ipc_model:
-    MIRI ipc deconvolution model
+    MIRI ipc deconvolution model.
   
 miri_jump_model:
-    MIRI jump detection information
+    MIRI jump detection information.
+    
+miri_lastframe_model:
+    MIRI last frame correction model.
     
 miri_latent_model:
     MIRI latent calibration information.
-    
-miri_mrs_d2c_model:
-    MIRI MRS distortion model.
 
 miri_linearity_model:
-    MIRI linearity correction coefficients
+    MIRI linearity correction coefficients.
+
+miri_pce_model:
+    MIRI Photometric Conversion Efficiency model (used by the ETC).
     
+miri_photometric_models:
+    MIRI photometric conversion models (used by the pipeline).
+
 miri_pixel_saturation_model:
     MIRI pixel saturation data
 
-miri_psf_model:
+miri_psf_models:
     JWST/MIRI point-spread-function data.
 
 miri_telescope_emission_model:
     JWST/MIRI telescope emission data.
+
+miri_transmission_correction_model:
+    MIRI tranmission correction data.
 
 miri_wavelength_calibration_model:
     MIRI wavelength calibration coefficients
