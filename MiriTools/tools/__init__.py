@@ -19,7 +19,7 @@ Available modules
 filesearching:
     File searching utilities.
 
-miri.tools:
+miriplot:
     Plotting utilities.
 
 Scripts
