@@ -12,4 +12,5 @@
 nosetests
 #
 # Reverse the removal of the __init__.py.
-svn revert __init__.py
+#svn revert __init__.py
+git checkout -- __init__.py
