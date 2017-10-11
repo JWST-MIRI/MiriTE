@@ -282,7 +282,7 @@ def get_cdp(cdptype, model='FM', detector='ANY', readpatt='ANY', channel='ANY',
     cdptype: str
         Data type of CDP to be obtained. Must be one of the defined
         MIRI CDP types. For example, 'MASK', 'DARK', 'LASTFRAME',
-        'DISTORTION', 'DROOP', 'PIXELFLAT', 'FRINGEFLAT', 'PHOTOM', 'IPC',
+        'DISTORTION', 'DROOP', 'PIXELFLAT', 'FRINGE', 'PHOTOM', 'IPC',
         'COLCORR', 'FLUX', 'JUMP', 'LATENT', 'LINEARITY', 'SATURATION',
         'PSF', 'STRAY', 'TRACORR', 'WAVCORR', 'TELEM', etc....
     model: str (optional)
@@ -778,7 +778,7 @@ class MiriCDPFolder(object):
         cdptype: str
             Data type of CDP to be obtained. Must be one of the defined
             MIRI CDP types. For example, 'MASK', 'DARK', 'LASTFRAME',
-            'DISTORTION', 'DROOP', 'PIXELFLAT', 'FRINGEFLAT', 'PHOTOM', 'IPC',
+            'DISTORTION', 'DROOP', 'PIXELFLAT', 'FRINGE', 'PHOTOM', 'IPC',
             'COLCORR', 'FLUX', 'JUMP', 'LATENT', 'LINEARITY', 'SATURATION',
             'PSF', 'STRAY', 'TRACORR', 'WAVCORR', 'TELEM', etc....
         model: str (optional)
@@ -1621,7 +1621,7 @@ class MiriCDPInterface(object):
         cdptype: str
             Data type of CDP to be obtained. Must be one of the defined
             MIRI CDP types. For example, 'MASK', 'DARK', 'LASTFRAME',
-            'DISTORTION', 'DROOP', 'PIXELFLAT', 'FRINGEFLAT', 'PHOTOM', 'IPC',
+            'DISTORTION', 'DROOP', 'PIXELFLAT', 'FRINGE', 'PHOTOM', 'IPC',
             'COLCORR', 'FLUX', 'JUMP', 'LATENT', 'LINEARITY', 'SATURATION',
             'PSF', 'STRAY', 'TRACORR', 'WAVCORR', 'TELEM', etc....
         model: str (optional)
@@ -1911,7 +1911,7 @@ class MiriCDPInterface(object):
         cdptype: str
             Data type of CDP to be obtained. Must be one of the defined
             MIRI CDP types. For example, 'MASK', 'DARK', 'LASTFRAME',
-            'DISTORTION', 'DROOP', 'PIXELFLAT', 'FRINGEFLAT', 'PHOTOM', 'IPC',
+            'DISTORTION', 'DROOP', 'PIXELFLAT', 'FRINGE', 'PHOTOM', 'IPC',
             'COLCORR', 'FLUX', 'JUMP', 'LATENT', 'LINEARITY', 'SATURATION',
             'PSF', 'STRAY', 'TRACORR', 'WAVCORR', 'TELEM', etc....
         model: str (optional)
