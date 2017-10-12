@@ -50,10 +50,10 @@ properties:
         type: number
         title: Number of illuminated detector columns (pixels)
         fits_keyword: DETCOLS
-      samples_discarded:
+      samples_skipped:
         type: number
-        title: Simulated samples discarded per A/D cycle
-        fits_keyword: NDISCARD
+        title: Simulated samples skipped per A/D cycle
+        fits_keyword: SMPSKIP
       well_depth:
         type: number
         title: Simulated detector well depth (electrons)

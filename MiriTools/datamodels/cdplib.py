@@ -100,6 +100,8 @@ http://miri.ster.kuleuven.be/bin/view/Internal/CalDataProducts
              Explicitly convert string parameters to string.
 04 Oct 2017: Recent updates broke the version number sorting update made
              on 24 Jan 2017. Now corrected.
+12 Oct 2017: Make the detector parameter mandatory in get_cdp(), since it
+             is a primary key into the CDP_DICT dictionary.
 
 Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -256,11 +258,11 @@ def cdp_version_decode( cdp_version ):
     return (cdprelease, cdpversion, cdpsubversion)
 
 #+++ MAIN FUNCTION +++
-def get_cdp(cdptype, model='FM', detector='ANY', readpatt='ANY', channel='ANY',
+def get_cdp(cdptype, detector, model='FM', readpatt='ANY', channel='ANY',
             band='ANY', mirifilter='ANY', subarray='FULL', integration=None,
             cdprelease=None, cdpversion=None, cdpsubversion=None,
-            ftp_host=None, ftp_path=None, ftp_user='miri',
-            ftp_passwd='', timeout=None, local_path=None, cdp_env_name='CDP_DIR',
+            ftp_host=None, ftp_path=None, ftp_user='miri', ftp_passwd='',
+            timeout=None, local_path=None, cdp_env_name='CDP_DIR',
             miri_env_name='MIRI_ENV', logger=LOGGER, fail_message=True):
     """
     
@@ -285,15 +287,14 @@ def get_cdp(cdptype, model='FM', detector='ANY', readpatt='ANY', channel='ANY',
         'DISTORTION', 'DROOP', 'PIXELFLAT', 'FRINGE', 'PHOTOM', 'IPC',
         'COLCORR', 'FLUX', 'JUMP', 'LATENT', 'LINEARITY', 'SATURATION',
         'PSF', 'STRAY', 'TRACORR', 'WAVCORR', 'TELEM', etc....
+    detector: str
+        The MIRI detector required ('MIRIMAGE', 'MIRIFUSHORT',
+        'MIRIFULONG' or 'ANY').
+        The old names ('IM', 'SW' or 'LW') may be used to find CDPs
+        prior to the CDP-3 release.
     model: str (optional)
         The MIRI model required ('VM', 'FM' or 'JPL').
         Defaults to 'FM'.
-    detector: str (optional)
-        The MIRI detector required ('MIRIMAGE', 'MIRIFUSHORT',
-        'MIRIFULONG' or 'ANY').
-        The old names ('IM', 'SQ' or 'LW') may be used to find CDPs
-        prior to the CDP-3 release.
-        Defaults to 'ANY', which will match any detector.
     readpatt: str (optional)
         The MIRI readout pattern required ('FAST', 'SLOW', or 'ANY').
         Defaults to 'ANY', which will match any readout pattern.  
@@ -459,9 +460,21 @@ def get_cdp(cdptype, model='FM', detector='ANY', readpatt='ANY', channel='ANY',
         local_filename = CDPInterface.update_cache(filename, ftp_path)
 
         # Read the contents of the file into a new data model, using the class
-        # derived associated with the data type.
-        #data_class = CDP_DICT[ cdptype ]
+        # derived associated with the data type, detector and filter.
         kwlist = [cdptype]
+        if not detector or detector == 'ANY':
+            # Ambiguous detector. Try to figure it out from the other parameters.
+            if mirifilter:
+                detector = 'MIRIIMAGE'
+            elif miriband:
+                if '1' in miriband or '2' in miriband:
+                    detector = 'MIRIFUSHORT'
+                elif '3' in miriband or '4' in miriband:
+                    detector = 'MIRIFULONG'
+            strg = "Detector specification is ambiguous. Trying detector=%s" % \
+                str(detector)
+            mylogger.warn(strg)
+
         if detector:
             kwlist.append(detector)
         if mirifilter:

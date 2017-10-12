@@ -29,6 +29,10 @@ should be executed first.
 30 Mar 2015: Reduced the scope of the parameter file search so it only
              checks in 3 directories.
 05 May 2017: Changed permission for nosetests.
+13 Oct 2017: test_frame_time and test_exposure_time updated to assume the new
+             frame time calculation from Mike Ressler. SLOW mode now uses
+             8 out of 9 samples. Test the new frame_rti function.
+             Import more detector parameters from detector_properties.
 
 @author: Steven Beard (UKATC)
 
@@ -46,7 +50,7 @@ import unittest
 import numpy as np
 
 from miri.simulators.scasim.cosmic_ray import CosmicRay
-from miri.simulators.scasim.detector import DetectorArray
+from miri.simulators.scasim.detector import frame_rti, DetectorArray
 
 from miri.tools.filesearching import ParameterFileManager, make_searchpath
 import miri.simulators.scasim
@@ -58,13 +62,16 @@ detector_properties = ParameterFileManager("detector_properties.py",
                             logger=LOGGER)
 #from miri.simulators.scasim import detector_properties
 
+# Actual detector parameters
 _KNOWN_DETECTORS = list(detector_properties['DETECTORS_DICT'].keys())
+_FIRST_DETECTOR = detector_properties['DETECTORS_DICT'][str(_KNOWN_DETECTORS[0])]
+
+# Smaller-sized detector used for testing.
 _PIXELS_PER_SIDE = 16
 _REF_PIXELS_LEFT = 4
 _REF_PIXELS_RIGHT = 4
 _REF_PIXELS_BOTTOM = 0
 _REF_PIXELS_TOP = 4
-_WELL_DEPTH = 250000
 
 class TestDetectorArray(unittest.TestCase):
     
@@ -74,12 +81,13 @@ class TestDetectorArray(unittest.TestCase):
         # reference rows at the bottom but an extra 4 reference rows at
         # the top.
         self.detector = DetectorArray(_KNOWN_DETECTORS[0],
-                                      _PIXELS_PER_SIDE, _PIXELS_PER_SIDE, 6.5,
+                                      _PIXELS_PER_SIDE, _PIXELS_PER_SIDE,
+                                      _FIRST_DETECTOR['TARGET_TEMPERATURE'],
                                       left_columns=_REF_PIXELS_LEFT,
                                       right_columns=_REF_PIXELS_RIGHT,
                                       bottom_rows=_REF_PIXELS_BOTTOM,
                                       top_rows=_REF_PIXELS_TOP,
-                                      well_depth=_WELL_DEPTH,
+                                      well_depth=_FIRST_DETECTOR['WELL_DEPTH'],
                                       verbose=0, logger=LOGGER)
         self.detector.set_seed(42)
         samples = detector_properties.get('READOUT_MODE', 'SLOW')
@@ -95,46 +103,49 @@ class TestDetectorArray(unittest.TestCase):
         # will raise an exception.
         for detid in _KNOWN_DETECTORS:
             det = DetectorArray(detid, _PIXELS_PER_SIDE, _PIXELS_PER_SIDE,
-                                6.5, left_columns=_REF_PIXELS_LEFT,
+                                _FIRST_DETECTOR['TARGET_TEMPERATURE'],
+                                left_columns=_REF_PIXELS_LEFT,
                                 right_columns=_REF_PIXELS_RIGHT,
                                 bottom_rows=_REF_PIXELS_BOTTOM,
                                 top_rows=_REF_PIXELS_TOP,
-                                well_depth=_WELL_DEPTH, verbose=0,
+                                well_depth=_FIRST_DETECTOR['WELL_DEPTH'], verbose=0,
                                 logger=LOGGER)
             del det
         self.assertRaises(KeyError, DetectorArray, 'No such SCA',
-                          _PIXELS_PER_SIDE, _PIXELS_PER_SIDE, 6.5,
+                          _PIXELS_PER_SIDE, _PIXELS_PER_SIDE,
+                          _FIRST_DETECTOR['TARGET_TEMPERATURE'],
                           left_columns=_REF_PIXELS_LEFT,
                           right_columns=_REF_PIXELS_RIGHT,
                           bottom_rows=_REF_PIXELS_BOTTOM,
                           top_rows=_REF_PIXELS_TOP,
-                          well_depth=_WELL_DEPTH, verbose=0, logger=LOGGER)
+                          well_depth=_FIRST_DETECTOR['WELL_DEPTH'], verbose=0, logger=LOGGER)
         # Zero or negative detector sizes should be rejected.
         self.assertRaises(ValueError, DetectorArray, _KNOWN_DETECTORS[0],
-                          0, 0, 6.5,
+                          0, 0, _FIRST_DETECTOR['TARGET_TEMPERATURE'],
                           left_columns=_REF_PIXELS_LEFT,
                           right_columns=_REF_PIXELS_RIGHT,
                           bottom_rows=_REF_PIXELS_BOTTOM,
                           top_rows=_REF_PIXELS_TOP,
-                          well_depth=_WELL_DEPTH, verbose=0, logger=LOGGER)
+                          well_depth=_FIRST_DETECTOR['WELL_DEPTH'], verbose=0, logger=LOGGER)
         self.assertRaises(ValueError, DetectorArray, _KNOWN_DETECTORS[0],
-                          -1, -1, 6.5,
+                          -1, -1, _FIRST_DETECTOR['TARGET_TEMPERATURE'],
                           left_columns=_REF_PIXELS_LEFT,
                           right_columns=_REF_PIXELS_RIGHT,
                           bottom_rows=_REF_PIXELS_BOTTOM,
                           top_rows=_REF_PIXELS_TOP,
-                          well_depth=_WELL_DEPTH, verbose=0)
+                          well_depth=_FIRST_DETECTOR['WELL_DEPTH'], verbose=0)
         self.assertRaises(ValueError, DetectorArray, _KNOWN_DETECTORS[0],
                           _PIXELS_PER_SIDE, _PIXELS_PER_SIDE, 6.5,
                           left_columns=-1, right_columns=-1,
                           bottom_rows=-1, top_rows=-1,
-                          well_depth=_WELL_DEPTH, verbose=0, logger=LOGGER)
+                          well_depth=_FIRST_DETECTOR['WELL_DEPTH'], verbose=0, logger=LOGGER)
         # Having no reference pixels at all should be ok
         det = DetectorArray(_KNOWN_DETECTORS[0],
-                            _PIXELS_PER_SIDE, _PIXELS_PER_SIDE, 6.5,
+                            _PIXELS_PER_SIDE, _PIXELS_PER_SIDE,
+                            _FIRST_DETECTOR['TARGET_TEMPERATURE'],
                             left_columns=0, right_columns=0,
                             bottom_rows=0, top_rows=0,
-                            well_depth=_WELL_DEPTH,
+                            well_depth=_FIRST_DETECTOR['WELL_DEPTH'],
                             verbose=0, logger=LOGGER)
         del det
 
@@ -154,41 +165,79 @@ class TestDetectorArray(unittest.TestCase):
     def test_readout_mode(self):
         # Test the setting of the readout mode
         self.detector.set_readout_mode(1, 0)
-        self.detector.set_readout_mode(10, 2)
+        self.detector.set_readout_mode(8, 1)
         
     def test_frame_time(self):
+        # First test the global frame_rti function by recalculating some of
+        # the key rows in Mike Ressler's table.
+        test_parameters = [(  1, 258,   1, 1024, 0, 1, 4, False,  2.77504),
+                           (  1, 258,   1, 1024, 0, 1, 6, False,  2.79552),
+                           (  1,  64,  65,  320, 0, 1, 4, False,  0.24320),
+                           (  2,   5,   1,   16, 0, 1, 4, False,  0.07296),
+                           (  2,   5,   1,   16, 0, 1, 4, True,   0.07296),
+                           (  2,  65,  65,  320, 0, 1, 4, False,  0.24576),
+                           ( 91, 106, 765,  828, 0, 1, 4, False,  0.14144),
+                           ( 91, 106, 765,  828, 0, 1, 4, True,   0.09600),
+                           ( 96,  99, 787,  802, 0, 1, 4, False,  0.08800),
+                           ( 96,  99, 787,  802, 0, 1, 4, True,   0.07600),   
+                           (181, 244,  65,  320, 0, 1, 4, False,  0.70400),
+                           (181, 244,  65,  320, 0, 1, 4, True,   0.33792),
+                           
+                           (  1, 258,   1, 1024, 1, 8, 4, False, 23.88992),
+                           (  1, 258,   1, 1024, 2, 8, 4, False, 26.51136)
+                           ]
+        REFPIX_SAMPLESKIP = 3
+        for (colstart, colstop, rowstart, rowstop, sampleskip, samplesum,
+             resetwidth, burst_mode, expected) in test_parameters:
+            frame_clks = frame_rti(1024, 258,
+                                   colstart, colstop, rowstart, rowstop,
+                                   sampleskip, REFPIX_SAMPLESKIP, samplesum,
+                                   resetwidth, _FIRST_DETECTOR['RESET_OVERHEAD'],
+                                   burst_mode)
+            frame_time = frame_clks * _FIRST_DETECTOR['CLOCK_TIME']
+            msg = "Frame time calculation for \'%s\' incorrect " % \
+                str( (colstart, colstop, rowstart, rowstop, sampleskip,
+                      samplesum, resetwidth, burst_mode) )
+            msg += "(%g != %g)." % \
+                (frame_time, expected)
+            self.assertAlmostEqual(frame_time, expected, places=5, msg=msg)
+
         # Repeat this test for all known MIRI detectors
         for detid in _KNOWN_DETECTORS:
             # The frame time for a MIRI 1024x1024 pixel detector in
-            # full frame mode should be around 2.775 seconds in FAST
-            # mode (nsamples=1) and around 27.11 seconds in SLOW mode
-            # (nsamples=10)
+            # full frame mode should be around 2.77504 seconds in FAST
+            # mode (samplesum=1, sampleskip=0) and around 23.88992 seconds
+            # in SLOW mode (samplesum=8, sampleskip=1).
             miri_detector = DetectorArray(detid,
-                                      1024, 1024, 6.5,
-                                      left_columns=4, right_columns=4,
-                                      bottom_rows=0, top_rows=256,
-                                      well_depth=250000, verbose=0,
-                                      logger=LOGGER)
-            full_fast_time = miri_detector.frame_time(1)
-            self.assertAlmostEqual(full_fast_time, 2.775, 3)
-            full_slow_time = miri_detector.frame_time(10)
-            self.assertAlmostEqual(full_slow_time, 27.11, 2)
+                                      _FIRST_DETECTOR['ILLUMINATED_ROWS'],
+                                      _FIRST_DETECTOR['ILLUMINATED_COLUMNS'],
+                                      _FIRST_DETECTOR['TARGET_TEMPERATURE'],
+                                      left_columns=_FIRST_DETECTOR['LEFT_COLUMNS'],
+                                      right_columns=_FIRST_DETECTOR['RIGHT_COLUMNS'],
+                                      bottom_rows=_FIRST_DETECTOR['BOTTOM_ROWS'],
+                                      top_rows=_FIRST_DETECTOR['TOP_ROWS'],
+                                      well_depth=_FIRST_DETECTOR['WELL_DEPTH'],
+                                      verbose=0, logger=LOGGER)
+            full_fast_time = miri_detector.frame_time(1, 0)
+            self.assertAlmostEqual(full_fast_time, 2.77504, places=5)
+            full_slow_time = miri_detector.frame_time(8, 1)
+            self.assertAlmostEqual(full_slow_time, 23.88992, places=5)
             
             # The subarray readout time should be less than the full
             # frame readout.
-            sub_fast_time = miri_detector.frame_time(1, subarray=(1,1,256,256))
+            sub_fast_time = miri_detector.frame_time(1, 0, subarray=(1,1,256,256))
             self.assertTrue(sub_fast_time < full_fast_time)
-            sub_slow_time = miri_detector.frame_time(10, subarray=(1,1,256,256))
+            sub_slow_time = miri_detector.frame_time(8, 1, subarray=(1,1,256,256))
             self.assertTrue(sub_slow_time < full_slow_time)        
             del miri_detector
         
     def test_exposure_time(self):
         # The exposure time for a particular readout mode should
-        # scale with the number of groups and number of integrations.
-        time_1_1, elapsed_1_1 = self.detector.exposure_time(1, 1, 10)
-        time_1_10, elapsed_1_10 = self.detector.exposure_time(1, 10, 10)
-        time_10_1, elapsed_10_1 = self.detector.exposure_time(10, 1, 10)
-        time_10_10, elapsed_10_10 = self.detector.exposure_time(10, 10, 10)
+        # scale with the number of integrations and number of groups.
+        time_1_1, elapsed_1_1 = self.detector.exposure_time(1, 1, 8, 1)
+        time_1_10, elapsed_1_10 = self.detector.exposure_time(1, 10, 8, 1)
+        time_10_1, elapsed_10_1 = self.detector.exposure_time(10, 1, 8, 1)
+        time_10_10, elapsed_10_10 = self.detector.exposure_time(10, 10, 8, 1)
         ratio1 = time_1_10 / time_1_1
         ratio2 = time_10_1 / time_1_1
         ratio3 = time_10_10 / time_1_1
@@ -231,10 +280,11 @@ class TestDetectorArray(unittest.TestCase):
         # Create a DetectorArray object with no reference pixels, so the
         # size of the subarray is more predictable.
         detector = DetectorArray(_KNOWN_DETECTORS[0],
-                                  _PIXELS_PER_SIDE, _PIXELS_PER_SIDE, 6.5,
+                                  _PIXELS_PER_SIDE, _PIXELS_PER_SIDE,
+                                  _FIRST_DETECTOR['TARGET_TEMPERATURE'],
                                   left_columns=0, right_columns=0,
                                   bottom_rows=0, top_rows=0,
-                                  well_depth=_WELL_DEPTH,
+                                  well_depth=_FIRST_DETECTOR['WELL_DEPTH'],
                                   verbose=0, logger=LOGGER)
         dshape = detector.detector_shape
         # Create a flux array the same shape as the detector whose values

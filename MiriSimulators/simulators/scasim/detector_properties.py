@@ -28,6 +28,13 @@ Sources:
     (FPM EIDP), 10 May 2010.
 (3) UA_MIRI_006, MIRI Test Report, Description of Bad Pixel Mask,
     Version 4, 28 August 2011.
+(4) The Mid-Infrared Instrument for the James Webb Space Telescope,
+    VIII: The MIRI Focal Plane System; M. E. Ressler et al.,
+    Publications of the Astronomical Society of Pacific, Volume 127,
+    Issue 953, pp. 675 (2015)
+(5) JPL MIRI DFM 478 04.02, MIRI FPS Exposure Time Calculations (SCE FPGA2),
+    M. E. Ressler, October 2014.
+
 
 :History:
 
@@ -129,7 +136,9 @@ Sources:
              dark current in e/s.
 19 Jul 2017: Well depth adjusted to match expected saturation levels.
              Nominal dark current changed from 0.12 to 0.21 e/s.
-01 Sep 2017: Removed fixed DARK maps from detector properties.
+13 Oct 2017: New frame time calculation from Mike Ressler.
+             SLOW mode now uses 8 out of 9 samples. READOUT_MODE now defines
+             samplesum, sampleskip and refpixsampleskip parameters separately.
 
 @author: Steven Beard (UKATC)
 
@@ -202,13 +211,15 @@ _sca493['ZP_FAST'] = [[0.0, -2.917], [0.0, -2.292], [0.0, -2.396], [0.0, -2.408]
 # _sca493['SENSITIVITY'] = [1.0, 0.0]  # Linearity sensitivity coeffs [const,slope]
 _sca493['SENSITIVITY'] = [1.1, -0.4]  # Linearity sensitivity coeffs [const,slope]
 _sca493['CLOCK_TIME'] = 1.0e-5 # Detector clock time in seconds
-_sca493['CLOCK_PER_RESET'] = 3 # Number of clock cycles per reset
-_sca493['CLOCK_PER_REF'] = 3   # Extra settling cycles for reference pixels
+_sca493['RESET_WIDTH'] = 4 # The width of the reset pulse in clock cycles
+_sca493['RESET_OVERHEAD'] = 3 # Number of clock cycles per reset
 _sca493['FRAME_RESETS'] = 0    # Extra resets between integrations
 _sca493['TARGET_TEMPERATURE'] = 6.7   # Target temperature in K
 _sca493['DARK_CURRENT_FILE'] = find_simulator_file('dark_currentIM.fits')
 _sca493['DARK_CURRENT'] = 0.21 # Nominal dark current level (electrons/s)
 _sca493['QE_FILE'] = find_simulator_file('qe_measurementIM.fits')
+# Dark map derived from FM CDP data:
+_sca493['DARK_MAP'] = find_simulator_file('MIRI_FM_MIRIMAGE_FAST_DARK.fits')
 _sca493['NOISEFACTOR'] = 1.0   # Noise adjustment factor
 
 _sca494 = {}
@@ -242,13 +253,15 @@ _sca494['ZP_FAST'] = [[0.0, -2.917], [0.0, -2.292], [0.0, -2.396], [0.0, -2.408]
 # _sca494['SENSITIVITY'] = [1.0, 0.0]  # Linearity sensitivity coeffs [const,slope]
 _sca494['SENSITIVITY'] = [1.1, -0.4]  # Linearity sensitivity coeffs [const,slope]
 _sca494['CLOCK_TIME'] = 1.0e-5 # Detector clock time in seconds
-_sca494['CLOCK_PER_RESET'] = 3 # Number of clock cycles per reset
-_sca494['CLOCK_PER_REF'] = 3   # Extra settling cycles for reference pixels
+_sca494['RESET_WIDTH'] = 4 # The width of the reset pulse in clock cycles
+_sca494['RESET_OVERHEAD'] = 3 # Number of clock cycles per reset
 _sca494['FRAME_RESETS'] = 0    # Extra resets between integrations
 _sca494['TARGET_TEMPERATURE'] = 6.7   # Target temperature in K
 _sca494['DARK_CURRENT_FILE'] = find_simulator_file('dark_currentLW.fits')
 _sca494['DARK_CURRENT'] = 0.21 # Nominal dark current level (electrons/s)
 _sca494['QE_FILE'] = find_simulator_file('qe_measurementLW.fits')
+# Dark map derived from FM CDP data:
+_sca494['DARK_MAP'] = find_simulator_file('MIRI_FM_MIRIFULONG_FAST_DARK.fits')
 _sca494['NOISEFACTOR'] = 1.0   # Noise adjustment factor
 
 _sca495 = {}
@@ -282,8 +295,8 @@ _sca495['ZP_FAST'] = [[0.0, -2.917], [0.0, -2.292], [0.0, -2.396], [0.0, -2.408]
 # _sca495['SENSITIVITY'] = [1.0, 0.0]  # Linearity sensitivity coeffs [const,slope]
 _sca495['SENSITIVITY'] = [1.1, -0.4]  # Linearity sensitivity coeffs [const,slope]
 _sca495['CLOCK_TIME'] = 1.0e-5 # Detector clock time in seconds
-_sca495['CLOCK_PER_RESET'] = 3 # Number of clock cycles per reset
-_sca495['CLOCK_PER_REF'] = 3   # Extra settling cycles for reference pixels
+_sca495['RESET_WIDTH'] = 4 # The width of the reset pulse in clock cycles
+_sca495['RESET_OVERHEAD'] = 3 # Number of clock cycles per reset
 _sca495['FRAME_RESETS'] = 0    # Extra resets between integrations
 _sca495['TARGET_TEMPERATURE'] = 6.7   # Target temperature in K
 # The pixel response function is the sensitivity variation across the
@@ -292,6 +305,9 @@ _sca495['PIXEL_RESPONSE'] = None      # No pixel response function
 _sca495['DARK_CURRENT_FILE'] = find_simulator_file('dark_currentSW.fits')
 _sca495['DARK_CURRENT'] = 0.21 # Nominal dark current level (electrons/s)
 _sca495['QE_FILE'] = find_simulator_file('qe_measurementSW.fits')
+# Dark map derived from FM CDP data:
+# _sca495['BAD_PIXEL_MAP'] = find_simulator_file('MIRI_FM_MIRIFUSHORT_MASK.fits')
+_sca495['DARK_MAP'] = find_simulator_file('MIRI_FM_MIRIFUSHORT_FAST_DARK.fits')
 _sca495['NOISEFACTOR'] = 1.0   # Noise adjustment factor
 
 # Other detector descriptions (e.g. for other JWST instruments) can be
@@ -309,33 +325,43 @@ DETECTORS_DICT = {'MIRIMAGE'    : _sca493,
 
 #
 # Available readout modes. The tuple contains default values for:
-# nsample  - number of A/D samples making up each readout.
-# discard  - number of A/D samples discarded before averaging.
-# nframes  - number of frames averaged per group.
-# groupgap - number of frames dropped between groups.
-# ngroups  - default number of readout groups per integration.
-# nints    - default number of integrations per exposure.
-# avggrps  - number of groups averaged to reduce data rate.
-# avgints  - number of integrations averaged to reduce data rate.
-#                                          g
-#                              n   d   n   r   n       a   a
-#                              s   i   f   o   g       v   v
-#                              a   s   r   u   r   n   g   g
-#                              m   c   a   p   o   i   g   i
-#                              p   a   m   g   u   n   r   n
-#                              l   r   e   a   p   t   p   t
-#                              e   d   s   p   s   s   s   s
+# samplesum = number of A/D samples per reading
+# sampleskip = number of A/D samples skipped before reading a pixel.
+# refpixsampleskip = number of A/D samples skipped before reading a reference pixel.
+# nframes = number of frames averaged per group.
+# groupgap = number of frames dropped between groups.
+# ngroups  = default number of readout groups per integration.
+# nints    = default number of integrations per exposure.
+# avggrps  = number of groups averaged to reduce data rate.
+# avgints  = number of integrations averaged to reduce data rate.
+#
+#                                      r
+#                                      e
+#                                      f
+#                                      p
+#                                      i
+#                                      x
+#                                  s   s
+#                              s   a   a
+#                              a   m   m       g
+#                              m   p   p   n   r   n       a   a
+#                              p   l   l   f   o   g       v   v
+#                              l   e   e   r   u   r   n   g   g
+#                              e   s   s   a   p   o   i   g   i
+#                              s   k   k   m   g   u   n   r   n
+#                              u   i   i   e   a   p   t   p   t
+#                              m   p   p   s   p   s   s   s   s
 READOUT_MODE = {}
-READOUT_MODE['SLOW'] =       (10,  2,  1,  0, 10,  1,  1,  1)
-READOUT_MODE['FAST'] =       (1,   0,  1,  0,  1, 10,  1,  1)
-READOUT_MODE['FASTINTAVG'] = (1,   0,  1,  0,  1,  4,  1,  4)
-READOUT_MODE['FASTGRPAVG'] = (1,   0,  1,  0,  4,  1,  4,  1)
+READOUT_MODE['SLOW'] =       (8,   1,  3,  1,  0, 10,  1,  1,  1)
+READOUT_MODE['FAST'] =       (1,   0,  3,  1,  0,  1, 10,  1,  1)
+READOUT_MODE['FASTINTAVG'] = (1,   0,  3,  1,  0,  1,  4,  1,  4)
+READOUT_MODE['FASTGRPAVG'] = (1,   0,  3,  1,  0,  4,  1,  4,  1)
 # The following four readout modes were used for MIRI testing only, and they
-# will upset the STScI data model if used.
-# READOUT_MODE['SLOWINTAVG'] = (10,  2,  1,  0,  1,  4,  1,  4)
-# READOUT_MODE['SLOWGRPAVG'] = (10,  2,  1,  0,  4,  1,  4,  1)
-# READOUT_MODE['SLOWGRPGAP'] = (10,  2,  4,  8,  4,  1,  1,  1)
-# READOUT_MODE['FASTGRPGAP'] = (1,   0,  4,  8,  4,  1,  1,  1)
+# will upset the JWST pipeline software if used.
+# READOUT_MODE['SLOWINTAVG'] = (8,   1,  3,  1,  0,  1,  4,  1,  4)
+# READOUT_MODE['SLOWGRPAVG'] = (8,   1,  3,  1,  0,  4,  1,  4,  1)
+# READOUT_MODE['SLOWGRPGAP'] = (8,   1,  3,  4,  8,  4,  1,  1,  1)
+# READOUT_MODE['FASTGRPGAP'] = (1,   0,  3,  4,  8,  4,  1,  1,  1)
 DEFAULT_READOUT_MODE = 'FAST'
 
 

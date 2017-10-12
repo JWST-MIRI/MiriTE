@@ -109,23 +109,26 @@ References
    Astronomical Society of Pacific, Volume 127, Issue 953, pp. 665
    (2015)
 
-6. The Mid-Infrared Instrument for the James Webb Space Telescope,
+6. JPL MIRI DFM 478 04.02, MIRI FPS Exposure Time Calculations (SCE FPGA2),
+   M. E. Ressler, October 2014.
+
+7. The Mid-Infrared Instrument for the James Webb Space Telescope,
    VIII: The MIRI Focal Plane System; M. E. Ressler et al.,
    Publications of the Astronomical Society of Pacific, Volume 127,
    Issue 953, pp. 675 (2015)
 
-7. MIRI DFM 308-04.02, Analysis of the Proton Flux on the MIRI Detector Arrays,
+8. MIRI DFM 308-04.02, Analysis of the Proton Flux on the MIRI Detector Arrays,
    M. Ressler, 3 August 2009.
 
-8. JWST-STScI-00198, SM-12, A Library of Simulated Cosmic Ray Events Impacting
+9. JWST-STScI-00198, SM-12, A Library of Simulated Cosmic Ray Events Impacting
    JWST HgCdTe Detectors, M. Robberto, 9 March 2010.
 
-9. JWST Calibration Software Online Documentation,
-   http://stsdas.stsci.edu/jwst/docs/sphinx/ 
+10. JWST Calibration Software Online Documentation,
+    http://stsdas.stsci.edu/jwst/docs/sphinx/ 
 
-10. DHAS miri_sloper Online Documentation, http://tiamat.as.arizona.edu/dhas/
+11. DHAS miri_sloper Online Documentation, http://tiamat.as.arizona.edu/dhas/
     
-11. MIRI CDP Calibration Data Products documentation,
+12. MIRI CDP Calibration Data Products documentation,
     http://miri.ster.kuleuven.be/bin/view/Internal/CalDataProducts
 
 Scripts

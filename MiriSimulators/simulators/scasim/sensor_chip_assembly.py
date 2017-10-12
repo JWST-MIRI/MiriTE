@@ -306,6 +306,9 @@ MIRI SCA and its environment:
 21 Sep 2017: Additional WCS and WCS-like keywords copied from the INTENSITY
              metadata of the input illumination model.
 03 Oct 2017: Added test simulations of all known MRS bands.
+13 Oct 2017: New frame time calculation from Mike Ressler.
+             SLOW mode now uses 8 out of 9 samples. READOUT_MODE now defines
+             samplesum, sampleskip and refpixsampleskip parameters separately.
 
 @author: Steven Beard
 
@@ -1732,7 +1735,7 @@ class SensorChipAssembly(object):
         del fringe_model
         
     def set_readout_mode(self, mode, inttime=None, ngroups=None, nints=None,
-                         nsample=None):
+                         samplesum=None):
         """
         
         Defines the SCA detector readout mode and integration parameters.
@@ -1742,7 +1745,7 @@ class SensorChipAssembly(object):
         mode: string
             Readout mode, which can be one of the following options.
             
-            * 'SLOW' - 10 samples per readout and defaults of ngroups=10
+            * 'SLOW' - 9 samples per readout and defaults of ngroups=10
               and nints=1
             * 'FAST' - 1 sample per readout and defaults of ngroups=1
               and nints=10
@@ -1770,11 +1773,11 @@ class SensorChipAssembly(object):
             one integration.
             *NOTE: nints can be safely changed without affecting the
             readout mode.*
-        nsample: int, optional
-            Normally None, but if specified allows nsample to be defined
+        samplesum: int, optional
+            Normally None, but if specified allows samplesum to be defined
             directly - overriding the values defined in the detector
             properties file. This is only for testing weird readout
-            modes, since MIRI users cannot change nsample explicitly.
+            modes, since MIRI users cannot change samplesum explicitly.
             There must be at least one sample.
             *NOTE: Altering this value from its default will change
             the readout mode to 'TESTnn'.*
@@ -1789,14 +1792,15 @@ class SensorChipAssembly(object):
         self.readout_mode = mode
         try:
             mode_tuple = detector_properties.get('READOUT_MODE', mode)
-            self.nsample_def = int(mode_tuple[0])
-            self.ndiscard_def = int(mode_tuple[1])
-            self.nframes = int(mode_tuple[2])
-            self.groupgap = int(mode_tuple[3])
-            self.ngroups_def = int(mode_tuple[4])
-            self.nints_def = int(mode_tuple[5])
-            self.avggrps = int(mode_tuple[6])
-            self.avgints = int(mode_tuple[7])
+            self.samplesum_def = int(mode_tuple[0])
+            self.sampleskip_def = int(mode_tuple[1])
+            self.refpixsampleskip_def = int(mode_tuple[2])
+            self.nframes = int(mode_tuple[3])
+            self.groupgap = int(mode_tuple[4])
+            self.ngroups_def = int(mode_tuple[5])
+            self.nints_def = int(mode_tuple[6])
+            self.avggrps = int(mode_tuple[7])
+            self.avgints = int(mode_tuple[8])
         except (KeyError, IndexError, TypeError, ValueError):
             strg = "Unrecognised or badly defined readout mode: %s" % mode
             raise ValueError(strg)
@@ -1850,18 +1854,20 @@ class SensorChipAssembly(object):
 
         # Overriding nsample is for theoretical testing only
         # and will cause the readout mode to become 'TESTnn'
-        if nsample is None:
-            self.nsample = self.nsample_def
-            self.ndiscard = self.ndiscard_def
+        if samplesum is None:
+            self.samplesum = self.samplesum_def
+            self.sampleskip = self.sampleskip_def
+            self.refpixsampleskip = self.refpixsampleskip_def
         else:
-            if int(nsample) <= 0:
+            if int(samplesum) <= 0:
                 raise ValueError("Number of samples must be > 0")
-            self.nsample = int(nsample)
-            if self.nsample > 2:
-                self.ndiscard = 2
+            self.samplesum = int(samplesum)
+            if self.samplesum > 2:
+                self.sampleskip = 1
             else:
-                self.ndiscard = 0
-            self.readout_mode = 'TEST%d' % self.nsample
+                self.sampleskip = 0
+            self.refpixsampleskip = self.refpixsampleskip_def
+            self.readout_mode = 'TEST%d' % self.samplesum
             
         # This flag will trigger a recalculation of the integration time
         # during the next integration after a DetectorArray object has been
@@ -1870,8 +1876,8 @@ class SensorChipAssembly(object):
         self.inttime_calculated = False
         
         if self._verbose > 2:
-            strg = "Setting readout mode to %s (nsample=%d): " % \
-                (mode, self.nsample)
+            strg = "Setting readout mode to %s (sampleskip=%d, samplesum=%d): " % \
+                (mode, self.sampleskip, self.samplesum)
             if self.time_mode == 'groups_to_time':
                 strg += "\n  integration time determined from ngroups=%d" % \
                     self.ngroups
@@ -2025,9 +2031,9 @@ class SensorChipAssembly(object):
                 self.inttime_req = self.inttime
             self.inttime_calculated = True
 
-        # Forward the readout mode to the detector.
-        self.detector.set_readout_mode(self.nsample, self.ndiscard,
-                                       self.nframes)
+#         # Forward the readout mode to the detector.
+#         self.detector.set_readout_mode(self.samplesum, self.sampleskip,
+#                                        self.refpixsampleskip, self.nframes)
        
         # Get the combined illumination from the illumination map.
         # This calculation only needs to be done once unless the
@@ -2065,7 +2071,9 @@ class SensorChipAssembly(object):
             # after only one frame time.
             if frame_time is None:
                 ftime = self.detector.frame_time(
-                                        self.nsample,
+                                        self.samplesum,
+                                        self.sampleskip,
+                                        refpixsampleskip=self.refpixsampleskip,
                                         subarray=self.subarray,
                                         burst_mode=self.subarray_burst_mode)
             else:
@@ -2150,8 +2158,10 @@ class SensorChipAssembly(object):
                 
             # The group time is the frame time x number of frames per group.
             if frame_time is None:
-                ftime =  self.detector.frame_time(
-                                        self.nsample,
+                ftime = self.detector.frame_time(
+                                        self.samplesum,
+                                        self.sampleskip,
+                                        refpixsampleskip=self.refpixsampleskip,
                                         subarray=self.subarray,
                                         burst_mode=self.subarray_burst_mode)
             else:
@@ -2181,7 +2191,7 @@ class SensorChipAssembly(object):
             # >>> exposure data.
             # >>>
             self.detector.integrate(self.flux, time, intnum=intnum)
-            total_samples = self.nframes * (self.nsample - self.ndiscard)
+            total_samples = self.nframes * self.samplesum
             if total_samples < 1:
                 total_samples = 1
             # Assist the garbage collector by discarding the previous
@@ -2190,7 +2200,7 @@ class SensorChipAssembly(object):
                 del self.integration_data
             self.integration_data = \
                 self.detector.readout(subarray=self.subarray,
-                                      nsamples=total_samples)
+                                      total_samples=total_samples)
             if self._makeplot and self._verbose > 7:
                 mplt.plot_image2D(self.integration_data,
                     xlabel='Columns', ylabel='Rows', withbar=True,
@@ -2289,10 +2299,10 @@ class SensorChipAssembly(object):
                 self.inttime_req = self.inttime
             self.inttime_calculated = True
 
-        # Forward the readout mode to the detector.
-        self.detector.set_readout_mode(self.nsample, self.ndiscard,
-                                       self.nframes)
- 
+#         # Forward the readout mode to the detector.
+#         self.detector.set_readout_mode(self.samplesum, self.sampleskip,
+#                                        self.refpixsampleskip, self.nframes)
+
         # If needed, create a new exposure data object.
         self._new_exposure_data()
 
@@ -2369,8 +2379,8 @@ class SensorChipAssembly(object):
 
         # Detector properties and readout mode
         self.metadata["READPATT"] = self.readout_mode
-        self.metadata["NSAMPLES"] = self.nsample
-        self.metadata["NDISCARD"] = self.ndiscard
+        self.metadata["NSAMPLES"] = self.samplesum
+        self.metadata["SMPSKIP"] = self.sampleskip
         self.metadata["DETROWS"] = self.shape[0]
         self.metadata["DETCOLS"] = self.shape[1]
         #self.metadata["ZROFRAME"] = False
@@ -2451,8 +2461,10 @@ class SensorChipAssembly(object):
         clktime =  self.detector.clock_time()
         clktime *= 1.0E6   # Convert from seconds to microseconds
         if frame_time is None:
-            ftime =  self.detector.frame_time(
-                                    self.nsample,
+            ftime = self.detector.frame_time(
+                                    self.samplesum,
+                                    self.sampleskip,
+                                    refpixsampleskip=self.refpixsampleskip,
                                     subarray=self.subarray,
                                     burst_mode=self.subarray_burst_mode)
         else:
@@ -2462,7 +2474,7 @@ class SensorChipAssembly(object):
         self.metadata["TFRAME"] = ftime
         self.metadata["TGROUP"] = gtime
 
-        self.metadata["ROWRSETS"] = self._sca['CLOCK_PER_REF']
+        self.metadata["ROWRSETS"] = self.refpixsampleskip
         self.metadata["FRMRSETS"] = self._sca['FRAME_RESETS'] # Old keyword
         self.metadata["NRESETS"]  = self._sca['FRAME_RESETS']  # New keyword
                 
@@ -2825,8 +2837,12 @@ class SensorChipAssembly(object):
         # time taken for the dropped frames must be added to the
         # integration time.
         if frame_time is None:
-            ftime = self.detector.frame_time(self.nsample, subarray=subarray,
-                                             burst_mode=burst_mode)
+            ftime = self.detector.frame_time(
+                                    self.samplesum,
+                                    self.sampleskip,
+                                    refpixsampleskip=self.refpixsampleskip,
+                                    subarray=self.subarray,
+                                    burst_mode=self.subarray_burst_mode)
         else:
             ftime = frame_time
         if ngroups > 1:
@@ -2845,8 +2861,8 @@ class SensorChipAssembly(object):
                 burststr = " (burst mode)"
             else:
                 burststr = ""
-            strg = "nsample=%d and subarray=%s%s gives frame time=%.3fs; " % \
-                (self.nsample, substr, burststr, ftime)
+            strg = "samplesum=%d, sampleskip=%d and subarray=%s%s gives frame time=%.3fs; " % \
+                (self.samplesum, self.sampleskip, substr, burststr, ftime)
             strg += "ngroups=%d nframes=%d groupgap=%d " % \
                 (ngroups, self.nframes, self.groupgap)
             strg += "gives an integration time of %.2fs." % time
@@ -2869,8 +2885,12 @@ class SensorChipAssembly(object):
         # number is also rounded up to the nearest whole multiple of avggrps.
         # There must be at least one group.
         if frame_time is None:
-            ftime = self.detector.frame_time(self.nsample, subarray=subarray,
-                                             burst_mode=burst_mode)
+            ftime = self.detector.frame_time(
+                                    self.samplesum,
+                                    self.sampleskip,
+                                    refpixsampleskip=self.refpixsampleskip,
+                                    subarray=self.subarray,
+                                    burst_mode=self.subarray_burst_mode)
         else:
             ftime = frame_time
         gtime = ftime * self.nframes
@@ -2896,8 +2916,8 @@ class SensorChipAssembly(object):
                 burststr = " (burst mode)"
             else:
                 burststr = ""
-            strg = "nsample=%d and subarray=%s%s gives frame time=%.3fs; " % \
-                (self.nsample, substr, burststr, ftime)
+            strg = "samplesum=%d, sampleskip=%d and subarray=%s%s gives frame time=%.3fs; " % \
+                (self.samplesum, self.sampleskip, substr, burststr, ftime)
             strg +=" Integration time of %.2fs with nframes=%d groupgap=%d " % \
                 (time, self.nframes, self.groupgap)
             if ngroups > 1:
@@ -3044,8 +3064,9 @@ class SensorChipAssembly(object):
         
         """
         strg = prefix + "Detector readout mode is " + \
-            "%s (nsample=%d, nframe=%d, groupgap=%s) " % \
-            (self.readout_mode, self.nsample, self.nframes, self.groupgap)
+            "%s (samplesum=%d, sampleskip=%d, nframe=%d, groupgap=%s) " % \
+            (self.readout_mode, self.samplesum, self.sampleskip,
+             self.nframes, self.groupgap)
         strg += "\n%swith %d integrations " % (prefix, self.nints)
         
         if self.time_mode == 'groups_to_time':
@@ -3905,7 +3926,9 @@ class SensorChipAssembly(object):
         (exp, elapsed) = self.detector.exposure_time(
                                         self.nints,
                                         self.ngroups,
-                                        self.nsample,
+                                        self.samplesum,
+                                        self.sampleskip,
+                                        refpixsampleskip=self.refpixsampleskip,
                                         nframes=self.nframes,
                                         groupgap=self.groupgap,
                                         subarray=self.subarray,
@@ -4895,12 +4918,25 @@ if __name__ == '__main__':
 #    test_input_file_name  = './data/DoesNotExist.fits'
     test_output_stub = './data/SCATestOutput'
 
-    # WHICH TESTS TO RUN?
+    # Which tests to run?
     TEST_MODELS = True
     TEST_BANDS = True
     TEST_SUBARRAYS = True
     TEST_READOUTS = True
-
+    
+    # Which simulations to include?
+    QE_ADJUST = True,
+    SIMULATE_POISSON_NOISE = True
+    SIMULATE_READ_NOISE = True
+    SIMULATE_REF_PIXELS = True
+    SIMULATE_BAD_PIXELS = True
+    SIMULATE_DARK_CURRENT = True
+    SIMULATE_FLAT_FIELD = True
+    SIMULATE_GAIN = True
+    SIMULATE_NONLINEARITY = True
+    SIMULATE_DRIFTS = True
+    SIMULATE_LATENCY = True
+    
     # MODIFY THESE TWO VARIABLES TO CONTROL THE DEGREE OF INTERACTION
     VERBOSE = 1
     PLOTTING = False
@@ -4925,7 +4961,18 @@ if __name__ == '__main__':
         exposure_map = sca.simulate_pipe(illumination_map, scale=10.0,
                             readout_mode='SLOW', nints=1, ngroups=10,
                             start_time=42.0, makeplot=PLOTTING,
-                            cosmic_ray_mode='NONE', include_pixeldq=INCLUDE_PIXELDQ,
+                            cosmic_ray_mode='NONE',
+                            include_pixeldq=INCLUDE_PIXELDQ, qe_adjust=QE_ADJUST,
+                            simulate_poisson_noise=SIMULATE_POISSON_NOISE,
+                            simulate_read_noise=SIMULATE_READ_NOISE,
+                            simulate_ref_pixels=SIMULATE_REF_PIXELS,
+                            simulate_bad_pixels=SIMULATE_BAD_PIXELS,
+                            simulate_dark_current=SIMULATE_DARK_CURRENT,
+                            simulate_flat_field=SIMULATE_FLAT_FIELD,
+                            simulate_gain=SIMULATE_GAIN,
+                            simulate_nonlinearity=SIMULATE_NONLINEARITY,
+                            simulate_drifts=SIMULATE_DRIFTS,
+                            simulate_latency=SIMULATE_LATENCY,      
                             verbose=VERBOSE)
         if VERBOSE > 1:
             print( exposure_map )
@@ -4947,7 +4994,18 @@ if __name__ == '__main__':
         exposure_map = sca.simulate_pipe(illumination_map, scale=10.0,
                             readout_mode='SLOW', nints=1, ngroups=10,
                             makeplot=PLOTTING, cosmic_ray_mode='NONE',
-                            include_pixeldq=INCLUDE_PIXELDQ, verbose=VERBOSE)
+                            include_pixeldq=INCLUDE_PIXELDQ,
+                            qe_adjust=QE_ADJUST,
+                            simulate_poisson_noise=SIMULATE_POISSON_NOISE,
+                            simulate_read_noise=SIMULATE_READ_NOISE,
+                            simulate_ref_pixels=SIMULATE_REF_PIXELS,
+                            simulate_bad_pixels=SIMULATE_BAD_PIXELS,
+                            simulate_dark_current=SIMULATE_DARK_CURRENT,
+                            simulate_flat_field=SIMULATE_FLAT_FIELD,
+                            simulate_gain=SIMULATE_GAIN,
+                            simulate_nonlinearity=SIMULATE_NONLINEARITY,
+                            simulate_drifts=SIMULATE_DRIFTS,
+                            verbose=VERBOSE)
         if VERBOSE > 1:
             print( exposure_map )
             (exposure_time, duration, start_time, mid_time, end_time) = \
@@ -4983,7 +5041,17 @@ if __name__ == '__main__':
                 exposure_map = sca.simulate_pipe(illumination_map, scale=10.0,
                         readout_mode=mode, ngroups=ngroups, nints=1, start_time='NOW',
                         cosmic_ray_mode='SOLAR_MIN', makeplot=PLOTTING,
-                        include_pixeldq=INCLUDE_PIXELDQ, verbose=VERBOSE)
+                        include_pixeldq=INCLUDE_PIXELDQ, qe_adjust=QE_ADJUST,
+                        simulate_poisson_noise=SIMULATE_POISSON_NOISE,
+                        simulate_read_noise=SIMULATE_READ_NOISE,
+                        simulate_ref_pixels=SIMULATE_REF_PIXELS,
+                        simulate_bad_pixels=SIMULATE_BAD_PIXELS,
+                        simulate_dark_current=SIMULATE_DARK_CURRENT,
+                        simulate_flat_field=SIMULATE_FLAT_FIELD,
+                        simulate_gain=SIMULATE_GAIN,
+                        simulate_nonlinearity=SIMULATE_NONLINEARITY,
+                        simulate_drifts=SIMULATE_DRIFTS,
+                        verbose=VERBOSE)
                 if VERBOSE > 1:
                     print( exposure_map )
                     (exposure_time, duration, start_time, mid_time, end_time) = \
@@ -5023,7 +5091,17 @@ if __name__ == '__main__':
                     readout_mode=mode, subarray=subarray,
                     ngroups=ngroups, nints=1, start_time='NOW',
                     cosmic_ray_mode='SOLAR_MIN', makeplot=PLOTTING,
-                    include_pixeldq=INCLUDE_PIXELDQ, verbose=VERBOSE)
+                    include_pixeldq=INCLUDE_PIXELDQ,  qe_adjust=QE_ADJUST,
+                    simulate_poisson_noise=SIMULATE_POISSON_NOISE,
+                    simulate_read_noise=SIMULATE_READ_NOISE,
+                    simulate_ref_pixels=SIMULATE_REF_PIXELS,
+                    simulate_bad_pixels=SIMULATE_BAD_PIXELS,
+                    simulate_dark_current=SIMULATE_DARK_CURRENT,
+                    simulate_flat_field=SIMULATE_FLAT_FIELD,
+                    simulate_gain=SIMULATE_GAIN,
+                    simulate_nonlinearity=SIMULATE_NONLINEARITY,
+                    simulate_drifts=SIMULATE_DRIFTS,
+                    verbose=VERBOSE)
             if VERBOSE > 1:
                 print( exposure_map )
                 (exposure_time, duration, start_time, mid_time, end_time) = \
@@ -5067,9 +5145,19 @@ if __name__ == '__main__':
                 # being masked by the flat-field.
                 exposure_map = sca.simulate_pipe(illumination_map, scale=10.0,
                         readout_mode=mode, subarray='FULL', ngroups=ngroups,
-                        nints=1, cosmic_ray_mode='SOLAR_MIN', qe_adjust=False,
-                        simulate_flat_field=False, makeplot=PLOTTING,
-                        include_pixeldq=INCLUDE_PIXELDQ, verbose=VERBOSE)
+                        nints=1, cosmic_ray_mode='SOLAR_MIN', 
+                        makeplot=PLOTTING, include_pixeldq=INCLUDE_PIXELDQ,
+                        qe_adjust=False,
+                        simulate_poisson_noise=SIMULATE_POISSON_NOISE,
+                        simulate_read_noise=SIMULATE_READ_NOISE,
+                        simulate_ref_pixels=SIMULATE_REF_PIXELS,
+                        simulate_bad_pixels=SIMULATE_BAD_PIXELS,
+                        simulate_dark_current=SIMULATE_DARK_CURRENT,
+                        simulate_flat_field=False,
+                        simulate_gain=SIMULATE_GAIN,
+                        simulate_nonlinearity=SIMULATE_NONLINEARITY,
+                        simulate_drifts=SIMULATE_DRIFTS,
+                        verbose=VERBOSE)
                 if VERBOSE > 1:
                     print( exposure_map )
                     (exposure_time, duration, start_time, mid_time, end_time) = \
@@ -5104,6 +5192,16 @@ if __name__ == '__main__':
                     inttime=inttime, nints=1, cosmic_ray_mode='SOLAR_MIN',
                     fileformat='STScI', datashape='hypercube',
                     include_pixeldq=INCLUDE_PIXELDQ, overwrite=True,
+                    qe_adjust=QE_ADJUST,
+                    simulate_poisson_noise=SIMULATE_POISSON_NOISE,
+                    simulate_read_noise=SIMULATE_READ_NOISE,
+                    simulate_ref_pixels=SIMULATE_REF_PIXELS,
+                    simulate_bad_pixels=SIMULATE_BAD_PIXELS,
+                    simulate_dark_current=SIMULATE_DARK_CURRENT,
+                    simulate_flat_field=SIMULATE_FLAT_FIELD,
+                    simulate_gain=SIMULATE_GAIN,
+                    simulate_nonlinearity=SIMULATE_NONLINEARITY,
+                    simulate_drifts=SIMULATE_DRIFTS,
 #                     fileformat='FITSWriter', datashape='hypercube',
                     makeplot=PLOTTING, verbose=VERBOSE )
             
@@ -5116,6 +5214,16 @@ if __name__ == '__main__':
                     cosmic_ray_mode='SOLAR_MIN',
                     fileformat='STScI', datashape='hypercube',
                     include_pixeldq=INCLUDE_PIXELDQ, overwrite=True,
+                    qe_adjust=QE_ADJUST,
+                    simulate_poisson_noise=SIMULATE_POISSON_NOISE,
+                    simulate_read_noise=SIMULATE_READ_NOISE,
+                    simulate_ref_pixels=SIMULATE_REF_PIXELS,
+                    simulate_bad_pixels=SIMULATE_BAD_PIXELS,
+                    simulate_dark_current=SIMULATE_DARK_CURRENT,
+                    simulate_flat_field=SIMULATE_FLAT_FIELD,
+                    simulate_gain=SIMULATE_GAIN,
+                    simulate_nonlinearity=SIMULATE_NONLINEARITY,
+                    simulate_drifts=SIMULATE_DRIFTS,
 #                     fileformat='FITSWriter', datashape='hypercube',
                     makeplot=PLOTTING, verbose=VERBOSE )
     del sca

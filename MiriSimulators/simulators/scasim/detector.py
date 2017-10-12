@@ -206,6 +206,10 @@ Module detector - Contains the DetectorArray class.
              Make some metadata optional.
 04 Sep 2017: Explicitly delete old calibration data objects to save memory.
              Added _clear_calibration_data() method.
+13 Oct 2017: New frame time calculation from Mike Ressler.
+             SLOW mode now uses 8 out of 9 samples. READOUT_MODE now defines
+             samplesum, sampleskip and refpixsampleskip parameters separately.
+             Added frame_rti function and associated tests.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -277,6 +281,133 @@ AVERAGED_DARK = False
 
 # Set to True to include latent and zeropoint coefficients in the metadata
 EXTRA_METADATA = False
+
+#
+# Global helper functions
+#
+def frame_rti(detectorrows, ampcolumns, colstart, colstop, rowstart, rowstop,
+              sampleskip, refpixsampleskip, samplesum, resetwidth,
+              resetoverhead, burst_mode):
+    """
+    
+    Helper function which calculates the number of clock cycles, or RTI,
+    needed to read out the detector with a given a list of FPGA parameters.
+    This function can be used to test the frame time calculation over a
+    wide range of scenarios.
+    
+    :Reference:
+    
+    JPL MIRI DFM 478 04.02, MIRI FPS Exposure Time Calculations,
+    M. E. Ressler, October 2014
+
+    :Parameters:
+    
+    detectorrows:
+        Total number of detector rows.
+    ampcolumns
+        Total number of amplifier columns (including reference columns).
+        = Total number of detector columns / Number of amplifiers.
+    colstart: int
+        Amplifier column at which readout starts.
+        Derived from the subarray mode.
+    colstop: int
+        Amplifier column at which readout stops.
+        Derived from the subarray mode.
+    rowstart: int
+        Detector row at which readout starts.
+        Derived from the subarray mode.
+    rowstop: int
+        Detector row at which readout stops.
+        Derived from the subarray mode.
+    sampleskip: int
+        Number of clock cycles to dwell on a pixel before reading it.
+        Derived from the readout mode.
+    refpixsampleskip: int
+        Number of clock cycles to dwell on a reference pixel before reading it.
+        Derived from the readout mode.
+    samplesum: int
+        Number of clock cycles to sample a pixel during readout.
+    resetwidth: int
+        Width of the reset pulse in clock cycles.
+        Derived from the readout mode.
+    resetoverhead: int
+        The overhead, in clock cycles, associated with setting shift
+        registers back to zero.
+    burst_mode: boolean, optional, default is False
+        True if a subarray is being read out in burst mode,
+        which skips quickly over unwanted columns.
+        
+    :Returns:
+    
+    frame_rti: float
+        Number of clock cycles (RTI) for readout.
+    
+    """            
+    # The time taken to skip a row not contained in a subarray is the
+    # row reset overhead, which is the reset pulse width plus the overhead
+    # to reset the shift registers.
+    row_reset = resetwidth + resetoverhead
+    rti_row_non_roi = row_reset
+
+    # The number of clock cycles needed to read a pixel is the         
+    pix_clocks = sampleskip + samplesum
+    refpix_clocks = refpixsampleskip + samplesum
+    
+    if (colstart == 1) or (not burst_mode):
+        # For a row within a subarray (if burst_mode is False or the subarray
+        # begins at column 1), we start with the row reset overheads, then add
+        # the reference pixel time, refpix_clocks, then add the science pixel
+        # time, n * pix_clocks.
+        rti_row_roi = row_reset
+#         strg = "rti_row_roi=%d " % row_reset
+        if colstart == 1:
+            rti_row_roi += refpix_clocks
+#             strg += " + %d " % refpix_clocks
+        else:
+            rti_row_roi += resetwidth
+        if colstop == ampcolumns:
+            rti_row_roi += (colstop-2) * pix_clocks
+#             strg += " + (%d * %d) " % ((colstop-2), pix_clocks)
+            rti_row_roi += refpix_clocks
+#             strg += " + %d " % refpix_clocks
+        else:
+            rti_row_roi += (colstop-1) * pix_clocks
+#             strg += " + (%d * %d) " % ((colstop-1), pix_clocks)
+#             print(strg)
+    else:
+        # In burst_mode, when a subarray does not touch the left hand edge,
+        # each row begins with the same reset overhead, then the left hand
+        # pixels are clocked at 5 times the normal rate until the subarray
+        # is reached. If the number of burst columns is not an even multiple
+        # of 5, the readout is paused until a normal clock boundary.
+        rti_row_roi = row_reset
+#         strg = "rti_row_roi=%d " % row_reset
+        if colstart == 1:
+            rti_row_roi += refpix_clocks
+#             strg += " + %d " % refpix_clocks
+        else:
+            rti_row_roi += refpix_clocks + ((colstart-2)*pix_clocks+4)//5
+#             strg += " + %d + %d " % (refpix_clocks,
+#                                      ((colstart-2)*pix_clocks+4)//5)
+            
+        if colstop == ampcolumns:
+            rti_row_roi += ((colstop-2)-colstart+1) * pix_clocks
+#             strg += " + (%d * %d) " % (((colstop-2)-colstart+1), pix_clocks)
+            rti_row_roi += refpix_clocks
+            strg += " + %d " % refpix_clocks
+        else:
+            rti_row_roi += (colstop-colstart+1) * pix_clocks
+#             strg += " + (%d * %d) " % ((colstop-colstart+1), pix_clocks)
+#             print(strg)
+
+    # The total number of clock cycles to read the frame is the sum
+    # of the portion before the ROI, after the ROI and during the ROI.
+#         print("rti_row_non_roi=", rti_row_non_roi, "rti_row_roi=", rti_row_roi)
+    frame_rti = (rowstart-1) * rti_row_non_roi + \
+        (rowstop-rowstart+1) * rti_row_roi + \
+        (detectorrows-rowstop) * rti_row_non_roi
+    return frame_rti
+
 
 class DetectorArray(object):
     """
@@ -511,6 +642,13 @@ class DetectorArray(object):
         refout_rows = rows
         refout_columns = top_rows * detector_columns / refout_rows
         self.refout_shape = (refout_rows, refout_columns)
+        
+        # Default readout mode
+        self.samplesum = 1
+        self.sampleskip = 0
+        self.refpixsampleskip = 3
+        self.nframes = 1
+
 
 # NOTE: AMPLIFIER CLASS IS STILL AVAILABLE BUT NO LONGER USED FOR MIRI.
 #         # Add the readout amplifiers associated with this detector
@@ -1909,54 +2047,58 @@ class DetectorArray(object):
             
         """
         np.random.seed(seedvalue)
-
-    def set_readout_mode(self, nsample, ndiscard=0, nframes=1):
+ 
+    def set_readout_mode(self, samplesum, sampleskip=0, refpixsampleskip=3,
+                         nframes=1):
         """
-        
+         
         Defines the SCA detector readout mode parameters which determine
         the read noise.
-        
+         
         :Parameters:
-        
-        nsample: int
-            The total number of samples per frame (which affects the
-            read noise). Must be at least 1.
-        ndiscard: int, optional, default=0
-            The number of samples discarded during a frame (e.g. the first
-            and last samples are usually discarded when nsample > 2).
+         
+        samplesum: int
+            The total number of samples when reading a pixel (which
+            affects the read noise). Must be at least 1.
+        sampleskip: int, optional, default=0
+            The number of samples skipped before reading a pixel.
+        refpixsampleskip: int, optional, default=3
+            The number of samples skipped before reading a reference pixel.
         nframes: int, optional, default=1
             The number of frames per group. Normally 1 for MIRI data, but
             if greater than 1 this parameter further reduces the read
             noise for each group.
-            
+             
         """
-        if int(nsample) <= 0:
-            strg = "Number of samples per frame must be at least 1."
-            raise ValueError(strg)
-        if int(ndiscard) < 0:
-            strg = "Number of samples discarded cannot be negative."
+        if int(samplesum) <= 0:
+            strg = "Number of samples per pixel must be at least 1."
             raise ValueError(strg)
         if int(nframes) <= 0:
             strg = "Number of frames per group must be at least 1."
             raise ValueError(strg)
+ 
+        self.samplesum = samplesum
+        self.sampleskip = sampleskip
+        self.refpixsampleskip = refpixsampleskip
+        self.nframes = nframes
 
-        used_samples = int(nframes) * (int(nsample) - int(ndiscard))
-        # There must be at least one used sample.
-        if used_samples < 1:
-            used_samples = 1
-        self.nsample = used_samples
-            
-    def frame_time(self, nsample, subarray=None, burst_mode=False):
+    def frame_time(self, samplesum, sampleskip, refpixsampleskip=3,
+                   subarray=None, burst_mode=False):
         """
         
         Calculate the frame time for a given subarray and readout mode.
         
         :Parameters:
         
-        nsample: int
-            The total number of samples per readout, derived from the
-            readout mode (including any discarded samples).
-            Usually 1 or 10. Must be at least 1.
+        samplesum: int
+            Number of clock cycles to sample a pixel during readout.
+            Derived from the readout mode.
+        sampleskip: int
+            Number of clock cycles to dwell on a pixel before reading it.
+            Derived from the readout mode.
+        refpixsampleskip: int, optional, default is 3
+            Number of clock cycles to dwell on a reference pixel before reading it.
+            Derived from the readout mode.
         subarray: tuple of 4 ints, optional, default is None
             If None a full frame readout is assumed. Otherwise this
             parameter should be set to subarray parameters
@@ -1978,12 +2120,16 @@ class DetectorArray(object):
             Frame time in seconds.
             
         """
-        if int(nsample) <= 0:
-            strg = "Number of samples per readout must be at least 1."
+        # Default to the current readout mode
+        if samplesum is None:
+            samplesum = self.samplesum
+        if sampleskip is None:
+            sampleskip = self.sampleskip
+            
+        if int(samplesum) <= 0:
+            strg = "Number of samples per readout (samplesum) must be at least 1."
             raise ValueError(strg)
 
-        # The frame time calculation is taken from the example in the
-        # MIRI Operations Concept Document.
         # First define the physical location of the subarray on the
         # array scanned by a single (normal) amplifier. (Since the
         # amplifiers readout in parallel, it is only necessary to
@@ -2017,66 +2163,25 @@ class DetectorArray(object):
                 " colstop=" + str(colstop) + \
                 " rowstart=" + str(rowstart) + \
                 " rowstop=" + str(rowstop) )
-        
-        # If the subarray touches the left or right column extra clock
-        # cycles are used to allow for the reference pixel settling time.
-        if colstart == 1:
-            left_ref_pix = int(self._sca['CLOCK_PER_REF'])
-        else:
-            left_ref_pix = 0
-        rightedge = (self.left_columns + self.illuminated_shape[1] + \
-                     self.right_columns) / self._normal_amps
-        if colstop == rightedge:
-            right_ref_pix = int(self._sca['CLOCK_PER_REF'])
-        else:
-            right_ref_pix = 0
-        if self._verbose > 3:
-            self.logger.debug( "left_ref_pix=%d, right_ref_pix=%d" % \
-                              (left_ref_pix, right_ref_pix) )
-        
-        # For each row, the number of clock cycles spent reading the pixels
-        # within the region of interest (ROI) is as follows.
-        # NOTE: The number of clock cycles per read is given by the
-        # number of samples - one clock cycle per sample.
-        roi_row_clks = \
-            (colstop-colstart+1+left_ref_pix+right_ref_pix) * int(nsample)
 
-        # Extra clock cycles are needed to begin each row and discard the
-        # columns to the left of the region of interest.
-        # In subarray burst mode these extra clock cycles are not needed.
-        if subarray is not None and burst_mode:
-            ovr_row_clks = 0
-        else:
-            ovr_row_clks = colstart + \
-                int(self._sca['CLOCK_PER_RESET']) + \
-                self._normal_amps - 1
- 
-        # The total clock cycles needed per row is the sum of the above.
-        # NOTE: I assume these are still needed in burst mode?
-        row_clks = roi_row_clks + ovr_row_clks
-
-        # In addition these clock cycles are needed to discard the rows
-        # entirely outside the region of interest.
-        rst_clks = 2 + int(self._sca['CLOCK_PER_RESET'])
-        if self._verbose > 3:
-            self.logger.debug( "roi_row_clks=" + str(roi_row_clks) + \
-                " ovr_row_clks=" + str(ovr_row_clks) + \
-                " row_clks=" + str(row_clks) + " rst_clks=" + str(rst_clks) )
-        
-        # The total number of clock cycles to read the frame is the sum
-        # of the portion before the ROI, after the ROI and during the ROI.
-        frame_clks = (rowstart-1) * rst_clks + \
-            (self.illuminated_shape[1]-rowstop) * rst_clks + \
-            (rowstop-rowstart+1) * row_clks
+        # The frame RTI calculation is taken from Mike Ressler's
+        # "MIRI FPS Exposure Time Calculations (SCE FPGA2)" document,
+        # which updates the original description in the MIRI Operations
+        # Concept Document.
+        detectorrows = self.illuminated_shape[0]
+        ampcolumns = 2 + self.illuminated_shape[1]/self._normal_amps
+        resetwidth = self._sca['RESET_WIDTH']
+        resetoverhead = self._sca['RESET_OVERHEAD']
+        frame_clks = frame_rti(detectorrows, ampcolumns, colstart, colstop,
+                               rowstart, rowstop, sampleskip, refpixsampleskip,
+                               samplesum, resetwidth, resetoverhead, burst_mode) 
 
         # Multiply the number of clock cycles by the cycle time to get
         # the frame time.
-        frame_time = \
-            frame_clks * float(self._sca['CLOCK_TIME'])
+        frame_time =  frame_clks * float(self._sca['CLOCK_TIME'])
         if self._verbose > 3:
             self.logger.debug( "frame_clks=" + str(frame_clks) + \
-                               " frame_time=" + str(frame_time) )
-        
+                               " frame_time=" + str(frame_time) )        
         return frame_time
     
     def clock_time(self):
@@ -2096,8 +2201,9 @@ class DetectorArray(object):
         """
         return self._sca['CLOCK_TIME']
         
-    def exposure_time(self, nints, ngroups, nsample, subarray=None,
-                      burst_mode=False, frame_time=None, nframes=1,
+    def exposure_time(self, nints, ngroups, samplesum, sampleskip,
+                      refpixsampleskip=3, subarray=None, burst_mode=False,
+                      add_initial_resets=False, frame_time=None, nframes=1,
                       groupgap=0 ):
         """
         
@@ -2111,9 +2217,15 @@ class DetectorArray(object):
             The number of integrations per exposure. Must be at least 1.
         ngroups: int
             The number of groups per integration. Must be at least 1.
-        nsample: int
-            The number of samples per readout, derived from the readout mode.
-            Usually 1 or 10.  Must be at least 1.
+        samplesum: int
+            Number of clock cycles to sample a pixel during readout.
+            Derived from the readout mode.
+        sampleskip: int
+            Number of clock cycles to dwell on a pixel before reading it.
+            Derived from the readout mode.
+        refpixsampleskip: int, optional, default is 3
+            Number of clock cycles to dwell on a reference pixel before reading it.
+            Derived from the readout mode.
         subarray: tuple of 4 ints, optional, default is None
             The subarray mode from which to determine the frame time.
             If the frame_time parameter is given explicitly (see below),
@@ -2125,6 +2237,9 @@ class DetectorArray(object):
         burst_mode: boolean, optional, default is False
             True if a subarray is being read out in burst mode,
             which skips quickly over unwanted columns.
+        add_initial_resets: boolean, optional, default is False
+            True if this is the first integration and additional reset frames
+            are to be added.
         frame_time: float, optional
             The detector frame time, in seconds.
             If specified, this parameter overrides the readout mode and
@@ -2165,7 +2280,9 @@ class DetectorArray(object):
 
         # Begin by calculating the frame time.
         if frame_time is None:
-            ftime = self.frame_time(nsample, subarray=subarray,
+            ftime = self.frame_time(samplesum, sampleskip,
+                                    refpixsampleskip=refpixsampleskip,
+                                    subarray=subarray,
                                     burst_mode=burst_mode)
         else:
             ftime = frame_time
@@ -2354,7 +2471,7 @@ class DetectorArray(object):
         # Wait for the elapsed time
         self.pixels.wait(time, bgflux=bgflux)
         
-    def readout(self, subarray=None, nsamples=1, removeneg=True):
+    def readout(self, subarray=None, total_samples=None, removeneg=True):
         """
         
         Read out the detector (non destructive)
@@ -2366,9 +2483,10 @@ class DetectorArray(object):
             parameter should be set to subarray parameters
             (firstrow, firstcol, subrows, subcolumns).
             *NOTE: Rows and columns are numbered from 1.*
-        nsamples: int, optional, default=1
-            The total number of readout samples. If greater than 1
-            this reduces the Poisson noise.
+        total_samples: int, optional
+            The total number of times the pixel is sampled during readout.
+            If greater than 1 this reduces the Poisson noise.
+            Defaults to the current readout mode.
         removeneg: bool, optional, default=True
             If True, remove negative values from the readout and replace
             them with zero.
@@ -2379,12 +2497,15 @@ class DetectorArray(object):
             The data array read out from the detector.
             
         """
+        # Default to the number of samples defined by the readout mode.
+        if total_samples is None:
+            total_samples = self.samplesum * self.nframes
         # >>> Read out the integrator. The integrator returns an integer
         # array, but this needs to be converted to floating point to
         # prevent the readout noise calculation from wrapping around
         # and generating spurious large values in the reference pixel
         # regions.
-        read_data = self.pixels.readout(nsamples=nsamples).astype(np.double)
+        read_data = self.pixels.readout(nsamples=total_samples).astype(np.double)
 
 #         # Apply a random drift to the amplifier electronics
 #         random_level_change(amplifier_properties['MAX_REF_DRIFT'])
@@ -2421,13 +2542,13 @@ class DetectorArray(object):
                  
             # Determine the amount of read noise to by applied to the detector
             # data. The noise is reduced when there is more than one sample.
-            if self.nsample > 1:
+            if total_samples > 1:
                 if self._verbose > 3:
                     self.logger.debug( "Applying readout noise in the range of " + \
                         "%f to %f (e), sampled %d times." % \
                         (np.min(self.readnoise_map), np.max(self.readnoise_map),
-                         self.nsample) )
-                noise = self.readnoise_map / np.sqrt(self.nsample)
+                         self.used_samples) )
+                noise = self.readnoise_map / np.sqrt(total_samples)
             else:
                 if self._verbose > 3:
                     self.logger.debug( "Applying readout noise in the range of %f to %f (e)." % \
@@ -2711,201 +2832,184 @@ class DetectorArray(object):
 if __name__ == '__main__':
     print( "Testing the DetectorArray class" )
 
+    # WHICH TESTS TO RUN?
+    TEST_FRAME_RTI = True
+    TEST_READINGS = True
+    TEST_FRAMETIMES = True
+
     # MODIFY THESE TWO VARIABLES TO CONTROL THE DEGREE OF INTERACTION
     verbose = 3
-    PLOTTING = True        # Set to False to turn off plotting.
+    PLOTTING = False        # Set to False to turn off plotting.
 
     NREADINGS = 12
     NFRAGMENTS = 3
     NINTS = 3
 
-    # Create a DetectorArray object for a detector with a the same
-    # area of illuminated pixels as SCA 494 (1024 x 1024).
-    nrows = detector_properties.get('_sca494', 'ILLUMINATED_ROWS')
-    ncolumns = detector_properties.get('_sca494', 'ILLUMINATED_COLUMNS')
-#     detector = DetectorArray('MIRIFULONG', nrows, ncolumns, 6.7,
-#                              makeplot=PLOTTING, verbose=verbose)
-# Raise the detector temperature so the dark current and artefacts
-# are more apparent.
-    detector = DetectorArray('MIRIFULONG', nrows, ncolumns, 7.5,
-                             makeplot=PLOTTING, verbose=verbose)
- 
-    samples = detector_properties.get('READOUT_MODE', 'SLOW')
-    detector.set_readout_mode(samples[0], samples[1])
- 
-    # Display the contents
-    print( "===Status after creation of DetectorArray." )
-    print( detector )
- 
-    darkflux = 0.1 * np.ones([nrows,ncolumns])
-    mediumflux = 10.0 * np.ones([nrows,ncolumns])
-    brightflux = 100.0 * np.ones([nrows,ncolumns])
- 
-#     print( "\n===Slope tests." )
-#     # Import the miri.tools plotting module.
-#     import miri.tools.miriplot as mplt
-#     # Go through a sequence of integrations and record the
-#     # readings as a function of time
-#     time = []
-#     signal = []
-#     slope = []
-#     elapsed = 0.0
-#     sequence = "DARK +"
-#     for integ in range(0,NINTS+1):
-#         if integ == 0:
-#             detector.reset(new_exposure=True)
-#         else:
-#             detector.reset(new_exposure=True)
-#         for reading in range(1,NREADINGS+1):
-#             detector.integrate(darkflux, 60.0)
-#             array = detector.readout()
-#             elapsed += 60.0
-#             time.append(elapsed)
-#             signal.append(array[100][100])
-#             slope.append(detector.last_flux[100][100])
-#             del array
-# 
-#     sequence += "BRIGHT +"
-#     for integ in range(0,NINTS+1):
-#         if integ == 0:
-#             detector.reset(new_exposure=True)
-#         else:
-#             detector.reset(new_exposure=True)
-#         for reading in range(1,NREADINGS+1):
-#             detector.integrate(brightflux, 60.0)
-#             array = detector.readout()
-#             elapsed += 60.0
-#             time.append(elapsed)
-#             signal.append(array[100][100])
-#             slope.append(detector.last_flux[100][100])
-#             del array
-# 
-#     sequence += "DARK +"
-#     for integ in range(0,NINTS+1):
-#         if integ == 0:
-#             detector.reset(new_exposure=True)
-#         else:
-#             detector.reset(new_exposure=True)
-#         for reading in range(1,NREADINGS+1):
-#             detector.integrate(darkflux, 60.0)
-#             array = detector.readout()
-#             elapsed += 60.0
-#             time.append(elapsed)
-#             signal.append(array[100][100])
-#             slope.append(detector.last_flux[100][100])
-#             del array
-# 
-#     sequence += "MEDIUM +"
-#     for integ in range(0,NINTS+1):
-#         if integ == 0:
-#             detector.reset(new_exposure=True)
-#         else:
-#             detector.reset(new_exposure=True)
-#         for reading in range(1,NREADINGS+1):
-#             detector.integrate(mediumflux, 60.0)
-#             array = detector.readout()
-#             elapsed += 60.0
-#             time.append(elapsed)
-#             signal.append(array[100][100])
-#             slope.append(detector.last_flux[100][100])
-#             del array
-# 
-#     sequence += "DARK"
-#     for integ in range(0,NINTS+1):
-#         if integ == 0:
-#             detector.reset(new_exposure=True)
-#         else:
-#             detector.reset(new_exposure=True)
-#         for reading in range(1,NREADINGS+1):
-#             detector.integrate(darkflux, 60.0)
-#             array = detector.readout()
-#             elapsed += 60.0
-#             time.append(elapsed)
-#             signal.append(array[100][100])
-#             slope.append(detector.last_flux[100][100])
-#             del array
-# 
-#     mplt.plot_xy(time, signal, linefmt='bo', xlabel='Time (seconds)',
-#                  ylabel='Reading (counts)', title=sequence)
-#     mplt.plot_xy(time, slope, linefmt='bo', xlabel='Time (seconds)',
-#                  ylabel='Slope (counts/second)', title=sequence)
-     
-    # Make 4 normal readings
-    NREADINGS = 4
-    IPERIODS = 3
-    detector.reset()
-    for reading in range(1,NREADINGS+1):
- 
-        # Iterate for 3 integration periods
-        for count in range(1,IPERIODS+1):
- 
-            # Integrate with some flux
-            detector.integrate(mediumflux, 30.0)
-     
-            if verbose > 2:
-                print( "\n===Status after integration period", count )
-                print( detector )
+    if TEST_FRAME_RTI:
+        print( "\n===Frame RTI tests." )
+        print("Col  Col  Row  Row  Smp Smp Rst   Brs    Pred")
+        print("Strt Stop Strt Stop Skp Sum Rid   Md     (s)")
+
+        namps = 4
+        detectorrows = \
+                detector_properties.get('_sca494', 'ILLUMINATED_ROWS')
+        ampcolumns = 2 + \
+                detector_properties.get('_sca494', 'ILLUMINATED_COLUMNS')/namps
+        resetoverhead = \
+                detector_properties.get('_sca494', 'RESET_OVERHEAD')
+        refpixsampleskip = 3
+        clock_time = \
+                detector_properties.get('_sca494', 'CLOCK_TIME')
+        
+        test_parameters = [(  1, 258,   1, 1024, 0, 1, 4, False),
+                           (  1, 258,   1, 1024, 0, 1, 6, False),
+                           (  1,  64,  65,  320, 0, 1, 4, False),
+                           (  1,   5,   1,   16, 0, 1, 4, False),
+                           (  1,   5,   1,   16, 0, 1, 4, True),
+                           (  2,  65,  65,  320, 0, 1, 4, False),
+                           ( 91, 106, 765,  828, 0, 1, 4, False),
+                           ( 91, 106, 765,  828, 0, 1, 4, True),
+                           ( 96,  99, 787,  802, 0, 1, 4, False),
+                           ( 96,  99, 787,  802, 0, 1, 4, True),
+                           (181, 244,  65,  320, 0, 1, 4, False),
+                           (181, 244,  65,  320, 0, 1, 4, True),
+                           
+                           (  1, 258,   1, 1024, 1, 8, 4, False),
+                           (  1, 258,   1, 1024, 2, 8, 4, False),
+                           
+                           (  1,  16,   1,   64, 0, 1, 1, False),
+                           (  1,  16,   1,   64, 0, 1, 4, False),
+                           (  1,  16,   1,   64, 1, 1, 4, False),
+                           (  1,  16,   1,   64, 2, 8, 4, False),
+                           (  1,  16,   1,   64, 2, 16, 4, False),
+                            ]
+        for (colstart, colstop, rowstart, rowstop, sampleskip, samplesum,
+             resetwidth, burst_mode) in test_parameters:
+            frame_clks = frame_rti(detectorrows, ampcolumns,
+                                   colstart, colstop, rowstart, rowstop,
+                                   sampleskip, refpixsampleskip, samplesum,
+                                   resetwidth, resetoverhead, burst_mode)
+            frame_time = frame_clks * clock_time
     
-        # Read out the integrator
-        readout = detector.readout()
-        if verbose > 1:
-            print( "Reading", reading, "signal:\n", readout )
-#         if PLOTTING:
-#             detector.plot(description='Test plot at reading %d' % reading)
- 
-    # Make another reading in quick succession.
-    # Ensure this reading cannot be less than the previous one.
-    # NOTE: For a proper test there need to be some assert statements.
-    readout = detector.readout()
-    if verbose > 2:
-        print( "Another reading", reading, "signal:\n", readout )
-    if PLOTTING:
-        detector.plot(description='Test plot at end of integration')
-#    detector.hit_by_cosmic_rays(100000.0, 512, 512)
-#    detector.plot(description='Test plot after cosmic ray hit')
+            strg = "%4d %4d %4d %4d %3d %3d %3d  %5s %9.5f" % (colstart, colstop,
+                                                      rowstart, rowstop,
+                                                      sampleskip, samplesum,
+                                                      resetwidth, str(burst_mode),
+                                                      frame_time)
+            print(strg)
+                    
+    if TEST_READINGS or TEST_FRAMETIMES:
+        # Create a DetectorArray object for a detector with a the same
+        # area of illuminated pixels as SCA 494 (1024 x 1024).
+        nrows = detector_properties.get('_sca494', 'ILLUMINATED_ROWS')
+        ncolumns = detector_properties.get('_sca494', 'ILLUMINATED_COLUMNS')
+        # Raise the detector temperature so the dark current and artefacts
+        # are more apparent.
+        detector = DetectorArray('MIRIFULONG', nrows, ncolumns, 7.5,
+                                 makeplot=PLOTTING, verbose=verbose)
+#         detector = DetectorArray('MIRIFULONG', nrows, ncolumns, 6.7,
+#                                  makeplot=PLOTTING, verbose=verbose)
      
-    # Reset the detector and check the signal has returned to zero
-    # (within the expected level of persistence).
-    detector.reset()
-    if verbose > 1:
-        print( "\n===Status after a reset." )
+        samples = detector_properties.get('READOUT_MODE', 'SLOW')
+        print("SLOW mode sample array=%s" % str(samples))
+        detector.set_readout_mode(samples[0], samples[1], samples[2])
+     
+        # Display the contents
+        print( "===Status after creation of DetectorArray." )
         print( detector )
+     
+        darkflux = 0.1 * np.ones([nrows,ncolumns])
+        mediumflux = 10.0 * np.ones([nrows,ncolumns])
+        brightflux = 100.0 * np.ones([nrows,ncolumns])
  
-    # Integrate on the detector again and ensure the integration
-    # starts again at zero (with the expected level of persistence).
-    # NOTE: This should perhaps be checked with an assert statement?
-    detector.integrate(mediumflux, 30.0)
-    if verbose > 2:
-        print( "\n===Status after another integration after the reset." )
-        print( detector )
-    print( "" )
+    if TEST_READINGS:
+        # Make 4 normal readings
+        NREADINGS = 4
+        IPERIODS = 3
+        detector.reset()
+        for reading in range(1,NREADINGS+1):
+     
+            # Iterate for 3 integration periods
+            for count in range(1,IPERIODS+1):
+     
+                # Integrate with some flux
+                detector.integrate(mediumflux, 30.0)
+         
+                if verbose > 2:
+                    print( "\n===Status after integration period", count )
+                    print( detector )
+        
+            # Read out the integrator
+            readout = detector.readout()
+            if verbose > 1:
+                print( "Reading", reading, "signal:\n", readout )
+    #         if PLOTTING:
+    #             detector.plot(description='Test plot at reading %d' % reading)
+     
+        # Make another reading in quick succession.
+        # Ensure this reading cannot be less than the previous one.
+        # NOTE: For a proper test there need to be some assert statements.
+        readout = detector.readout()
+        if verbose > 2:
+            print( "Another reading", reading, "signal:\n", readout )
+        if PLOTTING:
+            detector.plot(description='Test plot at end of integration')
+    #    detector.hit_by_cosmic_rays(100000.0, 512, 512)
+    #    detector.plot(description='Test plot after cosmic ray hit')
+         
+        # Reset the detector and check the signal has returned to zero
+        # (within the expected level of persistence).
+        detector.reset()
+        if verbose > 1:
+            print( "\n===Status after a reset." )
+            print( detector )
+     
+        # Integrate on the detector again and ensure the integration
+        # starts again at zero (with the expected level of persistence).
+        # NOTE: This should perhaps be checked with an assert statement?
+        detector.integrate(mediumflux, 30.0)
+        if verbose > 2:
+            print( "\n===Status after another integration after the reset." )
+            print( detector )
+        print( "" )
 
-    subarray_list = detector_properties.get('STANDARD_SUBARRAYS')
-    for subarray in subarray_list:
-        subarray_properties = detector_properties.get('SUBARRAY', subarray)
-        for burst_mode in (False, True):
-            fast_time = detector.frame_time(1, subarray=subarray_properties,
-                                            burst_mode=burst_mode)
-            slow_time = detector.frame_time(10, subarray=subarray_properties,
-                                            burst_mode=burst_mode)
-            fast_exp = detector.exposure_time(2, 1, 1,
-                                              subarray=subarray_properties,
-                                              burst_mode=burst_mode,
-                                              nframes=1, groupgap=0)
-            slow_exp = detector.exposure_time(2, 1, 10,
-                                              subarray=subarray_properties,
-                                              burst_mode=burst_mode,
-                                              nframes=1, groupgap=0)
+    if TEST_FRAMETIMES:
+        fast_samples = detector_properties.get('READOUT_MODE', 'FAST')
+        slow_samples = detector_properties.get('READOUT_MODE', 'SLOW')
+    
+        subarray_list = detector_properties.get('STANDARD_SUBARRAYS')
+        for subarray in subarray_list:
+            subarray_properties = detector_properties.get('SUBARRAY', subarray)
+            for burst_mode in (False, True):
+                fast_time = detector.frame_time(fast_samples[0], fast_samples[1],
+                                                refpixsampleskip=fast_samples[2],
+                                                subarray=subarray_properties,
+                                                burst_mode=burst_mode)
+                slow_time = detector.frame_time(slow_samples[0], slow_samples[1],
+                                                refpixsampleskip=slow_samples[2],
+                                                subarray=subarray_properties,
+                                                burst_mode=burst_mode)
+                fast_exp = detector.exposure_time(2, 1, fast_samples[0],
+                                                  fast_samples[1],
+                                                  refpixsampleskip=fast_samples[2],
+                                                  subarray=subarray_properties,
+                                                  burst_mode=burst_mode,
+                                                  nframes=1, groupgap=0)
+                slow_exp = detector.exposure_time(2, 1, slow_samples[0],
+                                                  slow_samples[1],
+                                                  refpixsampleskip=slow_samples[2],
+                                                  subarray=subarray_properties,
+                                                  burst_mode=burst_mode,
+                                                  nframes=1, groupgap=0)
+    
+                if burst_mode:
+                    substr = subarray + " (burst)"
+                else:
+                    substr = subarray
+                strg = "Subarray %18s: Frame time: Fast=%6.3fs; Slow=%6.3fs. " % \
+                    (substr, fast_time, slow_time)
+                strg += "Elapsed for 2 ints: Fast=%6.3fs; Slow=%6.3fs." % \
+                    (fast_exp[1], slow_exp[1])
+                print( strg )
 
-            if burst_mode:
-                substr = subarray + " (burst)"
-            else:
-                substr = subarray
-            strg = "Subarray %18s: Frame time: Fast=%6.3fs; Slow=%6.3fs. " % \
-                (substr, fast_time, slow_time)
-            strg += "Elapsed for 2 ints: Fast=%6.3fs; Slow=%6.3fs." % \
-                (fast_exp[1], slow_exp[1])
-            print( strg )
-
-    #del detector, darkflux, mediumflux, brightflux
     print( "Test finished." )
