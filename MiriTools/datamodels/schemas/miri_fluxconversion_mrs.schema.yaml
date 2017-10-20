@@ -42,4 +42,5 @@ allOf:
       ndim: 2
       axes: [rows, columns]
       units: arcsec^2
+      datatype: float32
 
