@@ -27,6 +27,7 @@ in the datamodels.miri_fluxconversion_model module.
 07 Oct 2015: Made exception catching Python 3 compatible.
 03 Dec 2015: Added MiriPowerlawColourCorrectionModel.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+24 Oct 2017: Set the pixel size when testing MiriMrsFluxConversionModel
 
 @author: Steven Beard (UKATC)
 
@@ -513,9 +514,14 @@ class TestMiriMrsFluxconversionModel(unittest.TestCase):
                      (0.01, 0.04, 0.0)]
         self.err = [err_plane, err_plane, err_plane]
         self.dq =  [(1,0,0), (0,1,0), (1,0,1)]
+        
+        self.pixsiz = [(1.01, 1.02, 1.03),
+                       (1.04, 1.05, 1.06),
+                       (1.07, 1.08, 1.09)]
 
         self.dataproduct = MiriMrsFluxconversionModel( \
-                              data=self.flux, err=self.err, dq=self.dq )
+                              data=self.flux, err=self.err, dq=self.dq,
+                              pixsiz=self.pixsiz )
         self.testfile = "MiriMrsFluxconversion_test.fits"
         
     def tearDown(self):
@@ -549,6 +555,10 @@ class TestMiriMrsFluxconversionModel(unittest.TestCase):
             nulldp = MiriMrsFluxconversionModel( )
         descr1 = str(nulldp)
         self.assertIsNotNone(descr1)
+        # NOTE: pixsiz must be defined first to prevent a
+        # "Wrong number of dimensions" exception.
+        nulldp.pixsiz = self.pixsiz
+        self.assertIsNotNone(nulldp.pixsiz)
         nulldp.data = self.flux
         self.assertIsNotNone(nulldp.data)
         descr2 = str(nulldp)
