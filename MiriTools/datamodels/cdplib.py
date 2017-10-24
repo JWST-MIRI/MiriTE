@@ -103,7 +103,7 @@ http://miri.ster.kuleuven.be/bin/view/Internal/CalDataProducts
 12 Oct 2017: Make the detector parameter mandatory in get_cdp(), since it
              is a primary key into the CDP_DICT dictionary.
 24 Oct 2017: Corrected persistence problem where ftp-host remained 'LOCAL'
-             even when changed back.
+             even when changed back. 
 
 Steven Beard (UKATC), Vincent Geers (UKATC)
 
