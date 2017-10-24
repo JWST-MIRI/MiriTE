@@ -102,6 +102,8 @@ http://miri.ster.kuleuven.be/bin/view/Internal/CalDataProducts
              on 24 Jan 2017. Now corrected.
 12 Oct 2017: Make the detector parameter mandatory in get_cdp(), since it
              is a primary key into the CDP_DICT dictionary.
+24 Oct 2017: Corrected persistence problem where ftp-host remained 'LOCAL'
+             even when changed back.
 
 Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -1326,7 +1328,7 @@ class MiriCDPInterface(object):
         self._close()
  
     def refresh(self, ftp_host=None, ftp_path=None, ftp_user=None,
-                ftp_passwd=None, timeout=None, local_path=None,
+                ftp_passwd=None, timeout=15.0, local_path=None,
                 cdp_env_name='CDP_DIR', miri_env_name='MIRI_ENV'):
         """
         
@@ -1335,9 +1337,16 @@ class MiriCDPInterface(object):
         Parameters: See class doc string.
 
         """
+        if ftp_host is None:
+            self.ftp_host = MiriCDPInterface.FTP_HOST_DEFAULT
+        if ftp_user is None:
+            self.ftp_user = MiriCDPInterface.FTP_USER_DEFAULT
+        if ftp_path is None:
+            self.ftp_path = MiriCDPInterface.FTP_PATH_DEFAULT
+
         # Only execute this method if any of the SFTP or local cache
         # parameters have changed.
-        if ((ftp_host is not None) and (ftp_host != self.ftp_host)) or \
+        if (ftp_host != self.ftp_host) or \
            ((ftp_path is not None) and (ftp_path != self.ftp_path)) or \
            ((timeout is not None) and (timeout != self.timeout)) or \
            ((local_path is not None) and (local_path != self.local_path)) or \
@@ -1345,7 +1354,7 @@ class MiriCDPInterface(object):
             (cdp_env_name != self.cdp_env_name)) or \
            ((miri_env_name is not None) and \
             (miri_env_name != self.miri_env_name)) or \
-           ((ftp_user is not None) and (ftp_user != self.ftp_user)) or \
+           (ftp_user != self.ftp_user) or \
            ((ftp_passwd is not None) and (ftp_passwd != self.ftp_passwd)):
 
             # Close any open connection and remove the old CDP folder list.
