@@ -104,6 +104,7 @@ http://miri.ster.kuleuven.be/bin/view/Internal/CalDataProducts
              is a primary key into the CDP_DICT dictionary.
 24 Oct 2017: Corrected persistence problem where ftp-host remained 'LOCAL'
              even when changed back. 
+26 Oct 2017: Corrected bug in get_cdp_doc function.
 
 Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -2080,7 +2081,7 @@ class MiriCDPInterface(object):
                             open_attempted = False
                         
                         # The local path needs translating into something SFTP understands.
-                        public_url = self.ftp_host + '/.../' + cdp_file
+                        public_url = self.ftp_host + '/.../' + cdp_doc
                         strg = " Retrieving CDP document\n  from sftp \'%s\'\n" % public_url
                         strg += "  to cache \'%s\' ..." % local_filename
                         self.logger.info(strg)

@@ -119,6 +119,8 @@ This is a general purpose class which is not specific to scasim.
 21 Apr 2017: Restored the plot_polynomial function and added plot_corrected.
 27 Jul 2017: Added an option to the wait() method to simulate a non-zero
              background flux.
+26 Oct 2017: Take into account the correlation between samples when calculating
+             Poisson noise.
 
 @author: Steven Beard (UKATC)
 
@@ -224,7 +226,9 @@ class PoissonIntegrator(object):
     expected_count: float array
         The particles/charges accumulated within the elements of the
         integrator at the current time.
-    last_readout: int
+    last_count: float array
+        The expected count of the integrator when last sampled.
+    last_readout: int array
         The reading obtained from the integrator when the expected_count
         was last sampled.
     flux: float array
@@ -296,6 +300,7 @@ class PoissonIntegrator(object):
         # array which is truncated to integer when read out.
         self.zeropoint = np.zeros(self.shape)
         self.expected_count = np.zeros(self.shape)
+        self.last_count = np.zeros(self.shape)
         self.last_readout = np.zeros(self.shape, dtype=np.uint32)
         self.flux = np.zeros(self.shape)
         self.nperiods = 0    # Number of integration periods since reset.
@@ -325,6 +330,7 @@ class PoissonIntegrator(object):
             # Objects created in the constructor
             del self.flux
             del self.last_readout
+            del self.last_count
             del self.expected_count
             del self.zeropoint
         except Exception:
@@ -484,6 +490,7 @@ class PoissonIntegrator(object):
         if self.pedestal is not None:
             self.zeropoint = self.zeropoint + self.pedestal
         self.expected_count = self.expected_count * 0.0
+        self.last_count = self.expected_count
 
         # Reset exposure time and last readout memory, and set the
         # clock time measured at reset.
@@ -647,7 +654,7 @@ class PoissonIntegrator(object):
                      self.expected_count.max())
                 self.logger.debug(strg)
             # Round extreme values.
-            rounded_array = np.around(self.expected_count, 4)
+            rounded_array = np.around(self.expected_count-self.last_count, 4)
             # Filter out zero, negative or bad values.
             where_zero = np.where(rounded_array <= 0)
             if where_zero:
@@ -672,7 +679,7 @@ class PoissonIntegrator(object):
             # Put the zero values back to zero.
             if where_zero:
                 read_array[where_zero] = 0
-            read_array = self.zeropoint + read_array
+            read_array = self.zeropoint + self.last_count + read_array
         else:
             read_array = self.zeropoint + self.expected_count
         
@@ -687,6 +694,9 @@ class PoissonIntegrator(object):
             maxread = self.bucket_size
 #         read_array = np.clip(read_array, self.last_readout, maxread)
         read_array = np.clip(read_array, 0.0, maxread)
+        
+        # Remember the last expected count
+        self.last_count = self.expected_count
         
         # Increment the reading/group counter and save the last readout.
         self.readings += 1

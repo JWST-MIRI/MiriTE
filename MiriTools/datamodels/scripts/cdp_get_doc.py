@@ -6,6 +6,7 @@
 # 30 Jun 2017: meta.reffile schema level removed to match changes in the
 #              JWST build 7.1 data models release. meta.reffile.type also
 #              changed to meta.reftype. TYPE keyword replaced by DATAMODL.
+# 26 Jun 2017: Added cdp_ftp_path parameter and set to default if not specified.
 #
 # @author: Steven Beard (UKATC)
 #
@@ -39,6 +40,11 @@ The command also takes the following options::
         The password with which to access the CDP repository.
         The default is blank, which will cause the script to
         prompt the user.
+    --cdp_ftp_path
+        A list of folders (or folders) on the SFTP host to be searched
+        for CDP documents, consisting of a list of folder names separated by
+        a ":" delimiter. Examples: 'CDP', 'CDPSIM', 'CDPSIM:CDP:CDPTMP'.
+        Defaults to the standard CDP repository at Leuven.
     --issue
         An issue string which must be matched.
         The default is blank, which will match all issues.
@@ -81,6 +87,9 @@ if __name__ == "__main__":
     parser.add_option("", "--password", dest="password", type="string",
                      default=None, help="Password for CDP server"
                      )
+    parser.add_option("", "--cdp_ftp_path", dest="cdp_ftp_path", type="string",
+                     default='', help="Search path for imported CDPs"
+                     )
     parser.add_option("", "--issue", dest="issue", type="string",
                      default=None, help="Document issue string to be matched"
                      )
@@ -103,6 +112,10 @@ if __name__ == "__main__":
         time.sleep(1) # Ensure help text appears before error messages.
         parser.error("Not enough arguments provided")
         sys.exit(1)
+        
+    cdp_ftp_path = options.cdp_ftp_path
+    if not cdp_ftp_path:
+        cdp_ftp_path = MiriCDPInterface.FTP_PATH_DEFAULT
 
     force = options.force
     verb = options.verb
@@ -119,6 +132,7 @@ if __name__ == "__main__":
 
     miricdp = MiriCDPInterface(ftp_user=options.username,
                                ftp_passwd=options.password,
+                               ftp_path=cdp_ftp_path,
                                logger=LOGGER)
     if verb:
         strg = "%s documents are available:\n" % len(miricdp.cdp_docs_available)

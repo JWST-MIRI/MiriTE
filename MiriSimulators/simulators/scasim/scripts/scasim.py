@@ -60,6 +60,7 @@
 # 07 Feb 2017: Added option to control whether output file contains
 #              data quality information.
 # 13 Jun 2017: Added cdp_ftp_path parameter.
+# 26 Oct 2017: Set cdp_ftp_path to default if not specified.
 # 
 # @author: Steven Beard (UKATC)
 
@@ -266,6 +267,7 @@ import os, sys, time
 
 from miri.simulators.scasim.exposure_data import get_file_header
 from miri.simulators.scasim.sensor_chip_assembly import SensorChipAssembly1
+from miri.simulators.scasim.detector import SIM_CDP_FTP_PATH
 
 if __name__ == "__main__":
     # parse arguments
@@ -434,6 +436,8 @@ if __name__ == "__main__":
     if scale is None:
         scale = 1.0
     cdp_ftp_path = options.cdp_ftp_path
+    if not cdp_ftp_path:
+        cdp_ftp_path = SIM_CDP_FTP_PATH
     cdprelease = options.cdprelease
     previous = options.previous
 

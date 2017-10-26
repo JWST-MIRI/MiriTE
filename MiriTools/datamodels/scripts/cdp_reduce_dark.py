@@ -7,6 +7,7 @@
 # 20 Jan 2017: Replaced "clobber" parameter with "overwrite".
 # 15 Jun 2017: Added option to average multiple frames/groups
 #              together. Use the MiriDarkReferenceModel methods.
+# 26 Jun 2017: Added ability to extract the groups to a smaller 3-D dark.
 #
 # @author: Steven Beard (UKATC)
 #
@@ -42,7 +43,11 @@ The command also takes the following options:
     --groupend
         The last group/frame number to be extracted/averaged from the dark.
     --average or -a
-        Average the data. If not specified, a slope will be determined.
+        Average the data. This option overrides --slope if both are specified.
+    --slope or -l
+        Determine a slope of the data. If neither --average nor --slope are
+        specified, the data will be extracted unchanged to a smaller 3-D
+        DARK product.
     --simplefits or -s
         Use simple FITS I/O (in an attempt to save memory).
     --normalize
@@ -79,7 +84,10 @@ if __name__ == "__main__":
                       help="Overwrite the copy of the file if it already exists"
                      )
     parser.add_option("-a", "--average", dest="average", action="store_true",
-                      help="Average the data rather than taking a slope?"
+                      help="Average the data?"
+                     )
+    parser.add_option("-l", "--slope", dest="slope", action="store_true",
+                      help="Determine a slope from the data?"
                      )
     parser.add_option("-s", "--simplefits", dest="simplefits", action="store_true",
                       help="Run simplified FITS code to save memory?"
@@ -94,6 +102,7 @@ if __name__ == "__main__":
     groupend = options.groupend
     overwrite = options.overwrite
     average = options.average
+    slope = options.slope
     simplefits = options.simplefits
     normalize = options.normalize
     try:
@@ -123,16 +132,20 @@ if __name__ == "__main__":
         else:
             if average:
                 strg += "Averaging groups %d-%d" % (groupstart, groupend)
-            else:
+            elif slope:
                 strg += "Determining slope for groups %d-%d" % (groupstart, groupend)
+            else:
+                strg += "Extracting groups %d-%d" % (groupstart, groupend)
     elif groupstart is not None:
         strg += "Extracting group %d" % groupstart
         groupend = groupstart
     else:
         if average:
             strg += "Averaging all groups"
-        else:
+        elif slope:
             strg += "Determining slope for all groups"
+        else:
+            strg += "No group limits. Copying the whole data model."
 
     # Open the MIRI dark data model, extract the required frame
     # and save it to a MIRI image model.
@@ -182,9 +195,11 @@ if __name__ == "__main__":
                     newmodel = datamodel.average_groups(startgroup=None,
                                                         endgroup=None,
                                                         normalize=normalize)
-                else:
+                elif slope:
                     newmodel = datamodel.slope_data(startgroup=None,
                                                     endgroup=None)
+                else:
+                    newmodel = datamodel
                     
             elif groupstart == groupend:
                 newmodel = datamodel.extract_group(group=groupstart,
@@ -194,9 +209,15 @@ if __name__ == "__main__":
                     newmodel = datamodel.average_groups(startgroup=groupstart,
                                                         endgroup=groupend,
                                                         normalize=normalize)
-                else:
+                elif slope:
                     newmodel = datamodel.slope_data(startgroup=groupstart,
                                                     endgroup=groupend)
+                else:
+                    newmodel = MiriDarkReferenceModel( \
+                                    data=datamodel.data[:,groupstart:groupend,:,:],
+                                    err=datamodel.err[:,groupstart:groupend,:,:],
+                                    dq=datamodel.dq )
+                    
             newmodel.save( outputfile, overwrite=overwrite )
             del newmodel
             del datamodel
