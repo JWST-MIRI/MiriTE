@@ -280,7 +280,7 @@ INSTALLED_DARK = False
 AVERAGED_DARK = False
 
 # Set to True to include latent and zeropoint coefficients in the metadata
-EXTRA_METADATA = False
+EXTRA_METADATA = True
 
 #
 # Global helper functions
@@ -2547,7 +2547,7 @@ class DetectorArray(object):
                     self.logger.debug( "Applying readout noise in the range of " + \
                         "%f to %f (e), sampled %d times." % \
                         (np.min(self.readnoise_map), np.max(self.readnoise_map),
-                         self.used_samples) )
+                         total_samples) )
                 noise = self.readnoise_map / np.sqrt(total_samples)
             else:
                 if self._verbose > 3:
