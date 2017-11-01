@@ -68,6 +68,7 @@ classes and associated functions.
 17 Jul 2017: Added rebinning function to load_cosmic_ray_libraries.
              Added flags for finer control over which tests are run.
              Statistics function added. Rebin by averaging.
+31 Oct 2017: Reduced verbosity of cosmic ray event reporting.
 
 @author: Steven Beard (UKATC)
 
@@ -189,7 +190,7 @@ class CosmicRay(object):
         self.toplogger = logger
         self.logger = logger.getChild("scasim.cosmic_ray")
         self._verbose = int(verbose)
-        if verbose > 3:
+        if verbose > 4:
             self.logger.setLevel(logging.DEBUG)
             self.logger.debug( "+++CosmicRay object created with energy " + \
                 str(energy) + " MeV hitting the detector at " + \
@@ -478,7 +479,7 @@ class CosmicRayEnvironment(object):
         """
         self.toplogger = logger
         self.logger = logger.getChild("scasim.cosmic_ray")
-        if verbose > 3:
+        if verbose > 4:
             self.logger.setLevel(logging.DEBUG)
             self.logger.debug( "+++CosmicRayEnvironment object created " + \
                 "using method %s and flux %g (micron^2/sec)" % \

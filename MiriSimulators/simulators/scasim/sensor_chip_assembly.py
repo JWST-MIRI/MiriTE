@@ -309,6 +309,8 @@ MIRI SCA and its environment:
 13 Oct 2017: New frame time calculation from Mike Ressler.
              SLOW mode now uses 8 out of 9 samples. READOUT_MODE now defines
              samplesum, sampleskip and refpixsampleskip parameters separately.
+01 Nov 2017: Do not simulate detector drifts and latents in SLOW mode, since
+             the measured parameters are only valid for FAST mode.
 
 @author: Steven Beard
 
@@ -374,8 +376,8 @@ detector_properties = ParameterFileManager(
 #
 # Global helper function
 #
-def _report_sca_parameters(inputfile, outputfile, detectorid, fringemap,
-                           fileformat, datashape, qe_adjust,
+def _report_sca_parameters(inputfile, outputfile, detectorid, readout_mode,
+                           fringemap, fileformat, datashape, qe_adjust,
                            simulate_poisson_noise, simulate_read_noise,
                            simulate_ref_pixels, simulate_bad_pixels,
                            simulate_dark_current, simulate_flat_field,
@@ -394,7 +396,8 @@ def _report_sca_parameters(inputfile, outputfile, detectorid, fringemap,
     """
     if inputfile:
         if isinstance(inputfile, (tuple,list)):
-            strg = "Simulating detector readout for " + str(detectorid) + \
+            strg = "Simulating " + str(readout_mode) + \
+                " detector readout for " + str(detectorid) + \
                 " from list of illumination files:"
             for thisfile in inputfile:
                 strg += "   %s" % thisfile
@@ -406,15 +409,23 @@ def _report_sca_parameters(inputfile, outputfile, detectorid, fringemap,
                     if hasattr(inputfile.meta.instrument, 'detector'):
                         detectorid = inputfile.meta.instrument.detector
             detectorid = inputfile.meta.instrument.detector
-            logger.info( "Simulating detector readout for " + str(detectorid) + \
+            readout_mode = ''
+            if hasattr(inputfile, 'meta'):
+                if hasattr(inputfile.meta, 'exposure'):
+                    if hasattr(inputfile.meta.instrument, 'readpatt'):
+                        readout_mode = inputfile.meta.exposure.readpatt
+            logger.info( "Simulating " + str(readout_mode) + \
+                " detector readout for " + str(detectorid) + \
                 " from illumination data model of shape " + \
                 str(inputfile.intensity.shape) + ".")
             logger.debug( inputfile.get_meta_str() )
         else:
-            logger.info( "Simulating detector readout for " + str(detectorid) + \
+            logger.info( "Simulating " + str(readout_mode) + \
+                " detector readout for " + str(detectorid) + \
                 " from illumination file:\n   %s" % inputfile )
     else:
-        logger.info( "Simulating detector readout for " + str(detectorid) + \
+        logger.info( "Simulating " + str(readout_mode) + \
+            " detector readout for " + str(detectorid) + \
             " from illumination data array" )
 
     if fringemap is not None and fringemap:
@@ -456,9 +467,9 @@ def _report_sca_parameters(inputfile, outputfile, detectorid, fringemap,
         switched_off.append("Bias and Gain")
     if not simulate_nonlinearity:
         switched_off.append("Non-linearity")
-    if not simulate_drifts:
+    if ('SLOW' in readout_mode) or (not simulate_drifts):
         switched_off.append("Detector drifts")
-    if not simulate_latency:
+    if ('SLOW' in readout_mode) or (not simulate_latency):
         switched_off.append("Detector latency")
     if switched_off:
         logger.debug( "NOTE: The following effects are switched off: %s" % \
@@ -956,7 +967,7 @@ class SensorChipAssembly(object):
         
         self.define_cosmic_ray_env(cosmic_ray_mode)
             
-        self.set_simulation_flags(qe_adjust=qe_adjust,
+        self.set_simulation_flags(readout_mode, qe_adjust=qe_adjust,
                                   simulate_poisson_noise=simulate_poisson_noise,
                                   simulate_read_noise=simulate_read_noise,
                                   simulate_ref_pixels=simulate_ref_pixels,
@@ -1117,7 +1128,7 @@ class SensorChipAssembly(object):
         """
         np.random.seed(seedvalue)
 
-    def set_simulation_flags(self, qe_adjust=True,
+    def set_simulation_flags(self, readout_mode, qe_adjust=True,
                              simulate_poisson_noise=True,
                              simulate_read_noise=True,
                              simulate_ref_pixels=True,
@@ -1180,16 +1191,22 @@ class SensorChipAssembly(object):
                 strg += "ON."
             else:
                 strg += "OFF."
-            strg += "\n\tDetector drift effects turned "
-            if simulate_drifts:
-                strg += "ON."
+            if 'FAST' in readout_mode:
+                strg += "\n\tDetector drift effects turned "
+                if simulate_drifts:
+                    strg += "ON."
+                else:
+                    strg += "OFF."
+                strg += "\n\tDetector latency effects turned "
+                if simulate_latency:
+                    strg += "ON."
+                else:
+                    strg += "OFF."
             else:
-                strg += "OFF."
-            strg += "\n\tDetector latency effects turned "
-            if simulate_latency:
-                strg += "ON."
-            else:
-                strg += "OFF."
+                strg += "\n\tDetector drift and latency effects not "
+                strg += "simulated for SLOW readout mode."
+                simulate_drifts = False
+                simulate_latency = False
             self.logger.info( strg )
         # If any of the flags have changed, delete the detector and warn
         # the user
@@ -1928,7 +1945,8 @@ class SensorChipAssembly(object):
         # A wait is not possible until a DetectorArray object
         # has been successfully defined.
         if self.detector is None:
-            strg = "DetectorArray object not defined - use read_data first."
+            strg = "DetectorArray object not defined - " + \
+                "use read_data or set_illumination first."
             raise AttributeError(strg)
 
         # Elapsed must be positive.
@@ -3350,17 +3368,18 @@ class SensorChipAssembly(object):
         
         """
         if verbose > 1:
-            _report_sca_parameters(inputfile, outputfile, detectorid, fringemap,
-                               fileformat, datashape, qe_adjust,
-                               simulate_poisson_noise, simulate_read_noise,
-                               simulate_ref_pixels, simulate_bad_pixels,
-                               simulate_dark_current, simulate_flat_field,
-                               simulate_gain, simulate_nonlinearity,
-                               simulate_drifts, simulate_latency,
-                               cdp_ftp_path,
-                               readnoise_version, bad_pixels_version,
-                               flat_field_version, gain_version,
-                               logger=self.logger)
+            _report_sca_parameters(inputfile, outputfile, detectorid,
+                                   readout_mode, fringemap,
+                                   fileformat, datashape, qe_adjust,
+                                   simulate_poisson_noise, simulate_read_noise,
+                                   simulate_ref_pixels, simulate_bad_pixels,
+                                   simulate_dark_current, simulate_flat_field,
+                                   simulate_gain, simulate_nonlinearity,
+                                   simulate_drifts, simulate_latency,
+                                   cdp_ftp_path,
+                                   readnoise_version, bad_pixels_version,
+                                   flat_field_version, gain_version,
+                                   logger=self.logger)
 
         # Set the seed for the np.random function.
         np.random.seed(seedvalue)
@@ -3727,7 +3746,7 @@ class SensorChipAssembly(object):
         
         """
         if verbose > 1:
-            _report_sca_parameters(illumination_map, '', '', fringemap,
+            _report_sca_parameters(illumination_map, '', '', '', fringemap,
                                '', '', qe_adjust,
                                simulate_poisson_noise, simulate_read_noise,
                                simulate_ref_pixels, simulate_bad_pixels,

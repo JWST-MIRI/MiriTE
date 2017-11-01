@@ -121,6 +121,8 @@ This is a general purpose class which is not specific to scasim.
              background flux.
 26 Oct 2017: Take into account the correlation between samples when calculating
              Poisson noise.
+01 Nov 2017: Limit the extrapolation of zero point drift by applying a maximum
+             clock time.
 
 @author: Steven Beard (UKATC)
 
@@ -150,6 +152,9 @@ _MAXINT = sys.maxint
 # TODO: This is an arbitrary level set by trial and error. Can it be more exact?
 _MAXEXPECTED = _MAXINT - (100L * math.sqrt(_MAXINT))
 
+# The maximum clock time for which the slow zeropoint drift is valid.
+# The detector is assumed to settle after this time has elapsed.
+_MAXCLOCK = 100000.0
 
 def linear_regression(x, y):
     """
@@ -1238,9 +1243,11 @@ class ImperfectIntegrator(PoissonIntegrator):
         # Start with a base zeropoint
         zeropoint = np.zeros(shape)
         
-        # The zeropoint drifts slowly as a function of clock time in seconds.
+        # The zeropoint drifts slowly as a function of clock time in seconds,
+        # up to a maximum clock time.
         if slow_coeffs is not None:
-            zeropoint += slow_coeffs[0] + (slow_coeffs[1] * clock_time)
+            zeropoint += slow_coeffs[0] + \
+                         (slow_coeffs[1] * min(clock_time, _MAXCLOCK))
         
         # Integrations 2,3,4,5 onwards have an additional drift
         # dependent on the incoming flux.

@@ -139,6 +139,8 @@ Sources:
 13 Oct 2017: New frame time calculation from Mike Ressler.
              SLOW mode now uses 8 out of 9 samples. READOUT_MODE now defines
              samplesum, sampleskip and refpixsampleskip parameters separately.
+01 Nov 2017: Note that the detector drift and latent coefficients are only
+             valid for FAST mode.
 
 @author: Steven Beard (UKATC)
 
@@ -170,16 +172,19 @@ from miri.simulators.find_simulator_file import find_simulator_file
 # as extra rows on top of the normal detector image.
 #
 # Note that DARK_CURRENT_FILE describes how the dark current varies
-# with detector temperature. DARK_MAP describes how the dark current
+# with detector temperature. A 2-D DARK_MAP describes how the dark current
 # varies over the detector surface (including hot pixels which have
-# excessive dark current).
+# excessive dark current). A 3 or 4-D DARK_MAP also describes how the
+# dark current changes with group and integration.
+#
+# Note that detector drifts and latency have only been modelled in FAST
+# mode. The parameters defined here are not valid in SLOW mode.
 #
 # The find_simulator_file function searches for a named file within a
 # search path of simulator data files(starting with the current working
 # directory) and returns the absolute path.
 #
-# TODO: Replace with the measured FM/JPL persistence effects.
-# TODO: Are there too many fudge factors describing detector drifts?
+# TODO: Is there a better model to describe detector drifts?
 _sca493 = {}
 _sca493['SCA_ID'] = 493             # Numerical SCA ID
 _sca493['FPM_ID'] = "FPMSN106"      # Unique FPM ID
@@ -196,11 +201,12 @@ _sca493['TOP_ROWS'] = 256      # Reference rows in level 1 FITS image
 _sca493['PIXEL_SIZE'] = 25.0   # Pixel size in microns
 _sca493['THICKNESS'] = 470.0   # Detector thickness in microns
 _sca493['WELL_DEPTH'] = 354720 # Well depth in electrons
-_sca493['PEDESTAL'] = 11000    # Pedestal value in electrons
+_sca493['PEDESTAL'] = 10000    # Pedestal value in electrons
 _sca493['BAD_PEDESTAL'] = 1000 # Pedestal value for bad pixels in electrons
 _sca493['MEAN_GAIN'] = 5.5     # Mean gain (e/DN)  (Superceded by GAIN CDP)
 _sca493['PERSISTENCE'] = 0.0   # Linear persistence factor (0.0 to 1.0)
 # _sca493['PERSISTENCE'] = [1.0e-8, 0.03, 0.0]  # Persistence coefficients [2nd,1st,0th]
+# NOTE: The following 4 parameters are valid for FAST mode only.
 _sca493['LATENCY_SLOW'] = [1.67e-9, 136000.0] # Slow latency parameters [gain(1/e),decay]
 _sca493['LATENCY_FAST'] = [0.002, 300.0]      # Fast latency parameters [gain,decay]
 _sca493['ZP_SLOW'] = [45000.0, 0.0084]        # Slow zeropoint drift [const(e),scale(e/s)]
@@ -220,7 +226,7 @@ _sca493['DARK_CURRENT'] = 0.21 # Nominal dark current level (electrons/s)
 _sca493['QE_FILE'] = find_simulator_file('qe_measurementIM.fits')
 # Dark map derived from FM CDP data:
 _sca493['DARK_MAP'] = find_simulator_file('MIRI_FM_MIRIMAGE_FAST_DARK.fits')
-_sca493['NOISEFACTOR'] = 1.0   # Noise adjustment factor
+_sca493['NOISEFACTOR'] = 0.5   # Noise adjustment factor
 
 _sca494 = {}
 _sca494['SCA_ID'] = 494             # Numerical SCA ID
@@ -238,11 +244,12 @@ _sca494['TOP_ROWS'] = 256      # Reference rows in level 1 FITS image
 _sca494['PIXEL_SIZE'] = 25.0   # Pixel size in microns
 _sca494['THICKNESS'] = 470.0   # Detector thickness in microns
 _sca494['WELL_DEPTH'] = 359950 # Well depth in electrons
-_sca494['PEDESTAL'] = 11000    # Pedestal value in electrons
+_sca494['PEDESTAL'] = 10000    # Pedestal value in electrons
 _sca494['BAD_PEDESTAL'] = 1000 # Pedestal value for bad pixels in electrons
 _sca494['MEAN_GAIN'] = 5.5     # Mean gain (e/DN) (Superceded by GAIN CDP)
 _sca494['PERSISTENCE'] = 0.0   # Linear persistence factor (0.0 to 1.0)
 # _sca494['PERSISTENCE'] = [1.0e-8, 0.03, 0.0]  # Persistence coefficients [2nd,1st,0th]
+# NOTE: The following 4 parameters are valid for FAST mode only.
 _sca494['LATENCY_SLOW'] = [1.67e-9, 136000.0] # Slow latency parameters [gain(1/e),decay(s)]
 _sca494['LATENCY_FAST'] = [0.002, 300.0]      # Fast latency parameters [gain,decay(s)]
 _sca494['ZP_SLOW'] = [45000.0, 0.0084]        # Slow zeropoint drift [const(e),scale(e/s)]
@@ -262,7 +269,7 @@ _sca494['DARK_CURRENT'] = 0.21 # Nominal dark current level (electrons/s)
 _sca494['QE_FILE'] = find_simulator_file('qe_measurementLW.fits')
 # Dark map derived from FM CDP data:
 _sca494['DARK_MAP'] = find_simulator_file('MIRI_FM_MIRIFULONG_FAST_DARK.fits')
-_sca494['NOISEFACTOR'] = 1.0   # Noise adjustment factor
+_sca494['NOISEFACTOR'] = 0.5   # Noise adjustment factor
 
 _sca495 = {}
 _sca495['SCA_ID'] = 495             # Numerical SCA ID
@@ -280,11 +287,12 @@ _sca495['TOP_ROWS'] = 256      # Reference rows in level 1 FITS image
 _sca495['PIXEL_SIZE'] = 25.0   # Pixel size in microns
 _sca495['THICKNESS'] = 470.0   # Detector thickness in microns
 _sca495['WELL_DEPTH'] = 358190 # Well depth in electrons
-_sca495['PEDESTAL'] = 11000    # Pedestal value in electrons
+_sca495['PEDESTAL'] = 10000    # Pedestal value in electrons
 _sca495['BAD_PEDESTAL'] = 1000 # Pedestal value for bad pixels in electrons
 _sca495['MEAN_GAIN'] = 5.5     # Mean gain (e/DN) (Superceded by GAIN CDP)
 _sca495['PERSISTENCE'] = 0.0   # Linear persistence factor (0.0 to 1.0)
 # _sca495['PERSISTENCE'] = [1.0e-8, 0.03, 0.0]  # Persistence coefficients [2nd,1st,0th]
+# NOTE: The following 4 parameters are valid for FAST mode only.
 _sca495['LATENCY_SLOW'] = [1.67e-9, 136000.0] # Slow latency parameters [gain(1/e),decay]
 _sca495['LATENCY_FAST'] = [0.002, 300.0]      # Fast latency parameters [gain,decay]
 _sca495['ZP_SLOW'] = [45000.0, 0.0084]        # Slow zeropoint drift [const(e),scale(e/s)]
@@ -308,7 +316,7 @@ _sca495['QE_FILE'] = find_simulator_file('qe_measurementSW.fits')
 # Dark map derived from FM CDP data:
 # _sca495['BAD_PIXEL_MAP'] = find_simulator_file('MIRI_FM_MIRIFUSHORT_MASK.fits')
 _sca495['DARK_MAP'] = find_simulator_file('MIRI_FM_MIRIFUSHORT_FAST_DARK.fits')
-_sca495['NOISEFACTOR'] = 1.0   # Noise adjustment factor
+_sca495['NOISEFACTOR'] = 0.5   # Noise adjustment factor
 
 # Other detector descriptions (e.g. for other JWST instruments) can be
 # added here.
