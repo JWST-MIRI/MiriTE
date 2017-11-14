@@ -21,7 +21,7 @@ allOf:
     dq:
       title: Data quality array
       fits_hdu: DQ
-      default: 0.0
+      default: 0
       units: ''
       datatype: uint32
     dq_def:
