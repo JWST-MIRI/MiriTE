@@ -205,32 +205,34 @@ class TestMiriFlagsTable(unittest.TestCase):
         #value = self.flagtable['nosuchflag']
         self.assertRaises(KeyError, self.flagtable.__getitem__, 'nosuchflag')
         
-    def test_operations(self):
-        # Test the arithmetic operations
-        # It is possible to extend an existing table by adding a new one
-        bad_pixel_flags = [(29, 'choppy', 'Pixel is pretty choppy'),
-                           (30, 'noisy',  'Pixel is noisy')] #,
-        newtable = self.flagtable + bad_pixel_flags
-        descr = str(newtable)
-        self.assertIsNotNone(descr)
-        
-        value = newtable['choppy']
-        self.assertEqual(value, 29)
-        value = newtable['noisy']
-        self.assertEqual(value, 30)
-        del newtable
-        
-        # The same operation is possible by adding two FlagsTable objects
-        bad_pixel_table = dqflags.FlagsTable( bad_pixel_flags )
-        newtable = self.flagtable + bad_pixel_table
-        descr = str(newtable)
-        self.assertIsNotNone(descr)
-        
-        value = newtable['choppy']
-        self.assertEqual(value, 29)
-        value = newtable['noisy']
-        self.assertEqual(value, 30)
-        del newtable
+# Test no longer possible now self.flagstable contains the maximum
+# number of flags.
+#     def test_operations(self):
+#         # Test the arithmetic operations
+#         # It is possible to extend an existing table by adding a new one
+#         bad_pixel_flags = [(29, 'choppy', 'Pixel is pretty choppy'),
+#                            (30, 'noisy',  'Pixel is noisy')] #,
+#         newtable = self.flagtable + bad_pixel_flags
+#         descr = str(newtable)
+#         self.assertIsNotNone(descr)
+#         
+#         value = newtable['choppy']
+#         self.assertEqual(value, 29)
+#         value = newtable['noisy']
+#         self.assertEqual(value, 30)
+#         del newtable
+#         
+#         # The same operation is possible by adding two FlagsTable objects
+#         bad_pixel_table = dqflags.FlagsTable( bad_pixel_flags )
+#         newtable = self.flagtable + bad_pixel_table
+#         descr = str(newtable)
+#         self.assertIsNotNone(descr)
+#         
+#         value = newtable['choppy']
+#         self.assertEqual(value, 29)
+#         value = newtable['noisy']
+#         self.assertEqual(value, 30)
+#         del newtable
         
     def test_raising_lowering(self):
         # Test the use of the flags table to raise and lower flags
