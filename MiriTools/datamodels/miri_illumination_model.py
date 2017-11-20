@@ -859,6 +859,8 @@ if __name__ == '__main__':
 
     with MiriIlluminationFringingModel( intensity=ii3, wavelength=ww3,
                                         direction=dd4 ) as ill:
+        # Try non-default units.
+        ill.set_data_units('intensity', 'electrons/s')
         print(ill)
         if PLOTTING:
             ill.plot()

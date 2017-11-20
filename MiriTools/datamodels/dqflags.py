@@ -97,6 +97,7 @@ http://miri.ster.kuleuven.be/bin/view/Internal/DataQualityFlags
 06 Aug 2015: Updated list of PIXELDQ flags to match the JWST build 5
              pipeline specification.
 17 Mar 2017: Corrected some documentation typos.
+14 Nov 2017: Added some new DQ flags.
 
 @author: Ruyman Azzollini (DIAS), Steven Beard (UKATC)
 
@@ -196,7 +197,8 @@ def insert_value_column(flagtable):
 # This global variable contains the master set of JWST pipeline flags
 # used for the PIXELDQ and DQ arrays. The first 8 bits are also used
 # for the GROUPDQ array.For details see
-# https://confluence.stsci.edu/display/JWSTPWG/
+# http://jwst-reffiles.stsci.edu/source/data_quality.html
+#
 #                Bit Name                Description
 #                --- ----                -----------
 groupdq_setup = [(0,  'DO_NOT_USE',       'Bad pixel. Do not use.'),
@@ -232,7 +234,9 @@ pixeldq_setup = groupdq_setup + \
                  (26, 'OPEN',             
                                 'Open pixel (counts move to adj. pixels)'),
                  (27, 'ADJ_OPEN',         'Adjacent to open pixel'),
-                 (28, 'UNRELIABLE_RESET', 'Sensitive to reset anomaly')]
+                 (28, 'UNRELIABLE_RESET', 'Sensitive to reset anomaly'),
+                 (29, 'MSA_FAILED_OPEN ', 'Pixel sees light from failed open shutter'),
+                 (30, 'OTHER_BAD_PIXEL ', 'A catch-all flag')]
 pixeldq_flags = insert_value_column( pixeldq_setup )
 
 # The master table is a combination of both of the above tables.

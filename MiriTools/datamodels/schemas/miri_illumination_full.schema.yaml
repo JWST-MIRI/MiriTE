@@ -13,7 +13,7 @@ allOf:
             units:
               type: string
               title: Units of the direction array
-              fits_hdu: INTENSITY
+              fits_hdu: DIRECTION
               fits_keyword: BUNIT
     direction:
       title: The direction of the illumination

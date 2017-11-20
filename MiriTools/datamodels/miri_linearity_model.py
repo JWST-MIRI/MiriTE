@@ -49,6 +49,8 @@ The STScI jwst.datamodels documentation.
              JWST build 7.1 data models release. meta.reffile.type also
              changed to meta.reftype. TYPE keyword replaced by DATAMODL.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+20 Nov 2017: Updated the schema so the world coordinates are written to
+             the COEFFS data component.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 

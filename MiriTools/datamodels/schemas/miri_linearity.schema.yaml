@@ -1,11 +1,256 @@
 allOf:
-- $ref: miri_measured.schema.yaml
+- $ref: miri_core.schema.yaml
 - type: object
   title: MIRI nonlinearity measurement
   properties:
     meta:
       type: object
       properties:
+        wcsinfo:
+          title: WCS parameters
+          type: object
+          properties:
+            wcsaxes:
+              title: number of World Coordinate System axes
+              type: integer
+              fits_keyword: WCSAXES
+              fits_hdu: COEFFS
+            crpix1:
+              title: Axis 1 coordinate of the reference pixel
+              type: number
+              default: 0.0
+              fits_keyword: CRPIX1
+              fits_hdu: COEFFS
+            crpix2:
+              title: Axis 2 coordinate of the reference pixel
+              type: number
+              default: 0.0
+              fits_keyword: CRPIX2
+              fits_hdu: COEFFS
+            crpix3:
+              title: Axis 3 coordinate of the reference pixel
+              type: number
+              fits_keyword: CRPIX3
+              fits_hdu: COEFFS
+            crpix4:
+              title: Axis 4 coordinate of the reference pixel
+              type: number
+              fits_keyword: CRPIX4
+              fits_hdu: COEFFS
+            crval1:
+              title: Axis 1 value at the reference pixel
+              type: number
+              default: 0.0
+              fits_keyword: CRVAL1
+              fits_hdu: COEFFS
+            crval2:
+              title: Axis 2 value at the reference pixel
+              type: number
+              default: 0.0
+              fits_keyword: CRVAL2
+              fits_hdu: COEFFS
+            crval3:
+              title: Axis 3 value at the reference pixel
+              type: number
+              fits_keyword: CRVAL3
+              fits_hdu: COEFFS
+            crval4:
+              title: Axis 4 value at the reference pixel
+              type: number
+              fits_keyword: CRVAL4
+              fits_hdu: COEFFS
+            ctype1:
+              title: Axis 1 coordinate type
+              type: string
+              fits_keyword: CTYPE1
+              fits_hdu: COEFFS
+            ctype2:
+              title: Axis 2 coordinate type
+              type: string
+              fits_keyword: CTYPE2
+              fits_hdu: COEFFS
+            ctype3:
+              title: Axis 3 coordinate type
+              type: string
+              fits_keyword: CTYPE3
+              fits_hdu: COEFFS
+            ctype4:
+              title: Axis 4 coordinate type
+              type: string
+              fits_keyword: CTYPE4
+              fits_hdu: COEFFS
+            cunit1:
+              title: Axis 1 units
+              type: string
+              fits_keyword: CUNIT1
+              fits_hdu: COEFFS
+            cunit2:
+              title: Axis 2 units
+              type: string
+              fits_keyword: CUNIT2
+              fits_hdu: COEFFS
+            cunit3:
+              title: Axis 3 units
+              type: string
+              fits_keyword: CUNIT3
+              fits_hdu: COEFFS
+            cunit4:
+              title: Axis 4 units
+              type: string
+              fits_keyword: CUNIT4
+              fits_hdu: COEFFS
+            cdelt1:
+              title: Axis 1 increment per pixel
+              type: number
+              default: 1.0
+              fits_keyword: CDELT1
+              fits_hdu: COEFFS
+            cdelt2:
+              title: Axis 2 increment per pixel
+              type: number
+              default: 1.0
+              fits_keyword: CDELT2
+              fits_hdu: COEFFS
+            cdelt3:
+              title: Axis 3 increment per pixel
+              type: number
+              fits_keyword: CDELT3
+              fits_hdu: COEFFS
+            cdelt4:
+              title: Axis 4 increment per pixel
+              type: number
+              fits_keyword: CDELT4
+              fits_hdu: COEFFS
+            pc1_1:
+              title: linear transformation matrix element
+              type: number
+              fits_keyword: PC1_1
+              fits_hdu: COEFFS
+            pc1_2:
+              title: linear transformation matrix element
+              type: number
+              fits_keyword: PC1_2
+              fits_hdu: COEFFS
+            pc1_3:
+              title: linear transformation matrix element
+              type: number
+              fits_keyword: PC1_3
+              fits_hdu: COEFFS
+            pc2_1:
+              title: linear transformation matrix element
+              type: number
+              fits_keyword: PC2_1
+              fits_hdu: COEFFS
+            pc2_2:
+              title: linear transformation matrix element
+              type: number
+              fits_keyword: PC2_2
+              fits_hdu: COEFFS
+            pc2_3:
+              title: linear transformation matrix element
+              type: number
+              fits_keyword: PC2_3
+              fits_hdu: COEFFS
+            pc3_1:
+              title: linear transformation matrix element
+              type: number
+              fits_keyword: PC3_1
+              fits_hdu: COEFFS
+            pc3_2:
+              title: linear transformation matrix element
+              type: number
+              fits_keyword: PC3_2
+              fits_hdu: COEFFS
+            pc3_3:
+              title: linear transformation matrix element
+              type: number
+              fits_keyword: PC3_3
+              fits_hdu: COEFFS
+            s_region:
+              title: spatial extent of the observation
+              type: string
+              fits_keyword: S_REGION
+              fits_hdu: COEFFS
+            waverange_start:
+              title: lower bound of the default wavelength range
+              type: number
+              fits_keyword: WAVSTART
+              fits_hdu: COEFFS
+            waverange_end:
+              title: upper bound of the default wavelength range
+              type: number
+              fits_keyword: WAVEND
+              fits_hdu: COEFFS
+            spectral_order:
+              title: default spectral order
+              type: number
+              fits_keyword: SPORDER
+              fits_hdu: COEFFS
+            v2_ref:
+              title: Telescope v2 coordinate of the reference point (arcsec)
+              type: number
+              fits_keyword: V2_REF
+              fits_hdu: COEFFS
+            v3_ref:
+              title: Telescope v3 coordinate of the reference point (arcsec)
+              type: number
+              fits_keyword: V3_REF
+              fits_hdu: COEFFS
+            vparity:
+              title: Relative sense of rotation between Ideal xy and V2V3
+              type: integer
+              fits_keyword: VPARITY
+              fits_hdu: COEFFS
+            v3yangle:
+              title: Angle from V3 axis to Ideal y axis (deg)
+              type: number
+              fits_keyword: V3I_YANG
+              fits_hdu: COEFFS
+            ra_ref:
+              title: Right ascension of the reference point (deg)
+              type: number
+              fits_keyword: RA_REF
+              fits_hdu: COEFFS
+            dec_ref:
+              title: Declination of the reference point (deg)
+              type: number
+              fits_keyword: DEC_REF
+              fits_hdu: COEFFS
+            roll_ref:
+              title: Telescope roll angle of V3 measured from North over East at the ref. point (deg)
+              type: number
+              fits_keyword: ROLL_REF
+              fits_hdu: COEFFS
+        pointing:
+          title: Spacecraft pointing information
+          type: object
+          properties:
+            ra_v1:
+              title: RA of telescope V1 axis [deg]
+              type: number
+              fits_keyword: RA_V1
+              fits_hdu: COEFFS
+            dec_v1:
+              title: Dec of telescope V1 axis [deg]
+              type: number
+              fits_keyword: DEC_V1
+              fits_hdu: COEFFS
+            pa_v3:
+              title: Position angle of telescope V3 axis [deg]
+              type: number
+              fits_keyword: PA_V3
+              fits_hdu: COEFFS
+        coordinates:
+          title: Information about the coordinates in the file
+          type: object
+          properties:
+            reference_frame:
+              title: Name of the coordinate reference frame
+              type: string
+              default: ICRS
+              fits_keyword: RADESYS
+              enum: [ICRS]
+              fits_hdu: COEFFS
         data:
           type: object
           title: Information about the data array
@@ -14,6 +259,15 @@ allOf:
               type: string
               title: Units of the data array
               fits_hdu: COEFFS
+              fits_keyword: BUNIT
+        err:
+          type: object
+          title: Information about the error array
+          properties:
+            units:
+              type: string
+              title: Units of the error array
+              fits_hdu: ERR
               fits_keyword: BUNIT
         fit:
           type: object
@@ -44,7 +298,24 @@ allOf:
               title: Number of frames rejected
               fits_keyword: IREJECT
     data:
+      title: The linearity coefficients
       fits_hdu: COEFFS
       ndim: 3
       units: ''
+      axes: [order, rows, columns]
       datatype: float32
+    err:
+      title: Error array
+      fits_hdu: ERR
+      default: 0.0
+      units: ''
+      datatype: float32
+    dq:
+      title: Data quality array
+      fits_hdu: DQ
+      default: 0
+      units: ''
+      datatype: uint32
+    dq_def:
+      $ref: http://jwst.stsci.edu/schemas/dq_def.schema.yaml
+      

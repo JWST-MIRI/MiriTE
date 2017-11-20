@@ -136,6 +136,7 @@ The STScI jwst.datamodel library documentation.
 15 Sep 2017: World Coordinates setting functions split into smaller parts.
              "get_" functions added to make accessing the metadata easier.
 22 Sep 2017: Added more WCS-related metadata to the set_wcs_metadata function.
+20 Nov 2017: Corrected a bug in the set_data_units method.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -2560,26 +2561,28 @@ class MiriDataModel(DataModel):
             or if the data item does not exist.
         
         """
-        # If the units have not been specified, get a default
-        # from the schema.
+        # If the units have not been explicitly specified, get a default
+        # from the schema. Search for a .units components of the named item.
         defaulted = False
         if units is None:
             unitlist = self.find_schema_components('units')
-            if name in unitlist:
-                units = unitlist[name]
-                # Convert undefined units to a null string.
-                if units == 'None':
-                    units = ''
-                defaulted = True
+            for keyword in unitlist:
+                if name in keyword:
+                    units = str(unitlist[str(keyword)])
+                    # Convert undefined units to a null string.
+                    if units == 'None':
+                        units = ''
+                    defaulted = True
+                    break
 #                 print("+++Default of %s found in schema" % units)
 
-        # If there are valid units, define them by setting
-        # the metadata (if available).
+        # If there are valid units, define them by setting the metadata
+        # (if available).
         if units is not None:      
             if hasattr( self.meta, name):
                 metaname = getattr(self.meta, name)
                 if hasattr(metaname, 'units'):
-                    metaunits = getattr(metaname, 'units')
+                    metaunits = str(getattr(metaname, 'units'))
                     # Convert undefined units to a null string.
                     if metaunits == 'None':
                         metaunits = ''

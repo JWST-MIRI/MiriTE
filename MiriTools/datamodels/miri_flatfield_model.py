@@ -40,6 +40,7 @@ The STScI jwst.datamodels documentation.
              Do not set observation or target metadata. Neither are
              appropriate for a reference file.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+17 Nov 2017: Added more DQ flags.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -64,7 +65,9 @@ flat_reference_setup = \
              (2, 'UNRELIABLE_FLAT',     'Flat variance large'),
              (3, 'CDP_PARTIAL_DATA',    'Data derived from incomplete input'),
              (4, 'CDP_LOW_QUAL',        'Data of low quality'),
-             (5, 'CDP_UNRELIABLE_ERROR','Data without reliable error estimate')]
+             (5, 'CDP_UNRELIABLE_ERROR','Data without reliable error estimate'),
+             (6, 'NO_FLAT_FIELD',       'No flat-field data available'),
+             (7, 'DIFF_PATTERN',        'Diffraction pattern')]
 flat_reference_flags = insert_value_column( flat_reference_setup )
 
 
