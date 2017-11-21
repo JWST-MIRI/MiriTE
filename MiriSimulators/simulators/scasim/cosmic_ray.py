@@ -5,6 +5,14 @@
 Module cosmic_ray - Contains the CosmicRayEnvironment and CosmicRay 
 classes and associated functions.
 
+The CosmicRayEnvironment class describes a cosmic ray environment, capable
+of generating random cosmic ray events. Each individual event is represented
+by an instance of the CosmicRay class.
+
+The simulation is based on the parameters contained in the module
+cosmic_ray_properties.py and the data contained in a library of cosmic
+ray events.
+
 :History:
 
 25 Jul 2010: Created

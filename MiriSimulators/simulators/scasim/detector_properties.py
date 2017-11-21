@@ -11,11 +11,9 @@ properties can be described by the parameters contained here.
 The main differences are the material, pixel size and detector
 thickness.
 
-NOTE: The SCASim simulation is as good as the data contained in
-these properties files. Initially, the files contained estimated
-properties or properties derived from VM measurements. For the best
-simulation, the properties derived from the most recent FM
-measurements should be used. 
+NOTE: These properties have been defined to match the data obtained
+during FM testing of the detectors. For the best simulation, the
+parameters should be kept up to date as detector knowledge improves.
 
 Each set of properties is stored in a Python dictionary and the
 properties belonging to a particular focal plane module can be

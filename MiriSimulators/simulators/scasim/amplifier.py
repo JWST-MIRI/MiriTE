@@ -4,6 +4,14 @@
 
 Module amplifier - Contains the Amplifier class and associated functions.
 
+The simulation is based on the parameters contained in the module
+amplifier_properties.py
+
+NOTE: This legacy class is not currently used by SCASim. It may be used
+in the future to simulate a detector where the differences between the
+zones read out by different amplifiers is significant. MIRI CDPs don't
+distinguish between amplifiers and are applied to the whole detector.
+
 :History:
 
 06 Jul 2010: Created

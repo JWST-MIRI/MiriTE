@@ -13,44 +13,38 @@ Available modules
 sensor_chip_assembly
     SensorChipAssembly - Top level SCA simulator class
 
-data_maps
-    LEGACY DATA MODELS.
-    DataMap class - Generic data map manager.
-    Illumination map class - Loads/manages/saves/displays the description
-                             of the illumination on a detector.
-    DarkMap class          - Loads/manages/saves/displays dark maps.
-    BadPixelMap class      - Loads/manages/saves/displays bad pixel masks.
-
 exposure_data
     LEGACY DATA MODELS.
     ExposureData class - Assembles/manages/saves/displays the data
     created by a simulation.
 
 detector
-    DetectorArray class - Describes a MIRI detector
+    DetectorArray - Describes a MIRI detector
 
 amplifier
-    Amplifier class - Describes a detector amplifier.
+    LEGACY CLASS - not used at the moment
+    Amplifier - Describes a detector amplifier.
 
 cosmic_ray
-    CosmicRay class      - Describes a cosmic ray event.
+    CosmicRay            - Describes a cosmic ray event.
     CosmicRayEnvironment - Describes the cosmic ray environment.
     
 Scripts
 -------
-scasim - Run a SCASIM simulation.
+scasim - Run an SCASIM simulation.
+
+convert_exposure_data - Convert exposure data between FITSWRiter and STScI format
+
+plot_exposure - Plot the contents of an exposure (or ramp) data file.
 
 make_sca_file - Make a detector illumination file.
 
-make_sca_calibration - Make an artificial calibration file.
-
-make_qe_fits - Define a detector quantum efficiency measurement.
-
-make_measurements_fits - Define a detector parameter measurement.
-
 make_bad_pixel_mask - Define a detector bad pixel mask.
 
-make_maps_from_dhas - Convert a DHAS format bad pixel mask to SCASim files.
+make_fringe_map - Make an artificial fringe map.
+
+make_sca_calibration - Make an artificial calibration file.
+
 
 Data
 ----
@@ -64,6 +58,8 @@ data/SCATestInput80x64.fits
 02 Apr 2012: All module imports removed.
 13 Nov 2012: Description changed to reflect new teams/miri package structure.
 05 Jun 2013: Moved description of top level modules to miri.simulators.
+21 Nov 2017: Updated list of scripts.
+
 """
 
 # If you update this file don't forget also to update defsetup.py and 

@@ -25,12 +25,28 @@ The class hierarchy is:
             MiriMeasurement
         MiriQuantumEfficiency
             MiriFilter
+            
+The DetectorArray class simulates the underlying detector array, with the
+SensorChipAssembly class managing the application interface: interpreting
+the input data, managing the metadata and packaging the output data into
+the correct format.
+
+NOTE: There are three variations of SensorChipAssembly class, each of which
+is based on the Singleton design pattern. Once an instance is created it
+will persist until explicitly destroyed. This feature is used to implement
+the detector latency simulation, but it does produce side effects. The
+constructor is called only once, and a setup() method is used to change the
+detector properties once the a SensorChipAssembly object has been created.
     
 The following configuration files are use to describe the properties of the
 MIRI SCA and its environment:
 
     cosmic_ray_properties
     detector_properties
+    
+The simulation is also based on the calibration data contained in the MIRI
+bad pixel mask, gain, dark current and pixel flat-field Calibration
+Data Products (CDPs).
 
 :History:
 

@@ -231,7 +231,7 @@ The command also takes the following options:
     --overwrite or -o:
         Overwrite any existing FITS output file.
     --noqe:
-        Simulation without quantum efficiency adjustment
+        Simulation without quantum efficiency adjustment (input in electrons/s)
     --nopoisson:
         Simulation without Poisson noise.
     --noreadnoise:

@@ -8,11 +8,10 @@ detector readout amplifiers.
 
 The properties are stored in a list of Python dictionaries.
 
-NOTE: The SCASim simulation is as good as the data contained in
-these properties files. Initially, the files contained estimated
-properties or properties derived from VM measurements. For the best
-simulation, the properties derived from the most recent FM
-measurements should be used. 
+NOTE: This legacy module is not currently used by SCASim. It may be used
+in the future to simulate a detector where the differences between the
+zones read out by different amplifiers is significant. MIRI CDPs don't
+distinguish between amplifiers and are applied to the whole detector.
 
 :History:
 

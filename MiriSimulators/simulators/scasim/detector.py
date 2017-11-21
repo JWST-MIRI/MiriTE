@@ -4,6 +4,17 @@
 
 Module detector - Contains the DetectorArray class.
 
+This module simulates a detector which accumulates charge and may be
+read out non-destructively. The simulation is based on around an
+integrator object (ImperfectIntegrator), which simulates an integrator
+with Poisson noise and latency effects. The DetectorArray class adds a
+bad pixel map and simulates the gain, flat-field and dark current.
+
+The simulation is based on the parameters contained in the module
+detector_properties.py and the calibration data contained in the MIRI
+bad pixel mask, gain, dark current and pixel flat-field Calibration
+Data Products (CDPs).
+
 :History:
 
 18 Jun 2010: Created.

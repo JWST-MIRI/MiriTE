@@ -2,8 +2,22 @@
 
 """
 
-Module poisson_integrator - Contains the PoissonIntegrator class.
-This is a general purpose class which is not specific to scasim.
+Module poisson_integrator - Contains the PoissonIntegrator and
+ImperfectIntegrator classes.
+
+PoissonIntegrator is a general purpose class representing an integrator,
+such as a detector, which accumulates counts as a function of time. The
+current count can be sampled non-destructively at any time, but the
+reading obtained is subject to Poisson noise, depending on how many counts
+have accumulated since the last reading. The class simulates reset,
+integrate and readout functions.
+
+ImperfectIntegrator is based on PoissonIntegrator but also simulates
+imperfections, such as persistence, latency and zero-point drifts.
+
+These general purpose classes are not specific to any simulator, although
+ImperfectIntegrator implements the detector latency and zero-point drift
+effects simulated by SCASim.
 
 :History:
 18 Jun 2010: Created.
