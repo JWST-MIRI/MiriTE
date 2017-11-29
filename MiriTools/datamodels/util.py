@@ -54,6 +54,8 @@ processing the MIRI data models.
              changed to meta.reftype. TYPE keyword replaced by DATAMODL.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 04 Oct 2017: Check for data type in the FILETYPE keyword.
+29 Nov 2017: Removed obsolete find_fits_values function from CDP history
+             check. REFTYPE trumps FILETYPE when assessing data type.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -345,12 +347,12 @@ def open( init=None, astype=None):
                 if datatype:
                     # The data type in the file header is overriden.
                     kwlist.append(datatype)
-                elif 'FILETYPE' in header or 'FILETYPE' in header_keys:
-                    # There is a new data type keyword in the header.
-                    kwlist.append(header['FILETYPE'])
                 elif 'REFTYPE' in header or 'REFTYPE' in header_keys:
                     # There is a reference data type keyword in the header.
                     kwlist.append(header['REFTYPE'])
+                elif 'FILETYPE' in header or 'FILETYPE' in header_keys:
+                    # There is a new data type keyword in the header.
+                    kwlist.append(header['FILETYPE'])
                 elif 'DATAMODL' in header or 'DATAMODL' in header_keys:
                     # There is an old data type keyword in the header.
                     kwlist.append(header['DATAMODL'])
@@ -667,6 +669,7 @@ def verify_metadata(datamodel):
         check_list += CDP_SUBARRAY
     
     for (name,test_values) in check_list:
+#         print("Looking for %s with allowed values %s" % (name, str(test_values)))
         try:
             value = datamodel.get_fits_keyword(name)
 #             print("%s = %s" % (name, str(value)))
@@ -689,12 +692,11 @@ def verify_metadata(datamodel):
                 failure_string += "\'%s\' is not defined.\n" % name
         except KeyError:
             failure_string += "  Compulsory metadata keyword "
-            failure_string += "\'%s\' not found.\n" % name
+            failure_string += "\'%s\' not found in the data model schema.\n" % name
             
-    # Check for HISTORY records. Use the old and new methods of finding
-    # the records.
-    hlist = datamodel.find_fits_values('HISTORY')
-    hlist += datamodel.get_history()
+    # Check for HISTORY records.
+#     hlist = datamodel.find_fits_values('HISTORY')
+    hlist = datamodel.get_history()
     if hlist:
         history_checked = len(CDP_HISTORY) * [False]
         for history in hlist:

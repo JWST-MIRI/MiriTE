@@ -167,6 +167,11 @@ properties:
                MIR_LRS-SLITLESS, MIR_MRS, MIR_DARK, MIR_FLAT-IMAGE,
                MIR_FLATIMAGE, MIR_FLAT-MRS, MIR_FLATMRS, MIR_CORONCAL, N/A]
         fits_keyword: EXP_TYPE
+      readpatt:
+        type: string
+        title: Readout pattern
+        enum: [FAST, FASTGRPAVG, FASTINTAVG, SLOW, ANY, N/A]
+        fits_keyword: READPATT
       nframes:
         type: integer
         title: Number of frames coadded in a group

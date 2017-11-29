@@ -25,7 +25,7 @@ The STScI jwst.datamodel library documentation.
              getting and setting FITS comment and history records.
 13 Jun 2013: FITS query functions modified to look for a specific HDU
              when requested.
-03 Jul 2013: Metadata defaults moved to the JSON schema. maskable()
+03 Jul 2013: Metadata defaults moved to the schema. maskable()
              function added.
 05 Jul 2013: Check for data objects without a type.
 29 Jul 2013: Corrected typo that prevented data tables from being
@@ -137,6 +137,9 @@ The STScI jwst.datamodel library documentation.
              "get_" functions added to make accessing the metadata easier.
 22 Sep 2017: Added more WCS-related metadata to the set_wcs_metadata function.
 20 Nov 2017: Corrected a bug in the set_data_units method.
+29 Nov 2017: Updated get_history and get_history_str methods to cope with
+             a change to the data type of the .history attribute in the
+             underlying JWST data model.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -1746,10 +1749,17 @@ class MiriDataModel(DataModel):
     def get_history(self):
         """
         
-        Return the history list. Exists for backwards compatibility
+        Return the history list. Exists for backwards compatibility.
+        
+        NOTE: self.history is a list of HistoryEntry objects.
+        This function needs to return a list of strings.
         
         """
-        return self.history
+        hlist = []
+        for hitem in self.history:
+            if 'description' in hitem.keys():
+                hlist.append( str(hitem['description']) )
+        return hlist
         
     def get_history_str(self):
         """
@@ -1759,8 +1769,20 @@ class MiriDataModel(DataModel):
         
         """
         strg = ''
-        for hrecord in self.history:
-            strg += "HISTORY = \'" + str(hrecord) + "\'\n"
+        for hitem in self.history:
+            if 'description' in hitem.keys():
+                hstrg = str(hitem['description'])
+            else:
+                hstrg = ''
+            if 'time' in hitem.keys():
+                tstrg = str(hitem['time'])
+            else:
+                tstrg = ''
+            if hstrg:
+                strg += "HISTORY = \'" + hstrg + "\'"
+            if tstrg:
+                strg += "; TIME = \'" + tstrg + "\'"
+            strg += "\n"                        
         return strg
 
     #
@@ -2041,7 +2063,7 @@ class MiriDataModel(DataModel):
         
         NOTE: Unlike 'find_fits_keyword', this function also searches
         the "_extra_fits" tree  to match keywords not included in
-        the JSON schema file. This allows the function to track down
+        the schema file. This allows the function to track down
         ad-hoc comment and history records.
         
         :Parameters:
@@ -2092,8 +2114,8 @@ class MiriDataModel(DataModel):
 
         :Parameters:
         
-        schema : JSON schema fragment
-            JSON schema fragment
+        schema : Data model schema fragment
+            Data model schema fragment
 
         hdu_name : str, optional
             The name of the HDU to extract.  Defaults to ``'PRIMARY'``.
@@ -2153,7 +2175,6 @@ class MiriDataModel(DataModel):
                 raise KeyError(strg)
             else:
                 strg = "\n***WARNING: Keyword %s found %d times." % (keyword, ntimes)
-                #raise KeyError(strg)
                 strg += " Returning the first occurrence only"
                 warnings.warn(strg)
                 return self[location[0]]
