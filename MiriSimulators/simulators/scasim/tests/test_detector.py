@@ -18,7 +18,7 @@ should be executed first.
 26 Nov 2010: Get known detectors directly from the DETECTORS_DICT.
 05 Oct 2011: Test the get_counts function.
 25 Oct 2011: Read detector_properties using ParameterFileManager.
-13 Nov 2012: Major restructuring of the teams/miri folder. Import
+13 Nov 2012: Major restructuring of the package folder. Import
              statements updated.
 05 Jun 2013: Tidied up constructor and moved bad pixel mask and dark map
              access to separate functions. Rationalised attribute names.
