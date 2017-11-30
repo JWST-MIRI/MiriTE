@@ -106,7 +106,7 @@ Data Products (CDPs).
              in the PYTHONPATH.
 14 May 2012: MeasuredVariable class implemented as a JwstDataProduct.
 21 May 2012: Plotting modified to use the miriplot utilities.
-13 Nov 2012: Major restructuring of the teams/miri folder. Import statements
+13 Nov 2012: Major restructuring of the package folder. Import statements
              updated.
 15 Nov 2012: PoissonIntegrator class moved to simulators package.
 21 May 2013: Use new MIRI data model instead of DataMap.

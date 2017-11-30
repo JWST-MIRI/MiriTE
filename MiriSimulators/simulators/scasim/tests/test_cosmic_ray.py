@@ -13,7 +13,7 @@ CosmicRayEnvironment and CosmicRay classes.
 27 Sep 2010: Python environment for windows verified.
 16 Nov 2010: Set the seed of the random number generator, for more
              predictable and repeatable tests.
-13 Nov 2012: Major restructuring of the teams/miri folder. Import
+13 Nov 2012: Major restructuring of the package folder. Import
              statements updated.
 08 Sep 2015: Make compatible with Python 3
 05 May 2017: Changed permission for nosetests.

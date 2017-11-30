@@ -130,18 +130,6 @@ if __name__ == '__main__':
     # be explicitly imported here.
     print( "\nPython modules" )
     print( "----------------" )
-#     try:
-#         import json
-#         print( check_module( json ) )
-#     except ImportError as e:
-#         installation_ok = False
-#         print( "*** Module json could not be imported: %s" % e )
-#     except Exception as e:
-#         installation_ok = False
-#         strg = "*** Miscellaneous error while importing module json:"
-#         strg += "\n  %s: %s" % (e.__class__.__name__, e)
-#         warnings.warn(strg)
-
     try:
         import math, random, re, glob, datetime
     except ImportError as e:
@@ -248,27 +236,6 @@ if __name__ == '__main__':
 
     print( "\nSTScI Python modules" )
     print( "--------------------" )
-#     try:
-#         import stsci
-#         print( check_module( stsci ) )
-#         try:
-#             import stsci.tools
-#             print( check_module( stsci.tools, indent='   ' ) )
-#         except ImportError:
-#             # In older versions of stsci_python the pytools module
-#             # is used instead of stsci.tools
-#             import pytools
-#             print( check_module( pytools, indent='   ' ) )
-#     except ImportError as e:
-#         installation_ok = False
-#         warnings.warn("*** Module stsci could not be imported: %s" % e)
-#     except Exception as e:
-#         installation_ok = False
-#         strg = "*** Miscellaneous error while importing module stsci:"
-#         strg += "\n  %s: %s" % (e.__class__.__name__, e)
-#         warnings.warn(strg)
-# 
-#     print( " " )
     try:
         import asdf
         print( check_module( asdf ) )

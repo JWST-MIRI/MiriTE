@@ -13,7 +13,7 @@ PoissonIntegrator and ImperfectIntegrator class.
 16 Nov 2010: Set the seed of the random number generator, for more
              predictable and repeatable tests.
 05 Oct 2011: Enhanced the saturation test to check extreme input.
-13 Nov 2012: Major restructuring of the teams/miri folder. Import
+13 Nov 2012: Major restructuring of the package folder. Import
              statements updated.
 23 Apr 2014: Changed the terminology to match common MIRI usage (e.g.
              an "integration" includes an interval between resets, not

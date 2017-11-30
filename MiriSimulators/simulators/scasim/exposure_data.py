@@ -65,7 +65,7 @@ It has been superceeded by the datamodels/miri_exposure_model.py
 10 Apr 2012: matplotlib problem solved. It was caused by duplicate entries
              in the PYTHONPATH.
 26 Apr 2012: Brought up to date with changes in Metadata class.
-13 Nov 2012: Major restructuring of the teams/miri folder. Import statements
+13 Nov 2012: Major restructuring of the package folder. Import statements
              updated.
 14 Jan 2013: olddataproduct subpackage split from dataproduct.
 05 Jun 2013: Removed verbose flag and rationalised attribute names.

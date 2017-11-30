@@ -24,7 +24,7 @@ NOTE: Some tests within this module can take several minutes to run.
              directory for the temporary files.
 11 Jan 2012: Renamed symbol to avoid potential name clash:
              format-->fileformat.
-13 Nov 2012: Major restructuring of the teams/miri folder. Import
+13 Nov 2012: Major restructuring of the package folder. Import
              statements updated.
 05 Jun 2013: Tidied up constructor and moved bad pixel mask and dark map
              access to separate functions. Rationalised attribute names.

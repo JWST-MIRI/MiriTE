@@ -62,7 +62,7 @@ distinguish between amplifiers and are applied to the whole detector.
              in the PYTHONPATH.
 26 Apr 2012: Brought up to date with changes in Metadata class.
 21 May 2012: Plotting modified to use the miriplot utilities.
-13 Nov 2012: Major restructuring of the teams/miri folder. Import statements
+13 Nov 2012: Major restructuring of the package folder. Import statements
              updated.
 14 Jan 2013: olddataproduct subpackage split from dataproduct.
 21 May 2013: Removed references to the old MiriMetadata object.

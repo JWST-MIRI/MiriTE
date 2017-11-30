@@ -161,7 +161,7 @@ Data Products (CDPs).
              classes as a JwstDataProduct.
 26 Apr 2012: Brought up to date with changes in Metadata class.
 21 May 2012: Plotting modified to use the miriplot utilities.
-13 Nov 2012: Major restructuring of the teams/miri folder. Import statements
+13 Nov 2012: Major restructuring of the package folder. Import statements
              updated.
 14 Jan 2013: olddataproduct subpackage split from dataproduct.
 05 Jun 2013: Tidied up constructor and moved bad pixel mask and dark map

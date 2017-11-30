@@ -1,13 +1,13 @@
 #!/usr/bin/env/python
 
 """
-MIRI Software
-=============
+MIRI Tools and Environment Software
+===================================
 
-Package miri contains the tools, utilities, data calibration and analysis
-software developed by the MIRI Software Team
+Package MiriTE contains the tools, utilities, data models and common analysis
+functions developed by the MIRI Software Team
 
-The entire miri software suite can be built by executing the setup.py
+The entire package can be built by executing the setup.py
 script in the top level directory with the "install" argument.
 
 Available packages
@@ -35,7 +35,6 @@ miri.simulators
 12 May 2017: MIRI software split into 4 pieces: MiriTools, MiriCalibration,
              MiriPipeline and MiriSimulators (V4.0)
 19 Jun 2017: MIRI software merged with build 7.1 utilities (V5.0)
-13 Sep 2017: MiriCalibration and MiriPipeline packages separated.
 
 @author: Steven Beard (UKATC)
 

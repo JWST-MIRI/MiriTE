@@ -56,7 +56,7 @@ data/SCATestInput80x64.fits
 :History:
 16 Jan 2012: Test section comments added.
 02 Apr 2012: All module imports removed.
-13 Nov 2012: Description changed to reflect new teams/miri package structure.
+13 Nov 2012: Description changed to reflect new package structure.
 05 Jun 2013: Moved description of top level modules to miri.simulators.
 21 Nov 2017: Updated list of scripts.
 

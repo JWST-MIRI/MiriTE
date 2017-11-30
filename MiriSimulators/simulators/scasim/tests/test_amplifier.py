@@ -14,7 +14,7 @@ Amplifier class.
 16 Nov 2010: Added gain type test.
 16 Nov 2010: Set the seed of the random number generator, for more
              predictable and repeatable tests.
-13 Nov 2012: Major restructuring of the teams/miri folder. Import
+13 Nov 2012: Major restructuring of the package folder. Import
              statements updated.
 04 Jun 2013: Removed use of noise_mv object.
 08 Sep 2015: Make compatible with Python 3

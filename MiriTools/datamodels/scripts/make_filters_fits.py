@@ -9,7 +9,7 @@
 # 29 Mar 2012: History and docstring added and unwanted imports removed.
 # 02 Apr 2012: Corrected documentation.
 # 13 Apr 2012: Major changes to implement the Filter class as a JwstDataProduct.
-# 13 Nov 2012: Major restructuring of the teams/miri folder. Import statements
+# 13 Nov 2012: Major restructuring of the package folder. Import statements
 #              updated.
 # 01 Jun 2015: Corrected to use ".save" instead of ".tofits".
 # 08 Sep 2015: Made compatible with Python 3. Corrected import errors.

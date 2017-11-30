@@ -1,5 +1,5 @@
-MIRI Software Top Level Documentation
-=====================================
+MIRI TE Software Top Level Documentation
+========================================
 
 :Release: |release|
 :Date: |today|

@@ -2,6 +2,6 @@
 Copyright (c) 2010-2017 The JWST MIRI European Consortium software team. 
 All rights reserved.
 
-The software contained within the "teams/miri" tree has been developed 
+The software contained within the MiriTE package has been developed 
 by the MIRI EC software team as part of the JWST/MIRI consortium. Please 
-see the LICENCE files contained within each of the package directories.
+see the LICENCE files contained within each of the subpackages.

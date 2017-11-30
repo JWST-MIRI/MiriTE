@@ -45,7 +45,7 @@ Longer description, references, class hierarchy...
 :History:
 
 20 Sep 2012: Created
-13 Nov 2012: Major restructuring of the teams/miri folder.
+13 Nov 2012: Major restructuring of the package folder.
              Import statements updated.
 15 Mar 2013: condense and convGauss created
 20 Feb 2014: Old data product removed.

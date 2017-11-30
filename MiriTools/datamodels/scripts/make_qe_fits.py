@@ -14,7 +14,7 @@
 # 29 Mar 2012: QuantumEfficiency class now imported from miri.tools.filters
 #              module. Unnecessary imports removed.
 # 13 Apr 2012: Major changes to implement the Filter class as a JwstDataProduct.
-# 13 Nov 2012: Major restructuring of the teams/miri folder. Import statements
+# 13 Nov 2012: Major restructuring of the package folder. Import statements
 #              updated.
 # 11 Jul 2014: Switch over to using the new MiriQuantumEfficiency class,
 #              based on the jwst_lib data models.

@@ -18,7 +18,7 @@
 # 24 Nov 2010: Added the ability to create test data in a particular
 #              subarray mode.
 # 10 Jan 2011: Added optional scaid parameter.
-# 13 Nov 2012: Major restructuring of the teams/miri folder.
+# 13 Nov 2012: Major restructuring of the package folder.
 #              Import statements updated.
 # 18 Jun 2013: Modified to match the new parameter names used
 #              by data_maps.

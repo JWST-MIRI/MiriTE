@@ -1,9 +1,10 @@
-The teams/miri directory contains software developed by the MIRI 
+The MiriTE package contains software developed by the MIRI 
 European Consortium software team. The software contained here is 
 designed to support the creation and management of the MIRI
 calibration data products, support the development of MIRI
-pipeline algorithms and support the development of STScI JWST
-pipeline software (while not being part of that pipeline software).
+simulators and pipeline algorithms and support the development of
+STScI JWST pipeline software (while not being part of that
+pipeline software).
 
 The software depends on the JWST infrastructure libraries and STScI
 ASDF package.
@@ -76,14 +77,16 @@ The MIRI software may be built and installed with the command
 
    python setup.py install
 
-This is normally done as part of the MIRICLE installation script.
+This is normally done as part of the MIRI software installation script.
+See https://github.com/JWST-MIRI/MiriTE
 
 
 TESTING
 -------
 The unit tests included with the MIRI software can be run from the
-teams/miri directory using nosetests or pytests by running either of
+top-level directory using nosetests or pytests by running either of
 the scripts
 
    run_nosetests.sh
    run_pytests.sh
+   

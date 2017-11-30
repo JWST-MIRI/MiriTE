@@ -31,7 +31,7 @@
 #              effects can be simulated.
 # 11 Jan 2012: Renamed symbol to avoid potential name clash:
 #              format-->fileformat.
-# 13 Nov 2012: Major restructuring of the teams/miri folder.
+# 13 Nov 2012: Major restructuring of the package folder.
 #              Import statements updated.
 # 18 Jun 2013: Modified to match the new parameter names used by
 #              simulate_sca. 'STSCI' added to file format options.

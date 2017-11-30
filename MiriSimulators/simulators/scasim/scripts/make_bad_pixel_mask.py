@@ -12,7 +12,7 @@
 # 12 Oct 2010: Unwanted option strings removed.
 # 10 Jan 2011: Added optional scaid parameter.
 # 21 Sep 2011: Corrected some typos in comments.
-# 13 Nov 2012: Major restructuring of the teams/miri folder.
+# 13 Nov 2012: Major restructuring of the package folder.
 #              Import statements updated.
 # 18 Jun 2013: Modified to match the new parameter names used
 #              by data_maps.

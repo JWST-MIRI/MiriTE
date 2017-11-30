@@ -14,7 +14,7 @@ some of the features of the old MIRI data products.
 All MIRI data models depend on the STScI data model, found in the
 jwst.datamodels package. See
 
-https://aeon.stsci.edu/ssb/svn/jwst/trunk/jwst_lib/models/doc/source/devel/models.rst
+http://ssb.stsci.edu/doc/jwst_dev/jwst/datamodels/index.html
 
 Objects
 ~~~~~~~

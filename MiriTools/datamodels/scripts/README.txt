@@ -1,5 +1,5 @@
 Overview of MIRI data product scripts in 
-teams/miri/datamodels/scripts/
+MiriTools/datamodels/scripts/
 
 These general scripts should always be valid
 --------------------------------------------

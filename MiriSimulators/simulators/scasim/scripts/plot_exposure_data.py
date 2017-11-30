@@ -8,7 +8,7 @@
 # 08 Sep 2010: Created
 # 27 Sep 2010: Python environment for windows verified.
 # 23 Mar 2011: ExposureData.plot() changed to ExposureData.plotfig()
-# 13 Nov 2012: Major restructuring of the teams/miri folder.
+# 13 Nov 2012: Major restructuring of the package folder.
 #              Import statements updated.
 # 03 Mar 2015: Simulator simplified by removing the ability to save data
 #              to legacy file formats.

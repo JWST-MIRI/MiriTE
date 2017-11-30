@@ -72,7 +72,7 @@ d = thin diamond
 02 Oct 2012: Improved memory management. Copies of data not made unless
              essential.
 23 Oct 2012: Removed superflous code.
-13 Nov 2012: Major restructuring of the teams/miri folder. Import statements
+13 Nov 2012: Major restructuring of the package folder. Import statements
              updated.
 12 Jun 2014: Allow the Z axis label to be specified in 3-D plots.
 25 Jun 2014: Close and remove figures after they have been displayed.

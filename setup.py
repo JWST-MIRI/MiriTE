@@ -2,7 +2,7 @@
 
 """
 
-Setup file for installing the /teams/miri software
+Setup file for installing the MiriTE software
 
 :History:
 11 May 2017: Major new setup.py script based on ez_setup.py, using

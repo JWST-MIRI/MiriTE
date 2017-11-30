@@ -18,7 +18,7 @@
 # 04 Apr 2012: Improvements suggested by pylint.
 # 14 May 2012: Major changes to implement the MeasuredVariable class as a
 #              JwstDataProduct.
-# 13 Nov 2012: Major restructuring of the teams/miri folder. Import statements
+# 13 Nov 2012: Major restructuring of the package folder. Import statements
 #              updated.
 # 11 Jul 2014: Modified to use the new MiriMeasurement class instead of
 #              the old MeasuredVariable class.
