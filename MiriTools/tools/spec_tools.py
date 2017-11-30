@@ -166,15 +166,15 @@ def convGauss(x, n_points, sigma, mode = 'valid'):
     
     sigma: stdev, Sigma of Gaussian function
     
-    mode : {‘full’, ‘valid’, ‘same’}, optional
-    ‘full’:
+    mode : {'full', 'valid', 'same'}, optional
+    'full':
         This returns the convolution at each point of overlap, with an output
         shape of (N+M-1,). At the end-points of the convolution, the signals
         do not overlap completely, and boundary effects may be seen.
-    ‘same’:
+    'same':
         Mode same returns output of length max(M, N). Boundary effects are
         still visible.
-    ‘valid’: (default)
+    'valid': (default)
         Mode valid returns output of length max(M, N) - min(M, N) + 1.
         The convolution product is only given for points where the signals
         overlap completely. Values outside the signal boundary have no effect.
