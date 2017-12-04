@@ -30,6 +30,7 @@
 #              Corrected a bug: DETROWS keyword is not normally found in
 #              level 1 ramp data. Ensure all attempts to read a FITS
 #              keyword are within a try/except block.
+# 04 Dec 2017: Added missing "overwrite" parameter to functions.
 # 
 # @author: Steven Beard (UKATC)
 #
@@ -89,7 +90,7 @@ from miri.datamodels import MiriRampModel
 from miri.datamodels.sim import MiriExposureModel
 from miri.simulators.scasim.exposure_data import ExposureData, load_exposure_data
 
-def convert_dhas_to_level1b( inputfile, outputfile, verbose=0 ):
+def convert_dhas_to_level1b( inputfile, outputfile, verbose=0, overwrite=False ):
     """
     
     Convert a DHAS/FitsWriter format file into a STScI level 1b
@@ -192,7 +193,7 @@ def convert_dhas_to_level1b( inputfile, outputfile, verbose=0 ):
     output_model.add_history(hstrg)
     output_model.save(outputfile, overwrite=overwrite)
 
-def convert_level1b_to_dhas( inputfile, outputfile, verbose=0 ):
+def convert_level1b_to_dhas( inputfile, outputfile, verbose=0, overwrite=False ):
     """
     
     Convert a STScI level 1b ramp data file into a DHAS/FitsWriter
@@ -223,7 +224,14 @@ def convert_level1b_to_dhas( inputfile, outputfile, verbose=0 ):
         ngroups = 1
         rows = inputdata.shape[0]
         columns = inputdata.shape[1]
-
+        
+    # Abort if the input data is not of the type expected
+    if rows == 0 and columns == 0:
+        # The input data does not contain a SCI data array
+        strg = "Input file \'%s\' does not contain a SCI array. " % inputfile
+        strg += "Are you sure this is level 1b exposure data?"
+        raise TypeError(strg)
+            
     # Add the reference output array, if it exists.
     if (input_model.refout is not None) and (len(input_model.refout) > 0):
         # Deduce the size of the reference output
@@ -369,12 +377,14 @@ if __name__ == "__main__":
         if verbose > 0:
             print( "Converting DHAS file %s to level1b file %s." % \
                    (inputfile, outputfile) )
-        convert_dhas_to_level1b( inputfile, outputfile, verbose=verbose )
+        convert_dhas_to_level1b( inputfile, outputfile, verbose=verbose,
+                                 overwrite=overwrite )
         
     else: # level1b_to_dhas
         if verbose > 0:
             print( "Converting level1b file %s to DHAS file %s." % \
                    (inputfile, outputfile) )
-        convert_level1b_to_dhas( inputfile, outputfile, verbose=verbose )
+        convert_level1b_to_dhas( inputfile, outputfile, verbose=verbose,
+                                 overwrite=overwrite )
 
     print( "New exposure data saved to %s." % outputfile )
