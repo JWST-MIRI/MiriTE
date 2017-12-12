@@ -115,7 +115,50 @@ class TestPoissonIntegrator(unittest.TestCase):
         self.integrator.reset()
         readout6 = self.integrator.readout()
         self.assertTrue(np.all(readout6 == 0))
-        
+
+    def test_flux(self):
+        # Test that, when noise is switched off, the output flux is the
+        # input illumination multiplied by the exposure time, at least
+        # to within one electron.
+        # Create a very simple 3 x 3 Poisson integrator object with
+        # Poisson noise turned off
+        intnonoise = PoissonIntegrator(3, 3, simulate_poisson_noise=False,
+                                       verbose=0)
+        fluxlevel = 12.345
+        exptime = 100.0
+        flux = fluxlevel * np.ones((3,3), dtype=np.float32)
+        intnonoise.reset()
+        intnonoise.integrate(flux, exptime)
+        readout1 = intnonoise.readout().astype(np.int32)
+        intnonoise.integrate(flux, exptime)
+        readout2 = intnonoise.readout().astype(np.int32)
+        difference = readout2 - readout1
+        deviation = difference.mean() - (fluxlevel * exptime)
+        self.assertLess(abs(deviation), 1.0)
+        del intnonoise
+
+    def test_noise(self):
+        # Test that the Poisson noise level is approximately the
+        # square root of the input signal.
+        # The test needs to be done using a 1000x1000 integrator
+        # to eliminate the small number statistics.
+        intnoise = PoissonIntegrator(1000, 1000, verbose=0)
+        intnoise.set_seed(42)
+        fluxlevel = 10.0
+        exptime = 10.0
+        flux = fluxlevel * np.ones((1000,1000), dtype=np.float32)
+        intnoise.reset()
+        readout1 = intnoise.readout().astype(np.int32)
+        intnoise.integrate(flux, exptime)
+        readout2 = intnoise.readout().astype(np.int32)
+        difference = readout2 - readout1
+        noise = difference.std()
+        # The following comparison can only be approximate, since the
+        # noise should approximate the square root of expected count,
+        # not the actual readings. Make sure it is within 2%.
+        deviation = difference.mean() -  (noise * noise)
+        self.assertLess(abs(deviation), difference.mean()/50.0)
+
     def test_saturation(self):
         # If a bucket size is defined, the integrator will saturate
         # when the count reaches or exceeds this bucket size.
