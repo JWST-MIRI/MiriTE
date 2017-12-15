@@ -221,6 +221,7 @@ Data Products (CDPs).
              SLOW mode now uses 8 out of 9 samples. READOUT_MODE now defines
              samplesum, sampleskip and refpixsampleskip parameters separately.
              Added frame_rti function and associated tests.
+13 Dec 2017: INSTALLED_DARK option removed.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -281,17 +282,13 @@ MASK_RC_PIXEL = 16
 MASK_NON_SCIENCE = 512
 
 # Configure the simulation of the DARK.
-# Set INSTALLED_DARK True to use the averaged DARK installed with SCASim
-# Set INSTALLED_DARK False to fetch a DARK from the MIRI CDP repository.
-INSTALLED_DARK = False
-# The next flag only takes effect when INSTALLED_DARK is False.
 # Set AVERAGED_DARK True to simulate an average 2-D DARK scaled to the expected
 # dark current during each integration.
 # Set AVERAGED_DARK False to add the full 4-D DARK at the end of each exposure.
 AVERAGED_DARK = False
 
-# Set to True to include latent and zeropoint coefficients in the metadata
-EXTRA_METADATA = True
+# Set to True to include debugging information in the metadata
+EXTRA_METADATA = False
 
 #
 # Global helper functions
@@ -936,18 +933,13 @@ class DetectorArray(object):
         # with this detector.
         self.dark_map = None
         if self.simulate_dark_current:
-            if INSTALLED_DARK:
-                # Read the DARK installed with SCASim.
-                self.add_dark_map_fixed(self._sca['DARK_MAP'],
-                                        readpatt=readpatt)
-            else:
-                # Read the DARK from the MIRI CDP repository.
-                # The AVERAGED_DARK flag determines whether an averaged dark or
-                # the full 4-D dark is obtained.
-                self.add_dark_map_cdp(self._sca['DETECTOR'], readpatt=readpatt,
-                                  subarray=subarray, averaged=AVERAGED_DARK,
-                                  cdp_ftp_path=cdp_ftp_path,
-                                  cdp_version=dark_map_version)
+            # Read the DARK from the MIRI CDP repository.
+            # The AVERAGED_DARK flag determines whether an averaged dark or
+            # the full 4-D dark is obtained.
+            self.add_dark_map_cdp(self._sca['DETECTOR'], readpatt=readpatt,
+                              subarray=subarray, averaged=AVERAGED_DARK,
+                              cdp_ftp_path=cdp_ftp_path,
+                              cdp_version=dark_map_version)
         else:
             # Do not simulate the dark current.
             self.add_dark_map_fixed(None)

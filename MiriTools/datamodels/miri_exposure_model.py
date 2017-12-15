@@ -75,6 +75,7 @@ The STScI jwst.datamodels documentation.
 20 Jul 2017: Also clip the output above 65535 DN in add_dark.
 27 Jul 2017: Added cosmic ray count to metadata.
 11 Sep 2017: Ensure EXPSTART, EXPMID and EXPEND keywords are MJD.
+13 Dec 2017: Corrected the default frame time for the slope_data function.
 
 @author: Steven Beard (UKATC)
 
@@ -978,7 +979,7 @@ class MiriExposureModel(MiriRampModel):
                 super(MiriExposureModel, newproduct).save(path, *args, **kwargs)
                 del newproduct
 
-    def slope_data(self, grptime=2.785, diff_only=False):
+    def slope_data(self, grptime=2.77504, diff_only=False):
         """
         
         Return a copy of the SCI data array where all group planes
@@ -988,7 +989,7 @@ class MiriExposureModel(MiriRampModel):
         
         :Parameters:
         
-        grptime: float, optional, default=2.785s
+        grptime: float, optional, default=2.77504s
             The time interval between groups (which determines the
             time axis for the slope calculation).
         diff_only: bool, optional, default=False

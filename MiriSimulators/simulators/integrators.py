@@ -137,6 +137,8 @@ effects simulated by SCASim.
              Poisson noise.
 01 Nov 2017: Limit the extrapolation of zero point drift by applying a maximum
              clock time.
+14 Dec 2017: Adjust Poisson noise calculation to be based on last readout,
+             not on last expected value.
 
 @author: Steven Beard (UKATC)
 
@@ -509,7 +511,7 @@ class PoissonIntegrator(object):
         if self.pedestal is not None:
             self.zeropoint = self.zeropoint + self.pedestal
         self.expected_count = self.expected_count * 0.0
-        self.last_count = self.expected_count
+        self.last_count = self.last_count * 0.0
 
         # Reset exposure time and last readout memory, and set the
         # clock time measured at reset.
@@ -698,12 +700,10 @@ class PoissonIntegrator(object):
             # Put the zero values back to zero.
             if where_zero:
                 read_array[where_zero] = 0
-            read_array = self.zeropoint + self.last_count + read_array
+            #read_array = self.zeropoint + self.last_count + read_array
+            read_array = self.zeropoint + self.last_readout + read_array
         else:
             read_array = self.zeropoint + self.expected_count
-        
-#         # The bad pixels will not give a correct reading.
-#         read_array = self._apply_bad_pixels( read_array )
         
         # The latest readout cannot be less than the previous readout or
         # (if specified) larger than the defined bucket size.
@@ -715,7 +715,7 @@ class PoissonIntegrator(object):
         read_array = np.clip(read_array, 0.0, maxread)
         
         # Remember the last expected count
-        self.last_count = self.expected_count
+        self.last_count = deepcopy(self.expected_count)
         
         # Increment the reading/group counter and save the last readout.
         self.readings += 1

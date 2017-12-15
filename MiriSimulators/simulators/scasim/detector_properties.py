@@ -139,6 +139,7 @@ Sources:
              samplesum, sampleskip and refpixsampleskip parameters separately.
 01 Nov 2017: Note that the detector drift and latent coefficients are only
              valid for FAST mode.
+13 Dec 2017: DARK_MAP property removed.
 
 @author: Steven Beard (UKATC)
 
@@ -222,9 +223,7 @@ _sca493['TARGET_TEMPERATURE'] = 6.7   # Target temperature in K
 _sca493['DARK_CURRENT_FILE'] = find_simulator_file('dark_currentIM.fits')
 _sca493['DARK_CURRENT'] = 0.21 # Nominal dark current level (electrons/s)
 _sca493['QE_FILE'] = find_simulator_file('qe_measurementIM.fits')
-# Dark map derived from FM CDP data:
-_sca493['DARK_MAP'] = find_simulator_file('MIRI_FM_MIRIMAGE_FAST_DARK.fits')
-_sca493['NOISEFACTOR'] = 0.5   # Noise adjustment factor
+_sca493['NOISEFACTOR'] = 1.0   # Noise adjustment factor
 
 _sca494 = {}
 _sca494['SCA_ID'] = 494             # Numerical SCA ID
@@ -265,9 +264,7 @@ _sca494['TARGET_TEMPERATURE'] = 6.7   # Target temperature in K
 _sca494['DARK_CURRENT_FILE'] = find_simulator_file('dark_currentLW.fits')
 _sca494['DARK_CURRENT'] = 0.21 # Nominal dark current level (electrons/s)
 _sca494['QE_FILE'] = find_simulator_file('qe_measurementLW.fits')
-# Dark map derived from FM CDP data:
-_sca494['DARK_MAP'] = find_simulator_file('MIRI_FM_MIRIFULONG_FAST_DARK.fits')
-_sca494['NOISEFACTOR'] = 0.5   # Noise adjustment factor
+_sca494['NOISEFACTOR'] = 1.0   # Noise adjustment factor
 
 _sca495 = {}
 _sca495['SCA_ID'] = 495             # Numerical SCA ID
@@ -311,10 +308,7 @@ _sca495['PIXEL_RESPONSE'] = None      # No pixel response function
 _sca495['DARK_CURRENT_FILE'] = find_simulator_file('dark_currentSW.fits')
 _sca495['DARK_CURRENT'] = 0.21 # Nominal dark current level (electrons/s)
 _sca495['QE_FILE'] = find_simulator_file('qe_measurementSW.fits')
-# Dark map derived from FM CDP data:
-# _sca495['BAD_PIXEL_MAP'] = find_simulator_file('MIRI_FM_MIRIFUSHORT_MASK.fits')
-_sca495['DARK_MAP'] = find_simulator_file('MIRI_FM_MIRIFUSHORT_FAST_DARK.fits')
-_sca495['NOISEFACTOR'] = 0.5   # Noise adjustment factor
+_sca495['NOISEFACTOR'] = 1.0   # Noise adjustment factor
 
 # Other detector descriptions (e.g. for other JWST instruments) can be
 # added here.

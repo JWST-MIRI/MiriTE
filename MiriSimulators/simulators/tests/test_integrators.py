@@ -29,6 +29,7 @@ PoissonIntegrator and ImperfectIntegrator class.
              converted to signed integers so that negative differences
              can be managed.
 05 May 2017: Corrected permission for nosetests.
+13 Dec 2017: Added flux and noise tests.
 
 @author: Steven Beard (UKATC)
 
@@ -37,6 +38,7 @@ PoissonIntegrator and ImperfectIntegrator class.
 from __future__ import absolute_import, unicode_literals, division, print_function
 
 #import os, sys
+import copy
 import unittest
 import numpy as np
 
@@ -141,11 +143,12 @@ class TestPoissonIntegrator(unittest.TestCase):
     def test_noise(self):
         # Test that the Poisson noise level is approximately the
         # square root of the input signal.
-        # The test needs to be done using a 1000x1000 integrator
-        # to eliminate the small number statistics.
+        # The test is done using a 1024x1024 integrator to
+        # eliminate the small number statistics.
         intnoise = PoissonIntegrator(1024, 1024, verbose=0)
         intnoise.set_seed(42)
         exptime = 10.0
+        # Try 2 groups with varying flux levels.
         for fluxlevel in (1.234, 12.345, 123.456, 1234.56):
             flux = fluxlevel * np.ones((1024,1024), dtype=np.float32)
             intnoise.reset()
@@ -159,6 +162,31 @@ class TestPoissonIntegrator(unittest.TestCase):
             # not the actual readings. Make sure it is within 1%.
             deviation = difference.mean() -  (noise * noise)
             self.assertLess(abs(deviation), difference.mean()/100.0)
+        # Try 10 groups with a fixed flux level.
+        fluxlevel = 4.0
+        flux = fluxlevel * np.ones((1024,1024), dtype=np.float32)
+        intnoise.reset()
+        last_readout = intnoise.readout().astype(np.int32)
+        first_readout = copy.deepcopy(last_readout)
+        for group in range(1, 10):
+            intnoise.integrate(flux, exptime)
+            this_readout = intnoise.readout().astype(np.int32)
+            difference = this_readout - last_readout
+            noise = difference.std()
+            # Make sure the noise is within 1% of expectation.
+            deviation = difference.mean() -  (noise * noise)
+#             print("Mean=",difference.mean(), "Noise^2=", (noise*noise))
+#             print("Compare", abs(deviation), "with", difference.mean()/100.0)
+            self.assertLess(abs(deviation), difference.mean()/100.0)
+            last_readout = this_readout
+        # Check the noise level between the last and first reading.
+        difference = this_readout - first_readout
+        noise = difference.std()
+        # Make sure the noise is within 1% of expectation.
+        deviation = difference.mean() -  (noise * noise)
+#         print("Mean=",difference.mean(), "Noise^2=", (noise*noise))
+#         print("Compare", abs(deviation), "with", difference.mean()/100.0)
+        self.assertLess(abs(deviation), difference.mean()/100.0)
         del intnoise
 
     def test_saturation(self):
