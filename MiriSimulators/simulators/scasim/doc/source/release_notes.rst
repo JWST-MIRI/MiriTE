@@ -13,11 +13,7 @@ Full MIRISim-compatible release. The release supports the following features:
 
     * Simulator parameters are obtained from scasim command line arguments,
       from the parameters defined within configuration files and from
-      calibration data files. The configuration and calibration files are
-      located by searching the current working directory before looking
-      in the scasim installation. This means simulations with different
-      parameter can be tried by copying any of these files into the current
-      directory and editing them.
+      calibration data products.
 
     * Parsing of intensity and wavelength arrays within an input FITS file
       of detector illumination data.
@@ -27,23 +23,22 @@ Full MIRISim-compatible release. The release supports the following features:
  
     * Simulation of Poisson (shot) noise.
          
-    * Simulation of bad pixels.
+    * Simulation of bad pixels, as described in a MIRI calibration 
+      data product.
          
     * Simulation of the effect of quantum efficiency as a function of
       wavelength.
       
     * Simulation of dark current, which can vary with detector
-      temperature and location on the detector surface and include
-      hot pixels.
+      temperature, location on the detector surface, group and integration,
+      and can include hot pixels; as described in a MIRI calibration 
+      data product.
          
-    * Simulation of read noise as a function of temperature.
-           
-    * Simulation of amplifier bias and electronic drift (by assigning
-      each amplifier an arbitrary and slightly different bias and
-      randomly changing the electronic drift with each readout). How
-      the actual amplifiers behave is TBD.
-         
-    * Simulation of amplifier gain as described in a MIRI CDP file.
+    * Simulation of read noise as a function of temperature, as described
+      in a MIRI calibration data product.
+                    
+    * Simulation of amplifier gain, as described in a MIRI calibration
+      data product.
     
     * Simulation of non-linearity using polynomial coefficients.
            
@@ -74,8 +69,12 @@ Full MIRISim-compatible release. The release supports the following features:
 The following features could be improved:
       
     * The non-linearity coefficients are assumed to be constant over the
-      detector surface, rather than varying from pixel to pixel.
+      detector surface, rather than varying from pixel to pixel. These
+      coefficients are based on an approximate inverse of the MIRI
+      calibration data product and could be improved.
       
     * The simulation of detector latency and drift effects could be
       improved, in particular the effect of flux building up on the
-      detector in between integrations is not yet simulated.
+      detector in between integrations is not yet simulated, and the
+      effect in SLOW mode has not been calibrated.
+      

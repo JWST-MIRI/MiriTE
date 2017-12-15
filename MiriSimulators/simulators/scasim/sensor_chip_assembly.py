@@ -719,7 +719,9 @@ class SensorChipAssembly(object):
               makeplot=False, verbose=2):
         """
         
-        Set up a SensorChipAssembly simulation
+        Set up a SensorChipAssembly simulation.
+        
+        :Parameters:
         
         detectorid: string
             The detector ID, identifying a particular detector.
@@ -3543,6 +3545,35 @@ class SensorChipAssembly(object):
         NOTE: The clear_exposure_data() method can be used to delete
         the internal reference to the exposure data and save memory in
         between simulations.
+        
+        :Caveats:
+        
+        It is possible to create a MiriIlluminationModel object of any
+        size and shape and give it to this function, and it is common to
+        test the simulation using small datasets. Please note the following
+        caveats when giving SCASim arbitrary-sized illumination arrays or
+        arbitrary parameter settings:
+        
+           * If you give SCASim an illumination array of arbitrary size and
+             a subarray mode of 'FULL', SCASim will create a detector with
+             the same number of pixels as the illumination array. If you
+             specify a particular subarray mode, the input array must either
+             be full-sized (1024x1024) or be exactly the same size as the
+             named subarray.
+           * The frame time of the detector readout depends on the number
+             of pixels simulated - the smaller the detector the faster the
+             frame time. The frame time also depends on whether reference
+             pixels are included (by setting the simulate_ref_pixels flag).
+             Therefore, to make accurate timing tests or flux tests, you
+             need to provide a full-sized array (1024x1024) and use
+             simulate_ref_pixels=True. Be aware that the setting of the
+             qe_adjust flag will affect the measured flux level.
+           * Some simulation steps (bad pixels, dark current, pixel
+             flat-field, and gain) use MIRI calibration data products (CDPs).
+             Results are unpredictable if the CDP has been defined for a
+             different-sized detector than the one being simulated. If in
+             doubt, ensure the input array is full-size or sized according
+             to a named subarray mode.
                  
         :Parameters:
     

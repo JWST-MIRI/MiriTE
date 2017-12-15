@@ -49,7 +49,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'MIRI SCA Simulator'
-copyright = '2017, MIRI Software Team'
+copyright = '2018, MIRI Software Team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

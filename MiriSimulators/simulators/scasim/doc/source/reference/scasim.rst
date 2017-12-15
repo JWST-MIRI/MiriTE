@@ -9,7 +9,7 @@ LICENCE
 
 Copyright
 ^^^^^^^^^
-Copyright (c) 2010-2017 United Kingdom Astronomy Technology Centre, an 
+Copyright (c) 2010-2018 United Kingdom Astronomy Technology Centre, an 
 establishment of the Science and Technology Facilities Council. All 
 rights reserved.
 
@@ -213,7 +213,7 @@ The following modules may be found in the top level simulators
 package, and are shared with other MIRI simulators.
 
 *  find_simulator_file
-*  poisson_integrator
+*  integrators
 
 .. module:: miri.simulators
 
