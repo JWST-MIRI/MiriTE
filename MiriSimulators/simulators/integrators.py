@@ -139,6 +139,9 @@ effects simulated by SCASim.
              clock time.
 14 Dec 2017: Adjust Poisson noise calculation to be based on last readout,
              not on last expected value.
+04 Jan 2018: Corrected mistake which caused the zeropoint to be added to
+             every frame during Poisson noise calculation. Last readout
+             should be with respect to the zeropoint.
 
 @author: Steven Beard (UKATC)
 
@@ -718,8 +721,9 @@ class PoissonIntegrator(object):
         self.last_count = deepcopy(self.expected_count)
         
         # Increment the reading/group counter and save the last readout.
+        # NOTE: The last readout is measured from the zeropoint.
         self.readings += 1
-        self.last_readout = read_array.astype(np.uint32)
+        self.last_readout = read_array.astype(np.uint32) - self.zeropoint
         self.nperiods_at_readout = self.nperiods
         
         if self.verbose > 5:
@@ -770,7 +774,7 @@ class PoissonIntegrator(object):
             if self.nperiods_at_readout <= 0:
                 strg += "\n    There have been no readouts."
             else:
-                strg += "\n    Reading %d after integration period %d " \
+                strg += "\n    Reading %d (above zeropoint) after integration period %d " \
                     "obtained %d to %d %ss." % \
                     (self.readings, self.nperiods_at_readout, \
                      self.last_readout.min(), self.last_readout.max(), \
