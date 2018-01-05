@@ -52,7 +52,6 @@ __project__ = 'MIRI Simulators'
 __author__ = 'MIRI Software Team'
 __maintainer__ = __author__
 __copyright__ = '2018, %s' % __author__
-__version__ = '4.0'
 
 # Import classes that need to be accessible from the miri.simulators level.
 from integrators import PoissonIntegrator, ImperfectIntegrator
