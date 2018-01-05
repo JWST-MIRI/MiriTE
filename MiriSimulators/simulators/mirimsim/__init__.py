@@ -26,7 +26,6 @@ __project__ = 'MIRI Imager Simulator (obsolete - see mirisim)'
 __author__ = 'MIRI Software Team'
 __maintainer__ = 'rene.gastaud@cea.fr'
 __copyright__ = '2018, %s' % __author__
-__version__ = 'V0.00'
 
 # Insert global imports here.
 

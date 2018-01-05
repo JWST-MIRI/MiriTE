@@ -54,4 +54,3 @@ __project__ = 'MIRI Tools Software'
 __author__ = 'MIRI Software Team'
 __maintainer__ = 'Steven Beard: steven.beard@stfc.ac.uk'
 __copyright__ = '2018, %s' % __author__
-__version__ = '7.0'
