@@ -56,4 +56,3 @@ __version__ = '4.0'
 
 # Import classes that need to be accessible from the miri.simulators level.
 from integrators import PoissonIntegrator, ImperfectIntegrator
-
