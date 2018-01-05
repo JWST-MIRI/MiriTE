@@ -39,9 +39,8 @@ miri.simulators
 @author: Steven Beard (UKATC)
 
 """
-
+__project__ = 'MIRI Tool and Environment Software'
 __author__ = 'MIRI Software Team'
+__maintainer__ = __author__
+__copyright__ = '2018, %s' % __author__
 __version__ = '7.0'
-__svn_info__ = '$Id: __init__.py 4674 2017-09-14 13:47:02Z steven.beard@stfc.ac.uk $'
-
-
