@@ -141,7 +141,8 @@ effects simulated by SCASim.
              not on last expected value.
 04 Jan 2018: Corrected mistake which caused the zeropoint to be added to
              every frame during Poisson noise calculation. Last readout
-             should be with respect to the zeropoint.
+             should be with respect to the zeropoint. Some variables
+             renamed to better names.
 
 @author: Steven Beard (UKATC)
 
@@ -650,7 +651,7 @@ class PoissonIntegrator(object):
                 
         :Returns:
         
-        read_array: array_like
+        readout_array: array_like
             The latest count as read out (with Poisson noise).
             
         """
@@ -678,35 +679,34 @@ class PoissonIntegrator(object):
                      self.expected_count.max())
                 self.logger.debug(strg)
             # Round extreme values.
-            rounded_array = np.around(self.expected_count-self.last_count, 4)
+            rounded_diff = np.around(self.expected_count-self.last_count, 4)
             # Filter out zero, negative or bad values.
-            where_zero = np.where(rounded_array <= 0)
+            where_zero = np.where(rounded_diff <= 0)
             if where_zero:
-                rounded_array[where_zero] = 1
-            where_nan = np.where(np.isnan(rounded_array))
+                rounded_diff[where_zero] = 1
+            where_nan = np.where(np.isnan(rounded_diff))
             if where_nan:
-                rounded_array[where_nan] = 1
+                rounded_diff[where_nan] = 1
             try:
                 # Take a random sample from the Poisson distribution.
-                read_array = scipy.stats.poisson.rvs(rounded_array)
+                read_diff = scipy.stats.poisson.rvs(rounded_diff)
                 # If required, take more samples and average.
                 if nsamples > 1:
                     for ii in range(1, nsamples):
-                        read_array = read_array + \
-                            scipy.stats.poisson.rvs(rounded_array)
-                    read_array = read_array / float(nsamples)
+                        read_diff = read_diff + \
+                            scipy.stats.poisson.rvs(rounded_diff)
+                    read_diff = read_diff / float(nsamples)
             except ValueError, e:
-                strg = "Poisson rvs error. Array:\n"
-                strg += str(rounded_array)
+                strg = "Poisson rvs error. Difference array:\n"
+                strg += str(rounded_diff)
                 strg += "\n" + str(e)
                 raise ValueError(strg)
             # Put the zero values back to zero.
             if where_zero:
-                read_array[where_zero] = 0
-            #read_array = self.zeropoint + self.last_count + read_array
-            read_array = self.zeropoint + self.last_readout + read_array
+                read_diff[where_zero] = 0
+            readout_array = self.zeropoint + self.last_readout + read_diff
         else:
-            read_array = self.zeropoint + self.expected_count
+            readout_array = self.zeropoint + self.expected_count
         
         # The latest readout cannot be less than the previous readout or
         # (if specified) larger than the defined bucket size.
@@ -714,8 +714,7 @@ class PoissonIntegrator(object):
             maxread = _MAXINT
         else:
             maxread = self.bucket_size
-#         read_array = np.clip(read_array, self.last_readout, maxread)
-        read_array = np.clip(read_array, 0.0, maxread)
+        readout_array = np.clip(readout_array, 0.0, maxread)
         
         # Remember the last expected count
         self.last_count = deepcopy(self.expected_count)
@@ -723,17 +722,17 @@ class PoissonIntegrator(object):
         # Increment the reading/group counter and save the last readout.
         # NOTE: The last readout is measured from the zeropoint.
         self.readings += 1
-        self.last_readout = read_array.astype(np.uint32) - self.zeropoint
+        self.last_readout = readout_array.astype(np.uint32) - self.zeropoint
         self.nperiods_at_readout = self.nperiods
         
         if self.verbose > 5:
-            min = np.min( read_array )
-            max = np.max( read_array )
-            mean = np.mean( read_array )
+            min = np.min( readout_array )
+            max = np.max( readout_array )
+            mean = np.mean( readout_array )
             self.logger.debug("   min=%.1f, max=%.1f, mean=%.1f" % (min, max, mean))
         
         # Return the readout converted to int to make a discrete count.
-        return read_array.astype(np.uint32)
+        return readout_array.astype(np.uint32)
  
     def __str__(self):
         """

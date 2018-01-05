@@ -30,6 +30,9 @@ PoissonIntegrator and ImperfectIntegrator class.
              can be managed.
 05 May 2017: Corrected permission for nosetests.
 13 Dec 2017: Added flux and noise tests.
+04 Jan 2017: Check the flux is correct when noise is turned on and when there
+             is a non-zero pedestal. Also check the flux is correct when
+             zeropoint drift and latency effects are included.
 
 @author: Steven Beard (UKATC)
 
@@ -121,11 +124,13 @@ class TestPoissonIntegrator(unittest.TestCase):
     def test_flux(self):
         # Test that, when noise is switched off, the output flux is the
         # input illumination multiplied by the exposure time, at least
-        # to within one electron.
+        # to within one electron. Defining a pedestal level should make
+        # no difference.
         # Create a very simple 3 x 3 Poisson integrator object with
-        # Poisson noise turned off
+        # Poisson noise turned off.
         intnonoise = PoissonIntegrator(3, 3, simulate_poisson_noise=False,
                                        verbose=0)
+        intnonoise.set_pedestal(8000 * np.ones([3, 3]))
         exptime = 100.0
         for fluxlevel in (1.234, 12.345, 123.456, 1234.56):
             flux = fluxlevel * np.ones((3,3), dtype=np.float32)
@@ -139,6 +144,21 @@ class TestPoissonIntegrator(unittest.TestCase):
             deviation = difference.mean() - (fluxlevel * exptime)
             self.assertLess(abs(deviation), 1.0)
         del intnonoise
+        # Check that the flux level is also approximately
+        # correct when noise is turned on
+        self.integrator.set_pedestal(8000 * np.ones([3, 3]))
+        exptime = 100.0
+        for fluxlevel in (1.234, 12.345, 123.456, 1234.56):
+            flux = fluxlevel * np.ones((3,3), dtype=np.float32)
+            self.integrator.reset()
+            self.integrator.integrate(flux, exptime)
+            readout1 = self.integrator.readout().astype(np.int32)
+            self.integrator.integrate(flux, exptime)
+            readout2 = self.integrator.readout().astype(np.int32)
+            difference = readout2 - readout1
+            # The flux difference must be less than 5%.
+            deviation = difference.mean() - (fluxlevel * exptime)
+            self.assertLess(abs(deviation), difference.mean()/20.0)
 
     def test_noise(self):
         # Test that the Poisson noise level is approximately the
@@ -324,6 +344,34 @@ class TestImperfectIntegrator(unittest.TestCase):
         self.integrator.reset()
         readout7 = self.integrator.readout()
         self.assertTrue(np.all(readout7 == 0))
+ 
+    def test_flux(self):
+        # Check that the flux level is still approximately correct when noise,
+        # zeropoint drifts and latency effects are all turned on
+        self.integrator.set_pedestal(8000 * np.ones([3, 3]))
+        zp_slow = [45000.0, 0.0084]  # Slow zeropoint drift parameters
+        zp_fast = [[0.0, -2.917],    # Fast zeropoint drift parameters
+                   [0.0, -2.292],
+                   [0.0, -2.396],
+                   [0.0, -2.408]]
+        self.integrator.set_zeropoint(zp_slow, zp_fast)
+        slow_latency = [1.67e-9, 136000.0] # Slow latency parameters
+        fast_latency = [0.002, 300.0]      # Fast latency parameters
+        self.integrator.set_latency(slow_latency, fast_latency)
+        sensitivity = [1.1, -0.4]  # Linearity sensitivity coeffs
+        self.integrator.set_sensitivity(sensitivity)
+        exptime = 100.0
+        for fluxlevel in (1.234, 12.345, 123.456, 1234.56):
+            flux = fluxlevel * np.ones((3,3), dtype=np.float32)
+            self.integrator.reset()
+            self.integrator.integrate(flux, exptime)
+            readout1 = self.integrator.readout().astype(np.int32)
+            self.integrator.integrate(flux, exptime)
+            readout2 = self.integrator.readout().astype(np.int32)
+            difference = readout2 - readout1
+            # The flux difference must be less than 5%.
+            deviation = difference.mean() - (fluxlevel * exptime)
+            self.assertLess(abs(deviation), difference.mean()/20.0)
         
     def test_saturation(self):
         # If a bucket size is defined, the integrator will saturate
