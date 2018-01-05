@@ -41,16 +41,18 @@ data/detector/*.fits
 02 Apr 2012: All module imports removed.
 04 May 2013: Imported PoissonIntegrator
 05 Jun 2013: Moved description of top level modules from scasim to here.
-    
+05 Jan 2018: More version control information added. SVN info dropped.
+
 """
 
 # If you update this file don't forget also to update defsetup.py and 
 # doc/source/conf.py. The release version number is defined in three 
 # places. doc/source/release_notes.rst might also need to be updated.
+__project__ = 'MIRI Simulators'
 __author__ = 'MIRI Software Team'
-__maintainer__ = 'Steven Beard and Rene Gastaud: <steven.beard@stfc.ac.uk>'
-__version__ = 'V3.0'
-__svn_info__ = '$Id:$'
+__maintainer__ = __author__
+__copyright__ = '2018, %s' % __author__
+__version__ = '4.0'
 
 # Import classes that need to be accessible from the miri.simulators level.
 from integrators import PoissonIntegrator, ImperfectIntegrator
