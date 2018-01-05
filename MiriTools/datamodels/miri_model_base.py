@@ -140,6 +140,8 @@ The STScI jwst.datamodel library documentation.
 29 Nov 2017: Updated get_history and get_history_str methods to cope with
              a change to the data type of the .history attribute in the
              underlying JWST data model.
+04 Jan 2018: Fill a masked array before calculating statistics in
+             get_data_stats() to prevent a numpy warning.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -2755,6 +2757,8 @@ class MiriDataModel(DataModel):
             # of the HasDataErrAndDq class in operations.py.
             if self.maskable() and hasattr(self, name + "_masked"):
                 data = getattr(self, name + "_masked")
+                # Fill a masked array to prevent a numpy warning.
+                data = data.filled()
                 strg += " - masked array"
             else:
                 data = getattr(self, name)
