@@ -18,16 +18,15 @@ Data
 
 :History:
 29 Nov 2012: Template created.
-    
+05 Jan 2018: More version control information added. SVN info dropped.
+
 """
 
-# If you update this file don't forget also to update defsetup.py and 
-# doc/source/conf.py. The release version number is defined in three 
-# places. doc/source/release_notes.rst might also need to be updated.
+__project__ = 'MIRI Imager Simulator (obsolete - see mirisim)'
 __author__ = 'MIRI Software Team'
 __maintainer__ = 'rene.gastaud@cea.fr'
+__copyright__ = '2018, %s' % __author__
 __version__ = 'V0.00'
-__svn_info__ = '$Id:$'
 
 # Insert global imports here.
 

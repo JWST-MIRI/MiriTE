@@ -22,6 +22,7 @@ of those modules (when such information is available).
 02 Jun 2017: Modified to match latest dependencies.
 04 Sep 2017: Added memory test
 13 Sep 2017: Removed MiriCalibration and MiriPipeline.
+05 Jan 2018: SVN info dropped.
 
 @author: Steven Beard (UKATC)
 
@@ -58,15 +59,14 @@ def check_module( mymodule, indent='' ):
     _strg = "%s%s" % (indent, repr(mymodule))
     if hasattr(mymodule, '__name__'):
         _strg += "\n%s   - name:  %s" % (indent, str(mymodule.__name__))
+    if hasattr(mymodule, '__project__'):
+        _strg += "\n%s   - project:  %s" % (indent, str(mymodule.__project__))
     if hasattr(mymodule, '__package__'):
         _strg += "\n%s   - package:  %s" % (indent, str(mymodule.__package__))
     if hasattr(mymodule, '__author__'):
         _strg += "\n%s   - author:  %s" % (indent, str(mymodule.__author__))
     if hasattr(mymodule, '__version__'):
         _strg += "\n%s   - version:  %s" % (indent, str(mymodule.__version__))
-    if hasattr(mymodule, '__svn_info__'):
-        _strg += "\n%s   - svn version:  %s" % \
-            (indent, str(mymodule.__svn_info__))
     if hasattr(mymodule, '__path__'):
         _strg += "\n%s   - imported from:  %s" % \
             (indent, str(mymodule.__path__))

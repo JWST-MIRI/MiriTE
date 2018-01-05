@@ -47,11 +47,11 @@ Data
              bug very difficult.
 06 Sep 2016: Changed to miri.tools
 19 Jun 2017: Updated to use build 7.1 data models (V7.0)
+05 Jan 2018: More version control information added. SVN info dropped.
 
 """
-
+__project__ = 'MIRI Tools Software'
 __author__ = 'MIRI Software Team'
-__maintainer__ = 'Fred Lahuis: F.Lahuis@sron.nl'
+__maintainer__ = 'Steven Beard: steven.beard@stfc.ac.uk'
+__copyright__ = '2018, %s' % __author__
 __version__ = '7.0'
-__svn_info__ = '$Id: __init__.py 4363 2016-06-16 12:38:39Z steven.beard@stfc.ac.uk $'
-

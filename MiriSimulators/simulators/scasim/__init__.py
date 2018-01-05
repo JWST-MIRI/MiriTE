@@ -59,6 +59,7 @@ data/SCATestInput80x64.fits
 13 Nov 2012: Description changed to reflect new package structure.
 05 Jun 2013: Moved description of top level modules to miri.simulators.
 21 Nov 2017: Updated list of scripts.
+05 Jan 2018: More version control information added. SVN info dropped.
 
 """
 
@@ -67,7 +68,5 @@ data/SCATestInput80x64.fits
 # places. doc/source/release_notes.rst might also need to be updated.
 __author__ = 'Steven Beard, MIRI Software Team'
 __maintainer__ = 'Steven Beard <steven.beard@stfc.ac.uk>'
+__copyright__ = '2018, %s' % __author__
 __version__ = '4.0'
-__svn_info__ = '$Id:$'
-
-

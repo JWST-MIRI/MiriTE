@@ -158,13 +158,15 @@ data/examples/filter_example.py:
 18 Aug 2016: miri.miritools.measurements merged with miri.miritools.dataproduct.
 06 Sep 2016: Renamed to miri.datamodels
 29 Jun 2017: Updated to use build 7.1 data models.
+05 Jan 2018: More version control information added. SVN info dropped.
 
 """
 
+__project__ = 'MIRI Data Model Software'
 __author__ = 'MIRI Software Team'
 __maintainer__ = 'Steven Beard: steven.beard@stfc.ac.uk'
+__copyright__ = '2018, %s' % __author__
 __version__ = '7.0'
-__svn_info__ = '$Id: __init__.py 1549 2012-09-14 10:50:23Z StevenBeard $'
 
 # Import common data products
 from miri.datamodels.miri_model_base import MiriDataModel
