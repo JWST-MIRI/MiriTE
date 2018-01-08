@@ -327,6 +327,7 @@ Data Products (CDPs).
              samplesum, sampleskip and refpixsampleskip parameters separately.
 01 Nov 2017: Do not simulate detector drifts and latents in SLOW mode, since
              the measured parameters are only valid for FAST mode.
+08 Jan 2018: Import version number from miri package.
 
 @author: Steven Beard
 
@@ -346,7 +347,7 @@ import time, os
 # numpy.
 import numpy as np
 
-from miri.simulators.scasim import __version__
+from miri import __version__
 
 # General purpose quantum efficiency class
 from miri.datamodels.miri_filters import MiriQuantumEfficiency
@@ -2390,7 +2391,7 @@ class SensorChipAssembly(object):
                                             hdu_name='INTENSITY')
          
         # Set up the primary metadata according to MIRI-UM-00004-RAL
-        simname = "MIRI SCA simulator (%s)" % __version__
+        simname = "MIRI SCA simulator (MiriTE %s)" % __version__
         strg = "Processed by %s" % simname
         if hasattr(self.metadata, 'add_history'):
             self.metadata.add_history(strg)
