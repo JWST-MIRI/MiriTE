@@ -23,9 +23,6 @@ Release Notes
    release_notes
    release_notes_tools
    release_notes_datamodels
-   release_notes_imaging
-   release_notes_coronography
-   release_notes_spectroscopy
    release_notes_simulators
 
 Package Reference
@@ -36,17 +33,5 @@ Package Reference
 
    reference/tools/tools
    reference/datamodels/datamodels
-   reference/imaging/imaging
-   reference/coronography/coronography
-   reference/spectroscopy/spectroscopy
    reference/simulators/simulators
 
-Appendix - Installation Utilities
----------------------------------
-
-.. module:: miri
-
-.. toctree::
-   :maxdepth: 1
-
-   setup_utils

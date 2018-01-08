@@ -14,6 +14,14 @@
 
 import sys, os
 
+try:
+    import miri
+    import miri.tools
+except ImportError:
+    strg = "***Please build the miri package with  \'python setup.py install\'"
+    strg += "  before building the documentation.\n"
+    raise ImportError(strg)
+
 # If extensions (or modules to document with autodoc) are in another 
 # directory, add these directories to sys.path here. If the directory is 
 # relative to the documentation root, use os.path.abspath to make it 
@@ -45,22 +53,22 @@ source_suffix = '.rst'
 # The encoding of source files.
 #source_encoding = 'utf-8'
 
-# The master toctree document.
+# The master toctree document.                             <--------------------
 master_doc = 'reference/miri_tools'
 #master_doc = 'reference/index'
 
-# General information about the project.
-project = 'MIRI Tools'
-copyright = '2017, MIRI Software Team'
+# General information about the project.                   <--------------------
+project = miri.tools.__project__
+copyright = miri.tools.__copyright__
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
-# The short X.Y version.
-version = '7.0'
+# The short X.Y version.                                   <--------------------
+version = miri.__version__
 # The full version, including alpha/beta/rc tags.
-release = '7.0 (jwst build 7.1 data models)'
+release = miri.__version__ + " (MiriTE package)"
 #release = release.replace('GlobalRev:','')
 #release = release.replace('$','')
 
