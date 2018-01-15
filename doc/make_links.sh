@@ -11,25 +11,25 @@ cd ./source
 #done
 #
 # tools
-echo linking miri/MiriTools/tools
-ln -fs ../../MiriTools/tools/doc/source/release_notes.rst ./release_notes_tools.rst
+echo linking miri/tools
+ln -fs ../../tools/doc/source/release_notes.rst ./release_notes_tools.rst
 mkdir -p reference
 cd ./reference
-ln -fs ../../../MiriTools/tools/doc/source/reference ./tools
+ln -fs ../../../tools/doc/source/reference ./tools
 cd ..
 # datamodels
-echo linking miri/MiriTools/datamodels
-ln -fs ../../MiriTools/datamodels/doc/source/release_notes.rst ./release_notes_datamodels.rst
+echo linking miri/datamodels
+ln -fs ../../datamodels/doc/source/release_notes.rst ./release_notes_datamodels.rst
 mkdir -p reference
 cd ./reference
-ln -fs ../../../MiriTools/datamodels/doc/source/reference ./datamodels
+ln -fs ../../../datamodels/doc/source/reference ./datamodels
 cd ..
 # simulators
-echo linking miri/MiriSimulators/simulators
-ln -fs ../../MiriSimulators/simulators/doc/source/release_notes.rst ./release_notes_simulators.rst
+echo linking miri/simulators
+ln -fs ../../simulators/doc/source/release_notes.rst ./release_notes_simulators.rst
 mkdir -p reference
 cd ./reference
-ln -fs ../../../MiriSimulators/simulators/doc/source/reference ./simulators
+ln -fs ../../../simulators/doc/source/reference ./simulators
 cd ..
 
 cd ..

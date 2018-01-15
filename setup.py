@@ -13,6 +13,7 @@ Setup file for installing the MiriTE software
 14 Jul 2017: Unpack the 470 micron version of the cosmic ray libraries.
 27 Jul 2017: Require Python 2.7
 13 Sep 2017: MiriCalibration and MiriPipeline packages separated.
+15 Jan 2018: MiriTools and MiriSimulators levels removed from package.
 
 @author: Steven Beard (UKATC)
 
@@ -80,17 +81,17 @@ else:
 # The simulator detector data files are found relative to the 
 # directory containing this Python script.
 (this_dir, this_file) = os.path.split(__file__)
-cr_data_path = os.path.join(this_dir, "MiriSimulators/simulators/data/cosmic_rays")
+cr_data_path = os.path.join(this_dir, "simulators/data/cosmic_rays")
 if not os.path.isdir(cr_data_path):
     strg = "Cosmic ray data directory %s not found" % cr_data_path
     raise EnvironmentError(strg)
 
-detector_data_path = os.path.join(this_dir, "MiriSimulators/simulators/data/detector")
+detector_data_path = os.path.join(this_dir, "simulators/data/detector")
 if not os.path.isdir(detector_data_path):
     strg = "Detector data directory %s not found" % detector_data_path
     raise EnvironmentError(strg)
 
-scasim_data_path = os.path.join(this_dir, "MiriSimulators/simulators/scasim/data")
+scasim_data_path = os.path.join(this_dir, "simulators/scasim/data")
 if not os.path.isdir(scasim_data_path):
     strg = "SCASIM data directory %s not found" % scasim_data_path
     raise EnvironmentError(strg)
@@ -209,16 +210,16 @@ setup(
              ],
     package_dir={
                  'miri': '',
-                 'miri.tools': 'MiriTools/tools/',
-                 'miri.tools.tests': 'MiriTools/tools/tests',
-                 'miri.datamodels': 'MiriTools/datamodels/',
-                 'miri.datamodels.tests': 'MiriTools/datamodels/tests',
-                 'miri.simulators': 'MiriSimulators/simulators/',
-                 'miri.simulators.tests': 'MiriSimulators/simulators/tests',
-                 'miri.simulators.mirimsim': 'MiriSimulators/simulators/mirimsim/',
-                 'miri.simulators.mirimsim.tests': 'MiriSimulators/simulators/mirimsim/tests',
-                 'miri.simulators.scasim': 'MiriSimulators/simulators/scasim',
-                 'miri.simulators.scasim.tests': 'MiriSimulators/simulators/scasim/tests',
+                 'miri.tools': 'tools/',
+                 'miri.tools.tests': 'tools/tests',
+                 'miri.datamodels': 'datamodels/',
+                 'miri.datamodels.tests': 'datamodels/tests',
+                 'miri.simulators': 'simulators/',
+                 'miri.simulators.tests': 'simulators/tests',
+                 'miri.simulators.mirimsim': 'simulators/mirimsim/',
+                 'miri.simulators.mirimsim.tests': 'simulators/mirimsim/tests',
+                 'miri.simulators.scasim': 'simulators/scasim',
+                 'miri.simulators.scasim.tests': 'simulators/scasim/tests',
                 },
     package_data={'miri.tools': ['data/__init__.py'],
                   'miri.datamodels': ['schemas/*.yaml', 'data/*.fits',
@@ -239,29 +240,29 @@ setup(
                                       'data/__init__.py'],
                  },
     scripts=['miri_installation_check.py',
-             'MiriTools/datamodels/scripts/check_jwslib_datamodel.py',
-             'MiriTools/datamodels/scripts/cdp_add_history.py',
-             'MiriTools/datamodels/scripts/cdp_add_subarray.py',
-             'MiriTools/datamodels/scripts/cdp_get_doc.py',
-             'MiriTools/datamodels/scripts/cdp_print.py',
-             'MiriTools/datamodels/scripts/cdp_reduce_dark.py',
-             'MiriTools/datamodels/scripts/cdp_verify.py',
-             'MiriTools/datamodels/scripts/convert_fits_to_asdf.py',
-             'MiriTools/datamodels/scripts/find_me_another.py',
-             'MiriTools/datamodels/scripts/dqflags_examples.py',
-             'MiriTools/datamodels/scripts/multicdp_verify.py',
-             'MiriTools/datamodels/scripts/multicdp_subarray.csh',
-             'MiriTools/datamodels/scripts/make_filters_fits.py',
-             'MiriTools/datamodels/scripts/make_measurements_fits.py',
-             'MiriTools/datamodels/scripts/make_qe_fits.py',
-             'MiriSimulators/simulators/mirimsim/scripts/mirimsim.py',
-             'MiriSimulators/simulators/scasim/scripts/make_bad_pixel_mask.py',
-             'MiriSimulators/simulators/scasim/scripts/make_fringe_map.py',
-             'MiriSimulators/simulators/scasim/scripts/make_sca_calibration.py',
-             'MiriSimulators/simulators/scasim/scripts/make_sca_file.py',
-             'MiriSimulators/simulators/scasim/scripts/convert_exposure_data.py',
-             'MiriSimulators/simulators/scasim/scripts/detector_latency_test.py',
-             'MiriSimulators/simulators/scasim/scripts/plot_exposure_data.py',
-             'MiriSimulators/simulators/scasim/scripts/scasim.py',
+             'datamodels/scripts/check_jwslib_datamodel.py',
+             'datamodels/scripts/cdp_add_history.py',
+             'datamodels/scripts/cdp_add_subarray.py',
+             'datamodels/scripts/cdp_get_doc.py',
+             'datamodels/scripts/cdp_print.py',
+             'datamodels/scripts/cdp_reduce_dark.py',
+             'datamodels/scripts/cdp_verify.py',
+             'datamodels/scripts/convert_fits_to_asdf.py',
+             'datamodels/scripts/find_me_another.py',
+             'datamodels/scripts/dqflags_examples.py',
+             'datamodels/scripts/multicdp_verify.py',
+             'datamodels/scripts/multicdp_subarray.csh',
+             'datamodels/scripts/make_filters_fits.py',
+             'datamodels/scripts/make_measurements_fits.py',
+             'datamodels/scripts/make_qe_fits.py',
+             'simulators/mirimsim/scripts/mirimsim.py',
+             'simulators/scasim/scripts/make_bad_pixel_mask.py',
+             'simulators/scasim/scripts/make_fringe_map.py',
+             'simulators/scasim/scripts/make_sca_calibration.py',
+             'simulators/scasim/scripts/make_sca_file.py',
+             'simulators/scasim/scripts/convert_exposure_data.py',
+             'simulators/scasim/scripts/detector_latency_test.py',
+             'simulators/scasim/scripts/plot_exposure_data.py',
+             'simulators/scasim/scripts/scasim.py',
             ],
 )
