@@ -195,7 +195,7 @@ elif cleanflag:
 setup(
     name="miri",
     version=find_version("__init__.py"),
-    description="MIRI Data Calibration and Analysis Software",
+    description="MIRI tools, data models and simulator software",
     author="MIRI European Consortium",
     author_email="F.Lahuis@sron.nl",
     license="See LICENCE file",

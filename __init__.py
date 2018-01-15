@@ -13,15 +13,15 @@ script in the top level directory with the "install" argument.
 Available packages
 ------------------
 miri.tools
-    Contained in MiriTools/tools
+    Contained in MiriTE/tools
     Common utilities for MIRI software.
 
 miri.datamodels
-    Contained in MiriTools/datamodels
+    Contained in MiriTE/datamodels
     Common data models for MIRI software.
 
 miri.simulators
-    Contained in MiriSimulators/simulators.
+    Contained in MiriTE/simulators.
     MIRI simulator packages.
     
 24 Jun 2010: Created.
@@ -35,6 +35,7 @@ miri.simulators
 12 May 2017: MIRI software split into 4 pieces: MiriTools, MiriCalibration,
              MiriPipeline and MiriSimulators (V4.0)
 19 Jun 2017: MIRI software merged with build 7.1 utilities (V5.0)
+15 Jan 2018: MiriTools and MiriSimulators levels removed from package
 
 @author: Steven Beard (UKATC)
 
