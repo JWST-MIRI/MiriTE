@@ -105,6 +105,8 @@ http://miri.ster.kuleuven.be/bin/view/Internal/CalDataProducts
 24 Oct 2017: Corrected persistence problem where ftp-host remained 'LOCAL'
              even when changed back. 
 26 Oct 2017: Corrected bug in get_cdp_doc function.
+15 Jan 2018: Do not attempt to set a timeout on a non-existent sftp
+             connection.
 
 Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -1537,7 +1539,7 @@ class MiriCDPInterface(object):
             self.sftp = None
             
         # Change the timeout, if one has been provided.
-        if self.timeout is not None:
+        if (self.sftp is not None) and (self.timeout is not None):
             self.sftp.timeout = self.timeout
 
     def _close(self):
