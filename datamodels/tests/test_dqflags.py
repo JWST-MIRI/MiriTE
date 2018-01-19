@@ -17,11 +17,7 @@ Simple tests of classes in "dqflags" module.
 # For consistency, import the same Python V3 features as the STScI data model.
 from __future__ import absolute_import, unicode_literals, division, print_function
 
-from pdb import set_trace as stop
-# import os
 import unittest
-# import warnings
-
 import numpy as np
 
 import miri.datamodels.dqflags as dqflags

@@ -142,6 +142,7 @@ The STScI jwst.datamodel library documentation.
              underlying JWST data model.
 04 Jan 2018: Fill a masked array before calculating statistics in
              get_data_stats() to prevent a numpy warning.
+19 Jan 2018: Added set_telescope function for creating test data.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -774,6 +775,20 @@ class MiriDataModel(DataModel):
                     self.meta.pointing.pa_v3)
         else:
             return (None, None, None)
+
+    def set_telescope(self):
+        """
+        
+        A convenience function to ensure the telescope metadata is set
+        correctly. The telscope should always be 'JWST'.
+        
+        :Parameters:
+        
+        None
+        
+        """
+        if hasattr(self, 'meta') and hasattr(self.meta, 'telescope'):
+            self.meta.telescope = 'JWST'
 
     def set_instrument_metadata(self, detector, modelnam='FM', detsetng='ANY',
                                 filt='', channel='', band='',
@@ -2991,7 +3006,7 @@ if __name__ == '__main__':
         assert(len(dump_strg) > 0)
 #         print("\n" + dump_strg + "\n")
         # Define some metadata.
-        testdata.set_housekeeping_metadata('UKATC', 'Joe Bloggs', 'V1.0')
+        testdata.set_housekeeping_metadata('UKATC', 'Joe Bloggs', 'GROUND', 'V1.0')
         testdata.set_observation_metadata() # Use current data/time
         testdata.set_pointing_metadata(ra_v1=12.20, dec_v1=-7.15, pa_v3=2.0)
         testdata.set_target_metadata(ra=12.0, dec=-7.0)

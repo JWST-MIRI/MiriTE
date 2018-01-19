@@ -56,6 +56,8 @@ processing the MIRI data models.
 04 Oct 2017: Check for data type in the FILETYPE keyword.
 29 Nov 2017: Removed obsolete find_fits_values function from CDP history
              check. REFTYPE trumps FILETYPE when assessing data type.
+18 Jan 2018: Corrected a problem where the open() function closed an
+             hdulist provided as input.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -67,7 +69,6 @@ import os
 import copy
 import warnings
 from astropy.extern import six
-from pdb import set_trace as stop
 
 import numpy as np
 from numpy.testing import assert_array_equal, assert_array_almost_equal
@@ -307,6 +308,7 @@ def open( init=None, astype=None):
     """
     # Initialise defaults.
     hdulist = None
+    preserve_hdulist = False
     kwlist = []
     if astype is None:
         datatype = ''
@@ -333,6 +335,7 @@ def open( init=None, astype=None):
                 hdulist = pyfits.open(init.decode('utf-8'))
             elif isinstance(init, pyfits.HDUList):
                 hdulist = init
+                preserve_hdulist = True
 
             if hdulist is not None:
                 if len(hdulist) == 1:
@@ -381,7 +384,7 @@ def open( init=None, astype=None):
             strg += "  %s: %s" % (e.__class__.__name__, str(e))
             raise IOError(strg)
         finally:
-            if hdulist is not None:
+            if hdulist is not None and not preserve_hdulist:
                 hdulist.close()
                 del hdulist
 
