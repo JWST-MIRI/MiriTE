@@ -1,7 +1,8 @@
 #!/bin/bash
 
 cd ./source
-mirimod=$(echo mirimsim scasim)
+# There is now only one module: scasim
+mirimod=$(echo scasim)
 for module in $mirimod; do
 	echo linking miri/simulators/$module
 	ln -fs ../../$module/doc/source/release_notes.rst ./release_notes_$module.rst  &&\

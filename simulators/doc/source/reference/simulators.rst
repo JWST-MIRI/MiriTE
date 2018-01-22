@@ -9,6 +9,9 @@ Introduction
 This document describes the implementation details for the MIRI general 
 simulators package (simulators).
 
+Note that most MIRI simulators may now be found in a separate MIRISim
+package.
+
 Modules
 ~~~~~~~
 General purpose simulator modules may be found in the simulators/lib 
@@ -21,16 +24,6 @@ directory
 
    find_simulator_file
    integrators
-
-Subpackage - mirimsim
-~~~~~~~~~~~~~~~~~~~~~
-The MIRI imager simulator. NOTE: This subpackage is empty. mirisimsim has
-been moved to the MIRISim package.
-
-.. toctree::
-   :maxdepth: 2
-
-   mirimsim/mirimsim
 
 Subpackage - scasim
 ~~~~~~~~~~~~~~~~~~~

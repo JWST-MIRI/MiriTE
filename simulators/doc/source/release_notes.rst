@@ -19,4 +19,3 @@ Module specific release notes
    :maxdepth: 1
 
    scasim/doc/source/release_notes.rst
-   mirimsim/doc/source/release_notes.rst

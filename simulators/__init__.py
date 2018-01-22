@@ -6,13 +6,13 @@ simulators
 ==========
 Package simulators contains a selection of MIRI simulators.
 
+Note that most MIRI simulators are now released separately in
+a MIRISim package.
+
 Available subpackages
 ---------------------
 scasim:
     MIRI sensor chip assembly simulator
-
-mirimsim:
-    MIRI imager simulator
 
 Available modules
 -----------------
@@ -42,6 +42,7 @@ data/detector/*.fits
 04 May 2013: Imported PoissonIntegrator
 05 Jun 2013: Moved description of top level modules from scasim to here.
 05 Jan 2018: More version control information added. SVN info dropped.
+22 Jan 2018: Removed empty mirimsim package.
 
 """
 

@@ -12,6 +12,7 @@ Module find_simulator_file - Contains function to search for simulator files.
 08 Sep 2015: Made compatible with Python 3.
 23 Mar 2016: Added a Python logger so a message can be displayed if a
              simulator file is not found.
+22 Jan 2018: Removed empty mirimsim package.
 
 @author: Steven Beard (UKATC)
 
@@ -54,12 +55,10 @@ def find_simulator_file( filename, logger=LOGGER ):
     """
     import miri.simulators.data
     import miri.simulators.scasim.data
-    import miri.simulators.mirimsim.data
     
     search_path = os.pathsep + './data'
     search_path += os.pathsep + miri.simulators.data.__path__[0]
     search_path += os.pathsep + miri.simulators.scasim.data.__path__[0]
-    search_path += os.pathsep + miri.simulators.mirimsim.data.__path__[0]
     
     firsttry = find_file_in_path( filename, search_path=search_path,
                                   pathsep=os.pathsep, walkdir=True)

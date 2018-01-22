@@ -13,7 +13,6 @@ Release Notes
    :maxdepth: 1
 
    release_notes
-   release_notes_mirimsim
    release_notes_scasim
 
 Package Reference

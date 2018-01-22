@@ -4,8 +4,8 @@ simulators. The following subpackages are available:
 The scasim subpackage contains the MIRI Sensor Chip Array Simulator 
 software (SCASim), developed by the UKATC, Edinburgh, UK.
 
-Other packages have been released separately in a software simulator called
-MIRISim. The "mirimsim" subpackage is currently empty.
+Other MIRI simulator packages have been released separately in a
+software simulator called MIRISim.
 
 Documentation describing this software may be found within the "doc" 
 directory. The following commands will build a new set of documentation:

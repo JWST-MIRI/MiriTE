@@ -14,6 +14,7 @@ Setup file for installing the MiriTE software
 27 Jul 2017: Require Python 2.7
 13 Sep 2017: MiriCalibration and MiriPipeline packages separated.
 15 Jan 2018: MiriTools and MiriSimulators levels removed from package.
+22 Jan 2018: Removed empty mirimsim simulator package.
 
 @author: Steven Beard (UKATC)
 
@@ -205,7 +206,6 @@ setup(
               'miri.tools', 'miri.tools.tests',
               'miri.datamodels', 'miri.datamodels.tests',
               'miri.simulators', 'miri.simulators.tests',
-              'miri.simulators.mirimsim', 'miri.simulators.mirimsim.tests',
               'miri.simulators.scasim', 'miri.simulators.scasim.tests',
              ],
     package_dir={
@@ -216,8 +216,6 @@ setup(
                  'miri.datamodels.tests': 'datamodels/tests',
                  'miri.simulators': 'simulators/',
                  'miri.simulators.tests': 'simulators/tests',
-                 'miri.simulators.mirimsim': 'simulators/mirimsim/',
-                 'miri.simulators.mirimsim.tests': 'simulators/mirimsim/tests',
                  'miri.simulators.scasim': 'simulators/scasim',
                  'miri.simulators.scasim.tests': 'simulators/scasim/tests',
                 },
@@ -234,7 +232,6 @@ setup(
                                       'data/cosmic_rays/*.txt',
                                       'data/filters/*.fits',
                                       'data/filters/*.txt'],
-                  'miri.simulators.mirimsim': ['data/__init__.py'],
                   'miri.simulators.scasim': ['data/SCATestInput80x64.fits',
                                       'data/SCATestHorseHead1024.fits',
                                       'data/__init__.py'],
@@ -255,7 +252,6 @@ setup(
              'datamodels/scripts/make_filters_fits.py',
              'datamodels/scripts/make_measurements_fits.py',
              'datamodels/scripts/make_qe_fits.py',
-             'simulators/mirimsim/scripts/mirimsim.py',
              'simulators/scasim/scripts/make_bad_pixel_mask.py',
              'simulators/scasim/scripts/make_fringe_map.py',
              'simulators/scasim/scripts/make_sca_calibration.py',
