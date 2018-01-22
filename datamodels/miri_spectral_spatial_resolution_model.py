@@ -8,7 +8,8 @@ spectral and spatial resolution models.
 
 :Reference:
 
-The STScI jwst_lib documentation.
+The STScI jwst_lib documentation. See
+http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 
 :History:
 

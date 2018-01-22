@@ -8,7 +8,8 @@ model.
 
 :Reference:
 
-The STScI jwst.datamodel library documentation.
+The STScI jwst.datamodel library documentation. See
+http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 
 :History:
 

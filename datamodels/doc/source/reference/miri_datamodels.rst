@@ -50,7 +50,7 @@ copyright and disclaimer.
 Where this software uses facilities developed by other members of the 
 MIRI consortium (e.g. its use of the JWST data models) it is also bound
 by the  licences issued with those facilities (see the LICENCE files
-contained in the jwst repository).
+released with the jwst software).
 
 Disclaimer
 ^^^^^^^^^^
@@ -64,7 +64,10 @@ that might result from the use of this software.
 Introduction
 ~~~~~~~~~~~~
 This document describes the implementation details for the MIRI data
-models. 
+models. These data models are built on the underlying JWST data models
+package, which is described here:
+
+http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 
 Modules
 ~~~~~~~

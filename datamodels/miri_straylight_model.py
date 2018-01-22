@@ -8,7 +8,8 @@ pixel mask model for MRS.
 
 :Reference:
 
-The STScI jwst.datamodels documentation.
+The STScI jwst.datamodels documentation. See
+http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 
 :History:
 

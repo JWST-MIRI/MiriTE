@@ -16,7 +16,8 @@ and use a lookup table to map each PSF plane to a filter and field position.
 
 :Reference:
 
-The STScI jwst.datamodels documentation.
+The STScI jwst.datamodels documentation. See
+http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 
 :History:
 

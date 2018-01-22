@@ -11,6 +11,14 @@ for example
    
 instead of needing to know the names of all the individual source files.
 
+:Reference:
+
+MIRI Calibration Data Products Documentation:
+
+
+JWST Calibration Data Products Documentation:
+http://ssb.stsci.edu/doc/jwst/jwst/introduction.html#crds-reference-files
+
 :History:
 
 23 May 2013: Created

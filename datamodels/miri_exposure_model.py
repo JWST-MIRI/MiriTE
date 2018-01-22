@@ -3,7 +3,7 @@
 
 """
 
-An extension to the MIRI data model for exposure data. Similar to the
+An extension to the MIRI data model for "level 1b" exposure data. Similar to the
 MIRI ramp data model, except the data may be built up a piece
 at a time instead of being created all at once. Groups and/or integrations
 can also be averaged together before being written to disk.
@@ -13,7 +13,13 @@ exposure data.
 
 :Reference:
 
-The STScI jwst.datamodels documentation.
+The STScI jwst.datamodels documentation:
+
+http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
+
+and the documentation on JWST file formats:
+
+http://ssb.stsci.edu/doc/jwst/jwst/datamodels/fits_files.html#raw-level-1b-suffix-uncal
 
 :History:
 

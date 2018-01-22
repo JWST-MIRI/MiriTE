@@ -13,7 +13,8 @@ CDPs released before CDP-4.
 
 :Reference:
 
-The STScI jwst.datamodels documentation.
+The STScI jwst.datamodels documentation. See
+http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 
 :History:
 

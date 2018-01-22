@@ -9,11 +9,10 @@ describing MIRI distortion coefficients.
 NOTE: The contents of this data model might change, depending on the 
 STScI implementation of distortion models.
 
-http://ssb.stsci.edu/doc/jwst_dev/jwst.datamodels.doc/html/index.html
-
 :Reference:
 
-The STScI jwst.datamodels documentation.
+The STScI jwst.datamodels documentation. See
+http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 
 :History:
 
