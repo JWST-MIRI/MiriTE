@@ -18,4 +18,4 @@ Module specific release notes
 .. toctree::
    :maxdepth: 1
 
-   scasim/doc/source/release_notes.rst
+   release_notes_scasim.rst

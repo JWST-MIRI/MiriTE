@@ -28,6 +28,8 @@
 #              check_wavelength and load_illumination_map functions
 #              moved here. Made compatible with Python 3.
 # 20 Jan 2017: Replaced "clobber" parameter with "overwrite".
+# 22 Jan 2018: Protect against incompatibility problems from legacy Image
+#              package.
 #
 # @author: Steven Beard (UKATC)
 
@@ -109,7 +111,10 @@ import astropy.io.fits as pyfits
 try:
     import Image
     _PIL_AVAILABLE = True
-except ImportError:
+except Exception:
+    # NOTE: Incompatibility problems may cause a number of different exceptions
+    # while attempting to import the Image package. Catch all of them.
+    Image = None
     _PIL_AVAILABLE = False
 
 from miri.datamodels.sim import MiriIlluminationModel
@@ -122,6 +127,8 @@ def _np_from_jpeg( filename ):
     Requires the Python Imaging Library, PIL.
     
     """
+    if not _PIL_AVAILABLE:
+       raise NotImplementedError("Cannot open JPEG file without Python Imaging Library")
     # Open the image file, convert the contents to a composite image
     # and transpose it to numpy orientation.
     jpim1 = Image.open(filename)
