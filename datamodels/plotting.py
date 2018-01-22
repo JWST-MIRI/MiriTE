@@ -502,7 +502,6 @@ class DataModelPlotVisitor(DataModelVisitor):
             warnings.warn(strg)
 
 
-
 #
 # A minimal test is run when this file is run as a main program.
 # For a more substantial test see miri/datamodels/tests.

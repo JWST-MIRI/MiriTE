@@ -1026,19 +1026,11 @@ class MiriDataModel(DataModel):
         None
         
         :Returns:
-        readpatt: str
-            Name of detector readout pattern.
-        nints: int
-            Number of integrations per exposure (missed out if set to None).
-        ngroups: int
-            Number of groups per integration (missed out if set to None).
-        nframes: int, optional
-            Number of frames coadded in group (always 1 for MIRI data)
         
         (readpatt, nints, ngroups, nframes):
             Detector readout pattern and the number of integrations,
             groups and frames.
-            (None, None, None, None) if not defined.
+            (None, None, None, None) if not defined.  
         
         """
         if hasattr(self, 'meta') and hasattr(self.meta, 'exposure'):

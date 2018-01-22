@@ -172,7 +172,6 @@ def insert_value_column(flagtable):
         A data structure containing a data quality flag table.
         The returned table will always have 4 columns.
             
-    
     """
     # FIXME: The following assertions do not work, even supplemented by recarray and FITS_record.
     # Is there a generic "list-like" and "record-like" test that
@@ -435,7 +434,6 @@ def raise_mask(dqarr, bitmask):
     newdqarr: numpy array or integer
         Returns array 'dqarr' with the specified bits raised in all
         elements (pixels).
-    
     
     """
     assert isinstance(bitmask, int)
