@@ -144,6 +144,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 04 Jan 2018: Fill a masked array before calculating statistics in
              get_data_stats() to prevent a numpy warning.
 19 Jan 2018: Added set_telescope function for creating test data.
+24 Jan 2018: Added association metadata to set_observation_metadata.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -644,11 +645,15 @@ class MiriDataModel(DataModel):
             else:
                 self.add_history(str(history))
                     
-    def set_observation_metadata(self, dateobs=None, timeobs=None, obsid=None):
+    def set_observation_metadata(self, dateobs=None, timeobs=None, obsid=None,
+                                 obsnumber=None, programnumber=None,
+                                 visitid=None, visitnumber=None, visitgroup=None,
+                                 activityid=None, exposurenumber=None):
         """
         
-        Convenience function to define observation metadata.
-        By default it sets the observation date to the current date and time.
+        Convenience function to define observation and association metadata.
+        By default it sets the observation date to the current date and time
+        and leaves the other fields empty.
         Useful for setting up test data.
         
         :Parameters:
@@ -661,6 +666,20 @@ class MiriDataModel(DataModel):
             If not given the current time will be used.
         obsid: str, optional
             Observation ID.
+        obsnumber: number, optional
+            Observation number
+        programnumber: str, optional
+            Program number
+        visitid: str, optional
+            Visit ID
+        visitnumber: str, optional
+            Visit number
+        visitgroup: str, optional
+            Visit group
+        activityid: str, optional
+            Activity ID
+        exposurenumber: str, optional
+            Exposure number
             
         """
         from datetime import datetime
@@ -678,7 +697,21 @@ class MiriDataModel(DataModel):
             else:
                 self.meta.observation.time = str(timeobs)
             if obsid is not None:
-                self.meta.observation.obs_id = obsid
+                self.meta.observation.obs_id = str(obsid)
+            if obsnumber is not None:
+                self.meta.observation.observation_number = str(obsnumber)
+            if programnumber is not None:
+                self.meta.observation.program_number  = str(programnumber)
+            if visitid is not None:
+                self.meta.observation.visit_id = str(visitid)
+            if visitnumber is not None:
+                self.meta.observation.visit_number = str(visitnumber)
+            if visitgroup is not None:
+                self.meta.observation.visit_group = str(visitgroup)
+            if activityid is not None:
+                self.meta.observation.activity_id  = str(activityid)
+            if exposurenumber is not None:
+                self.meta.observation.exposure_number  = str(exposurenumber)
         else:
             strg = "Observation metadata attributes missing from data model"
             raise AttributeError(strg)
@@ -3000,7 +3033,11 @@ if __name__ == '__main__':
 #         print("\n" + dump_strg + "\n")
         # Define some metadata.
         testdata.set_housekeeping_metadata('UKATC', 'Joe Bloggs', 'GROUND', 'V1.0')
-        testdata.set_observation_metadata() # Use current data/time
+        #testdata.set_observation_metadata() # Use current data/time
+        testdata.set_observation_metadata(obsid='001',
+                                 obsnumber='001', programnumber='1235',
+                                 visitid='001', visitnumber='001', visitgroup='01',
+                                 activityid='01', exposurenumber='0001')
         testdata.set_pointing_metadata(ra_v1=12.20, dec_v1=-7.15, pa_v3=2.0)
         testdata.set_target_metadata(ra=12.0, dec=-7.0)
         testdata.set_instrument_metadata(detector='MIRIMAGE', filt='F560W',
