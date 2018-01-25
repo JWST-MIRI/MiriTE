@@ -15,6 +15,7 @@ Setup file for installing the MiriTE software
 13 Sep 2017: MiriCalibration and MiriPipeline packages separated.
 15 Jan 2018: MiriTools and MiriSimulators levels removed from package.
 22 Jan 2018: Removed empty mirimsim simulator package.
+25 Jan 2018: Added missing url metadata.
 
 @author: Steven Beard (UKATC)
 
@@ -197,6 +198,7 @@ setup(
     name="miri",
     version=find_version("__init__.py"),
     description="MIRI tools, data models and simulator software",
+    url="https://github.com/JWST-MIRI/MiriTE",
     author="MIRI European Consortium",
     author_email="F.Lahuis@sron.nl",
     license="See LICENCE file",
