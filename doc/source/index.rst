@@ -25,13 +25,13 @@ Release Notes
    release_notes_datamodels
    release_notes_simulators
 
-Package Reference
------------------
+Package References
+------------------
 
 .. toctree::
    :maxdepth: 2
 
-   reference/tools/tools
-   reference/datamodels/datamodels
+   reference/tools/miri_tools
+   reference/datamodels/miri_datamodels
    reference/simulators/simulators
 

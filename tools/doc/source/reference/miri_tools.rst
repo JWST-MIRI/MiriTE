@@ -10,7 +10,7 @@ LICENCE
 
 Copyright
 ^^^^^^^^^
-Copyright (c) 2010-2017 The JWST MIRI European Consortium software team. 
+Copyright (c) 2010-2018 The JWST MIRI European Consortium software team. 
 All rights reserved.
 
 The miri.tools software has been developed by the MIRI EC software team 
@@ -64,9 +64,7 @@ that might result from the use of this software.
 Introduction
 ~~~~~~~~~~~~
 This document describes the implementation details for the MIRI general 
-purpose tools and utilities package (miri.tools). Tools may be found 
-within the top level miri.tools module, or they may be categorized into 
-subpackages, such as miri.datamodels.
+purpose tools and utilities package (miri.tools).
 
 Modules
 ~~~~~~~
@@ -89,15 +87,11 @@ Scripts
 General purpose miri.tools scripts may be found in the miri/tools/scripts 
 directory.
 
-At the moment there are no top level scripts. The scripts associated 
-with each subpackage may be found in the miri/tools/subpackage/scripts 
-directory.
+At the moment there are no scripts contained in the miri.tools package.
 
 Data
 ~~~~
-General purpose miri.tools data may be found in the miri/tools/data
-directory.
+General purpose miri.tools installation data may be found in the
+miri/tools/data directory.
 
-At the moment there are no top level data. The data associated with
-each subpackage may be found in the miri/tools/subpackage/data directory.
-
+At the moment the data directory is empty.

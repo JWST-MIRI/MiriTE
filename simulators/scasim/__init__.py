@@ -67,6 +67,6 @@ data/SCATestInput80x64.fits
 # doc/source/conf.py. The release version number is defined in three 
 # places. doc/source/release_notes.rst might also need to be updated.
 __project__ = 'MIRI SCA Simulator'
-__author__ = 'Steven Beard, MIRI Software Team'
-__maintainer__ = 'Steven Beard <steven.beard@stfc.ac.uk>'
+__author__ = 'MIRI Software Team'
+__maintainer__ = 'MIRI Software Team: miri@xxx.yyy'
 __copyright__ = '2018, %s' % __author__

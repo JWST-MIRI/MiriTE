@@ -3,7 +3,7 @@ MIRI TE Software |release| Installation Instructions
 
 :Release: |release|
 :Date: |today|
-:Author: Steven Beard <steven.beard@stfc.ac.uk>
+:Author: MIRI Software Team <miri@xxx.yyy>
 
 Notes
 ~~~~~
@@ -31,4 +31,5 @@ The "miri_installation_check.py" script can be run to check that
 all the necessary modules have been installed.
 
 The "run_nosetests.sh" or "run_pytests.sh" scripts can be run to execute
-all the MIRI module unit tests.
+all the MIRI module unit tests. "python setup.py nosetests" should also
+work.

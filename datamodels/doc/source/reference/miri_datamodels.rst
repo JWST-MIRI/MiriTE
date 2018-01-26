@@ -10,7 +10,7 @@ LICENCE
 
 Copyright
 ^^^^^^^^^
-Copyright (c) 2010-2017 The JWST MIRI European Consortium software team. 
+Copyright (c) 2010-2018 The JWST MIRI European Consortium software team. 
 All rights reserved.
 
 The miri data models have been developed by the MIRI EC software team 
@@ -183,8 +183,8 @@ Make Measurement Data File (make_measurement_fits)
 
 Data
 ~~~~
-General purpose miri.datamodels data may be found in the miri/datamodels/data
-directory.
+General purpose miri.datamodels installation data may be found
+in the miri/datamodels/data directory.
 
 Example Data
 ^^^^^^^^^^^^

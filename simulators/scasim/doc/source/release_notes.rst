@@ -4,6 +4,16 @@ MIRI SCAsim release notes (:mod:`miri.simulators.scasim`)
 :Release: |release|
 :Date: |today|
 
+The MIRI SCASim package simulates the behaviour of the
+MIRI detectors. The package makes use of the MIRI
+tools and MIRI data models, and therefore has the same
+dependencies as the miri.tools and miri.datamodels
+packages.
+
+The dependencies should be taken care of automatically
+by the MIRICLE installation script.
+
+
 Full MIRISim-compatible release. The release supports the following features:
 
     * API via a class method instead of a global function.

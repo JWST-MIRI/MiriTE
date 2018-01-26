@@ -15,8 +15,8 @@ Release Notes
    release_notes
    release_notes_scasim
 
-Package Reference
------------------
+Simulators Package
+------------------
 
 .. toctree::
    :maxdepth: 2

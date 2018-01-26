@@ -7,7 +7,7 @@ MIRI Simulator Software (:mod:`miri.simulators`)
 Introduction
 ~~~~~~~~~~~~
 This document describes the implementation details for the MIRI general 
-simulators package (simulators).
+simulators package (miri.simulators).
 
 Note that most MIRI simulators may now be found in a separate MIRISim
 package.

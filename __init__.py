@@ -37,11 +37,11 @@ miri.simulators
 19 Jun 2017: MIRI software merged with build 7.1 utilities (V5.0)
 15 Jan 2018: MiriTools and MiriSimulators levels removed from package
 
-@author: Steven Beard (UKATC)
+@author: MIRI Software Team
 
 """
 __project__ = 'MIRI Tool and Environment Software'
 __author__ = 'MIRI Software Team'
-__maintainer__ = __author__
+__maintainer__ = 'MIRI Software Team: miri@xxx.yyy'
 __copyright__ = '2018, %s' % __author__
 __version__ = '7.0'

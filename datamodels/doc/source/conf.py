@@ -54,8 +54,8 @@ source_suffix = '.rst'
 #source_encoding = 'utf-8'
 
 # The master toctree document.
-master_doc = 'reference/miri_datamodels'
-#master_doc = 'index'
+#master_doc = 'reference/miri_datamodels'
+master_doc = 'index'
 
 # General information about the project.
 project = miri.datamodels.__project__

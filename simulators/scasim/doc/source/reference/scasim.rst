@@ -178,7 +178,7 @@ MIRI simulation that are expected to change from observation
 to observation. More detailed control of the simulations is
 possible by editing the configuration files supplied with
 the simulator. The files, which may be found in the
-scasim/lib directory, are::
+simulators/scasim directory, are::
 
     cosmic_ray_properties.py
     detector_properties.py
@@ -225,7 +225,7 @@ package, and are shared with other MIRI simulators.
 
 Modules
 ~~~~~~~
-The scasim modules may be found in the scasim/lib directory.
+The miri.simulators.scasim modules may be found in the simulators/scasim directory.
 
 .. module:: miri.simulators.scasim
 

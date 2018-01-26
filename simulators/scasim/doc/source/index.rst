@@ -13,8 +13,8 @@ Release Notes
 
    release_notes
 
-Datamodels Package
-------------------
+SCASim Package
+--------------
 .. toctree::
    :maxdepth: 1
 

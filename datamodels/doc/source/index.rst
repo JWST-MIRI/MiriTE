@@ -13,8 +13,8 @@ Release Notes
 
    release_notes
 
-Datamodels Package
-------------------
+MIRI Datamodels Package
+-----------------------
 .. toctree::
    :maxdepth: 1
 

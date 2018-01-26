@@ -4,8 +4,17 @@ MIRI TE top level software release notes (:mod:`miri`)
 :Release: |release|
 :Date: |today|
 
-Release notes for the whole MIRI TE software suite are
-written here.
+The MIRI Tools and Environment (MiriTE) package contains
+all the software tools needed for MIRI software
+development. There are three subpackages:
 
-See the release notes for each individual package for
-details.
+miri.tools - general purpose tools and utilities
+miri.datamodels - MIRI data models
+miri.simulators - MIRI simulator tools and utilities
+
+MiriTE is used by the MIRI simulators (MIRISim) and
+by MIRI data analysis packages.
+
+See the release notes for the tools, datamodels and
+simulator packages, below.
+

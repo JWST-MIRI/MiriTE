@@ -51,7 +51,7 @@ data/detector/*.fits
 # places. doc/source/release_notes.rst might also need to be updated.
 __project__ = 'MIRI Simulators'
 __author__ = 'MIRI Software Team'
-__maintainer__ = __author__
+__maintainer__ = 'MIRI Software Team: miri@xxx.yyy'
 __copyright__ = '2018, %s' % __author__
 
 # Import classes that need to be accessible from the miri.simulators level.
