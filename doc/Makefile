@@ -32,6 +32,7 @@ clean: clean_links
 
 clean_links:
 	rm -f `find ./source -type l`
+	rm -rf ./source/reference/simulators
 
 links:
 	bash ./make_links.sh

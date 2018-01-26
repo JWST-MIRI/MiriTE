@@ -11,9 +11,10 @@ Full MIRISim-compatible release. The release supports the following features:
     * 3 different classes can be used at the same time to keep track
       of 3 detectors.
 
-    * Simulator parameters are obtained from scasim command line arguments,
-      from the parameters defined within configuration files and from
-      calibration data products.
+    * Simulator parameters are obtained from scasim command line arguments
+      or from the metadata contained within the illumination input files.
+      Detailed detector properties are defined within configuration files
+      or taken from calibration data products.
 
     * Parsing of intensity and wavelength arrays within an input FITS file
       of detector illumination data.
@@ -40,7 +41,7 @@ Full MIRISim-compatible release. The release supports the following features:
     * Simulation of amplifier gain, as described in a MIRI calibration
       data product.
     
-    * Simulation of non-linearity using polynomial coefficients.
+    * Simulation of non-linearity using sensitivity coefficients.
            
     * Simulation of different detector readout modes, including FASTINTAVG
       and FASTGRPAVG. Can also simulate readout modes used by other JWST
@@ -57,14 +58,15 @@ Full MIRISim-compatible release. The release supports the following features:
     * Any of the MIRI sensor chip assemblies (MIRIMAGE, MIRIFULONG or
       MIRIFUSHORT) may be simulated, together with their focal plane
       modules (FPM S/N 106, 104 or 105). More SCAs can be added by editing
-      a configuration file.
+      the detector configuration file.
            
     * Simulation of cosmic ray hits on the detector pixels (using an
       STScI library of cosmic ray events, with a fall-back of random
       generation of events if the library is not available).
            
-    * Writing either a FITSWriter format file or a level 1b FITS file in
-      either 'cube' or 'hypercube' format (with realistic header keywords).
+    * Writing either a DHAS FITSWriter format file or a JWST level 1b
+      FITS file in either 'cube' or 'hypercube' format (with realistic
+      header keywords).
 
 The following features could be improved:
       
@@ -77,4 +79,9 @@ The following features could be improved:
       improved, in particular the effect of flux building up on the
       detector in between integrations is not yet simulated, and the
       effect in SLOW mode has not been calibrated.
-      
+
+    * The "tree ring" and first frame effects are inherited from the
+      dark current calibration data product. The last frame effect is
+      not currently simulated.
+
+    * Reset switch charge decay is not currently simulated.

@@ -200,7 +200,7 @@ setup(
     description="MIRI tools, data models and simulator software",
     url="https://github.com/JWST-MIRI/MiriTE",
     author="MIRI European Consortium",
-    author_email="F.Lahuis@sron.nl",
+    author_email="miri@xxx.yyy",
     license="See LICENCE file",
     platforms=["Linux", "Mac OS X", "Win"],
     python_requires='~=2.7',
