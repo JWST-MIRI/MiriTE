@@ -1,8 +1,12 @@
 MIRI Simulator Software (:mod:`miri.simulators`)
 ================================================
 
-:Release: |release|
-:Date: |today|
+Release Notes
+~~~~~~~~~~~~~
+.. toctree::
+   :maxdepth: 1
+
+   release_notes
 
 Introduction
 ~~~~~~~~~~~~
@@ -14,8 +18,8 @@ package.
 
 Modules
 ~~~~~~~
-General purpose simulator modules may be found in the simulators/lib 
-directory
+General purpose simulator modules may be found in the top-level simulators 
+directory.
 
 .. module:: miri.simulators
 

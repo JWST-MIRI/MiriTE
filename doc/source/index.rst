@@ -12,7 +12,7 @@ Installation
 .. toctree::
    :maxdepth: 1
 
-   install.rst
+   reference/install
 
 Release Notes
 -------------
@@ -20,10 +20,10 @@ Release Notes
 .. toctree::
    :maxdepth: 1
 
-   release_notes
-   release_notes_tools
-   release_notes_datamodels
-   release_notes_simulators
+   reference/release_notes
+   reference/tools/release_notes
+   reference/datamodels/release_notes
+   reference/simulators/release_notes
 
 Package References
 ------------------

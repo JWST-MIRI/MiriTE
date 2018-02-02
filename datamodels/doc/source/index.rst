@@ -1,9 +1,6 @@
 MIRI Data Models Package Documentation
 ======================================
 
-:Release: |release|
-:Date: |today|
-
 .. module:: miri.datamodels
 
 Release Notes
@@ -11,7 +8,8 @@ Release Notes
 .. toctree::
    :maxdepth: 1
 
-   release_notes
+   reference/release_notes
+   reference/licence
 
 MIRI Datamodels Package
 -----------------------

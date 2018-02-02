@@ -1,9 +1,6 @@
 MIRI Miritools Package Documentation
 ====================================
 
-:Release: |release|
-:Date: |today|
-
 .. module:: miri.tools
 
 Release Notes
@@ -11,7 +8,8 @@ Release Notes
 .. toctree::
    :maxdepth: 1
 
-   release_notes
+   reference/release_notes
+   reference/licence
 
 MIRI Tools Package
 ------------------

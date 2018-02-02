@@ -12,9 +12,9 @@ specific to MIRI. Convenience functions are also included which implement
 some of the features of the old MIRI data products.
 
 All MIRI data models depend on the STScI data model, found in the
-jwst.datamodels package. See
+jwst.datamodels package. See the JWST user documentation:
 
-http://ssb.stsci.edu/doc/jwst_dev/jwst/datamodels/index.html
+https://jwst-docs.stsci.edu/display/HOM/JWST+User+Documentation+Home
 
 Objects
 ~~~~~~~

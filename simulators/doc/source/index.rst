@@ -1,9 +1,6 @@
 MIRI Simulators Package Documentation
 =====================================
 
-:Release: |release|
-:Date: |today|
-
 .. module:: miri.simulators
 
 Release Notes
@@ -12,8 +9,8 @@ Release Notes
 .. toctree::
    :maxdepth: 1
 
-   release_notes
-   release_notes_scasim
+   reference/release_notes
+   reference/scasim/release_notes
 
 Simulators Package
 ------------------

@@ -1,9 +1,6 @@
 MIRI Sensor Chip Assembly Simulator Documentation
 =================================================
 
-:Release: |release|
-:Date: |today|
-
 .. module:: miri.simulators.scasim
 
 Release Notes
@@ -11,7 +8,8 @@ Release Notes
 .. toctree::
    :maxdepth: 1
 
-   release_notes
+   reference/release_notes
+   reference/licence
 
 SCASim Package
 --------------
