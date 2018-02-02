@@ -6,7 +6,7 @@ Copyright
 Copyright (c) 2010-2018 The JWST MIRI European Consortium software team. 
 All rights reserved.
 
-The miri.tools software has been developed by the MIRI EC software team 
+The miri software tools have been developed by the MIRI EC software team 
 as part of the JWST/MIRI consortium, which includes the following 
 organisations: Ames Research Center, USA; Netherlands Foundation for 
 Research in Astronomy; CEA Service d'Astrophysique, Saclay, France; 
@@ -32,18 +32,14 @@ University of Stockholm, Sweden, Utah State University USA.
 
 Terms and Conditions of Use
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-This software may be used and copied free of charge only for 
+Users of the MIRI instrument of the JWST are welcome to use this
+software. The software may be used and copied free of charge only for 
 non-commercial research purposes. All copies of this software must 
 contain this copyright statement and disclaimer. The MIRI consortium 
 must be acknowledged in any publications arising from use of this 
 software. If you make modifications to this software, you must clearly 
 mark the software as having been changed and you must also retain this 
 copyright and disclaimer.
-
-Where this software uses facilities developed by other members of the 
-MIRI consortium (e.g. its use of JWST infrastructure) it is also bound
-by the licences issued with those facilities (see the LICENCE files
-contained in the JWST software repository).
 
 Disclaimer
 ^^^^^^^^^^

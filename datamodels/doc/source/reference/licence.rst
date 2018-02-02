@@ -32,18 +32,14 @@ University of Stockholm, Sweden, Utah State University USA.
 
 Terms and Conditions of Use
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-This software may be used and copied free of charge only for 
+Users of the MIRI instrument of the JWST are welcome to use this
+software. The software may be used and copied free of charge only for
 non-commercial research purposes. All copies of this software must 
 contain this copyright statement and disclaimer. The MIRI consortium 
 must be acknowledged in any publications arising from use of this 
 software. If you make modifications to this software, you must clearly 
 mark the software as having been changed and you must also retain this 
 copyright and disclaimer.
-
-Where this software uses facilities developed by other members of the 
-MIRI consortium (e.g. its use of the JWST data models) it is also bound
-by the  licences issued with those facilities (see the LICENCE files
-released with the jwst software).
 
 Disclaimer
 ^^^^^^^^^^
