@@ -52,6 +52,9 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 20 Nov 2017: Updated the schema so the world coordinates are written to
              the COEFFS data component.
+13 Feb 2018: Corrected a typo in the coeffs.setter. Added plot_goeffs,
+             get_coeffs_str and apply functions and updated the tests
+             run in the main program.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -61,6 +64,7 @@ from __future__ import absolute_import, unicode_literals, division, print_functi
 
 import numpy as np
 import numpy.ma as ma
+import sys
 
 # Import the MIRI measured data model.
 from miri.datamodels.dqflags import insert_value_column
@@ -175,8 +179,13 @@ class MiriLinearityModel(MiriMeasuredModel):
     def __str__(self):
         """
         
-        Display the contents of the dark reference object as a readable
+        Return the contents of the linearity reference object as a readable
         string.
+        
+        :Returns:
+        
+        description: str
+            A string containing a summary of the contents.
         
         """
         # First obtain a string describing the underlying measured
@@ -184,6 +193,9 @@ class MiriLinearityModel(MiriMeasuredModel):
         strg = super(MiriLinearityModel, self).__str__()
         
         # Add the extras
+        if (self.data is not None) and (self.data.shape[2] > 2):
+            strg += self.get_coeffs_str(underline=True)
+            strg += "\n"
         if self.meta.fit.model is not None and self.meta.fit.order is not None:
             strg += "\nFit model is \'%s\' of order %d.\n" % \
                 (self.meta.fit.model, self.meta.fit.order)
@@ -193,7 +205,135 @@ class MiriLinearityModel(MiriMeasuredModel):
         else:
             strg += "\nFit model is UNDEFINED.\n"
         return strg
+    
+    def plot_coeffs(self, row, column, description=""):
+        """
+        
+        Plot a graph showing the shape of the linearity function at the
+        specified row and column.
+        
+        :Parameters:
+        
+        row: int
+            The row at which the polynomial is to be plotted.
+        column: int or tuple of its.
+            The column at which the polynomial is to be plotted.
+        description: str (optional)
+            An optional description to be appended to the plot title.
+            
+        :Requires:
+        
+        miri.tools.miriplot
+        matplotlib.pyplot
+            
+        """
+        # Import the miri.tools plotting module.
+        import miri.tools.miriplot as mplt
+        
+        # Start with an array of smoothly increasing DN values
+        xarray = np.arange(0.0, 65000.0, 1000.0)
+        
+        # Convert the array using the given polynomial coefficients
+        ncoeffs = self.data.shape[0]
+        yarray = np.zeros_like(xarray)
+        for icoeff in range(0, ncoeffs):
+            yarray += self.data[icoeff,row,column] * (xarray ** icoeff)     
 
+        # Define fixed labels
+        xlabel = "Input DN"
+        ylabel = 'Output DN'
+        tstrg = \
+            "Linearity polynomial for detector %s" % str(self.meta.instrument.detector) + \
+            " (row=%d,col=%d)" % (row,column)
+        if description:
+            tstrg += "\n" + description
+            
+        # Plot the polynomial as an XY plot.
+        mplt.plot_xy(xarray, yarray, linefmt='bo', xlabel=xlabel,
+                     ylabel=ylabel, title=tstrg)
+        mplt.show_plot()
+        
+    def get_coeffs_str(self, underline=False):
+        """
+        
+        Return a string summarising the polynomial coefficients contained
+        in the linearity data model.
+        
+        :Parameters:
+
+        underline: bool, optional
+            Set to True if the title should be underlined. The default
+            is False.
+        
+        :Returns:
+        
+        coeffs_str: str
+            A string summarising the polynomial coefficients contained.
+        
+        """
+        ncoeffs = self.data.shape[0]        
+        # Obtain the two arrays containing the median coefficients
+        # for the left and right sides of the detector array
+        mcoeffs_l = []
+        mcoeffs_r = []
+        boundary2 = self.data.shape[2]//2
+        for icoeff in range(0, ncoeffs):
+            mcoeffs_l.append(np.median(self.data[icoeff,:,:boundary2]))
+            mcoeffs_r.append(np.median(self.data[icoeff,:,boundary2+1:]))
+        
+        # Determine whether the two arrays are identical or different
+        identical = True
+        for icoeff in range(0, ncoeffs):
+            if abs(mcoeffs_l[icoeff] - mcoeffs_r[icoeff]) > sys.float_info.epsilon:
+                identical = False
+        
+        strg = "\nMedian polynomial coefficients"
+        if underline:
+            strg += "\n-----------------------------"
+            strg += "\n      "
+        for icoeff in range(0, ncoeffs):
+            strg += "         L%d  " % icoeff
+        if identical:
+            strg += "\nAll:  "
+            for coeff in mcoeffs_l:
+                strg += " %12.6g" % coeff
+        else:
+            strg += "\nLeft: "
+            for coeff in mcoeffs_l:
+                strg += " %12.6g" % coeff
+            strg += "\nRight:"
+            for coeff in mcoeffs_r:
+                strg += " %12.6g" % coeff
+        return strg
+    
+    def apply(self, inramp):
+        """
+        
+        Apply the linearity coefficients to a ramp of DN values.
+        The input data must match the number of rows and columns
+        contained in the linearity coefficients array.
+        
+        :Parameters:
+        
+        inramp: array-like
+            Input array containing an uncorrected ramp of DN values.
+        
+        :Returns:
+        
+        outramp: array-like
+            Output array containing a corrected ramp of DN values.
+        
+        """
+        inramp = np.asarray(inramp)
+        assert (len(inramp.shape) > 1)
+        assert (inramp.shape[-1] == self.data.shape[-1])
+        assert (inramp.shape[-2] == self.data.shape[-2])
+        ncoeffs = self.data.shape[0]
+        outramp = np.zeros_like(inramp)
+        for icoeff in range(0, ncoeffs):
+            outramp += self.data[icoeff,:,:] * (inramp[:,:,:] ** icoeff)     
+        return outramp
+            
     # "coeffs" is an alias for the "data" attribute.
     @property
     def coeffs(self):
@@ -203,7 +343,7 @@ class MiriLinearityModel(MiriMeasuredModel):
             return None
 
     @coeffs.setter
-    def mask(self, data):
+    def coeffs(self, data):
         self.data = data
 
 
@@ -218,49 +358,61 @@ if __name__ == '__main__':
     SAVE_FILES = False
     READ_CDP_DATA = False
 
-    data3x3 = np.array([[1.,2.,3.],[4.,5.,6.],[7.,8.,9.]])
-    err3x3 = np.array([[1.,1.,1.],[2.,2.,2.],[1.,1.,1.]])
-    dq3x3 = np.array([[0,1,0],[1,0,1],[0,1,0]])
-    data3x3x2 = [data3x3,data3x3]
+    coeffs1d = [0.0, 0.865384, 4.64239e-6, -6.16093e-11, 7.23130e-16]
+    
+    coeffs3d = np.asarray([[coeffs1d, coeffs1d, coeffs1d],
+                          [coeffs1d, coeffs1d, coeffs1d],
+                          [coeffs1d, coeffs1d, coeffs1d],
+                          ])
+    coeffs3x3x5 = np.moveaxis(coeffs3d,-1,0)
+    err3x3x5 = 0.01 * np.ones_like(coeffs3x3x5)
+    dq3x3 = np.asarray([[0,1,0],[1,0,1],[0,1,0]])
+    
+    testdata = np.asarray([[19000.0, 20000.0, 21000.0],
+                           [22000.0, 18000.0, 20000.0],
+                           [22000.0, 18000.0, 20000.0]])
+    testramp = np.asarray([0.2*testdata,
+                           0.4*testdata, 0.6*testdata,
+                           0.8*testdata,
+                           testdata])
 
     print("Linearity data with data + err + dq:")
-    with MiriLinearityModel( coeffs=data3x3x2, err=err3x3, dq=dq3x3,
+    with MiriLinearityModel( coeffs=coeffs3x3x5, err=err3x3x5, dq=dq3x3,
                                 dq_def=linearity_reference_flags ) \
             as testdata1:
         print(testdata1)
+        print("input ramp=", testramp)
+        outramp = testdata1.apply( testramp )
+        print("output ramp=", outramp)
         if PLOTTING:
+            testdata1.plot_coeffs(row=1, column=1, description="testdata1")
             testdata1.plot(description="testdata1")
         if SAVE_FILES:
             testdata1.save("test_linearity_model1.fits", overwrite=True)
         del testdata1
 
     if READ_CDP_DATA:
-        print("Reading linearity data from a CDP file")
-        with MiriLinearityModel( init="D:/MIRI-CDP-4/MIRI_FM_MIRIFUSHORT_12_LINEARITY_04.02.00.fits") \
-                as testdata3:
-            print(testdata3.get_meta_str())
-            print("All occurences of BUNIT: " + str(testdata3.find_fits_values('BUNIT')))
-            print("Units of the COEFFS data: " + str(testdata3.get_fits_keyword('BUNIT', 'COEFFS')))
-
-            print("All COMMENT records: " + testdata3.get_comments_str())
-            print("All HISTORY records: " + testdata3.get_history_str())
-            print("Getting ORDER keyword: " + str(testdata3.get_fits_keyword('ORDER')))
-            testdata3.set_fits_keyword('ORDER', 3)
-            print("Getting ORDER keyword again: " + str(testdata3.get_fits_keyword('ORDER')))
-            print("Getting ORDER keyword again: " + str(testdata3.get_fits_keyword('ORDER')))
-        
-            testdata3.add_fits_comment('Test comment added during development')
-            testdata3.add_fits_comment('Another comment added during development')
-            testdata3.add_fits_comment('The science data are cool.', hdu_name='COEFFS')
-            testdata3.add_fits_comment('There is no data quality data.', hdu_name='DQ')
-            print("All COMMENT records again: " + testdata3.get_comments_str())
-
-            testdata3.add_history('Mucked about with during testing.')
-            print("All HISTORY records again: " + testdata3.get_history_str())
-        
-            #print(str(testdata3.to_flat_dict()))
-            #testdata3.search_schema('order', verbose=True)
-        
-            del testdata3
+        from miri.datamodels.cdplib import get_cdp
+        print("Reading linearity data from a CDP files")
+        for detector in ('MIRIMAGE', 'MIRIFUSHORT', 'MIRIFULONG'):
+            with get_cdp('LINEARITY', detector=detector) as testdata3:
+                print(testdata3)
+                if PLOTTING:
+                    testdata3.plot_coeffs(row=512, column=400, description="testdata3")
+                    testdata3.plot_coeffs(row=512, column=650, description="testdata3")
+                    testdata3.plot(description="testdata3")
+    
+#                 print("All occurences of BUNIT: " + str(testdata3.find_fits_values('BUNIT')))
+#                 print("Units of the COEFFS data: " + str(testdata3.get_fits_keyword('BUNIT', 'COEFFS')))
+#     
+#                 print("All COMMENT records: " + testdata3.get_comments_str())
+#                 print("All HISTORY records: " + testdata3.get_history_str())
+#                 print("Getting ORDER keyword: " + str(testdata3.get_fits_keyword('ORDER')))
+#                 testdata3.set_fits_keyword('ORDER', 3)
+#                 print("Getting ORDER keyword again: " + str(testdata3.get_fits_keyword('ORDER')))
+#                 testdata3.add_history('Mucked about with during testing.')
+#                 print("All HISTORY records again: " + testdata3.get_history_str())
+            
+                del testdata3
 
     print("Test finished.")
