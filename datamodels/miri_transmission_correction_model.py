@@ -111,7 +111,7 @@ class MiriMrsTransmissionCorrectionModel(MiriDataModel):
     def __str__(self):
         """
         
-        Display the contents of the transmission correction object
+        Return the contents of the transmission correction object
         as a readable string.
         
         """

@@ -106,7 +106,7 @@ class MiriMrsApertureCorrectionModel(MiriDataModel):
     def __str__(self):
         """
         
-        Display the contents of the aperture correction object
+        Return the contents of the aperture correction object
         as a readable string.
         
         """

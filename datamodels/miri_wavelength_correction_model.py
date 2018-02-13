@@ -142,7 +142,7 @@ class MiriMrsWavelengthCorrectionModel(MiriDataModel):
     def __str__(self):
         """
         
-        Display the contents of the wavelength correction object
+        Return the contents of the wavelength correction object
         as a readable string.
         
         """

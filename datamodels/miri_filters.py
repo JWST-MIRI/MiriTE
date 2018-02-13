@@ -249,7 +249,7 @@ class MiriFilter(MiriDataModel):
     def __str__(self):
         """
         
-        Display the contents of the filter transmission object as a readable
+        Return the contents of the filter transmission object as a readable
         string.
         
         """

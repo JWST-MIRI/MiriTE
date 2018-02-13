@@ -97,6 +97,7 @@ def linear_regression(x, y):
     #print("gives slope=", slope, "intercept=", intercept)
     return (slope, intercept)
 
+
 class MiriDarkReferenceModel(MiriMeasuredModel):
     """
     
@@ -217,7 +218,7 @@ class MiriDarkReferenceModel(MiriMeasuredModel):
     def __str__(self):
         """
         
-        Display the contents of the dark reference object as a readable
+        Return the contents of the dark reference object as a readable
         string.
         
         """

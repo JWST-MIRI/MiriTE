@@ -290,7 +290,7 @@ class MiriBadPixelMaskModel(MiriDataModel, HasMask):
     def __str__(self):
         """
         
-        Display the contents of the bad pixel mask object as a readable
+        Return the contents of the bad pixel mask object as a readable
         string.
         
         """

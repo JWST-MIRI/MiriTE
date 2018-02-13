@@ -152,7 +152,7 @@ class MiriTelescopeEmissionModel(MiriMeasuredModel):
     def __str__(self):
         """
         
-        Display the contents of the telescope emission object as a readable
+        Return the contents of the telescope emission object as a readable
         string.
         
         """

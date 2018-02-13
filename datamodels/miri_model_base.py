@@ -814,7 +814,7 @@ class MiriDataModel(DataModel):
         """
         
         A convenience function to ensure the telescope metadata is set
-        correctly. The telscope should always be 'JWST'.
+        correctly. The telescope should always be 'JWST'.
         
         :Parameters:
         
@@ -1994,6 +1994,9 @@ class MiriDataModel(DataModel):
         Add a comment to the comment records contained in the metadata
         associated with a given FITS HDU.
         
+        NOTE: This function is deprecated. The add_comment function
+        will be more reliable.
+        
         :Parameters:
         
         comment: str
@@ -2096,7 +2099,6 @@ class MiriDataModel(DataModel):
                 strg += "\t" + str(comment[ii]) + "\n"
         return strg
 
-
     def find_fits_values(self, keyword):
         """
         
@@ -2152,8 +2154,6 @@ class MiriDataModel(DataModel):
         
         Returns a list of metadata element names that are stored in a
         given FITS HDU.
-        
-        DEBUGGED VERSION OF THE METHOD IN JWSTLIB.MODELS.SCHEMA
 
         :Parameters:
         
@@ -2876,7 +2876,7 @@ class MiriDataModel(DataModel):
     def stats(self):
         """
         
-        Display statistics about a generic MIRI data object as a
+        Return statistics about a generic MIRI data object as a
         readable string.
         
         The string contains a list of data arrays together with
@@ -2919,7 +2919,7 @@ class MiriDataModel(DataModel):
     def __str__(self):
         """
         
-        Display the contents of a generic MIRI data object as a readable
+        Return the contents of a generic MIRI data object as a readable
         string.
         
         :Returns:

@@ -216,7 +216,7 @@ class MiriPointSpreadFunctionModel(MiriMeasuredModel):
     def __str__(self):
         """
         
-        Display the contents of the PSF object as a readable
+        Return the contents of the PSF object as a readable
         string.
         
         """
@@ -310,7 +310,7 @@ class MiriImagingPointSpreadFunctionModel(MiriPointSpreadFunctionModel):
     def __str__(self):
         """
         
-        Display the contents of the imaging PSF object as a readable
+        Return the contents of the imaging PSF object as a readable
         string.
         
         """
@@ -371,7 +371,7 @@ class MiriLrsPointSpreadFunctionModel(MiriPointSpreadFunctionModel):
     def __str__(self):
         """
         
-        Display the contents of the LRS PSF object as a readable
+        Return the contents of the LRS PSF object as a readable
         string.
         
         """
@@ -414,7 +414,7 @@ class MiriMrsPointSpreadFunctionModel(MiriPointSpreadFunctionModel):
     def __str__(self):
         """
         
-        Display the contents of the MRS PSF object as a readable
+        Return the contents of the MRS PSF object as a readable
         string.
         
         """

@@ -149,7 +149,7 @@ class MiriMrsResolutionModel(MiriDataModel):
     def __str__(self):
         """
         
-        Display the contents of the spectral resolution object
+        Return the contents of the spectral-spatial resolution object
         as a readable string.
         
         """

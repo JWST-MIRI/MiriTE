@@ -132,7 +132,7 @@ class MiriResetSwitchChargeDecayModel(MiriDataModel):
     def __str__(self):
         """
         
-        Display the contents of the RSDC object as a readable
+        Return the contents of the RSCD object as a readable
         string.
         
         """

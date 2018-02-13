@@ -476,7 +476,7 @@ class MiriExposureModel(MiriRampModel):
     def __str__(self):
         """
         
-        Display the contents of the exposure model object as a readable
+        Return the contents of the exposure model object as a readable
         string.
         
         """

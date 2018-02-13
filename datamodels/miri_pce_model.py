@@ -213,6 +213,16 @@ class MiriPceModel(MiriDataModel):
 
         Replace any negative values found in the efficiency measurements
         with 0.0.
+        
+        :Parameters:
+        
+        pce_table: list of tuples or numpy record array
+            Input table
+            
+        :Returns:
+        
+        new_table: list of tuples or numpy record array
+            Output table
 
         """
         new_table = []
@@ -305,7 +315,7 @@ class MiriPceModel(MiriDataModel):
     def __str__(self):
         """
         
-        Display the contents of the PCE efficiency object as a readable
+        Return the contents of the PCE efficiency object as a readable
         string.
         
         """

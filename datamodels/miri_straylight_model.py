@@ -138,7 +138,7 @@ class MiriMrsStraylightModel(MiriBadPixelMaskModel):
     def __str__(self):
         """
         
-        Display the contents of the MRS straylight pixel mask object
+        Return the contents of the MRS straylight pixel mask object
         as a readable string.
         
         """

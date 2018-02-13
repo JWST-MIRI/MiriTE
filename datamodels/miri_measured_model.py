@@ -178,7 +178,7 @@ class MiriSimpleModel(MiriDataModel, HasData):
     def __str__(self):
         """
         
-        Display the contents of the simple data object as a readable
+        Return the contents of the simple data object as a readable
         string. The function will display the contents of the data
         array.
         
@@ -357,9 +357,9 @@ class MiriMeasuredModel(MiriDataModel, HasDataErrAndDq):
     def __str__(self, extra_objects=True):
         """
         
-        Display the contents of the measured data object as a readable
-        string. The function will display the contents of the data, err
-        and dq arrays and the dq_def table. It will also display any
+        Return the contents of the measured data object as a readable
+        string. The string will include the contents of the data, err
+        and dq arrays and the dq_def table. It will also include any
         extra data arrays found in the data structure, unless the
         extra_objects flags is set False.
         
@@ -419,7 +419,7 @@ class MiriMeasuredModel(MiriDataModel, HasDataErrAndDq):
     def extra_objects_str(self):
         """
         
-        Display the contents of extra objects (in addition to those
+        Return the contents of extra objects (in addition to those
         expected in a measured model) as a readable string.
         
         """
@@ -785,7 +785,7 @@ class MiriRampModel(MiriMeasuredModel):
     def __str__(self):
         """
         
-        Display the contents of the ramp data object as a readable
+        Return the contents of the ramp data object as a readable
         string.
         
         """
@@ -1005,7 +1005,7 @@ class MiriSlopeModel(MiriMeasuredModel):
     def __str__(self):
         """
         
-        Display the contents of the slope object as a readable
+        Return the contents of the slope object as a readable
         string.
         
         """

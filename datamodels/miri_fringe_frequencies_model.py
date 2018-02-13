@@ -104,7 +104,7 @@ class MiriMrsFringeFrequenciesModel(MiriDataModel):
     def __str__(self):
         """
         
-        Display the contents of the fringe frequencies object
+        Return the contents of the fringe frequencies object
         as a readable string.
         
         """

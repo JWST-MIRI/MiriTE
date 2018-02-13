@@ -366,7 +366,7 @@ class MiriImagingDistortionModel(MiriDataModel):
     def __str__(self):
         """
         
-        Display the contents of the distortion map object as a readable
+        Return the contents of the distortion map object as a readable
         string.
         
         """
@@ -481,7 +481,7 @@ class MiriLrsD2WModel(MiriDataModel):
     def __str__(self):
         """
         
-        Display the contents of the wavelength calibration object as a readable
+        Return the contents of the wavelength calibration object as a readable
         string.
         
         """
@@ -740,7 +740,7 @@ class MiriMrsDistortionModel12(MiriDataModel):
     def __str__(self):
         """
         
-        Display the contents of the D2C map object as a readable
+        Return the contents of the D2C map object as a readable
         string.
         
         """
@@ -1012,7 +1012,7 @@ class MiriMrsDistortionModel34(MiriDataModel):
     def __str__(self):
         """
         
-        Display the contents of the D2C map object as a readable
+        Return the contents of the D2C map object as a readable
         string.
         
         """

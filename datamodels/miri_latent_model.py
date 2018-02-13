@@ -249,7 +249,7 @@ class MiriLatentDecayModel(MiriDataModel):
     def __str__(self):
         """
         
-        Display the contents of the latent decay object as a readable
+        Return the contents of the latent decay object as a readable
         string.
         
         """

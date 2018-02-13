@@ -137,7 +137,7 @@ class MiriDroopModel(MiriDataModel):
     def __str__(self):
         """
         
-        Display the contents of the droop object as a readable
+        Return the contents of the droop object as a readable
         string.
         
         """

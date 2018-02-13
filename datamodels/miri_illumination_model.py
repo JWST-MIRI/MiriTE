@@ -581,7 +581,7 @@ class MiriIlluminationModel(MiriDataModel):
     def __str__(self):
         """
         
-        Display the contents of the illumination map object as a readable
+        Return the contents of the illumination map object as a readable
         string.
         
         """
@@ -744,7 +744,7 @@ class MiriIlluminationFringingModel(MiriIlluminationModel):
     def __str__(self):
         """
         
-        Display the contents of the illumination map with fringing object
+        Return the contents of the illumination map with fringing object
         as a readable string.
         
         """
