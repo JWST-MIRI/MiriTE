@@ -53,8 +53,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 20 Nov 2017: Updated the schema so the world coordinates are written to
              the COEFFS data component.
 13 Feb 2018: Corrected a typo in the coeffs.setter. Added plot_goeffs,
-             get_coeffs_str and apply functions and updated the tests
-             run in the main program.
+             get_coeffs_str, apply, get_forward_table and get_reverse_table
+             functions and updated the tests run in the main program.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -333,7 +333,127 @@ class MiriLinearityModel(MiriMeasuredModel):
         for icoeff in range(0, ncoeffs):
             outramp += self.data[icoeff,:,:] * (inramp[:,:,:] ** icoeff)     
         return outramp
+    
+    def get_forward_table(self, row, column, max_dn=65535):
+        """
+        
+        Return a table which translates input DN to output DN using
+        the coefficients associated with the given row and column.
+        The table is contained in an array of integers so that the
+        expression
+        
+           output_dn = forward_table[ input_dn ]
+           
+        will correct the input DN value for nonlinearity.
+        The forward table is useful in situations where it is quicker
+        to calculate all possible polynomial conversions in advance
+        (e.g. if the conversion is to be applied more than max_dn times).
+        
+        :Parameters:
+        
+        row: int
+            The row at which the polynomial is to be plotted.
+        column: int or tuple of its.
+            The column at which the polynomial is to be plotted.
+        max_dn: int (optional)
+            The maximum input DN value. Also the size of the returned table.
+            Defaults to 65525. The minimum DN value is always 0.
             
+        :Returns:
+        
+        forward_table: array of int
+            An array of integers containing the translation table.
+            
+        """        
+        # Start with an array of all possible DN values
+        inarray = np.arange(0.0, float(max_dn), 1.0)
+        
+        # Convert the array using the given polynomial coefficients
+        ncoeffs = self.data.shape[0]
+        farray = np.zeros_like(inarray)
+        for icoeff in range(0, ncoeffs):
+            farray += self.data[icoeff,row,column] * (inarray ** icoeff)
+            
+        # Convert the output array to integer.
+        outarray = np.round(farray).astype(np.int)
+        return outarray
+
+    def get_reverse_table(self, row, column, max_dn=65535, fill_gaps=True):
+        """
+        
+        Return a table which translates output DN back to input DN using
+        the coefficients associated with the given row and column.
+        The table is contained in an array of integers so that the
+        expression
+        
+           input_dn = forward_table[ output_dn ]
+           
+        will reveal the input DN value that would generate the given
+        output when converted with the nonlinearity polynomial.
+        The reverse table is useful in situations (such as in a data
+        simulator) where it is necessary to run the pipeline steps
+        backwards.
+        
+        :Parameters:
+        
+        row: int
+            The row at which the polynomial is to be plotted.
+        column: int or tuple of its.
+            The column at which the polynomial is to be plotted.
+        max_dn: int (optional)
+            The maximum input DN value.
+            Defaults to 65525. The minimum DN value is always 0.
+        fill_gaps: bool (optional)
+            If True (the default), interpolate the table to fill any gaps.
+            
+        :Returns:
+        
+        reverse_table: array of int
+            An array of integers containing the translation table.
+            
+        """
+        # Determine the maximum DN in the reverse table
+        ncoeffs = self.data.shape[0]
+        fmax = 0.0
+        for icoeff in range(0, ncoeffs):
+            fmax += self.data[icoeff,row,column] * (float(max_dn) ** icoeff)
+        max_dn_out = int(fmax)
+        # Initialise a reverse table
+        rarray = np.zeros([max_dn_out+1])
+        
+        # Start by generating a forward table.
+        ftable = self.get_forward_table(row, column, max_dn=max_dn)
+        
+        # Use the forward table to populate the reverse table
+        for indn in range(0, max_dn):
+            outdn = int(ftable[indn])
+            rarray[outdn] = indn
+            
+        # If any elements remain unpopulated, interpolate the nearest
+        # non-zero values.
+        if fill_gaps:
+            runopen = False
+            for outdn in range(1, max_dn_out):
+                if rarray[outdn] == 0:
+                    if not runopen:
+                        runstart = outdn
+                        runopen = True
+                else:
+                    if runopen:
+                        runend = outdn
+                        runopen = False
+                        leftvalue = rarray[runstart-1]
+                        rightvalue = rarray[runend]
+                        inc = (rightvalue - leftvalue)/float(runend-runstart)
+                        for rundn in range(runstart,runend):
+                            rarray[rundn] = rarray[rundn-1] + inc
+            if rarray[max_dn_out] == 0:
+                rarray[max_dn_out] = max_dn
+            
+        # Convert the output array to integer.
+        reverse_array = np.round(rarray).astype(np.int)
+        return reverse_array
+
     # "coeffs" is an alias for the "data" attribute.
     @property
     def coeffs(self):
@@ -381,9 +501,19 @@ if __name__ == '__main__':
                                 dq_def=linearity_reference_flags ) \
             as testdata1:
         print(testdata1)
+        # Test the apply function
         print("input ramp=", testramp)
         outramp = testdata1.apply( testramp )
         print("output ramp=", outramp)
+        # Test the calculation of forward and reverse tables
+        forward = testdata1.get_forward_table(row=1, column=1)
+        print("Forward table of length", len(forward))
+        print(str(forward))
+        reverse = testdata1.get_reverse_table(row=1, column=1)
+        print("Reverse table of length", len(reverse))
+        print(str(reverse))
+        
+        #print(str(reverse))
         if PLOTTING:
             testdata1.plot_coeffs(row=1, column=1, description="testdata1")
             testdata1.plot(description="testdata1")
@@ -397,6 +527,20 @@ if __name__ == '__main__':
         for detector in ('MIRIMAGE', 'MIRIFUSHORT', 'MIRIFULONG'):
             with get_cdp('LINEARITY', detector=detector) as testdata3:
                 print(testdata3)
+                # Test the calculation of forward and reverse tables
+                forward = testdata3.get_forward_table(row=512, column=400)
+                print("Forward table of length", len(forward))
+                print(str(forward))
+                reverse = testdata3.get_reverse_table(row=512, column=400)
+                print("Reverse table of length", len(reverse))
+                print(str(reverse))
+                # Test the calculation of forward and reverse tables
+                forward = testdata3.get_forward_table(row=512, column=650)
+                print("Forward table of length", len(forward))
+                print(str(forward))
+                reverse = testdata3.get_reverse_table(row=512, column=650)
+                print("Reverse table of length", len(reverse))
+                print(str(reverse))
                 if PLOTTING:
                     testdata3.plot_coeffs(row=512, column=400, description="testdata3")
                     testdata3.plot_coeffs(row=512, column=650, description="testdata3")
