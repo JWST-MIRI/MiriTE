@@ -45,8 +45,8 @@ MIRI SCA and its environment:
     detector_properties
     
 The simulation is also based on the calibration data contained in the MIRI
-bad pixel mask, gain, dark current and pixel flat-field Calibration
-Data Products (CDPs).
+bad pixel mask, gain, nonlinearity, dark current and pixel flat-field
+Calibration Data Products (CDPs).
 
 :History:
 
@@ -328,6 +328,7 @@ Data Products (CDPs).
 01 Nov 2017: Do not simulate detector drifts and latents in SLOW mode, since
              the measured parameters are only valid for FAST mode.
 08 Jan 2018: Import version number from miri package.
+14 Feb 2018: Added version number for nonlinearity CDP.
 
 @author: Steven Beard
 
@@ -402,7 +403,7 @@ def _report_sca_parameters(inputfile, outputfile, detectorid, readout_mode,
                            simulate_drifts, simulate_latency,
                            cdp_ftp_path,
                            readnoise_version, bad_pixels_version,
-                           flat_field_version, gain_version,
+                           flat_field_version, linearity_version, gain_version,
                            logger=LOGGER):
     """
     
@@ -505,6 +506,9 @@ def _report_sca_parameters(inputfile, outputfile, detectorid, readout_mode,
     if flat_field_version:
         logger.debug("Pixel flat-field CDP restricted to version number: " + \
                      str(flat_field_version))
+    if linearity_version:
+        logger.debug("Nonlinearity CDP restricted to version number: " + \
+                     str(linearity_version))
     if gain_version:
         logger.debug("Gain CDP restricted to version number: " + \
                      str(gain_version))
@@ -716,7 +720,7 @@ class SensorChipAssembly(object):
               simulate_drifts=True, simulate_latency=True,
               cdp_ftp_path=SIM_CDP_FTP_PATH,
               readnoise_version='', bad_pixels_version='',
-              flat_field_version='', gain_version='',
+              flat_field_version='', linearity_version='', gain_version='',
               makeplot=False, verbose=2):
         """
         
@@ -860,6 +864,8 @@ class SensorChipAssembly(object):
             A specific bad pixel mask CDP version number of the form 'x.y.z'.
         flat_field_version: string, optional, default=''
             A specific pixel flat-field CDP version number of the form 'x.y.z'.
+        linearity_version: string, optional, default=''
+            A specific nonlinearity CDP version number of the form 'x.y.z'.
         gain_version: string, optional, default=''
             A specific gain CDP version number of the form 'x.y.z'.
         makeplot: boolean, optional, default=False
@@ -1002,6 +1008,7 @@ class SensorChipAssembly(object):
         self.readnoise_version  = readnoise_version
         self.bad_pixels_version = bad_pixels_version
         self.flat_field_version = flat_field_version
+        self.linearity_version  = linearity_version
         self.gain_version       = gain_version
 
         self._setup = True
@@ -1686,6 +1693,7 @@ class SensorChipAssembly(object):
                                 readnoise_version=self.readnoise_version,
                                 bad_pixels_version=self.bad_pixels_version,
                                 flat_field_version=self.flat_field_version,
+                                linearity_version=self.linearity_version,
                                 gain_version=self.gain_version,
                                 makeplot=self._makeplot,
                                 verbose=self._verbose,
@@ -1715,6 +1723,7 @@ class SensorChipAssembly(object):
                     cdp_ftp_path=self.cdp_ftp_path,
                     bad_pixels_version=self.bad_pixels_version,
                     flat_field_version=self.flat_field_version,
+                    linearity_version=self.linearity_version,
                     readnoise_version=self.readnoise_version,
                     gain_version=self.gain_version)
 
@@ -3140,7 +3149,7 @@ class SensorChipAssembly(object):
             simulate_nonlinearity=True, simulate_drifts=True,
             simulate_latency=True, cdp_ftp_path=SIM_CDP_FTP_PATH,
             readnoise_version='', bad_pixels_version='',
-            flat_field_version='', gain_version='',
+            flat_field_version='', linearity_version='', gain_version='',
             makeplot=False, seedvalue=None, verbose=2):
         """
     
@@ -3340,6 +3349,8 @@ class SensorChipAssembly(object):
             A specific bad pixel mask CDP version number of the form 'x.y.z'.
         flat_field_version: string, optional, default=''
             A specific pixel flat-field CDP version number of the form 'x.y.z'.
+        linearity_version: string, optional, default=''
+            A specific nonlinearity CDP version number of the form 'x.y.z'.
         gain_version: string, optional, default=''
             A specific gain CDP version number of the form 'x.y.z'.
         makeplot: boolean, optional, default=False
@@ -3397,7 +3408,8 @@ class SensorChipAssembly(object):
                                    simulate_drifts, simulate_latency,
                                    cdp_ftp_path,
                                    readnoise_version, bad_pixels_version,
-                                   flat_field_version, gain_version,
+                                   flat_field_version, linearity_version,
+                                   gain_version,
                                    logger=self.logger)
 
         # Set the seed for the np.random function.
@@ -3449,6 +3461,7 @@ class SensorChipAssembly(object):
               readnoise_version=readnoise_version,
               bad_pixels_version=bad_pixels_version,
               flat_field_version=flat_field_version, 
+              linearity_version=linearity_version, 
               gain_version=gain_version,
               makeplot=makeplot, verbose=verbose)
         for ii in range(0, len(inputfile)):
@@ -3533,7 +3546,8 @@ class SensorChipAssembly(object):
                       simulate_drifts=True, simulate_latency=True,
                       cdp_ftp_path=SIM_CDP_FTP_PATH,
                       readnoise_version='', bad_pixels_version='',
-                      flat_field_version='', gain_version='',
+                      flat_field_version='', linearity_version='',
+                      gain_version='',
                       makeplot=False, seedvalue=None, verbose=2):
         """
     
@@ -3742,6 +3756,8 @@ class SensorChipAssembly(object):
             A specific bad pixel mask CDP version number of the form 'x.y.z'.
         flat_field_version: string, optional, default=''
             A specific pixel flat-field CDP version number of the form 'x.y.z'.
+        linearity_version: string, optional, default=''
+            A specific nonlinearity CDP version number of the form 'x.y.z'.
         gain_version: string, optional, default=''
             A specific gain CDP version number of the form 'x.y.z'.
         makeplot: boolean, optional, default=False
@@ -3803,7 +3819,8 @@ class SensorChipAssembly(object):
                                simulate_drifts, simulate_latency,
                                cdp_ftp_path,
                                readnoise_version, bad_pixels_version,
-                               flat_field_version, gain_version,
+                               flat_field_version, linearity_version,
+                               gain_version,
                                logger=self.logger)
 
         # Set the seed for the np.random function.
@@ -3859,6 +3876,7 @@ class SensorChipAssembly(object):
             readnoise_version=readnoise_version,
             bad_pixels_version=bad_pixels_version,
             flat_field_version=flat_field_version, 
+            linearity_version=linearity_version, 
             gain_version=gain_version,
             makeplot=makeplot, verbose=verbose)
    
@@ -4117,7 +4135,7 @@ def simulate_sca(inputfile, outputfile, detectorid, scale=1.0, fringemap=None,
                  simulate_drifts=True, simulate_latency=True,
                  cdp_ftp_path=SIM_CDP_FTP_PATH,
                  readnoise_version='', bad_pixels_version='',
-                 flat_field_version='', gain_version='',
+                 flat_field_version='', linearity_version='', gain_version='',
                  makeplot=False, seedvalue=None, verbose=2, logger=LOGGER):
     """
     
@@ -4312,6 +4330,8 @@ def simulate_sca(inputfile, outputfile, detectorid, scale=1.0, fringemap=None,
         A specific bad pixel mask CDP version number of the form 'x.y.z'.
     flat_field_version: string, optional, default=''
         A specific pixel flat-field CDP version number of the form 'x.y.z'.
+    linearity_version: string, optional, default=''
+        A specific nonlinearity CDP version number of the form 'x.y.z'.
     gain_version: string, optional, default=''
         A specific gain CDP version number of the form 'x.y.z'.
     makeplot: boolean, optional, default=False
@@ -4390,6 +4410,7 @@ def simulate_sca(inputfile, outputfile, detectorid, scale=1.0, fringemap=None,
         readnoise_version=readnoise_version,
         bad_pixels_version=bad_pixels_version,
         flat_field_version=flat_field_version, 
+        linearity_version=linearity_version, 
         gain_version=gain_version,
         makeplot=makeplot, seedvalue=seedvalue, verbose=verbose)
 
@@ -4409,7 +4430,8 @@ def simulate_sca_list(inputfile, outputfile, detectorid, scale=1.0,
                       simulate_drifts=True, simulate_latency=True,
                       cdp_ftp_path=SIM_CDP_FTP_PATH,
                       readnoise_version='', bad_pixels_version='',
-                      flat_field_version='', gain_version='',
+                      flat_field_version='', linearity_version='',
+                      gain_version='',
                       makeplot=False, seedvalue=None, verbose=2, logger=LOGGER):
     """
     
@@ -4606,6 +4628,8 @@ def simulate_sca_list(inputfile, outputfile, detectorid, scale=1.0,
         A specific bad pixel mask CDP version number of the form 'x.y.z'.
     flat_field_version: string, optional, default=''
         A specific pixel flat-field CDP version number of the form 'x.y.z'.
+    linearity_version: string, optional, default=''
+        A specific nonlinearity CDP version number of the form 'x.y.z'.
     gain_version: string, optional, default=''
         A specific gain CDP version number of the form 'x.y.z'.
     makeplot: boolean, optional, default=False
@@ -4684,6 +4708,7 @@ def simulate_sca_list(inputfile, outputfile, detectorid, scale=1.0,
         readnoise_version=readnoise_version,
         bad_pixels_version=bad_pixels_version,
         flat_field_version=flat_field_version, 
+        linearity_version=linearity_version, 
         gain_version=gain_version,
         makeplot=makeplot, seedvalue=seedvalue, verbose=verbose)
    
@@ -4702,7 +4727,8 @@ def simulate_sca_pipeline(illumination_map, scale=1.0,
                           simulate_drifts=True, simulate_latency=True,
                           cdp_ftp_path=SIM_CDP_FTP_PATH,
                           readnoise_version='', bad_pixels_version='',
-                          flat_field_version='', gain_version='',
+                          flat_field_version='', linearity_version='',
+                          gain_version='',
                           makeplot=False, seedvalue=None, verbose=2,
                           logger=LOGGER):
     """
@@ -4878,6 +4904,8 @@ def simulate_sca_pipeline(illumination_map, scale=1.0,
         A specific bad pixel mask CDP version number of the form 'x.y.z'.
     flat_field_version: string, optional, default=''
         A specific pixel flat-field CDP version number of the form 'x.y.z'.
+    linearity_version: string, optional, default=''
+        A specific nonlinearity CDP version number of the form 'x.y.z'.
     gain_version: string, optional, default=''
         A specific gain CDP version number of the form 'x.y.z'.
     makeplot: boolean, optional, default=False
@@ -4961,6 +4989,7 @@ def simulate_sca_pipeline(illumination_map, scale=1.0,
         readnoise_version=readnoise_version,
         bad_pixels_version=bad_pixels_version,
         flat_field_version=flat_field_version, 
+        linearity_version=linearity_version, 
         gain_version=gain_version,
         makeplot=makeplot, seedvalue=seedvalue, verbose=verbose)
     return exposure_data

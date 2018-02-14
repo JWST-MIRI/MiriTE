@@ -12,8 +12,8 @@ bad pixel map and simulates the gain, flat-field and dark current.
 
 The simulation is based on the parameters contained in the module
 detector_properties.py and the calibration data contained in the MIRI
-bad pixel mask, gain, dark current and pixel flat-field Calibration
-Data Products (CDPs).
+bad pixel mask, gain, nonlinearity, dark current and pixel flat-field
+Calibration Data Products (CDPs).
 
 :History:
 
@@ -222,6 +222,9 @@ Data Products (CDPs).
              samplesum, sampleskip and refpixsampleskip parameters separately.
              Added frame_rti function and associated tests.
 13 Dec 2017: INSTALLED_DARK option removed.
+14 Feb 2018: Added table-based non-linearity correction, which can be selected
+             with the NONLINEARITY_BY_TABLE flag. Added function to read the
+             non-linearity CDP.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -286,6 +289,17 @@ MASK_NON_SCIENCE = 512
 # dark current during each integration.
 # Set AVERAGED_DARK False to add the full 4-D DARK at the end of each exposure.
 AVERAGED_DARK = False
+
+# Configure the nonlinearity simulation.
+# Setting this to True simulates nonlinearity using a lookup table
+# obtained from the nonlinearity CDP. The wavelength dependence of
+# the effect will be included but the saturation level will be more
+# uncertain.
+# Setting this to False simulates nonlinearity by simulating the
+# change in detector sensitivity with charge accumulated. The wavelength
+# dependence will not be included, but the saturation level will be
+# more accurate.
+NONLINEARITY_BY_TABLE = True
 
 # Set to True to include debugging information in the metadata
 EXTRA_METADATA = False
@@ -526,6 +540,8 @@ class DetectorArray(object):
         A specific bad pixel mask CDP version number of the form 'x.y.z'.
     flat_field_version: string, optional, default=''
         A specific pixel flat-field CDP version number of the form 'x.y.z'.
+    linearity_version: string, optional, default=''
+        A specific nonlinearity CDP version number of the form 'x.y.z'.
     gain_version: string, optional, default=''
         A specific gain CDP version number of the form 'x.y.z'.
     makeplot: boolean, optional, default=False
@@ -569,8 +585,8 @@ class DetectorArray(object):
                  simulate_drifts=True, simulate_latency=True,
                  cdp_ftp_path=SIM_CDP_FTP_PATH,
                  readnoise_version='', bad_pixels_version='',
-                 dark_map_version='',
-                 flat_field_version='', gain_version='',
+                 dark_map_version='', flat_field_version='',
+                 linearity_version='', gain_version='',
                  makeplot=False, verbose=2, logger=LOGGER):
         """
         
@@ -688,7 +704,7 @@ class DetectorArray(object):
             self.pixels.set_zeropoint(None, None)
         
         self.simulate_nonlinearity = simulate_nonlinearity
-        if self.simulate_nonlinearity:
+        if self.simulate_nonlinearity and not NONLINEARITY_BY_TABLE:
             self.pixels.set_sensitivity( self._sca['SENSITIVITY'] )
         else:
             self.pixels.set_sensitivity( [1.0, 0.0] )
@@ -717,6 +733,7 @@ class DetectorArray(object):
                             bad_pixels_version=bad_pixels_version,
                             dark_map_version=dark_map_version,
                             flat_field_version=flat_field_version,
+                            linearity_version=linearity_version,
                             readnoise_version=readnoise_version,
                             gain_version=gain_version)
             
@@ -856,8 +873,8 @@ class DetectorArray(object):
                     mirifilter=None, miriband=None,
                     cdp_ftp_path=SIM_CDP_FTP_PATH,
                     bad_pixels_version='', dark_map_version='',
-                    flat_field_version='', readnoise_version='',
-                    gain_version=''):
+                    flat_field_version='', linearity_version='',
+                    readnoise_version='', gain_version=''):
         """
         
         Add calibration data which defines the behaviour of the detector.
@@ -866,8 +883,9 @@ class DetectorArray(object):
         * Bad pixel mask
         * Dark map
         * Flat-field map
-        * Gain map
+        * Linearity correction
         * Readnoise map
+        * Gain map
         
         :Parameters:
         
@@ -893,6 +911,8 @@ class DetectorArray(object):
         dark_map_version: string, optional, default=''
             A specific version number of the form 'x.y.z'.
         flat_field_version: string, optional, default=''
+            A specific version number of the form 'x.y.z'.
+        linearity_version: string, optional, default=''
             A specific version number of the form 'x.y.z'.
         readnoise_version: string, optional, default=''
             A specific version number of the form 'x.y.z'.
@@ -942,7 +962,7 @@ class DetectorArray(object):
                               cdp_version=dark_map_version)
         else:
             # Do not simulate the dark current.
-            self.add_dark_map_fixed(None)
+            self.add_dark_map_cdp(None)
         
         # Look up the dark current multiplier for the given detector temperature.
         darkmv = MiriMeasurement(init=self._sca['DARK_CURRENT_FILE'],
@@ -968,7 +988,17 @@ class DetectorArray(object):
                               cdp_version=flat_field_version)
         else:
             self.add_flat_map(None)
-       
+
+        # Get the pixel flat-field associated with this detector.
+        self.linearity_table_left = None
+        self.linearity_table_right = None
+        if self.simulate_nonlinearity and NONLINEARITY_BY_TABLE:
+            self.add_linearity_table(self._sca['DETECTOR'], mirifilter=mirifilter,
+                              miriband=miriband, cdp_ftp_path=cdp_ftp_path,
+                              cdp_version=linearity_version)
+        else:
+            self.add_linearity_table(None)
+ 
         # Get the read noise associated with this detector.
         self.readnoise_map = None
         if self.simulate_read_noise:
@@ -1028,6 +1058,13 @@ class DetectorArray(object):
         if self.flat_map is not None:
             del self.flat_map
         self.flat_map = None
+
+        if self.linearity_table_left is not None:
+            del self.linearity_table_left
+        self.linearity_table_left = None
+        if self.linearity_table_right is not None:
+            del self.linearity_table_right
+        self.linearity_table_right = None
 
         if self.readnoise_map is not None:
             del self.readnoise_map
@@ -1091,8 +1128,8 @@ class DetectorArray(object):
             self.pixels.set_pedestal( None )
             self.bad_pixel_filename = ''
             return
+
         self.bad_pixel_filename = bad_pixel_mask.meta.filename
-        
         bp_detectorid = bad_pixel_mask.meta.instrument.detector
         if bp_detectorid is not None:
             if bp_detectorid != self.detectorid:
@@ -1187,6 +1224,7 @@ class DetectorArray(object):
             self.gain_map_filename = ''
             self.mean_gain = 1.0
             return
+
         self.gain_map_filename = gain_model.meta.filename
         # The CDP data includes the reference columns but not the
         # reference rows.
@@ -1220,99 +1258,99 @@ class DetectorArray(object):
         self.mean_gain = mean_gain
         del gain_model
 
-# Original version which used a dark supplied with the SCASim release.
-    def add_dark_map_fixed(self, filename, readpatt=None):
-        """
-        
-        Add a fixed dark map associated with the detector.
-        The dark current map is scaled to the expected dark current
-        in electrons/s.
-       
-        This version loads a fixed averaged dark which is supplied
-        with the SCASim release.
-
-        :Parameters:
-        
-        filename: string
-            The name of the file from which to load the dark map.
-        readpatt: string
-            Detector readout mode to which the dark map applies.
-       
-        """
-        # If a null filename is given, clear the dark map.
-        if filename is None or not filename:
-            self.dark_map = None
-            self.dark_map_filename = ''
-            self.dark_averaged = True
-            self.mean_dark = 0.0
-            return
-        
-        # The DARK calibration used here is generated from the CDP DARK
-        # and supplied with SCASim.
-        if self._verbose > 1:
-            strg = "Reading \'DARK\' model from \'%s\'" % filename
-            self.logger.info( strg )
-
-        # Get the dark current map, which must be the same size as the
-        # illuminated part of the detector. Since there is one dark map
-        # mask per FPM but test data can come in various sizes extract the
-        # relevant window from the mask. The dark map includes the
-        # normal detector pixels (including the reference columns) but does
-        # not include the reference rows added to the level 1 FITS data.
-        #dark_model = MiriMeasuredModel( filename )
-        dark_model = MiriDarkReferenceModel( filename )
-        nints = dark_model.data.shape[0]
-        # Multiply by the gain to convert the read noise from DN into electrons.
-        # The CDP data includes the reference columns but not the
-        # reference rows.
-        dark_map = dark_model.data[:, 0:self.illuminated_shape[0],
-                                   0:self.detector_shape[1]] * self.mean_gain
-        self.dark_map_filename = filename
-
-        # Scale the averaged dark map to the expected level in electrons/s.
-        expected_level = self._sca['DARK_CURRENT']
-        pos_values = np.where(dark_map > 0.0)
-        actual_level = np.median(dark_map[pos_values])
-# CANNOT TEST THE FOLLOWING - MemoryError
-#         actual_std = np.std(dark_map[pos_values])
-#         good_values = np.where(pos_values < (actual_mean + 3.0*actual_std))
-#         good_mean = np.mean(dark_map[good_values])
-        if self._verbose > 1:
-            self.logger.debug("Scaling the DARK by %.4g" % \
-                             (expected_level / actual_level))
-        dark_map = dark_map * expected_level / actual_level
-
-        # Remove negative values from the dark map.
-        neg_values = np.where(dark_map < 0.0)
-        dark_map[neg_values] = 0.0
-        self.mean_dark = np.mean(dark_map)
-
-        # If there are any reference rows, extend the dark map to
-        # include the additional pixels in the reference rows, otherwise
-        # use the dark map as is.
-        if self.top_rows > 0:
-            new_map = self.mean_dark * np.ones([nints, self.detector_shape[0],
-                                                self.detector_shape[1]])
-            new_map[:,self.bottom_rows:-self.top_rows,:] = dark_map
-            dark_map = new_map
-        elif self.bottom_rows > 0:
-            new_map = self.mean_dark * np.ones([nints, self.detector_shape[0],
-                                                self.detector_shape[1]])
-            new_map[:,self.bottom_rows:,:] = dark_map
-            dark_map = new_map
-
-        # Plot the dark map if requested.
-        if self._verbose > 1 and self._makeplot:
-            tstrg = "Dark map obtained from " + \
-                os.path.basename(filename)
-            mplt.plot_image(dark_map, title=tstrg)
-            #mplt.plot_hist(dark_map.ravel(), title=tstrg)
-
-        if self.dark_map is not None:
-            del self.dark_map
-        self.dark_map = dark_map
-        self.dark_averaged = True
-        del dark_model
+# # Original version which used a dark supplied with the SCASim release.
+#     def add_dark_map_fixed(self, filename, readpatt=None):
+#         """
+#         
+#         Add a fixed dark map associated with the detector.
+#         The dark current map is scaled to the expected dark current
+#         in electrons/s.
+#        
+#         This version loads a fixed averaged dark which is supplied
+#         with the SCASim release.
+# 
+#         :Parameters:
+#         
+#         filename: string
+#             The name of the file from which to load the dark map.
+#         readpatt: string
+#             Detector readout mode to which the dark map applies.
+#        
+#         """
+#         # If a null filename is given, clear the dark map.
+#         if filename is None or not filename:
+#             self.dark_map = None
+#             self.dark_map_filename = ''
+#             self.dark_averaged = True
+#             self.mean_dark = 0.0
+#             return
+#         
+#         # The DARK calibration used here is generated from the CDP DARK
+#         # and supplied with SCASim.
+#         if self._verbose > 1:
+#             strg = "Reading \'DARK\' model from \'%s\'" % filename
+#             self.logger.info( strg )
+# 
+#         # Get the dark current map, which must be the same size as the
+#         # illuminated part of the detector. Since there is one dark map
+#         # mask per FPM but test data can come in various sizes extract the
+#         # relevant window from the mask. The dark map includes the
+#         # normal detector pixels (including the reference columns) but does
+#         # not include the reference rows added to the level 1 FITS data.
+#         #dark_model = MiriMeasuredModel( filename )
+#         dark_model = MiriDarkReferenceModel( filename )
+#         nints = dark_model.data.shape[0]
+#         # Multiply by the gain to convert the read noise from DN into electrons.
+#         # The CDP data includes the reference columns but not the
+#         # reference rows.
+#         dark_map = dark_model.data[:, 0:self.illuminated_shape[0],
+#                                    0:self.detector_shape[1]] * self.mean_gain
+#         self.dark_map_filename = filename
+# 
+#         # Scale the averaged dark map to the expected level in electrons/s.
+#         expected_level = self._sca['DARK_CURRENT']
+#         pos_values = np.where(dark_map > 0.0)
+#         actual_level = np.median(dark_map[pos_values])
+# # CANNOT TEST THE FOLLOWING - MemoryError
+# #         actual_std = np.std(dark_map[pos_values])
+# #         good_values = np.where(pos_values < (actual_mean + 3.0*actual_std))
+# #         good_mean = np.mean(dark_map[good_values])
+#         if self._verbose > 1:
+#             self.logger.debug("Scaling the DARK by %.4g" % \
+#                              (expected_level / actual_level))
+#         dark_map = dark_map * expected_level / actual_level
+# 
+#         # Remove negative values from the dark map.
+#         neg_values = np.where(dark_map < 0.0)
+#         dark_map[neg_values] = 0.0
+#         self.mean_dark = np.mean(dark_map)
+# 
+#         # If there are any reference rows, extend the dark map to
+#         # include the additional pixels in the reference rows, otherwise
+#         # use the dark map as is.
+#         if self.top_rows > 0:
+#             new_map = self.mean_dark * np.ones([nints, self.detector_shape[0],
+#                                                 self.detector_shape[1]])
+#             new_map[:,self.bottom_rows:-self.top_rows,:] = dark_map
+#             dark_map = new_map
+#         elif self.bottom_rows > 0:
+#             new_map = self.mean_dark * np.ones([nints, self.detector_shape[0],
+#                                                 self.detector_shape[1]])
+#             new_map[:,self.bottom_rows:,:] = dark_map
+#             dark_map = new_map
+# 
+#         # Plot the dark map if requested.
+#         if self._verbose > 1 and self._makeplot:
+#             tstrg = "Dark map obtained from " + \
+#                 os.path.basename(filename)
+#             mplt.plot_image(dark_map, title=tstrg)
+#             #mplt.plot_hist(dark_map.ravel(), title=tstrg)
+# 
+#         if self.dark_map is not None:
+#             del self.dark_map
+#         self.dark_map = dark_map
+#         self.dark_averaged = True
+#         del dark_model
 
 # This version fetches a DARK CDP from the repository.
     def add_dark_map_cdp(self, detector, readpatt=None, subarray=None,
@@ -1520,13 +1558,13 @@ class DetectorArray(object):
         :Parameters:
         
         detector: string
-            The detector name with which to look up the pixel flat-field.
+            The detector name with which to look up the pixel flat-field CDP.
         readpatt: string, optional
-            The readout mode with which to look up the flat-field.
+            The readout mode with which to look up the pixel flat-field CDP.
         subarray: string, optional
-            The subarray with which to look up the flat-field
+            The subarray with which to look up the pixel flat-field CDP.
         mirifilter: string, optional
-            The filter name with which to look up a flat-field
+            The filter name with which to look up a pixel flat-field CDP.
         miriband: string, optional
             The band name with which to look up a flat-field
         cdp_ftp_path: str, optional, default=SIM_CDP_FTP_PATH
@@ -1722,6 +1760,113 @@ class DetectorArray(object):
         self.flat_map = flat_map
         del flat_model
 
+    def add_linearity_table(self, detector, mirifilter=None, miriband=None,
+                     cdp_ftp_path=SIM_CDP_FTP_PATH, cdp_version=''):
+        """
+        
+        Add a linearity correction associated with the detector.
+
+        :Parameters:
+        
+        detector: string
+            The detector name with which to look up the linearity
+            correction CDP.
+        mirifilter: string, optional
+            The filter name with which to look up the linearity
+            correction CDP
+        miriband: string, optional
+            The band name with which to look up the linearity
+            correction CDP.
+        cdp_ftp_path: str, optional, default=SIM_CDP_FTP_PATH
+            If specified, a list of folders (or folders) on the SFTP host
+            where the MIRI CDPs are held to be searched, consisting of a
+            list of folder names separated by a ":" delimiter.
+            Examples: 'CDP', 'CDPSIM', 'CDPSIM:CDP:CDPTMP'
+            If not specified, the default CDP repository at Leuven is used.        
+        cdp_version: string, optional, default=''
+            A specific pixel flat-field CDP version number of the form 'x.y.z'.
+       
+        """
+        # If a null detector label is given, clear the linearity correction.
+        if detector is None:
+            self.linearity_table_left = None
+            self.linearity_table_right = None
+            self.linearity_filename = ''
+            return
+
+        strg = "Find a LINEARITY CDP for detector=%s" % detector
+        strg += " filter=%s, band=%s" %  (str(mirifilter), str(miriband))
+        self.logger.debug(strg)
+        
+        # Get the required CDP version numbers
+        (cdprelease, cdpversion, cdpsubversion) = cdp_version_decode( cdp_version )
+
+        # Get the linearity correction.        
+        linearity_model = get_cdp('LINEARITY', detector=detector,
+                             mirifilter=mirifilter, band=miriband,
+                             ftp_path=cdp_ftp_path,
+                             ftp_user=SIM_CDP_FTP_USER, 
+                             ftp_passwd=SIM_CDP_FTP_PASSWD,
+                             cdprelease=cdprelease,
+                             cdpversion=cdpversion,
+                             cdpsubversion=cdpsubversion,
+                             logger=self.toplogger)
+        if linearity_model is None and (mirifilter or miriband):
+            # If a particular filter or band could not be matched,
+            # try and find a CDP matching any filter or band.
+            linearity_model = get_cdp('LINEARITY', detector=detector,
+                                 mirifilter=None, band=None,
+                                 ftp_path=cdp_ftp_path,
+                                 ftp_user=SIM_CDP_FTP_USER, 
+                                 ftp_passwd=SIM_CDP_FTP_PASSWD,
+                                 cdprelease=cdprelease,
+                                 cdpversion=cdpversion,
+                                 cdpsubversion=cdpsubversion,
+                                 logger=self.toplogger)
+        if linearity_model is None:
+            strg = "Could not find linearity CDP for detector %s" % detector
+            if mirifilter:
+                strg += " with filter=\'%s\'" % mirifilter
+                alternative = True
+            if miriband:
+                strg += " with band=\'%s\'" % miriband
+                alternative = True
+            strg += ". There will be no linearity correction."
+            self.logger.error(strg)
+            self.linearity_table_left = None
+            self.linearity_table_right = None
+            self.linearity_filename = ''
+            return
+
+        self.linearity_filename = linearity_model.meta.filename
+        # Extract the linearity tables from the left and right halves of 
+        # the linearity CDP.
+        ncolumns = linearity_model.data.shape[-1]
+        nrows = linearity_model.data.shape[-2]
+        leftcol = ncolumns//4
+        rightcol = leftcol + ncolumns//2
+        row = nrows//2
+        self.linearity_table_left = \
+            linearity_model.get_reverse_table(row, leftcol)
+        self.linearity_table_right = \
+            linearity_model.get_reverse_table(row, rightcol)
+
+        # Plot the linearity tables if requested.
+        if self._verbose > 1 and self._makeplot:
+            tstrg = "linearity table obtained from " + \
+                os.path.basename(self.linearity_filename)
+            mplt.plot_xy( None, self.linearity_table_left,
+                          xlabel='Linear DN', ylabel='Nonlinear DN',
+                          title="LEFT " + tstrg)
+            mplt.plot_xy( None, self.linearity_table_right,
+                          xlabel='Linear DN', ylabel='Nonlinear DN',
+                          title="RIGHT " + tstrg)
+# Does not work because left and right tables have difference lengths
+#             mplt.plot_xycolumn( None, [self.linearity_table_left,
+#                                 self.linearity_table_right], title=tstrg)
+
+        del linearity_model
+
     def add_readnoise_map(self, detector, readpatt=None,
                           cdp_ftp_path=SIM_CDP_FTP_PATH, cdp_version=''):
         """
@@ -1780,6 +1925,7 @@ class DetectorArray(object):
             self.readnoise_map = None
             self.readnoise_map_filename = ''
             return
+
         self.readnoise_map_filename = readnoise_model.meta.filename
         # Multiply by the gain to convert the read noise from DN into electrons.
         readnoise_map = readnoise_model.data[0:self.illuminated_shape[0],
@@ -1938,6 +2084,13 @@ class DetectorArray(object):
             metadata.add_comment("Simulated read noise disabled.")
 
         if self.simulate_nonlinearity:
+            if NONLINEARITY_BY_TABLE:
+                metadata.add_comment("Non-linearity simulated by translation table.")
+                comment = "Nonlinearity: " + \
+                    os.path.basename(self.linearity_filename)
+                metadata.add_comment(comment)
+            else:
+                metadata.add_comment("Non-linearity simulated by detector sensitivity.")          
             if EXTRA_METADATA:
                 metadata["SENCOFF"] = str(self.pixels.sensitivity)
         elif comments_possible:
@@ -1995,7 +2148,7 @@ class DetectorArray(object):
                 strg = "Pixel flat-field: None. All pixels have equal weight."
                 metadata.add_comment(strg)
             else:
-                comment = "Pixel flat-field: " + \
+                comment = "Pixel flat: " + \
                     os.path.basename(self.flat_map_filename)
                 metadata.add_comment(comment)
                 strg = "Pixel flat-field ranges from %.2f to %.2f." % \
@@ -2306,12 +2459,13 @@ class DetectorArray(object):
             (int(self._sca['FRAME_RESETS']) * \
              ftime * (nints-1))
         if self._verbose > 3:
-            self.logger.debug( "int_time=" + str(int_time) + \
-                    " nints=" + str(nints) + \
-                    " exp_time=" + str(exp_time) + "s" \
-                    " frm_resets=" + str(self._sca['FRAME_RESETS']) + \
-                    " frm_time=", str(ftime) + "s" \
-                    " elapsed_time=" + str(elapsed_time) + "s" )
+            strg = "int_time=" + str(int_time) + \
+                " nints=" + str(nints) + \
+                " exp_time=" + str(exp_time) + "s" \
+                " frm_resets=" + str(self._sca['FRAME_RESETS']) + \
+                " frm_time=" + str(ftime) + "s" \
+                " elapsed_time=" + str(elapsed_time) + "s"
+            self.logger.debug( strg )
             
         return (exp_time, elapsed_time)
         
@@ -2593,6 +2747,36 @@ class DetectorArray(object):
                (subarray[3] != self.illuminated_shape[1]):
                 newdata = self._extract_subarray(read_data, subarray)
                 read_data = newdata
+
+        # At this point, the DN values may be translated with the linearity
+        # table, to simulate the effect of detector nonlinearity.
+        if self.simulate_nonlinearity and NONLINEARITY_BY_TABLE:
+            rcolumns = read_data.shape[1]
+            rcolmiddle = rcolumns//2
+            maxleft = len(self.linearity_table_left)
+            maxright = len(self.linearity_table_right)
+            if self._verbose > 3:
+                self.logger.debug( \
+                    "Applying nonlinearity lookup tables of length %d and %d." % \
+                    (maxleft,maxright) )
+            # TODO : Can this tedious lookup be done more quickly using numpy?
+            for rrow in range(0,read_data.shape[0]):
+                for rcolumn in range(0,rcolmiddle):
+                    oldvalue = int(read_data[rrow][rcolumn])
+                    if oldvalue < 0:
+                        oldvalue = 0
+                    if oldvalue > maxleft:
+                        oldvalue = maxleft
+                    newvalue = self.linearity_table_left[oldvalue]
+                    read_data[rrow][rcolumn] = newvalue
+                for rcolumn in range(rcolmiddle,rcolumns):
+                    oldvalue = int(read_data[rrow][rcolumn])
+                    if oldvalue < 0:
+                        oldvalue = 0
+                    if oldvalue > maxright:
+                        oldvalue = maxright
+                    newvalue = self.linearity_table_right[oldvalue]
+                    read_data[rrow][rcolumn] = newvalue
 
         if self._verbose > 4:
             self.logger.debug( "Detector readout: min=" + str(read_data.min()) + \

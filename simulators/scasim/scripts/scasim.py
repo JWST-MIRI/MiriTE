@@ -61,6 +61,7 @@
 #              data quality information.
 # 13 Jun 2017: Added cdp_ftp_path parameter.
 # 26 Oct 2017: Set cdp_ftp_path to default if not specified.
+# 14 Feb 2018: Added version number for nonlinearity CDP.
 # 
 # @author: Steven Beard (UKATC)
 
@@ -552,6 +553,7 @@ if __name__ == "__main__":
                      readnoise_version=cdprelease,
                      bad_pixels_version=cdprelease,
                      flat_field_version=cdprelease, 
+                     linearity_version=cdprelease, 
                      gain_version=cdprelease,
                      makeplot=makeplot, verbose=verbose)
     else:
@@ -580,6 +582,7 @@ if __name__ == "__main__":
                      readnoise_version=cdprelease,
                      bad_pixels_version=cdprelease,
                      flat_field_version=cdprelease, 
+                     linearity_version=cdprelease, 
                      gain_version=cdprelease,
                      makeplot=makeplot, verbose=verbose)
     del sca
