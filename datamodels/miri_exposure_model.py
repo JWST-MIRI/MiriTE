@@ -82,6 +82,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/fits_files.html#raw-level-1b-suffi
 27 Jul 2017: Added cosmic ray count to metadata.
 11 Sep 2017: Ensure EXPSTART, EXPMID and EXPEND keywords are MJD.
 13 Dec 2017: Corrected the default frame time for the slope_data function.
+19 Feb 2018: Added the ability to make nonlinearity correction in situ
+             (for simulation).
 
 @author: Steven Beard (UKATC)
 
@@ -816,7 +818,7 @@ class MiriExposureModel(MiriRampModel):
         """
         return self.data[intg, group, :, :]
     
-    def add_dark(self, darkarray ):
+    def add_dark(self, darkarray, clipvalue=65535.0 ):
         """
         
         Add a DARK array to exposure data in-situ (for simulation purposes).
@@ -838,6 +840,11 @@ class MiriExposureModel(MiriRampModel):
             the first and subsequent integrations.
             A 3-D array of shape (groups, columns, rows) is also acceptable
             but will be applied to all integrations.
+        clipvalue: float (optional)
+            An upper limit to which data are clipped after adding the DARK.
+            The default value is 65535.0, which keeps the exposure data within
+            the range of 16-bit telemetry. Set to None to turn off the
+            clipping.
             
         :Raises:
     
@@ -907,6 +914,75 @@ class MiriExposureModel(MiriRampModel):
             strg = "%d saturated pixels after adding DARK." % len(whereclipped[0])
             LOGGER.debug(strg)
             self.data[whereclipped] = 65535.0 
+            
+    def apply_translation(self, translation_table, fromcolumn=None,
+                          tocolumn=None, clipvalue=65535.0 ):
+        """
+        
+        Apply a translation table to the exposure data in-situ (for simulation
+        purposes). This function may be used to apply a linearity correction
+        table derived from a MIRI LINEARITY CDP file.
+        The exposure data and translation table are assumed both to be in
+        DN units.
+
+        The translation table is contained in an array of integers so that
+        
+           output_dn = translation_table[ input_dn ]
+            
+        :Parameters:
+        
+        translation_table: array of int
+            An array of integers containing the translation table.
+        fromcolumn: int (optional)
+            If given, the starting row to be converted
+        tocolumn: int (optional)
+            If given, the finishing row to be converted
+        clipvalue: float (optional)
+            An upper limit to which data are clipped after adding the DARK.
+            The default value is 65535.0, which keeps the exposure data within
+            the range of 16-bit telemetry. Set to None to turn off the
+            clipping.
+            
+        :Raises:
+    
+        TypeError
+            Raised if the data array has the wrong type, size or shape.
+            
+        """
+        maxtable = len(translation_table)
+        if fromcolumn is None:
+            fromcolumn = 0
+        if tocolumn is None:
+            tocolumn = self.data.shape[3]
+        LOGGER.debug("Applying linearity translation table of length %s" % maxtable + \
+              " to columns %d-%d" % (fromcolumn,tocolumn))
+        # TODO : Can this tedious lookup be done more quickly using numpy?
+        for integration in range(0, self.data.shape[0]):
+            for group in range(0, self.data.shape[1]):
+                for rrow in range(0,self.data.shape[2]):
+                    for rcolumn in range(fromcolumn,tocolumn):
+                        oldvalue = int(self.data[integration,group,rrow,rcolumn])
+                        if oldvalue < 0:
+                            oldvalue = 0
+                        if oldvalue > maxtable:
+                            oldvalue = maxtable
+                        newvalue = translation_table[oldvalue]
+                        self.data[integration,group,rrow,rcolumn] = newvalue
+
+        # The translation table must not allow the resulting data to go
+        # negative or contain zeros. It must also not allow the data to go
+        # above the maximum value for 16-bit telemetry data.
+        whereneg = np.where( self.data < 1.0 )
+        if whereneg and (len(whereneg[0]) > 0):
+            strg = "%d negative pixels after translation." % len(whereneg[0])
+            LOGGER.debug(strg)
+            self.data[whereneg] = 1.0
+        if clipvalue is not None:
+            whereclipped = np.where( self.data > clipvalue )
+            if whereclipped and (len(whereclipped[0]) > 0):
+                strg = "%d saturated pixels after translation." % len(whereclipped[0])
+                LOGGER.debug(strg)
+                self.data[whereclipped] = clipvalue 
 
     def save(self, path, *args, **kwargs):
         """

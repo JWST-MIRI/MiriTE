@@ -329,6 +329,7 @@ Calibration Data Products (CDPs).
              the measured parameters are only valid for FAST mode.
 08 Jan 2018: Import version number from miri package.
 14 Feb 2018: Added version number for nonlinearity CDP.
+19 Feb 2018: Non-linearity correction moved here.
 
 @author: Steven Beard
 
@@ -366,7 +367,8 @@ from miri.datamodels.sim import MiriExposureModel, \
 # The following modules form part of the sca simulator.
 from miri.simulators.scasim.cosmic_ray import CosmicRayEnvironment, CosmicRay, \
     load_cosmic_ray_library, load_cosmic_ray_random
-from miri.simulators.scasim.detector import DetectorArray, SIM_CDP_FTP_PATH
+from miri.simulators.scasim.detector import DetectorArray, SIM_CDP_FTP_PATH, \
+    NONLINEARITY_BY_TABLE
 
 # Import the miri.tools plotting module.
 import miri.tools.miriplot as mplt
@@ -2369,12 +2371,29 @@ class SensorChipAssembly(object):
                 self.logger.info("Adding the DARK calibration from %s" % \
                                  self.detector.dark_map_filename)
                 try:
-                    self.exposure_data.add_dark( self.detector.dark_map )
+                    self.exposure_data.add_dark( self.detector.dark_map,
+                                                 clipvalue=None )
                 except ValueError, e:
                     # Catch an exception and instead issue a log message.
                     strg = str(e)
                     strg += ": DARK addition skipped."
                     self.logger.error(strg)
+                    
+        # If the nonlinearity correction is done by translation table
+        # it is applied to the exposure data here.
+        if self.detector.simulate_nonlinearity and NONLINEARITY_BY_TABLE:
+            rcolumns = self.exposure_data.data.shape[3]
+            rcolmiddle = rcolumns//2
+            if self.detector.linearity_table_left is not None:
+                self.logger.info("Correcting nonlinearity from %s" % \
+                                 self.detector.linearity_filename)
+                self.exposure_data.apply_translation( \
+                    self.detector.linearity_table_left,
+                    fromcolumn=0, tocolumn=rcolmiddle )
+            if self.detector.linearity_table_right is not None:
+                self.exposure_data.apply_translation( \
+                    self.detector.linearity_table_right,
+                    fromcolumn=rcolmiddle, tocolumn=rcolumns )        
         
         # Copy the primary metadata from the illumination map to the
         # exposure data and append some additional information.

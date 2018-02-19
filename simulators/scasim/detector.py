@@ -225,6 +225,7 @@ Calibration Data Products (CDPs).
 14 Feb 2018: Added table-based non-linearity correction, which can be selected
              with the NONLINEARITY_BY_TABLE flag. Added function to read the
              non-linearity CDP.
+19 Feb 2018: Moved non-linearity correction to SensorChipAssembly class.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -2748,35 +2749,35 @@ class DetectorArray(object):
                 newdata = self._extract_subarray(read_data, subarray)
                 read_data = newdata
 
-        # At this point, the DN values may be translated with the linearity
-        # table, to simulate the effect of detector nonlinearity.
-        if self.simulate_nonlinearity and NONLINEARITY_BY_TABLE:
-            rcolumns = read_data.shape[1]
-            rcolmiddle = rcolumns//2
-            maxleft = len(self.linearity_table_left)
-            maxright = len(self.linearity_table_right)
-            if self._verbose > 3:
-                self.logger.debug( \
-                    "Applying nonlinearity lookup tables of length %d and %d." % \
-                    (maxleft,maxright) )
-            # TODO : Can this tedious lookup be done more quickly using numpy?
-            for rrow in range(0,read_data.shape[0]):
-                for rcolumn in range(0,rcolmiddle):
-                    oldvalue = int(read_data[rrow][rcolumn])
-                    if oldvalue < 0:
-                        oldvalue = 0
-                    if oldvalue > maxleft:
-                        oldvalue = maxleft
-                    newvalue = self.linearity_table_left[oldvalue]
-                    read_data[rrow][rcolumn] = newvalue
-                for rcolumn in range(rcolmiddle,rcolumns):
-                    oldvalue = int(read_data[rrow][rcolumn])
-                    if oldvalue < 0:
-                        oldvalue = 0
-                    if oldvalue > maxright:
-                        oldvalue = maxright
-                    newvalue = self.linearity_table_right[oldvalue]
-                    read_data[rrow][rcolumn] = newvalue
+#         # At this point, the DN values may be translated with the linearity
+#         # table, to simulate the effect of detector nonlinearity.
+#         if self.simulate_nonlinearity and NONLINEARITY_BY_TABLE:
+#             rcolumns = read_data.shape[1]
+#             rcolmiddle = rcolumns//2
+#             maxleft = len(self.linearity_table_left)
+#             maxright = len(self.linearity_table_right)
+#             if self._verbose > 3:
+#                 self.logger.debug( \
+#                     "Applying nonlinearity lookup tables of length %d and %d." % \
+#                     (maxleft,maxright) )
+#             # TODO : Can this tedious lookup be done more quickly using numpy?
+#             for rrow in range(0,read_data.shape[0]):
+#                 for rcolumn in range(0,rcolmiddle):
+#                     oldvalue = int(read_data[rrow][rcolumn])
+#                     if oldvalue < 0:
+#                         oldvalue = 0
+#                     if oldvalue > maxleft:
+#                         oldvalue = maxleft
+#                     newvalue = self.linearity_table_left[oldvalue]
+#                     read_data[rrow][rcolumn] = newvalue
+#                 for rcolumn in range(rcolmiddle,rcolumns):
+#                     oldvalue = int(read_data[rrow][rcolumn])
+#                     if oldvalue < 0:
+#                         oldvalue = 0
+#                     if oldvalue > maxright:
+#                         oldvalue = maxright
+#                     newvalue = self.linearity_table_right[oldvalue]
+#                     read_data[rrow][rcolumn] = newvalue
 
         if self._verbose > 4:
             self.logger.debug( "Detector readout: min=" + str(read_data.min()) + \
