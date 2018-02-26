@@ -52,5 +52,5 @@ Data
 """
 __project__ = 'MIRI Tools Software'
 __author__ = 'MIRI Software Team'
-__maintainer__ = 'MIRI Software Team: miri@xxx.yyy'
+__maintainer__ = 'MIRI Software Team: mirisim@roe.ac.uk'
 __copyright__ = '2018, %s' % __author__

@@ -3,7 +3,7 @@ MIRI TE Software |release| Installation Instructions
 
 :Release: |release|
 :Date: |today|
-:Author: MIRI Software Team <miri@xxx.yyy>
+:Author: MIRI Software Team <mirisim@roe.ac.uk>
 
 Notes
 ~~~~~

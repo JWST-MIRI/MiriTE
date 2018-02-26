@@ -42,6 +42,6 @@ miri.simulators
 """
 __project__ = 'MIRI Tool and Environment Software'
 __author__ = 'MIRI Software Team'
-__maintainer__ = 'MIRI Software Team: miri@xxx.yyy'
+__maintainer__ = 'MIRI Software Team: mirisim@roe.ac.uk'
 __copyright__ = '2018, %s' % __author__
 __version__ = '7.0'
