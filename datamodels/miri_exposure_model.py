@@ -84,6 +84,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/fits_files.html#raw-level-1b-suffi
 13 Dec 2017: Corrected the default frame time for the slope_data function.
 19 Feb 2018: Added the ability to make nonlinearity correction in situ
              (for simulation).
+27 Feb 2018: Much more efficient nonlinearity correction.
 
 @author: Steven Beard (UKATC)
 
@@ -949,26 +950,21 @@ class MiriExposureModel(MiriRampModel):
             Raised if the data array has the wrong type, size or shape.
             
         """
-        maxtable = len(translation_table)
-        if fromcolumn is None:
-            fromcolumn = 0
-        if tocolumn is None:
-            tocolumn = self.data.shape[3]
-        LOGGER.debug("Applying linearity translation table of length %s" % maxtable + \
-              " to columns %d-%d" % (fromcolumn,tocolumn))
-        # TODO : Can this tedious lookup be done more quickly using numpy?
-        for integration in range(0, self.data.shape[0]):
-            for group in range(0, self.data.shape[1]):
-                for rrow in range(0,self.data.shape[2]):
-                    for rcolumn in range(fromcolumn,tocolumn):
-                        oldvalue = int(self.data[integration,group,rrow,rcolumn])
-                        if oldvalue < 0:
-                            oldvalue = 0
-                        if oldvalue > maxtable:
-                            oldvalue = maxtable
-                        newvalue = translation_table[oldvalue]
-                        self.data[integration,group,rrow,rcolumn] = newvalue
-
+        translation_table = np.asarray(translation_table)
+        if translation_table.ndim == 1:
+            maxtable = len(translation_table)
+            if fromcolumn is None:
+                fromcolumn = 0
+            if tocolumn is None:
+                tocolumn = self.data.shape[3]
+            LOGGER.debug("Applying linearity translation table of length %s" % maxtable + \
+                  " to columns %d-%d" % (fromcolumn,tocolumn))
+            selection = np.clip(self.data[:, :, :, fromcolumn:tocolumn].astype(int), 0, maxtable)
+            self.data[:, :, :, fromcolumn:tocolumn] = translation_table[selection]
+        else:
+            strg = "Translation table array must be 1-D"
+            raise TypeError(strg)
+    
         # The translation table must not allow the resulting data to go
         # negative or contain zeros. It must also not allow the data to go
         # above the maximum value for 16-bit telemetry data.
@@ -1261,6 +1257,14 @@ if __name__ == '__main__':
             testdata1.plot_averaged(description="testdata1")
         if SAVE_FILES:
             testdata1.save("test_exposure_model1.fits", overwrite=True)
+            
+        print("Testing the translation table function")
+        table_l = np.array([13,12,11,10,9,8,7,6,5,4,3,2,1,0])
+        table_r = np.array([130,120,110,100,90,80,70,60,50,40,30,20,10,0])
+        testdata1.apply_translation( table_l, fromcolumn=0, tocolumn=2 )
+        testdata1.apply_translation( table_r, fromcolumn=2, tocolumn=5)
+        print(testdata1)
+        print(testdata1.statistics())
         del testdata1
 
     print("Exposure data with 1 integration and 12 groups of 4x4 pixels" + \
@@ -1277,7 +1281,7 @@ if __name__ == '__main__':
             for group in range(0, 12):
                 data = data4x5 + group + intg*group
                 testdata2.set_group(data, group, intg)
-        
+         
         print(testdata2)
         print(testdata2.statistics())
         if PLOTTING:

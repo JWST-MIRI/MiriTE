@@ -21,6 +21,7 @@ in the datamodels.miri_exposure_model module.
 03 Aug 2016: Included a check on the integrity of the size of the reference
              output data.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+27 Feb 2018: Added translation table test.
 
 @author: Steven Beard (UKATC)
 
@@ -230,6 +231,31 @@ class TestMiriExposureModel(unittest.TestCase):
             "Duration must be at least as long as exposure time.")
         self.assertGreater(end_time, start_time, \
             "Exposure end time is not later than exposure start time")
+        
+    def test_translation_table(self):
+        # Test the application of a nonlinearity translation table.
+        data4x5 = np.array([[1.,2.,3.,4.,5.],
+                            [5.,6.,7.,8.,9.],
+                            [8.,7.,6.,5.,6.],
+                            [4.,3.,2.,1.,2.]])
+        testmodel = MiriExposureModel(readpatt='FAST', nints=2, ngroups=3,
+                        rows=4, columns=5, refrows=0, refcolumns=0)       
+        # Build the exposure one group at a time
+        for intg in range(0, 2):
+            for group in range(0, 3):
+                data = data4x5 + group + intg*group
+                testmodel.set_group(data, group, intg)
+        # Apply a translation table
+        table = np.array([13,12,11,10,9,8,7,6,5,4,3,2,1,0])
+        testmodel.apply_translation( table )
+        # The data array should have been translated correctly.
+        expected = np.array([[12,11,10,9,8],
+                            [8,7,6,5,4],
+                            [5,6,7,8,7],
+                            [9,10,11,12,11]])
+        testslice = testmodel.data[0,0,:,:].astype(int)
+        self.assertTrue(np.all(expected == testslice), "Translation table failed")
+
 
 # If being run as a main program, run the tests.
 if __name__ == '__main__':
