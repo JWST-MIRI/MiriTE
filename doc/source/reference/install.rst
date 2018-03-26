@@ -8,18 +8,24 @@ MIRI TE Software |release| Installation Instructions
 Notes
 ~~~~~
 
-* The source file for this page is available at: \
+* The source file for this page is available at:: \
   https://github.com/JWST-MIRI/MiriTE/tree/master/doc/source/install.rst
 
-* For more information on installing this software, see: \
-  https://github.com/JWST-MIRI/MiriTE
+* For more information on installing this software, see:: \
+  https://github.com/JWST-MIRI/MiriTE and
+  http://miri.ster.kuleuven.be/bin/view/Public/MirisimInstallation
   
 * The installation script is designed for operating systems which understand
   the bash script.
 
 Building the MIRI Software
 --------------------------
-The software is built by executing the command
+The software can be built automatically using the MIRICLE script by following
+these instructions::
+
+http://miri.ster.kuleuven.be/bin/view/Public/MirisimInstallation
+
+It can also be built manually by executing the command::
 
 python setup.py install
 

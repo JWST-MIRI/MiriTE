@@ -14,7 +14,7 @@ This document describes the implementation details for the MIRI general
 simulators package (miri.simulators).
 
 Note that most MIRI simulators may now be found in a separate MIRISim
-package.
+package, http://miri.ster.kuleuven.be/bin/view/Public/MIRISim_Public
 
 Modules
 ~~~~~~~

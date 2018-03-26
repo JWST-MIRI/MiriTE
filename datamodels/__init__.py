@@ -7,7 +7,6 @@ datamodels
 
 Subpackage datamodels contains the MIRI data product 
 definitions and related utilities.
-See the LICENCE file for terms and conditions.
 
 Available modules
 -----------------

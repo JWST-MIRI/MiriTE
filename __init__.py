@@ -7,18 +7,24 @@ MIRI Tools and Environment Software
 Package MiriTE contains the tools, utilities, data models and common analysis
 functions developed by the MIRI Software Team
 
-The entire package can be built by executing the setup.py
-script in the top level directory with the "install" argument.
+The package is may be installed automatically using the MIRICLE installation
+script http://miri.ster.kuleuven.be/bin/view/Public/MirisimInstallation
+or manually by executing the setup.py script in the top level directory with
+the "install" argument.
+
+See the LICENCE file for terms and conditions.
 
 Available packages
 ------------------
 miri.tools
     Contained in MiriTE/tools
     Common utilities for MIRI software.
+    See http://miri.ster.kuleuven.be/pub/Public/MIRISim_Public/miri_tools.pdf
 
 miri.datamodels
     Contained in MiriTE/datamodels
     Common data models for MIRI software.
+    See http://miri.ster.kuleuven.be/pub/Public/MIRISim_Public/miri_datamodels.pdf
 
 miri.simulators
     Contained in MiriTE/simulators.

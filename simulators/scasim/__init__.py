@@ -6,7 +6,6 @@ simulators.scasim
 =================
 Subpackage simulators.scasim contains the MIRI Sensor Chip Assembly 
 (SCA) simulator.
-See the LICENCE file for terms and conditions.
 
 Available modules
 -----------------

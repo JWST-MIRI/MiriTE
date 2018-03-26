@@ -39,3 +39,4 @@ matplotlib 2.0.2 or later.
 
 These dependencies should be taken care of automatically
 by the MIRICLE installation script.
+See http://miri.ster.kuleuven.be/bin/view/Public/MirisimInstallation

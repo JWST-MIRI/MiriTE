@@ -13,8 +13,11 @@ miri.datamodels - MIRI data models
 miri.simulators - MIRI simulator tools and utilities
 
 MiriTE is used by the MIRI simulators (MIRISim) and
-by MIRI data analysis packages.
+by MIRI data analysis packages. The release notes for
+MIRISim may be found here:
+http://miri.ster.kuleuven.be/bin/view/Public/MIRISimPublicReleases
 
 See the release notes for the tools, datamodels and
 simulator packages, below.
+
 

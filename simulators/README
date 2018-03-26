@@ -1,11 +1,12 @@
 The simulators directory contains a collection of MIRI instrument 
-simulators. The following subpackages are available:
+simulators. Only one simulator subpackage is contained here:
 
 The scasim subpackage contains the MIRI Sensor Chip Array Simulator 
 software (SCASim), developed by the UKATC, Edinburgh, UK.
 
 Other MIRI simulator packages have been released separately in a
 software simulator called MIRISim.
+See http://miri.ster.kuleuven.be/bin/view/Public/MIRISim_Public
 
 Documentation describing this software may be found within the "doc" 
 directory. The following commands will build a new set of documentation:
@@ -19,4 +20,3 @@ make all-pdf
 After executing these commands you will find a reference manual in 
 "build/latex/miri_scasim.pdf".
 
-See the LICENCE file for terms and conditions of use.

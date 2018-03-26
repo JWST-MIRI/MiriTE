@@ -4,7 +4,6 @@
 miri.tools
 =========
 Package miri.tools provides common utilities for the MIRI software.
-See the LICENCE file for terms and conditions.
 
 Subpackages
 -----------

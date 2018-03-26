@@ -16,6 +16,7 @@ by a separate package called MIRiSim, so this package
 contains just the detector simulator, SCASIm. MiriTE and
 MIRISim are installed together to provide a fully-functional
 simulator.
+See http://miri.ster.kuleuven.be/bin/view/Public/MIRISim_Public
 
 The MIRI simulators package makes use of the MIRI
 tools and MIRI data models, and therefore has the same
@@ -24,6 +25,7 @@ packages.
 
 The dependencies should be taken care of automatically
 by the MIRICLE installation script.
+See http://miri.ster.kuleuven.be/bin/view/Public/MirisimInstallation
 
 
 Module specific release notes

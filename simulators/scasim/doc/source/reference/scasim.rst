@@ -71,7 +71,7 @@ References
    JWST HgCdTe Detectors, M. Robberto, 9 March 2010.
 
 10. JWST Calibration Software Online Documentation,
-    http://stsdas.stsci.edu/jwst/docs/sphinx/ 
+    https://jwst-docs.stsci.edu/display/JDAT 
 
 11. DHAS miri_sloper Online Documentation, http://tiamat.as.arizona.edu/dhas/
     

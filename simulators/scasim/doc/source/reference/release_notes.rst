@@ -12,7 +12,7 @@ packages.
 
 The dependencies should be taken care of automatically
 by the MIRICLE installation script.
-
+See http://miri.ster.kuleuven.be/bin/view/Public/MirisimInstallation
 
 Full MIRISim-compatible release. The release supports the following features:
 
@@ -80,10 +80,8 @@ Full MIRISim-compatible release. The release supports the following features:
 
 The following features could be improved:
       
-    * The non-linearity coefficients are assumed to be constant over the
-      detector surface, rather than varying from pixel to pixel. These
-      coefficients are based on an approximate inverse of the MIRI
-      calibration data product and could be improved.
+    * The non-linearity coefficients are based on an approximate inverse
+      of the MIRI calibration data product and could be improved.
       
     * The simulation of detector latency and drift effects could be
       improved, in particular the effect of flux building up on the
@@ -95,3 +93,5 @@ The following features could be improved:
       not currently simulated.
 
     * Reset switch charge decay is not currently simulated.
+
+For details see http://miri.ster.kuleuven.be/bin/view/Public/MIRISimPublicReleases

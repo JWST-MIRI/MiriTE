@@ -1,5 +1,8 @@
 This directory contains the MIRI data models, miri.datamodels. These are
-based on the JWST data models, jwst.datamodels.
+based on the JWST data models, jwst.datamodels, which are described in the
+"JDox" documentation here:
+
+https://jwst-docs.stsci.edu/display/JDAT/JWST+File+Names%2C+Formats%2C+and+Data+Structures
 
 YAML schemas describing each data model may be found in the "schemas"
 subdirectory.
@@ -14,6 +17,7 @@ cd build/latex
 make all-pdf
 
 After executing these commands you will find a reference manual in 
-"build/latex/miri_datamodels.pdf".
+"build/latex/miri_datamodels.pdf" and more readable set of HTML pages in
+"build/html". The latest PDF documentation may be found at
+http://miri.ster.kuleuven.be/pub/Public/MIRISim_Public/miri_datamodels.pdf
 
-See the LICENCE file for terms and conditions of use.
