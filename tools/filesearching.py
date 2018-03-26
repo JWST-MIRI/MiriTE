@@ -33,6 +33,7 @@ The class hierarchy is::
 23 Mar 2016: Verbosity parameter replaced by Python logger.
 30 Mar 2016: Added a search path parameter to the ParameterFileManager,
              so the search result can be made predictable.
+26 Mar 2018: Changed 'nosuchfile' to a name even less likely to exist.
 
 @author: Steven Beard (UKATC)
 
@@ -823,7 +824,7 @@ if __name__ == '__main__':
                   '__init__.py', \
                   'example_measurement.txt', \
                   'bad_pixelsLW.fits', \
-                  'nosuchfile.txt')
+                  'nequetamlimanoexisteelarchivo42.txt')
 
     for name in test_files:
         fmatched = find_file(name, canraise=False)

@@ -18,6 +18,7 @@ ParameterFileManager class.
              so the search result can be made predictable.
 16 Mar 2017: Removed unreliable '.' directory from test_find_files_matching
              function.
+26 Mar 2018: Changed 'nosuchfile' to something even less likely to exist.
 
 @author: Steven Beard (UKATC)
 
@@ -62,7 +63,7 @@ class TestParameterFileManager(unittest.TestCase):
         self.assertRaises(NameError, ParameterFileManager, '',
                           search_path=self.search_path,
                           logger=LOGGER)
-        self.assertRaises(NameError, ParameterFileManager, 'nosuchfile.py',
+        self.assertRaises(NameError, ParameterFileManager, 'nequetamlimanoexisteelarchivo42.py',
                           search_path=self.search_path,
                           logger=LOGGER)
         # Check what happens when the file cannot be interpreted
@@ -159,7 +160,7 @@ class TestFileSearchFunctions(unittest.TestCase):
         # Check that nothing is returned when no files are found
         count = 0
         for mfile in find_files_matching(self.test_dir,
-                                         patterns='nosuchfile.txt'):
+                                         patterns='nequetamlimanoexisteelarchivo42.txt'):
             count += 1
         self.assertEqual(count, 0)
 
@@ -168,7 +169,7 @@ class TestFileSearchFunctions(unittest.TestCase):
         found = find_file_in_tree(self.test_file_name, '.')
         self.assertTrue(os.path.isfile(found))
         # It returns an empty string if nothing is found.
-        found = find_file_in_tree('nosuchfile.txt', '.')
+        found = find_file_in_tree('nequetamlimanoexisteelarchivo42.txt', '.')
         self.assertEqual(found, '')
         
     def test_find_file_in_path(self):
@@ -176,7 +177,7 @@ class TestFileSearchFunctions(unittest.TestCase):
         found = find_file_in_path(self.test_file_name)
         self.assertTrue(os.path.isfile(found))
         # It returns an empty string if nothing is found.
-        found = find_file_in_path('nosuchfile.txt')
+        found = find_file_in_path('nequetamlimanoexisteelarchivo42.txt')
         self.assertEqual(found, '')
         
     def test_find_file_in_pythonpath(self):
@@ -185,7 +186,7 @@ class TestFileSearchFunctions(unittest.TestCase):
         found = find_file_in_pythonpath('__init__.py')
         self.assertTrue(os.path.isfile(found))
         # It returns an empty string if nothing is found.
-        found = find_file_in_pythonpath('nosuchfile.txt')
+        found = find_file_in_pythonpath('nequetamlimanoexisteelarchivo42.txt')
         self.assertEqual(found, '')
         
     def test_find_file(self):
@@ -199,9 +200,9 @@ class TestFileSearchFunctions(unittest.TestCase):
         
         # The function can either return an empty string or raise an
         # exception if the file is not found.
-        found = find_file('nosuchfile.txt', canraise=False)
+        found = find_file('nequetamlimanoexisteelarchivo42.txt', canraise=False)
         self.assertEqual(found, '')
-        self.assertRaises(NameError, find_file, 'nosuchfile.txt',
+        self.assertRaises(NameError, find_file, 'nequetamlimanoexisteelarchivo42.txt',
                           canraise=True)
         
     def test_find_file_prefix(self):
@@ -217,9 +218,9 @@ class TestFileSearchFunctions(unittest.TestCase):
         
         # The function can either return the prefix or raise an
         # exception if the file is not found.
-        found = find_file_prefix('nosuchfile', canraise=False)
-        self.assertEqual(found, 'nosuchfile')
-        self.assertRaises(NameError, find_file_prefix, 'nosuchfile',
+        found = find_file_prefix('nequetamlimanoexisteelarchivo42', canraise=False)
+        self.assertEqual(found, 'nequetamlimanoexisteelarchivo42')
+        self.assertRaises(NameError, find_file_prefix, 'nequetamlimanoexisteelarchivo42',
                           canraise=True)
         
 # If being run as a main program, run the tests.
