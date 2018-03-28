@@ -226,6 +226,7 @@ Calibration Data Products (CDPs).
              with the NONLINEARITY_BY_TABLE flag. Added function to read the
              non-linearity CDP.
 19 Feb 2018: Moved non-linearity correction to SensorChipAssembly class.
+28 Mar 2018: Use fail_message=False when searching for a linearity CDP.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -1811,7 +1812,8 @@ class DetectorArray(object):
                              cdprelease=cdprelease,
                              cdpversion=cdpversion,
                              cdpsubversion=cdpsubversion,
-                             logger=self.toplogger)
+                             logger=self.toplogger,
+                             fail_message=False)
         if linearity_model is None and (mirifilter or miriband):
             # If a particular filter or band could not be matched,
             # try and find a CDP matching any filter or band.
@@ -1823,7 +1825,9 @@ class DetectorArray(object):
                                  cdprelease=cdprelease,
                                  cdpversion=cdpversion,
                                  cdpsubversion=cdpsubversion,
-                                 logger=self.toplogger)
+                                 logger=self.toplogger,
+                                 fail_message=False)
+
         if linearity_model is None:
             strg = "Could not find linearity CDP for detector %s" % detector
             if mirifilter:
