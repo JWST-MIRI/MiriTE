@@ -63,6 +63,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/introduction.html#crds-reference-files
 16 Jun 2016: Old format MRS data models removed (as MIRISim no longer
              uses them).
 23 Jun 2016: Added MiriPceModel.
+01 Apr 2018: Separated the legacy models from the supported ones.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -126,8 +127,12 @@ from miri.datamodels.miri_telescope_emission_model import \
 # Define a dictionary giving the data type code for each of the above
 # CDP data models. Some of the models need to be distinguished by
 # detector and filter in addition to the type code.
-CDP_DICT = {'MASK'    : MiriBadPixelMaskModel, \
-            # Legacy keyword for backwards compatibility
+CDP_DICT = { \
+            # -----------------------------------------------------------
+            # Currently Supported Calibration Data Products
+            # -----------------------------------------------------------
+            'MASK'    : MiriBadPixelMaskModel, \
+            # BAD is an alias of MASK
             'BAD'     : MiriBadPixelMaskModel, \
             'DARK'    : MiriDarkReferenceModel, \
             'DISTORTION' : {'IM'  : {'P750L' : MiriLrsD2WModel, \
@@ -139,32 +144,12 @@ CDP_DICT = {'MASK'    : MiriBadPixelMaskModel, \
                          'MIRIFUSHORT' : MiriMrsDistortionModel12, \
                          'MIRIFULONG'  : MiriMrsDistortionModel34,
                          'ANY' : MiriImagingDistortionModel }, \
-            # The following lines are for backwards compatibility with older
-            # distortion models.
-            'DISTORT' : MiriImagingDistortionModel,  \
-            'D2W'     : MiriLrsD2WModel,  \
-            'D2C'     : {'MIRIFUSHORT' : MiriMrsDistortionModel12, \
-                         'MIRIFULONG'  : MiriMrsDistortionModel34},  \
-            'WCS'     : {'IM'  : {'P750L' : MiriLrsD2WModel, \
-                                  'ANY'   : MiriImagingDistortionModel}, \
-                         'SW'  : MiriMrsDistortionModel12, \
-                         'LW'  : MiriMrsDistortionModel12, \
-                         'MIRIMAGE'  : {'P750L' : MiriLrsD2WModel, \
-                                        'ANY'   : MiriImagingDistortionModel}, \
-                         'MIRIFUSHORT' : MiriMrsDistortionModel12, \
-                         'MIRIFULONG'  : MiriMrsDistortionModel34,
-                         'ANY' : MiriImagingDistortionModel }, \
-            # ------------------------------
             'DROOP'   : MiriDroopModel, \
             'FLAT'    : MiriFlatfieldModel, \
+            # FRINGE, PIXELFLAT and SKYFLAT are all kinds of FLAT
             'FRINGE' : MiriFlatfieldModel,  \
             'PIXELFLAT' : MiriFlatfieldModel,  \
             'SKYFLAT' : MiriFlatfieldModel,  \
-            # The following lines are for backwards compatibility with older
-            # flat-field models.
-            'PIXFLAT' : MiriFlatfieldModel,  \
-            'FRINGEFLAT' : MiriFlatfieldModel,  \
-            # ------------------------------
             'FRINGEFREQ' : MiriMrsFringeFrequenciesModel, \
             'RESET'   : MiriResetModel, \
             'RSCD'    : MiriResetSwitchChargeDecayModel, \
@@ -185,8 +170,57 @@ CDP_DICT = {'MASK'    : MiriBadPixelMaskModel, \
                          'MIRIFUSHORT' : MiriMrsFluxconversionModel, \
                          'MIRIFULONG'  : MiriMrsFluxconversionModel}, \
             'AREA' : MiriPixelAreaModel, \
-            # The following lines are for backwards compatibility with older
-            # flux models.
+            'COLCORR' : MiriImagingColourCorrectionModel, \
+            'COLCORRPL' : MiriPowerlawColourCorrectionModel, \
+            'JUMP'    : MiriJumpModel, \
+            'LASTFRAME' : MiriLastFrameModel, \
+            'LATENT'  : MiriLatentDecayModel, \
+            'LINEARITY' : MiriLinearityModel, \
+            # LIN is an alias for LINEARITY
+            'LIN'     : MiriLinearityModel,  \
+            'SATURATION' : MiriPixelSaturationModel, \
+            # SAT is an alias for SATURATION
+            'SAT'     : MiriPixelSaturationModel, \
+            'STRAYMASK' : {'SW'  : MiriMrsStraylightModel, \
+                         'LW'  : MiriMrsStraylightModel,
+                         'MIRIFUSHORT' : MiriMrsStraylightModel, \
+                         'MIRIFULONG'  : MiriMrsStraylightModel }, \
+            # STRAY is an alias for STRAYMASK
+            'STRAY'   : {'SW'  : MiriMrsStraylightModel, \
+                         'LW'  : MiriMrsStraylightModel,
+                         'MIRIFUSHORT' : MiriMrsStraylightModel, \
+                         'MIRIFULONG'  : MiriMrsStraylightModel }, \
+            'PSF'     : {'IM'  : {'P750L' : MiriLrsPointSpreadFunctionModel, \
+                                  'ANY'   : MiriImagingPointSpreadFunctionModel}, \
+                         'SW'  : MiriMrsPointSpreadFunctionModel, \
+                         'LW'  : MiriMrsPointSpreadFunctionModel, \
+                         'MIRIMAGE'  : {'P750L' : MiriLrsPointSpreadFunctionModel, \
+                                        'ANY'   : MiriImagingPointSpreadFunctionModel}, \
+                         'MIRIFUSHORT' : MiriMrsPointSpreadFunctionModel, \
+                         'MIRIFULONG'  : MiriMrsPointSpreadFunctionModel,
+                         'ANY' : MiriPointSpreadFunctionModel }, \
+            'PSF-OOF' : MiriImagingPointSpreadFunctionModel, \
+            'PSF-MONOCHROM' : MiriLrsPointSpreadFunctionModel, \
+            # -----------------------------------------------------------
+            # Legacy Keywords and Data Products - Backwards Compatibility Only
+            # The following section could be removed without affecting the
+            # JWST pipeline.
+            # -----------------------------------------------------------
+            'DISTORT' : MiriImagingDistortionModel,  \
+            'D2W'     : MiriLrsD2WModel,  \
+            'D2C'     : {'MIRIFUSHORT' : MiriMrsDistortionModel12, \
+                         'MIRIFULONG'  : MiriMrsDistortionModel34},  \
+            'WCS'     : {'IM'  : {'P750L' : MiriLrsD2WModel, \
+                                  'ANY'   : MiriImagingDistortionModel}, \
+                         'SW'  : MiriMrsDistortionModel12, \
+                         'LW'  : MiriMrsDistortionModel12, \
+                         'MIRIMAGE'  : {'P750L' : MiriLrsD2WModel, \
+                                        'ANY'   : MiriImagingDistortionModel}, \
+                         'MIRIFUSHORT' : MiriMrsDistortionModel12, \
+                         'MIRIFULONG'  : MiriMrsDistortionModel34,
+                         'ANY' : MiriImagingDistortionModel }, \
+            'PIXFLAT' : MiriFlatfieldModel,  \
+            'FRINGEFLAT' : MiriFlatfieldModel,  \
             'FLUX'    : {'IM'  : {'P750L' : MiriLrsFluxconversionModel, \
                                   'ANY'   : MiriImagingFluxconversionModel}, \
                          'SW'  : MiriMrsFluxconversionModel, \
@@ -210,37 +244,10 @@ CDP_DICT = {'MASK'    : MiriBadPixelMaskModel, \
                          'MIRIMAGE' : MiriLrsFluxconversionModel, \
                          'MIRIFUSHORT' : MiriMrsFluxconversionModel, \
                          'MIRIFULONG'  : MiriMrsFluxconversionModel}, \
-            # ------------------------------
-            'COLCORR' : MiriImagingColourCorrectionModel, \
-            'COLCORRPL' : MiriPowerlawColourCorrectionModel, \
-            'JUMP'    : MiriJumpModel, \
-            'LASTFRAME' : MiriLastFrameModel, \
-            'LATENT'  : MiriLatentDecayModel, \
-            'LINEARITY' : MiriLinearityModel, \
-            # Legacy keyword for backwards compatibility
-            'LIN'     : MiriLinearityModel,  \
-            'SATURATION' : MiriPixelSaturationModel, \
-            # Legacy keyword for backwards compatibility
-            'SAT'     : MiriPixelSaturationModel, \
-            'STRAY'   : {'SW'  : MiriMrsStraylightModel, \
-                         'LW'  : MiriMrsStraylightModel,
-                         'MIRIFUSHORT' : MiriMrsStraylightModel, \
-                         'MIRIFULONG'  : MiriMrsStraylightModel }, \
-            'PSF'     : {'IM'  : {'P750L' : MiriLrsPointSpreadFunctionModel, \
-                                  'ANY'   : MiriImagingPointSpreadFunctionModel}, \
-                         'SW'  : MiriMrsPointSpreadFunctionModel, \
-                         'LW'  : MiriMrsPointSpreadFunctionModel, \
-                         'MIRIMAGE'  : {'P750L' : MiriLrsPointSpreadFunctionModel, \
-                                        'ANY'   : MiriImagingPointSpreadFunctionModel}, \
-                         'MIRIFUSHORT' : MiriMrsPointSpreadFunctionModel, \
-                         'MIRIFULONG'  : MiriMrsPointSpreadFunctionModel,
-                         'ANY' : MiriPointSpreadFunctionModel }, \
-            'PSF-OOF' : MiriImagingPointSpreadFunctionModel, \
-            'PSF-MONOCHROM' : MiriLrsPointSpreadFunctionModel, \
-            # The following 3 lines are for backwards compatibility
             'IMPSF'  : MiriImagingPointSpreadFunctionModel, \
             'LRSPSF' : MiriLrsPointSpreadFunctionModel, \
             'MRSPSF' : MiriMrsPointSpreadFunctionModel, \
             'TelEm'  : MiriTelescopeEmissionModel, \
             'TEL_EMISSION'  : MiriTelescopeEmissionModel, \
+            # -----------------------------------------------------------
             }

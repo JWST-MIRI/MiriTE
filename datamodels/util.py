@@ -58,6 +58,8 @@ processing the MIRI data models.
              check. REFTYPE trumps FILETYPE when assessing data type.
 18 Jan 2018: Corrected a problem where the open() function closed an
              hdulist provided as input.
+09 Apr 2018: Added 'N/A' to the lists of valid CDP options. 'N/A' is
+             replaced by 'ANY' when looking up a CDP. Added FASTGRPAVG.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -92,7 +94,7 @@ MIRI_DETECTORS_EXTRAS = ['IM', 'LW', 'SW'] # For backwards compatibility only.
 
 MIRI_SETTINGS = ['RAL1', 'JPL1']
 
-MIRI_READPATTS = ['SLOW', 'FAST']
+MIRI_READPATTS = ['SLOW', 'FAST', 'FASTGRPAVG']
 
 MIRI_SUBARRAYS = ['MASK1140', 'MASK1550', 'MASK1065', 'MASKLYOT',
                   'BRIGHTSKY', 'SUB256', 'SUB128', 'SUB64', 'SLITLESSPRISM']
@@ -103,6 +105,8 @@ MIRI_BANDS = ['SHORT', 'MEDIUM', 'LONG', 'SHORT-MEDIUM',  'SHORT-LONG',
               'MEDIUM-SHORT', 'MEDIUM-LONG', 'LONG-SHORT', 'LONG-MEDIUM']
 MIRI_BANDS_EXTRAS = ['A', 'B', 'C'] # For backwards compatibility only.
 
+# Note that 'FLENS' and 'F2550WR' are allowed values for the filter metadata,
+# but there are no CDP files for these filters.
 MIRI_FILTERS = ['F560W','F770W','F1000W','F1130W', 'F1280W','F1500W','F1800W',
                 'F2100W', 'F2550W', 'F2550WR','F1065C', 'F1140C', 'F1550C',
                 'F2300C','P750L','FLENS', 'FND', 'OPAQUE']
@@ -110,12 +114,12 @@ MIRI_FILTERS = ['F560W','F770W','F1000W','F1130W', 'F1280W','F1500W','F1800W',
 # Rules for testing compulsory CDP metadata
 CDP_METADATA = [['TELESCOP', 'JWST'],
                 ['INSTRUME', 'MIRI'],
-                ['MODELNAM', MIRI_MODELS],
-                ['DETECTOR', ['MIRIMAGE', 'MIRIFUSHORT', 'MIRIFULONG']],
+                ['MODELNAM', MIRI_MODELS + ['N/A']],
+                ['DETECTOR', MIRI_DETECTORS + ['N/A']],
                 # DETSETNG is removed from STSCI CDP specification
 #                 ['DETSETNG', MIRI_SETTINGS + ['ANY']],
-                ['READPATT', MIRI_READPATTS + ['ANY']],
-                ['SUBARRAY', MIRI_SUBARRAYS + ['FULL', 'GENERIC']],
+                ['READPATT', MIRI_READPATTS + ['ANY', 'N/A']],
+                ['SUBARRAY', MIRI_SUBARRAYS + ['FULL', 'GENERIC', 'N/A']],
                 ['FASTAXIS', 1],
                 ['SLOWAXIS', 2],
                 ['PEDIGREE', ['GROUND', 'DUMMY', 'SIMULATION']],
@@ -240,6 +244,9 @@ def get_data_class( kwlist, dictionary=CDP_DICT ):
             key = klist.pop()
         else:
             key = 'ANY'
+        # 'N/A' is an alias for 'ANY'
+        if key == 'N/A':
+            key = 'ANY'            
         if key in kdict:
             thing = kdict[key]
             if isinstance(thing, dict):

@@ -79,8 +79,8 @@ properties:
         type: string
         title: Filter used by the instrument (imaging)
         enum: [F560W, F770W, F1000W, F1130W, F1280W, F1500W, F1800W, F2100W,
-               F2550W, F2550WR, F1065C, F1140C, F1550C, F2300C, P750L, FND,
-               OPAQUE, ANY, N/A, '']
+               F2550W, F2550WR, F1065C, F1140C, F1550C, F2300C, P750L, FLENS,
+               FND, OPAQUE, ANY, N/A, '']
         fits_keyword: FILTER
       ccc_pos:
         type: string
@@ -130,7 +130,7 @@ properties:
         title: Name of detector used to acquire the data
         comment: IM, LW, SW are for backwards compatibility
         enum: [IC, MIRIMAGE, MIRIFULONG, MIRIFUSHORT,
-               IM, LW, SW, JPL, ANY]
+               IM, LW, SW, JPL, ANY, N/A]
         fits_keyword: DETECTOR
       sca_id:
         type: string
@@ -144,7 +144,7 @@ properties:
         type: string
         title: Subarray used
         enum: [FULL, MASK1140, MASK1550, MASK1065, MASKLYOT, BRIGHTSKY,
-               SUB256, SUB128, SUB64, SLITLESSPRISM, GENERIC, '']
+               SUB256, SUB128, SUB64, SLITLESSPRISM, GENERIC, N/A, '']
         fits_keyword: SUBARRAY
       fastaxis:
         type: integer

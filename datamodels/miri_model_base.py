@@ -145,6 +145,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              get_data_stats() to prevent a numpy warning.
 19 Jan 2018: Added set_telescope function for creating test data.
 24 Jan 2018: Added association metadata to set_observation_metadata.
+11 Apr 2018: FLENS added to filter list and "N/A" added to some options in
+             data model metadata.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 

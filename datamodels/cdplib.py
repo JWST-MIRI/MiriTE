@@ -107,6 +107,9 @@ http://miri.ster.kuleuven.be/bin/view/Internal/CalDataProducts
 26 Oct 2017: Corrected bug in get_cdp_doc function.
 15 Jan 2018: Do not attempt to set a timeout on a non-existent sftp
              connection.
+09 Apr 2018: Allow 'N/A' as an alias for 'ANY' when searching.
+             Removed 'FLENS' from the filter doc strings and mentioned that
+             F2550WR is a redundant filter.
 
 Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -157,20 +160,20 @@ def _criteria_string(cdptype, model='FM', detector=None,
     
     """
     strg = cdptype
-    if detector and (detector != 'ANY'):
+    if detector and (detector != 'ANY') and (detector != 'N/A'):
         strg += ", detector=" + detector
-    if readpatt and (readpatt != 'ANY'):
+    if readpatt and (readpatt != 'ANY') and (readpatt != 'N/A'):
         strg += ", readpatt=" + readpatt
-    if ((channel and (channel != 'ANY')) or \
-        (band and (band != 'ANY'))):
+    if ((channel and (channel != 'ANY') and (channel != 'N/A')) or \
+        (band and (band != 'ANY') and (band != 'N/A'))):
         strg += ", channel/band="
-        if channel and (channel != 'ANY'):
+        if channel and (channel != 'ANY') and (channel != 'N/A'):
             strg += str(channel)
-        if band and (band != 'ANY'):
+        if band and (band != 'ANY') and (band != 'N/A'):
             strg += str(band)
     if mirifilter and (mirifilter != 'ANY'):
         strg += ", filter=" + mirifilter
-    if subarray and (subarray != 'ANY') and (subarray != 'FULL'):
+    if subarray and (subarray != 'ANY') and (subarray != 'N/A') and (subarray != 'FULL'):
         strg += ", subarray=" + subarray
     if integration:
         strg += ", integration=" + str(integration)
@@ -283,6 +286,8 @@ def get_cdp(cdptype, detector, model='FM', readpatt='ANY', channel='ANY',
     CDP file matches the criteria given. The last entry in an
     alphanumerically sorted list will be returned. It is recommended that
     all the required parameters are specified.
+    
+    NOTE: The function recognises the string 'N/A' as an alias for 'ANY'.
 
     If no CDP file could be matched, the function returns None.
     
@@ -320,13 +325,15 @@ def get_cdp(cdptype, detector, model='FM', readpatt='ANY', channel='ANY',
     mirifilter: str (optional)
         The MIRI filter required ('F560W', 'F770W', 'F1000W', 'F1130W',
         'F1280W', 'F1500W', 'F1800W', 'F2100W', 'F2550W', 'F2550WR',
-        'F1065C', 'F1140C', 'F1550C', 'F2300C', 'P750L', 'FLENS', 'FND',
+        'F1065C', 'F1140C', 'F1550C', 'F2300C', 'P750L', 'FND',
         'OPAQUE', 'ANY' or 'GENERIC').
         Valid only for imager data, when detector is 'IM'.
         Defaults to 'ANY', which will match any filter.
         Explicitly specifying 'GENERIC' will only match CDPs which do not
         specify any filter and therefore work with any filter (as opposed
         to 'ANY', which can match a CDP which is specific to one filter only).
+        Note that 'F2550W' and 'F2550WR' redundant filters - the CDPs
+        available for 'F2550W' are also valid for 'F2550WR'.
     subarray: str (optional)
         The MIRI subarray required ('FULL', 'MASK1140', 'MASK1550',
         'MASK1065', 'MASKLYOT', 'BRIGHTSKY', 'SUB256', 'SUB128',
@@ -792,6 +799,8 @@ class MiriCDPFolder(object):
         required criteria. The CDP file naming convention is assumed to be:
         
         MIRI_<model>_<detector>_<detsetng>_<readpatt>_<channelband_or_filter>_<subarray>_<reftype>_<version>.fits
+
+        NOTE: The function recognises the string 'N/A' as an alias for 'ANY'.
         
         :Parameters:
     
@@ -827,13 +836,15 @@ class MiriCDPFolder(object):
         mirifilter: str (optional)
             The MIRI filter required ('F560W', 'F770W', 'F1000W', 'F1130W',
             'F1280W', 'F1500W', 'F1800W', 'F2100W', 'F2550W', 'F2550WR',
-            'F1065C', 'F1140C', 'F1550C', 'F2300C', 'P750L', 'FLENS', 'FND',
+            'F1065C', 'F1140C', 'F1550C', 'F2300C', 'P750L', 'FND',
             'OPAQUE', 'ANY' or 'GENERIC').
             Valid only for imager data, when detector is 'IM'.
             By default, matches all filters.  
             Explicitly specifying 'GENERIC' will only match CDPs which do not
             specify any filter and therefore work with any filter (as opposed
             to 'ANY', which can match a CDP which is specific to one filter only).
+            Note that 'F2550W' and 'F2550WR' redundant filters - the CDPs
+            available for 'F2550W' are also valid for 'F2550WR'.
         subarray: str (optional)
             The MIRI subarray required ('FULL', 'MASK1140', 'MASK1550',
             'MASK1065', 'MASKLYOT', 'BRIGHTSKY', 'SUB256', 'SUB128',
@@ -883,16 +894,16 @@ class MiriCDPFolder(object):
         
         # The readout pattern is optional, and a CDP valid for any
         # pattern is specified by missing it out completely.
-        if readpatt is not None and readpatt != 'ANY':
+        if (readpatt is not None) and (readpatt != 'ANY') and (readpatt != 'N/A'):
             match_strings.append(readpatt)
                
         # The filter name is optional, and a CDP valid for any
         # filter is specified by missing it out completely.
         # Specifying 'GENERIC' will avoid CDPs designed for specific filters.
-        if mirifilter is not None and mirifilter != 'ANY' and \
-           mirifilter != 'GENERIC':
+        if (mirifilter is not None) and (mirifilter != 'ANY') and \
+           (mirifilter != 'GENERIC') and (mirifilter != 'N/A'):
             match_strings.append(mirifilter)
-        elif mirifilter is not None and mirifilter == 'GENERIC':
+        elif (mirifilter is not None) and (mirifilter == 'GENERIC'):
             for filt in MIRI_FILTERS:
                 avoid_strings.append(filt)
             
@@ -900,16 +911,17 @@ class MiriCDPFolder(object):
         # explicitly exclude the LRS CDPs, for which either the
         # 'P750L' filter or the 'SLITLESSPRISM' subarray would
         # have been specified explicitly.
-        if detector == 'MIRIMAGE' and mirifilter == 'ANY' and \
-           not subarray == 'SLITLESSPRISM':
+        if (detector == 'MIRIMAGE') and \
+           (mirifilter == 'ANY' or mirifilter == 'N/A') and \
+           (not subarray == 'SLITLESSPRISM'):
             avoid_strings.append('P750L')
 
         # The channel and band names are optional, and a CDP valid for any
         # channel or band is specified by missing either out completely.
         channel_band = ''
-        if channel is not None and channel != 'ANY':
+        if (channel is not None) and (channel != 'ANY') and (channel != 'N/A'):
             channel_band += str(channel)
-        if band is not None and band != 'ANY':
+        if (band is not None) and (band != 'ANY') and (band != 'N/A'):
             channel_band += band
         if channel_band:
             match_strings.append(channel_band)
@@ -919,10 +931,11 @@ class MiriCDPFolder(object):
         # subarray should be matched. If FULL frame data are needed, specific
         # subarrays should be explicitly avoided. Only the subarray='ANY'
         # option will match any subarray.
-        if subarray is not None and subarray != 'FULL' and \
-           subarray != 'ANY' and subarray != 'GENERIC':
+        if (subarray is not None) and (subarray != 'FULL') and \
+           (subarray != 'ANY') and (subarray != 'N/A') and (subarray != 'GENERIC'):
             match_strings.append(subarray)
-        if subarray == None or subarray == 'FULL' or subarray == 'GENERIC':
+        if (subarray == None) or (subarray == 'FULL') or \
+           (subarray == 'GENERIC') or (subarray == 'N/A'):
             # If full frame data is needed, CDPs designed for a specific
             # subarray will be avoided.
             for sarray in MIRI_SUBARRAYS:
@@ -931,7 +944,7 @@ class MiriCDPFolder(object):
         # The file name always contains the CDP type. A "_" is appended
         # to the match string to prevent cdptype "MASK" from matching the
         # coronographic MASK filters.
-        if cdptype is not None and cdptype != 'ANY':
+        if (cdptype is not None) and (cdptype != 'ANY'):
             match_strings.append(cdptype + "_")
                 
         # An integration number is optional, but is always explicitly
@@ -953,8 +966,8 @@ class MiriCDPFolder(object):
         # MIRIFULONG). The test will not match MIRIFULONG but will match
         # 34LONG, 3LONG, _LONG, etc...
         if (len(matched_files) > 1) and \
-           (band is not None and band != 'ANY') and \
-           (channel is None or channel == 'ANY'):
+           (band is not None and band != 'ANY' and band != 'N/A') and \
+           (channel is None or channel == 'ANY' or channel == 'N/A'):
             regexp_string = r"[A-Za-z0-9_\-]*[0-9_]" + band + "[A-Za-z0-9_\-]*"
 
             # Filter the list of files with this regular expression
@@ -1055,6 +1068,8 @@ class MiriCDPFolder(object):
         recommended that all the required parameters are specified except
         the version numbers.
 
+        NOTE: The function recognises the string 'N/A' as an alias for 'ANY'.
+
         :Parameters:
     
         cdptype: str
@@ -1086,13 +1101,15 @@ class MiriCDPFolder(object):
         mirifilter: str (optional)
             The MIRI filter required ('F560W', 'F770W', 'F1000W', 'F1130W',
             'F1280W', 'F1500W', 'F1800W', 'F2100W', 'F2550W', 'F2550WR',
-            'F1065C', 'F1140C', 'F1550C', 'F2300C', 'P750L', 'FLENS', 'FND',
+            'F1065C', 'F1140C', 'F1550C', 'F2300C', 'P750L', 'FND',
             'OPAQUE', 'ANY' or 'GENERIC').
             Valid only for imager data, when detector is 'IM'.
             By default, matches any filter.  
             Explicitly specifying 'GENERIC' will only match CDPs which do not
             specify any filter and therefore work with any filter (as opposed
             to 'ANY', which can match a CDP which is specific to one filter only).
+            Note that 'F2550W' and 'F2550WR' redundant filters - the CDPs
+            available for 'F2550W' are also valid for 'F2550WR'.
         subarray: str (optional)
             The MIRI subarray required ('FULL', 'MASK1140', 'MASK1550',
             'MASK1065', 'MASKLYOT', 'BRIGHTSKY', 'SUB256', 'SUB128',
@@ -1642,6 +1659,8 @@ class MiriCDPInterface(object):
         The CDP file naming convention is assumed to be:
         
         MIRI_<model>_<detector>_<detsetng>_<readpatt>_<channelband_or_filter>_<subarray>_<reftype>_<version>.fits
+
+        NOTE: The function recognises the string 'N/A' as an alias for 'ANY'.
         
         :Parameters:
     
@@ -1677,13 +1696,15 @@ class MiriCDPInterface(object):
         mirifilter: str (optional)
             The MIRI filter required ('F560W', 'F770W', 'F1000W', 'F1130W',
             'F1280W', 'F1500W', 'F1800W', 'F2100W', 'F2550W', 'F2550WR',
-            'F1065C', 'F1140C', 'F1550C', 'F2300C', 'P750L', 'FLENS', 'FND',
+            'F1065C', 'F1140C', 'F1550C', 'F2300C', 'P750L', 'FND',
             'OPAQUE', 'ANY' or 'GENERIC').
             Valid only for imager data, when detector is 'IM'.
             By default, matches all filters.  
             Explicitly specifying 'GENERIC' will only match CDPs which do not
             specify any filter and therefore work with any filter (as opposed
             to 'ANY', which can match a CDP which is specific to one filter only).
+            Note that 'F2550W' and 'F2550WR' redundant filters - the CDPs
+            available for 'F2550W' are also valid for 'F2550WR'.
         subarray: str (optional)
             The MIRI subarray required ('FULL', 'MASK1140', 'MASK1550',
             'MASK1065', 'MASKLYOT', 'BRIGHTSKY', 'SUB256', 'SUB128',
@@ -1746,6 +1767,8 @@ class MiriCDPInterface(object):
         recommended that all the required parameters are specified except
         the version numbers.
 
+        NOTE: The function recognises the string 'N/A' as an alias for 'ANY'.
+
         :Parameters:
     
         cdptype: str
@@ -1777,13 +1800,15 @@ class MiriCDPInterface(object):
         mirifilter: str (optional)
             The MIRI filter required ('F560W', 'F770W', 'F1000W', 'F1130W',
             'F1280W', 'F1500W', 'F1800W', 'F2100W', 'F2550W', 'F2550WR',
-            'F1065C', 'F1140C', 'F1550C', 'F2300C', 'P750L', 'FLENS', 'FND',
+            'F1065C', 'F1140C', 'F1550C', 'F2300C', 'P750L', 'FND',
             'OPAQUE', 'ANY' or 'GENERIC').
             Valid only for imager data, when detector is 'IM'.
             By default, matches any filter.  
             Explicitly specifying 'GENERIC' will only match CDPs which do not
             specify any filter and therefore work with any filter (as opposed
             to 'ANY', which can match a CDP which is specific to one filter only).
+            Note that 'F2550W' and 'F2550WR' redundant filters - the CDPs
+            available for 'F2550W' are also valid for 'F2550WR'.
         subarray: str (optional)
             The MIRI subarray required ('FULL', 'MASK1140', 'MASK1550',
             'MASK1065', 'MASKLYOT', 'BRIGHTSKY', 'SUB256', 'SUB128',
@@ -1965,13 +1990,15 @@ class MiriCDPInterface(object):
         mirifilter: str (optional)
             The MIRI filter required ('F560W', 'F770W', 'F1000W', 'F1130W',
             'F1280W', 'F1500W', 'F1800W', 'F2100W', 'F2550W', 'F2550WR',
-            'F1065C', 'F1140C', 'F1550C', 'F2300C', 'P750L', 'FLENS', 'FND',
+            'F1065C', 'F1140C', 'F1550C', 'F2300C', 'P750L', 'FND',
             'OPAQUE', 'ANY' or 'GENERIC').
             Valid only for imager data, when detector is 'IM'.
             By default, matches all filters.  
             Explicitly specifying 'GENERIC' will only match CDPs which do not
             specify any filter and therefore work with any filter (as opposed
             to 'ANY', which can match a CDP which is specific to one filter only).
+            Note that 'F2550W' and 'F2550WR' redundant filters - the CDPs
+            available for 'F2550W' are also valid for 'F2550WR'.
         subarray: str (optional)
             The MIRI subarray required ('FULL', 'MASK1140', 'MASK1550',
             'MASK1065', 'MASKLYOT', 'BRIGHTSKY', 'SUB256', 'SUB128',
