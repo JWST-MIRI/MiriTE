@@ -287,7 +287,7 @@ class MiriMeasurement(MiriDataModel):
 #                     else:
 #                         strg = "%s file: %s" % \
 #                             (self.name, self.filename)
-#                 elif isinstance(self.vnames, str):
+#                 elif isinstance(self.vnames, (str,unicode)):
 #                     MAX_LEN = _MAX_COMMENT_LEN - len(self.vnames) - 8
 #                     if len(self.filename) > MAX_LEN:
 #                          The filename is truncated if it is too long

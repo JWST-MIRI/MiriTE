@@ -2104,7 +2104,7 @@ def plot( *args ):
             ax = fig.add_subplot(pltrows, pltcols, count)
             
             # Check the data type.
-            if isinstance(obj, str):
+            if isinstance(obj,(str,unicode)):
                 
                 # Text is simply written within an otherwise empty axis.
                 ax.set_title( obj.__class__.__name__ )

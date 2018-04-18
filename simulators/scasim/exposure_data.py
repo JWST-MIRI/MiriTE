@@ -1226,7 +1226,7 @@ class ExposureData(object):
         """
         # Convert unusual values into a string
         if six.PY2:
-            usual_types = (str,float,int)
+            usual_types = (str,unicode,float,int)
         else:
             usual_types = (str,float,int)
         if not isinstance(value, usual_types):

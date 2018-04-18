@@ -247,7 +247,7 @@ def cdp_version_decode( cdp_version ):
     """
     # Reject a null version code, a non-string or an empty string.
     if cdp_version is None or \
-       not isinstance(cdp_version, str) or \
+       not isinstance(cdp_version, (str,unicode)) or \
        len(cdp_version) < 1:
         return (None, None, None)
     

@@ -936,7 +936,7 @@ def verify_fits_file(filename, cdp_checks=False):
     None.
     
     """
-    assert isinstance(filename, str)
+    assert isinstance(filename, (str,unicode))
     
     failure_strg = ''
     with pyfits.open( filename ) as hdulist:
