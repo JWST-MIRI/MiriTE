@@ -233,8 +233,8 @@ def get_exp_type(detector, filter, subarray='FULL', datatype='SCIENCE'):
         The exposure type string (EXP_TYPE)
     
     """
-    assert isinstance(detector, (str,unicode))
-    assert isinstance(filter, (str,unicode))
+    assert isinstance(detector, str)
+    assert isinstance(filter, str)
     
     if 'MIRIFU' in detector:
         if (filter and 'OPAQUE' in filter) or (datatype == 'DARK'):
