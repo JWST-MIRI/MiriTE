@@ -77,7 +77,7 @@ from miri.datamodels.miri_measured_model import MiriMeasuredModel
 from miri.tools.fitting import nonLinFit, gaussian
 from matplotlib import pyplot
 import miri.tools.miriplot as mplt
-
+import math
 
 def condense(spec, chunk, method = "Median", running = True):
     """
@@ -612,7 +612,18 @@ def subtractBackground(on, background):
            
     return on - background   
    
-   
+
+def lrs_round(floatNumber):
+    """
+    rounding floats to integers in a way that python 2 did
+    e.g. lrs_round(4.5) results in 5
+    :Paramters:
+    floatNumber: float to be rounded to integer
+    :Returns:
+    rounded number  
+    """
+    return floatNumber/abs(floatNumber) * math.floor(abs(floatNumber)+0.5)
+
 def interpolWaveOnRows(pos, wave):
     """
     
@@ -630,7 +641,7 @@ def interpolWaveOnRows(pos, wave):
     rows and corresponding interpolated wavelengths
    
     """        
-    rows = np.arange(0, round(np.nanmax(pos)), 1.)
+    rows = np.arange(0, lrs_round(np.nanmax(pos)), 1.)
     inter = interpolate.interp1d(pos, wave, bounds_error = False)
     new_wave= inter(rows)
     #a,b,c = interpolate.splrep(pos, wave, k=3)
