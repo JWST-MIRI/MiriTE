@@ -330,6 +330,7 @@ Calibration Data Products (CDPs).
 08 Jan 2018: Import version number from miri package.
 14 Feb 2018: Added version number for nonlinearity CDP.
 19 Feb 2018: Non-linearity correction moved here.
+26 Apr 2018: Corrected exception raising syntax for Python 3.
 
 @author: Steven Beard
 
@@ -2373,7 +2374,7 @@ class SensorChipAssembly(object):
                 try:
                     self.exposure_data.add_dark( self.detector.dark_map,
                                                  clipvalue=None )
-                except ValueError, e:
+                except ValueError as e:
                     # Catch an exception and instead issue a log message.
                     strg = str(e)
                     strg += ": DARK addition skipped."

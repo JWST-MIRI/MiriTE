@@ -110,6 +110,7 @@ http://miri.ster.kuleuven.be/bin/view/Internal/CalDataProducts
 09 Apr 2018: Allow 'N/A' as an alias for 'ANY' when searching.
              Removed 'FLENS' from the filter doc strings and mentioned that
              F2550WR is a redundant filter.
+26 Apr 2018: Corrected exception raising syntax for Python 3.
 
 Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -605,7 +606,7 @@ class MiriCDPFolder(object):
         if self.sftp is not None:
             try:
                 self.sftp.chdir(self.ftp_path)
-            except IOError, e:
+            except IOError as e:
                 strg = "IOError: Failed to change directory to FTP folder \'%s\'\n" % self.ftp_path
                 strg += "  %s" % str(e)
                 raise IOError(strg)
@@ -1920,7 +1921,7 @@ class MiriCDPInterface(object):
                         new_local_filename = local_filename.replace(os.path.sep, '/')
                         try:
                             self.sftp.chdir(ftp_path)
-                        except IOError, e:
+                        except IOError as e:
                             strg = "IOError: Failed to change directory to FTP folder \'%s\'\n" % ftp_path
                             strg += "  %s" % str(e)
                             raise IOError(strg)
@@ -2119,7 +2120,7 @@ class MiriCDPInterface(object):
                         new_local_filename = local_filename.replace(os.path.sep, '/')
                         try:
                             self.sftp.chdir(cdp_folder.ftp_path)
-                        except IOError, e:
+                        except IOError as e:
                             strg = "IOError: Failed to change directory to FTP folder \'%s\'\n" % cdp_folder.ftp_path
                             strg += "  %s" % str(e)
                             raise IOError(strg)

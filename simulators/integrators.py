@@ -143,6 +143,7 @@ effects simulated by SCASim.
              every frame during Poisson noise calculation. Last readout
              should be with respect to the zeropoint. Some variables
              renamed to better names.
+26 Apr 2018: Corrected exception raising syntax for Python 3.
 
 @author: Steven Beard (UKATC)
 
@@ -696,7 +697,7 @@ class PoissonIntegrator(object):
                         read_diff = read_diff + \
                             scipy.stats.poisson.rvs(rounded_diff)
                     read_diff = read_diff / float(nsamples)
-            except ValueError, e:
+            except ValueError as e:
                 strg = "Poisson rvs error. Difference array:\n"
                 strg += str(rounded_diff)
                 strg += "\n" + str(e)
