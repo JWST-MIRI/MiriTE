@@ -31,6 +31,7 @@
 #              level 1 ramp data. Ensure all attempts to read a FITS
 #              keyword are within a try/except block.
 # 04 Dec 2017: Added missing "overwrite" parameter to functions.
+# 27 Apr 2018: Corrected exception syntax for Python 3.
 # 
 # @author: Steven Beard (UKATC)
 #
@@ -181,7 +182,7 @@ def convert_dhas_to_level1b( inputfile, outputfile, verbose=0, overwrite=False )
                     strg = "\n\tFailed to convert metadata item with "
                     strg += "FITS keyword \'%s\'. " % fitskw
                     LOGGER.error(strg)
-                except Exception, e:
+                except Exception as e:
                     strg = "\n\tFailed to convert metadata item with "
                     strg += "FITS keyword \'%s\'. " % fitskw
                     strg += "\n\t%s" % str(e)

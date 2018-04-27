@@ -144,6 +144,7 @@ effects simulated by SCASim.
              should be with respect to the zeropoint. Some variables
              renamed to better names.
 26 Apr 2018: Corrected exception raising syntax for Python 3.
+27 Apr 2018: In Python 3 all integers are long. Removed "L" syntax.
 
 @author: Steven Beard (UKATC)
 
@@ -171,7 +172,7 @@ _MAXINT = sys.maxint
 # function overflows. It must be significantly less than _MAXINT to prevent
 # an overflowing value being randomly generated.
 # TODO: This is an arbitrary level set by trial and error. Can it be more exact?
-_MAXEXPECTED = _MAXINT - (100L * math.sqrt(_MAXINT))
+_MAXEXPECTED = _MAXINT - (100 * math.sqrt(_MAXINT))
 
 # The maximum clock time for which the slow zeropoint drift is valid.
 # The detector is assumed to settle after this time has elapsed.
