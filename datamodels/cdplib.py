@@ -1510,9 +1510,13 @@ class MiriCDPInterface(object):
         self.ftp_ok = False
         try:
             # First attempt to connect with hostkey checking
+            # FIXME: Disable host key checking for Python 3
+            cnopts = pysftp.CnOpts()
+            cnopts.hostkeys = None
             self.sftp = pysftp.Connection(self.ftp_host,
                                           username=self.ftp_user,
-                                          password=self.ftp_passwd)
+                                          password=self.ftp_passwd,
+                                          cnopts=cnopts)
             # If you get this far without an exception, the SFTP connection
             # has been successful.
             self.ftp_ok = True
