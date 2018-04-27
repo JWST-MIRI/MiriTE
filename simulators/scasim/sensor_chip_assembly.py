@@ -330,6 +330,8 @@ Calibration Data Products (CDPs).
 08 Jan 2018: Import version number from miri package.
 14 Feb 2018: Added version number for nonlinearity CDP.
 19 Feb 2018: Non-linearity correction moved here.
+20 Apr 2018: Non-linearity correction is only possible when amplifier gain
+             is also simulated.
 26 Apr 2018: Corrected exception raising syntax for Python 3.
 
 @author: Steven Beard
@@ -994,6 +996,14 @@ class SensorChipAssembly(object):
             self.qe = None
         
         self.define_cosmic_ray_env(cosmic_ray_mode)
+        
+        # Non-linearity simulation by translation table is only possible when
+        # amplifier gain is simulated.
+        if not simulate_gain and simulate_nonlinearity and NONLINEARITY_BY_TABLE:
+            strg = "Cannot simulate nonlinearity unless amplifier gain is also simulated"
+            strg += "\n   Nonlinearity simulation turned off."
+            self.logger.warn(strg)
+            simulate_nonlinearity = False
             
         self.set_simulation_flags(readout_mode, qe_adjust=qe_adjust,
                                   simulate_poisson_noise=simulate_poisson_noise,

@@ -675,7 +675,6 @@ class DetectorArray(object):
         self.refpixsampleskip = 3
         self.nframes = 1
 
-
 # NOTE: AMPLIFIER CLASS IS STILL AVAILABLE BUT NO LONGER USED FOR MIRI.
 #         # Add the readout amplifiers associated with this detector
 #         self._add_amplifiers(temperature, min_illuminated_row,
