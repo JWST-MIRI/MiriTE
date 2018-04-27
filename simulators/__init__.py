@@ -43,6 +43,7 @@ data/detector/*.fits
 05 Jun 2013: Moved description of top level modules from scasim to here.
 05 Jan 2018: More version control information added. SVN info dropped.
 22 Jan 2018: Removed empty mirimsim package.
+27 Apr 2018: Replaced relative import of integrators with absolute import.
 
 """
 
@@ -55,4 +56,4 @@ __maintainer__ = 'MIRI Software Team: mirisim@roe.ac.uk'
 __copyright__ = '2018, %s' % __author__
 
 # Import classes that need to be accessible from the miri.simulators level.
-from integrators import PoissonIntegrator, ImperfectIntegrator
+from miri.simulators.integrators import PoissonIntegrator, ImperfectIntegrator

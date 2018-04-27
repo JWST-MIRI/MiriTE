@@ -57,6 +57,8 @@ in the datamodels.miri_measured_model module.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 13 Sep 2017: Updated "not a file name" test to match the new behaviour of
              JWST pipeline version 0.7.8rc2
+27 Apr 2018: Corrected bug in get_history() length test.
+
 @author: Steven Beard (UKATC)
 
 """
@@ -284,7 +286,7 @@ class TestMiriMeasuredModel(unittest.TestCase):
         self.simpleproduct.add_history('History 1')
         self.simpleproduct.add_history('History 2')
         self.simpleproduct.add_history('History 3')
-        self.assertGreaterEqual(self.simpleproduct.get_history(), 3)
+        self.assertGreaterEqual(len(self.simpleproduct.get_history()), 3)
         strg = self.simpleproduct.get_history_str()
         self.assertIsNotNone(strg)
         self.assertGreater(len(strg), 0)

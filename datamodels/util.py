@@ -60,6 +60,7 @@ processing the MIRI data models.
              hdulist provided as input.
 09 Apr 2018: Added 'N/A' to the lists of valid CDP options. 'N/A' is
              replaced by 'ANY' when looking up a CDP. Added FASTGRPAVG.
+27 Apr 2018: Use str(e) to obtain an exception message rather than e.message.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -524,7 +525,7 @@ def assert_products_equal(a, b, arrays='data', tables=''):
                         (a.__class__.__name__, b.__class__.__name__)
                     strg += "\n  \'%s\' table attribute has changed \n" % \
                         table_attribute
-                    strg += "(%s)" % e.message
+                    strg += "(%s)" % str(e)
                     strg += "\n" + str(first)
                     strg += "\n\t c.f.\n" + str(second)
                     raise TypeError(strg)   
@@ -880,7 +881,7 @@ def verify_cdp_file(filename, datatype=None, overwrite=False, keepfile=False):
             datamodel.save( outputfile, overwrite=overwrite )
         except Exception as e:
             
-            strg = e.message +"\nNot possible to save data product to a file."
+            strg = str(e) + "\nNot possible to save data product to a file."
             if not keepfile:
                 # Delete the data model to close the temporary file.
                 del datamodel
