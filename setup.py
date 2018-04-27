@@ -16,6 +16,7 @@ Setup file for installing the MiriTE software
 15 Jan 2018: MiriTools and MiriSimulators levels removed from package.
 22 Jan 2018: Removed empty mirimsim simulator package.
 25 Jan 2018: Added missing url metadata.
+27 Apr 2018: Require Python 3.5.
 
 @author: MIRI Software Team
 
@@ -203,7 +204,7 @@ setup(
     author_email="mirisim@roe.ac.uk",
     license="See LICENCE file",
     platforms=["Linux", "Mac OS X"],
-    python_requires='~=2.7',
+    python_requires='>=3.5',
     packages=['miri',
               'miri.tools', 'miri.tools.tests',
               'miri.datamodels', 'miri.datamodels.tests',
