@@ -55,6 +55,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 13 Feb 2018: Corrected a typo in the coeffs.setter. Added plot_goeffs,
              get_coeffs_str, apply, get_forward_table and get_reverse_table
              functions and updated the tests run in the main program.
+20 Apr 2018: Corrected a bug where the second to last entry of the reverse_table
+             could end up containing zero.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -417,7 +419,7 @@ class MiriLinearityModel(MiriMeasuredModel):
         fmax = 0.0
         for icoeff in range(0, ncoeffs):
             fmax += self.data[icoeff,row,column] * (float(max_dn) ** icoeff)
-        max_dn_out = int(fmax)
+        max_dn_out = int(fmax+0.5)
         # Initialise a reverse table
         rarray = np.zeros([max_dn_out+1])
         
@@ -449,6 +451,8 @@ class MiriLinearityModel(MiriMeasuredModel):
                             rarray[rundn] = rarray[rundn-1] + inc
             if rarray[max_dn_out] == 0:
                 rarray[max_dn_out] = max_dn
+            if rarray[max_dn_out-1] == 0:
+                rarray[max_dn_out-1] = (rarray[max_dn_out-2] + rarray[max_dn_out])/2.0
             
         # Convert the output array to integer.
         reverse_array = np.round(rarray).astype(np.int)
