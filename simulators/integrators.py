@@ -145,6 +145,7 @@ effects simulated by SCASim.
              renamed to better names.
 26 Apr 2018: Corrected exception raising syntax for Python 3.
 27 Apr 2018: In Python 3 all integers are long. Removed "L" syntax.
+             Changed sys.maxint for sys.maxsize for Python 3.
 
 @author: Steven Beard (UKATC)
 
@@ -166,7 +167,8 @@ import numpy as np
 # The maximum allowable signed integer value. This is the largest particle
 # count which can be read from a Poisson integrator. The bucket size
 # will be set to this value if not specified.
-_MAXINT = sys.maxint
+#_MAXINT = sys.maxint # Python 2
+_MAXINT = sys.maxsize//2 # Python 3
 
 # The maximum level size of the expected count before the scipy.stats.poisson
 # function overflows. It must be significantly less than _MAXINT to prevent

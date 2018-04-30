@@ -61,6 +61,8 @@ processing the MIRI data models.
 09 Apr 2018: Added 'N/A' to the lists of valid CDP options. 'N/A' is
              replaced by 'ANY' when looking up a CDP. Added FASTGRPAVG.
 27 Apr 2018: Use str(e) to obtain an exception message rather than e.message.
+             Replaced deprecated boolean - operator with logical_xor
+             in assert_products_equal function. 
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -486,7 +488,8 @@ def assert_products_equal(a, b, arrays='data', tables=''):
             second = getattr(b, array_attribute)
 
             if first is not None and second is not None:
-                discr_nan = (np.isnan(first) - np.isnan(second)).sum() == 0
+#                 discr_nan = (np.isnan(first) - np.isnan(second)).sum() == 0
+                discr_nan = not np.any(np.logical_xor(np.isnan(first), np.isnan(second)))
                 discr_all = np.allclose(np.nan_to_num(first),
                                         np.nan_to_num(second))
 
