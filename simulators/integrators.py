@@ -145,7 +145,8 @@ effects simulated by SCASim.
              renamed to better names.
 26 Apr 2018: Corrected exception raising syntax for Python 3.
 27 Apr 2018: In Python 3 all integers are long. Removed "L" syntax.
-             Changed sys.maxint for sys.maxsize for Python 3.
+             Changed sys.maxint for sys.maxsize for Python 3. Replaced
+             xrange with range. Corrected bug in np.where statement.
 
 @author: Steven Beard (UKATC)
 
@@ -439,6 +440,8 @@ class PoissonIntegrator(object):
         Apply an integrator function to the data.
         This is a perfectly linear integrator.
         
+        NOTE: data must be a numpy array.
+        
         """
         if self.verbose > 6:
             self.logger.debug("+++Perfect integrator")
@@ -580,7 +583,7 @@ class PoissonIntegrator(object):
             if self.flux.shape == self.shape:      
                 # The input flux array must always be positive.
                 # Replace negative values with zero.
-                arenegative = np.where(flux < 0.0)
+                arenegative = np.where(self.flux < 0.0)
                 self.flux[arenegative] = 0.0
        
                 # Apply the integrator function
@@ -1532,9 +1535,9 @@ class ImperfectIntegrator(PoissonIntegrator):
                 # The energy array is partly inside the particle count array,
                 # so more complex assignment is needed. (This is a lot less
                 # efficient than numpy slicing.)
-                for rw in xrange(rowstart,rowend):
+                for rw in range(rowstart,rowend):
                     if rw >=0 and rw < self.expected_count.shape[0]:
-                        for cl in xrange(colstart,colend):
+                        for cl in range(colstart,colend):
                             if cl >=0 and cl < self.expected_count.shape[1]:
                                 erw = rw - rowstart
                                 ecl = cl - colstart

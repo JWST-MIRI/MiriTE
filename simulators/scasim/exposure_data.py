@@ -99,6 +99,7 @@ It has been superceeded by the datamodels/miri_exposure_model.py
 08 Aug 2017: Log an error instead of raising an exception when there are
              missing header keywords.
 11 Sep 2017: Ensure EXPSTART, EXPMID and EXPEND keywords are MJD.
+30 Apr 2018: Replaced xrange with range for Python 3.
 
 @author: Steven Beard
 
@@ -1605,9 +1606,9 @@ class ExposureData(object):
         count = np.zeros([self.nints_file, self.ngroups_file,
                             1, 1], dtype=np.float32)
         
-        for intg in xrange(0, self.nints):
+        for intg in range(0, self.nints):
             intg_file = intg // self.intavg
-            for grp in xrange(0, self.ngroups):
+            for grp in range(0, self.ngroups):
                 grp_file = grp // self.grpavg
                 output[intg_file,grp_file,:,:] += \
                     self.data[intg,grp,:,:]

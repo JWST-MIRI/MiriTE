@@ -333,6 +333,7 @@ Calibration Data Products (CDPs).
 20 Apr 2018: Non-linearity correction is only possible when amplifier gain
              is also simulated.
 26 Apr 2018: Corrected exception raising syntax for Python 3.
+             Corrected syntax of np.where() when looking for NaN values.
 
 @author: Steven Beard
 
@@ -2112,7 +2113,7 @@ class SensorChipAssembly(object):
             # Check the amount of flux is within a sensible range.
             # Give a warning if the flux is likely to saturate the
             # detector. Reject any truly silly flux levels.
-            wherenan = np.where( flux == np.nan )
+            wherenan = np.where( np.isnan(flux) )
             if len(wherenan[0]) > 0:
                 strg = "***Input flux array contains "
                 strg += "%d NaN values." % len(wherenan[0])
