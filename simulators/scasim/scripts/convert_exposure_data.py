@@ -33,6 +33,7 @@
 # 04 Dec 2017: Added missing "overwrite" parameter to functions.
 # 27 Apr 2018: Corrected exception syntax for Python 3.
 # 17 May 2018: Python 3: Converted dictionary keys return into a list.
+# 18 May 2018: Changed deprecated logger.warn() to logger.warning().
 # 
 # @author: Steven Beard (UKATC)
 #
@@ -120,7 +121,7 @@ def convert_dhas_to_level1b( inputfile, outputfile, verbose=0, overwrite=False )
             refrows = 0
     except KeyError:
         # No reference output
-        LOGGER.warn("No reference output data. Cannot deduce size of reference image.")
+        LOGGER.warning("No reference output data. Cannot deduce size of reference image.")
         refcolumns = 0
         refrows = 0
     

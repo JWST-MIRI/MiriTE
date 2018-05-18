@@ -112,6 +112,7 @@ http://miri.ster.kuleuven.be/bin/view/Internal/CalDataProducts
              F2550WR is a redundant filter.
 26 Apr 2018: Corrected exception raising syntax for Python 3.
 17 May 2018: Python 3: Converted dictionary keys return into a list.
+18 May 2018: Changed deprecated logger.warn() to logger.warning().
 
 Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -489,7 +490,7 @@ def get_cdp(cdptype, detector, model='FM', readpatt='ANY', channel='ANY',
                     detector = 'MIRIFULONG'
             strg = "Detector specification is ambiguous. Trying detector=%s" % \
                 str(detector)
-            mylogger.warn(strg)
+            mylogger.warning(strg)
 
         if detector:
             kwlist.append(detector)
@@ -646,7 +647,7 @@ class MiriCDPFolder(object):
         # Give a warning if no files have been found. This will cause
         # all subsequent attempts to match or get a CDP file to fail.
         if not self.cdp_files_available:
-            self.logger.warn("No CDP files available!")
+            self.logger.warning("No CDP files available!")
 
         # Find the documents associated with the calibration files
         self.cdp_docs_available = []
@@ -876,7 +877,7 @@ class MiriCDPFolder(object):
          
         """
         if self.sftp is None:
-            self.logger.warn("Matching against local CDP cache only.")
+            self.logger.warning("Matching against local CDP cache only.")
         
         # Build a list of substrings that must be contained and must be avoided.
         match_strings = []
@@ -1166,7 +1167,7 @@ class MiriCDPFolder(object):
                 # If the CDP names only differ in the version number, there will be no more than
                 # 2 characters different on average.
                 if _diff_count_list(candidates) > 2:
-                    self.logger.warn(strg)
+                    self.logger.warning(strg)
                 else:
                     self.logger.debug(strg)
                 return candidates[-1]
@@ -1535,7 +1536,7 @@ class MiriCDPInterface(object):
                     strg += "*** on the command line and answer the prompt"
                     strg += " to create a hostkey.\n"
                     strg += 60 * "*"
-                    self.logger.warn(strg)
+                    self.logger.warning(strg)
                     cnopts = pysftp.CnOpts()
                     cnopts.hostkeys = None
                     # Connect without host checking
@@ -1947,7 +1948,7 @@ class MiriCDPInterface(object):
                         self.logger.error(strg)
             else:
                 strg = " Ignoring empty file name \'%s\'" % str(cdp_file)
-                self.logger.warn(strg)
+                self.logger.warning(strg)
 #         # Ensure the connection is closed.
 #         self._close()
         return local_filename
@@ -2137,7 +2138,7 @@ class MiriCDPInterface(object):
                         self.logger.debug(strg)
                 else:
                     strg = " Ignoring empty document name \'%s\'" % str(cdp_doc)
-                    self.logger.warn(strg)
+                    self.logger.warning(strg)
         # Ensure the connection is closed.
         self._close()
         return files_copied

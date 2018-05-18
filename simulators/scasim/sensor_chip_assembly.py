@@ -335,6 +335,7 @@ Calibration Data Products (CDPs).
 26 Apr 2018: Corrected exception raising syntax for Python 3.
              Corrected syntax of np.where() when looking for NaN values.
 17 May 2018: Python 3: Converted dictionary keys return into a list.
+18 May 2018: Changed deprecated logger.warn() to logger.warning().
 
 @author: Steven Beard
 
@@ -1004,7 +1005,7 @@ class SensorChipAssembly(object):
         if not simulate_gain and simulate_nonlinearity and NONLINEARITY_BY_TABLE:
             strg = "Cannot simulate nonlinearity unless amplifier gain is also simulated"
             strg += "\n   Nonlinearity simulation turned off."
-            self.logger.warn(strg)
+            self.logger.warning(strg)
             simulate_nonlinearity = False
             
         self.set_simulation_flags(readout_mode, qe_adjust=qe_adjust,
@@ -1142,7 +1143,7 @@ class SensorChipAssembly(object):
                 else:
                     strg = "***Cosmic ray library is not defined."
                 strg += " Falling back to RANDOM mode."
-                self.logger.warn(strg)
+                self.logger.warning(strg)
                 self.cosmic_ray_env = load_cosmic_ray_random(
                                                     cosmic_ray_mode=cr_mode,
                                                     verbose=self._verbose,
@@ -1262,7 +1263,7 @@ class SensorChipAssembly(object):
            self.simulate_drifts != simulate_drifts or \
            self.simulate_latency != simulate_latency:
             if self.detector is not None:
-                self.logger.warn("Simulation flags have changed. " + \
+                self.logger.warning("Simulation flags have changed. " + \
                         "Restarting simulation with a new detector. " + \
                         "Latent effects up to this point will be erased.")
                 del self.detector
@@ -1328,7 +1329,7 @@ class SensorChipAssembly(object):
                 illum_shape
             strg += "Truncating to detector size of %d x %d pixels." % \
                 (self._sca['ILLUMINATED_COLUMNS'], self._sca['ILLUMINATED_ROWS'])
-            self.logger.warn(strg)
+            self.logger.warning(strg)
             self.illumination_map.truncate([self._sca['ILLUMINATED_COLUMNS'],
                                             self._sca['ILLUMINATED_ROWS']] )
 
@@ -1435,7 +1436,7 @@ class SensorChipAssembly(object):
                     strg += "may be too large for the bad pixel or dark "
                     strg += "frames, which expect up to %d x %d. " % fullframe
                     strg += "Try --nobadpixels --nodark."
-                    self.logger.warn( strg )
+                    self.logger.warning( strg )
                     
         # Give a warning if the input subarray mode is smaller than the
         # output subarray mode.
@@ -1446,7 +1447,7 @@ class SensorChipAssembly(object):
                     strg = "NOTE: Output subarray (%d x %d) " % oshape
                     strg += "is larger than input array (%d x %d)." % ishape
                     strg += " There will be some gaps in the output data."
-                    self.logger.warn( strg )
+                    self.logger.warning( strg )
        
         # The previous flux data is invalid.
         self.flux = None
@@ -1529,7 +1530,7 @@ class SensorChipAssembly(object):
                 illum_shape
             strg += "Truncating to detector size of %d x %d pixels." % \
                 (self._sca['ILLUMINATED_COLUMNS'], self._sca['ILLUMINATED_ROWS'])
-            self.logger.warn(strg)
+            self.logger.warning(strg)
             illumination_map.truncate([self._sca['ILLUMINATED_COLUMNS'],
                                        self._sca['ILLUMINATED_ROWS']] )
             
@@ -2119,14 +2120,14 @@ class SensorChipAssembly(object):
                 strg = "***Input flux array contains "
                 strg += "%d NaN values." % len(wherenan[0])
                 strg += " These will be replaced by 0.0."
-                self.logger.warn(strg)
+                self.logger.warning(strg)
                 flux[ wherenan ] = 0.0 
             
             if flux.min() < 0.0:
                 whereneg = np.where( flux < 0.0 )
                 strg = "***Input flux array contains "
                 strg += "%d negative values." % len(whereneg[0])
-                self.logger.warn(strg)
+                self.logger.warning(strg)
 
             # Calculate an approximate flux that would saturate the detectors
             # after only one frame time.
@@ -2171,7 +2172,7 @@ class SensorChipAssembly(object):
                 strg += "is greater than first frame "
                 strg += "saturation level of %g photons/s/pixel." % \
                     float(saturation)
-                self.logger.warn(strg)
+                self.logger.warning(strg)
             
             if self.fringe_map_data is None:
                 self.flux = flux
@@ -2607,12 +2608,12 @@ class SensorChipAssembly(object):
                 strg = "\nKeyword %s cannot be set to %s." % (keyw, str(value))
                 strg += " " + str(e)
                 strg += " Ignored."
-                self.logger.warn(strg)
+                self.logger.warning(strg)
             except ValueError as e:
                 strg = "\nKeyword %s cannot be set to %s." % (keyw, str(value))
                 strg += " " + str(e)
                 strg += " Ignored."
-                self.logger.warn(strg)
+                self.logger.warning(strg)
              
         # Copy comment and history records to the exposure data FITS header.
         comments = self.metadata.get_comments()
@@ -4417,7 +4418,7 @@ def simulate_sca(inputfile, outputfile, detectorid, scale=1.0, fringemap=None,
     """
     strg = "\nsimulate_sca function is now deprecated. "
     strg += "Please use the SensorChipAssembly.simulate_files() class method."
-    logger.warn(strg)
+    logger.warning(strg)
     # Create an sca object and then run the simuation.
     sca = SensorChipAssembly1()
     sca.simulate_files(inputfile, outputfile, detectorid, scale=scale,
@@ -4715,7 +4716,7 @@ def simulate_sca_list(inputfile, outputfile, detectorid, scale=1.0,
     """
     strg = "\nsimulate_sca_list function is now deprecated. "
     strg += "Please use the SensorChipAssembly.simulate_files() class method."
-    logger.warn(strg)
+    logger.warning(strg)
     # Create an sca object and then run the simuation.
     sca = SensorChipAssembly1()
     sca.simulate_files(inputfile, outputfile, detectorid, scale=scale,
@@ -4996,7 +4997,7 @@ def simulate_sca_pipeline(illumination_map, scale=1.0,
     """
     strg = "\nsimulate_sca_pipeline function is now deprecated. "
     strg += "Please use the SensorChipAssembly.simulate_pipe() class method."
-    logger.warn(strg)
+    logger.warning(strg)
     # Create an sca object and then run the simuation.
     sca = SensorChipAssembly1()
     exposure_data = sca.simulate_pipe(illumination_map, scale=scale,
