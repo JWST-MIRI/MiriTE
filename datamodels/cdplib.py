@@ -1438,7 +1438,7 @@ class MiriCDPInterface(object):
                 while not ftp_passwd:
                     # getpass does not work under Windows.
                     if sys.platform.startswith("win"):
-                        ftp_passwd = raw_input( \
+                        ftp_passwd = input( \
                                     'Please enter ftp password for %s:' % \
                                     ftp_user)
                     else:

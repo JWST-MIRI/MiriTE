@@ -226,7 +226,7 @@ class TestSensorChipAssembly(unittest.TestCase):
         # small to accommodate them.
         # For all possible detector modules
         sca = SensorChipAssembly1(logger=LOGGER)
-        for detector in detector_properties['DETECTORS_DICT'].keys():
+        for detector in list(detector_properties['DETECTORS_DICT'].keys()):
             if VERBOSE:
                 print( "\nTesting detector", detector, "with readout modes: ", \
                        end='')
@@ -235,7 +235,7 @@ class TestSensorChipAssembly(unittest.TestCase):
                 random.shuffle(modes_to_test)
             else:
                 nsamples = int(0.5 + \
-                               len(detector_properties['READOUT_MODE'].keys()) * \
+                               len(list(detector_properties['READOUT_MODE'].keys())) * \
                                TEST_MODE_COVERAGE)
                 nsamples = max(nsamples, MINSAMPLES)
                 modes_to_test = random.sample( \

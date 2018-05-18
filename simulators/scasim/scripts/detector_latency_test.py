@@ -76,7 +76,7 @@ def ramps_to_slopes( array4d, grptime=1.0, diff_only=False ):
         
     else:
         # A full slope derived from linear regression.
-        timearray = grptime * np.array( range(0, ngroups) )
+        timearray = grptime * np.array( list(range(0, ngroups)) )
         for intg in range(0, nints):
             for row in range(0, rows):
                 for column in range(0, columns):

@@ -2720,7 +2720,7 @@ class SensorChipAssembly(object):
             vparity = intensity_metadata['VPARITY']
         else:
             vparity = None
-        if 'V3I_YANG' in intensity_metadata.keys():
+        if 'V3I_YANG' in list(intensity_metadata.keys()):
             v3yangle = intensity_metadata['V3I_YANG']
         else:
             v3yangle = None

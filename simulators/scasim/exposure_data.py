@@ -1570,7 +1570,7 @@ class ExposureData(object):
             output = (self.data[:,-1,:,:] - self.data[:,0,:,:]) / float(timediff)
         else:
             # Full straight line fit
-            timearray = grptime * np.array( range(0, self.ngroups) )
+            timearray = grptime * np.array( list(range(0, self.ngroups)) )
             for intg in range(0, self.nints):
                 for row in range(0, self.rows):
                     for column in range(0, self.columns):

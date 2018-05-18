@@ -276,7 +276,7 @@ def convert_level1b_to_dhas( inputfile, outputfile, verbose=0, overwrite=False )
     # NOTE: No attempt is made to translate between different metadata standards.
     newheader = pyfits.Header()
     fits_dict = input_model.fits_metadata_dict()
-    for kwd in (fits_dict.keys()):
+    for kwd in (list(fits_dict.keys())):
         (fitshdu, fitskw, fitscomment) = fits_dict[kwd]
         if fitshdu == 'PRIMARY':
             try:
