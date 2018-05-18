@@ -19,6 +19,7 @@ ParameterFileManager class.
 16 Mar 2017: Removed unreliable '.' directory from test_find_files_matching
              function.
 26 Mar 2018: Changed 'nosuchfile' to something even less likely to exist.
+17 May 2018: Python 3: Converted dictionary keys return into a list.
 
 @author: Steven Beard (UKATC)
 
@@ -84,7 +85,7 @@ class TestParameterFileManager(unittest.TestCase):
         # Look up a few parameters from the ParameterFileManager object.
         # All the keywords returned by keys() must exist and contain
         # valid values.
-        kwlist = self.pfmobject.keys()
+        kwlist = list(self.pfmobject.keys())
         for kw in kwlist:
             self.assertTrue(kw in self.pfmobject)
 #            self.assertTrue(self.pfmobject.has_key(kw))

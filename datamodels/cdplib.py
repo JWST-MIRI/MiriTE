@@ -111,6 +111,7 @@ http://miri.ster.kuleuven.be/bin/view/Internal/CalDataProducts
              Removed 'FLENS' from the filter doc strings and mentioned that
              F2550WR is a redundant filter.
 26 Apr 2018: Corrected exception raising syntax for Python 3.
+17 May 2018: Python 3: Converted dictionary keys return into a list.
 
 Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -437,7 +438,7 @@ def get_cdp(cdptype, detector, model='FM', readpatt='ANY', channel='ANY',
         strg = "Data type \'%s\' is not a recognised MIRI CDP.\n" % cdptype
         strg += "It must be one of: "
         start = True
-        for key in CDP_DICT.keys():
+        for key in list(CDP_DICT.keys()):
             if start:
                 start = False
             else:

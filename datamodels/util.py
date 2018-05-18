@@ -63,6 +63,7 @@ processing the MIRI data models.
 27 Apr 2018: Use str(e) to obtain an exception message rather than e.message.
              Replaced deprecated boolean - operator with logical_xor
              in assert_products_equal function. 
+17 May 2018: Python 3: Converted dictionary keys return into a list.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -356,7 +357,7 @@ def open( init=None, astype=None):
                     warnings.warn(strg)
                 
                 header = hdulist[0].header
-                header_keys = header.keys()
+                header_keys = list(header.keys())
                 if datatype:
                     # The data type in the file header is overriden.
                     kwlist.append(datatype)

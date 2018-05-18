@@ -147,6 +147,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 24 Jan 2018: Added association metadata to set_observation_metadata.
 11 Apr 2018: FLENS added to filter list and "N/A" added to some options in
              data model metadata.
+17 May 2018: Python 3: Converted dictionary keys return into a list.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -1476,7 +1477,7 @@ class MiriDataModel(DataModel):
             # Copy all metadata apart from keyword matches specified
             # in the ignore list.
             fitskwdict = other.fits_metadata_dict()
-            metakeys = fitskwdict.keys()
+            metakeys = list(fitskwdict.keys())
             notcopied = 0
             names = []
             for key in metakeys:
@@ -1802,7 +1803,7 @@ class MiriDataModel(DataModel):
         """
         hlist = []
         for hitem in self.history:
-            if 'description' in hitem.keys():
+            if 'description' in list(hitem.keys()):
                 hlist.append( str(hitem['description']) )
         return hlist
         
@@ -1815,11 +1816,11 @@ class MiriDataModel(DataModel):
         """
         strg = ''
         for hitem in self.history:
-            if 'description' in hitem.keys():
+            if 'description' in list(hitem.keys()):
                 hstrg = str(hitem['description'])
             else:
                 hstrg = ''
-            if 'time' in hitem.keys():
+            if 'time' in list(hitem.keys()):
                 tstrg = str(hitem['time'])
             else:
                 tstrg = ''
@@ -1969,7 +1970,7 @@ class MiriDataModel(DataModel):
         # TODO: Modify to use walk_schema
         if 'properties' in self.schema:
             # The schema has objects defined at the top level.
-            for subkey in self.schema['properties'].keys():
+            for subkey in list(self.schema['properties'].keys()):
                 if self.schema['properties'][subkey]['type'] == 'data':
                     fits_hdu = self.schema['properties'][subkey]['fits_hdu']
                     if hduname == fits_hdu:
@@ -1979,7 +1980,7 @@ class MiriDataModel(DataModel):
             # The schema objects can be found at the next level down.
             for sublevel in self.schema['allOf']:
                 if 'properties' in sublevel:
-                    for subkey in self.schema['properties'].keys():
+                    for subkey in list(self.schema['properties'].keys()):
                         if self.schema['properties'][subkey]['type'] == 'data':
                             fits_hdu = \
                                 self.schema['properties'][subkey]['fits_hdu']
@@ -2993,7 +2994,7 @@ class MiriDataModel(DataModel):
         """
         # Define a function to be applied at each level of the schema.
         def schema_to_string(subschema, path, combiner, ctx, recurse):
-            keys = subschema.keys()
+            keys = list(subschema.keys())
             #level = len(path.split('.'))
             for key in keys:
                 value = subschema.get(key)

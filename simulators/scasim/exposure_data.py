@@ -100,6 +100,7 @@ It has been superceeded by the datamodels/miri_exposure_model.py
              missing header keywords.
 11 Sep 2017: Ensure EXPSTART, EXPMID and EXPEND keywords are MJD.
 30 Apr 2018: Replaced xrange with range for Python 3.
+17 May 2018: Python 3: Converted dictionary keys return into a list.
 
 @author: Steven Beard
 
@@ -469,7 +470,7 @@ class Metadata(object):
             raise TypeError(strg)
 
         metadict = data_object.fits_metadata_dict()
-        metakeys = metadict.keys()
+        metakeys = list(metadict.keys())
         for keyw in metakeys:
             (fitshdu, fitskey, fitscomment) = metadict[keyw]
             value = data_object[keyw]
@@ -576,7 +577,7 @@ class Metadata(object):
         if add_description:
             fitsheader.add_comment(self.description)
         
-        for key in self.keys():
+        for key in list(self.keys()):
 
             # Check the keyword name is a valid FITS keyword.
             if not self._key_name_valid_fits(key):
@@ -641,7 +642,7 @@ class Metadata(object):
             strg += " \'%s\'" % self.description
         strg += ":\n"
         # Add a description for each known keyword
-        for key in self.keys():
+        for key in list(self.keys()):
             value = self._kwdict[key]
             strg += "%8s = %s\n" % (key, str(value))
         # Add any comment and history records contained in the

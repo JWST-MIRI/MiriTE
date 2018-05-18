@@ -334,6 +334,7 @@ Calibration Data Products (CDPs).
              is also simulated.
 26 Apr 2018: Corrected exception raising syntax for Python 3.
              Corrected syntax of np.where() when looking for NaN values.
+17 May 2018: Python 3: Converted dictionary keys return into a list.
 
 @author: Steven Beard
 
@@ -2413,7 +2414,7 @@ class SensorChipAssembly(object):
         metadata.from_data_object( self.illumination_map )
         
         # Import the primary metadata (but ignore the TYPE keyword)
-        for key in metadata.keys():
+        for key in list(metadata.keys()):
             if key == 'TYPE':
                 continue # Output data will have a different TYPE
             self.metadata[key] = metadata[key]
@@ -2597,7 +2598,7 @@ class SensorChipAssembly(object):
             self.logger.debug( str(self.metadata) )
 
         # Copy primary metadata to the exposure data FITS header.
-        for keyw in self.metadata.keys():
+        for keyw in list(self.metadata.keys()):
             value = self.metadata[keyw]
             try:
                 self.exposure_data.set_fits_keyword(keyw, value,
@@ -2631,7 +2632,7 @@ class SensorChipAssembly(object):
         # to the exposure data FITS header.
         # NOTE: Only the first 2 axes of the illumination model WCS
         # parameters are relevant.
-        if 'WCSAXES' in intensity_metadata.keys():
+        if 'WCSAXES' in list(intensity_metadata.keys()):
             wcsaxes = intensity_metadata['WCSAXES']
         else:
             wcsaxes = 2
@@ -2656,23 +2657,23 @@ class SensorChipAssembly(object):
             ctype_kw = 'CTYPE%d' % axis1
             cunit_kw = 'CUNIT%d' % axis1
             cdelt_kw = 'CDELT%d' % axis1
-            if crpix_kw in intensity_metadata.keys():
+            if crpix_kw in list(intensity_metadata.keys()):
                 crpix.append( intensity_metadata[crpix_kw] )
             else:
                 crpix.append( 0.0 )
-            if crval_kw in intensity_metadata.keys():
+            if crval_kw in list(intensity_metadata.keys()):
                 crval.append( intensity_metadata[crval_kw] )
             else:
                 crval.append( 0.0 )
-            if ctype_kw in intensity_metadata.keys():
+            if ctype_kw in list(intensity_metadata.keys()):
                 ctype.append( intensity_metadata[ctype_kw] )
             else:
                 ctype.append( '' )
-            if cunit_kw in intensity_metadata.keys():
+            if cunit_kw in list(intensity_metadata.keys()):
                 cunit.append( intensity_metadata[cunit_kw] )
             else:
                 cunit.append( '' )
-            if cdelt_kw in intensity_metadata.keys():
+            if cdelt_kw in list(intensity_metadata.keys()):
                 cdelt.append( intensity_metadata[cdelt_kw] )
             else:
                 cdelt.append( 1.0 )
@@ -2680,7 +2681,7 @@ class SensorChipAssembly(object):
             for other in range(0, 2):
                 other1 = other + 1
                 pc_kw = 'PC%d_%d' % (axis1, other1)
-                if pc_kw in intensity_metadata.keys():
+                if pc_kw in list(intensity_metadata.keys()):
                     pc_defined = True
                     pc[axis,other] = intensity_metadata[pc_kw]
 
@@ -2690,31 +2691,31 @@ class SensorChipAssembly(object):
             pc = None
 
         # Additional, WCS-related information.
-        if 'S_REGION' in intensity_metadata.keys():
+        if 'S_REGION' in list(intensity_metadata.keys()):
             s_region = intensity_metadata['S_REGION']
         else:
             s_region = None
-        if 'WAVSTART' in intensity_metadata.keys():
+        if 'WAVSTART' in list(intensity_metadata.keys()):
             waverange_start = intensity_metadata['WAVSTART']
         else:
             waverange_start = None
-        if 'WAVEND' in intensity_metadata.keys():
+        if 'WAVEND' in list(intensity_metadata.keys()):
             waverange_end = intensity_metadata['WAVEND']
         else:
             waverange_end = None
-        if 'SPORDER' in intensity_metadata.keys():
+        if 'SPORDER' in list(intensity_metadata.keys()):
             spectral_order = intensity_metadata['SPORDER']
         else:
             spectral_order = None
-        if 'V2_REF' in intensity_metadata.keys():
+        if 'V2_REF' in list(intensity_metadata.keys()):
             v2_ref = intensity_metadata['V2_REF']
         else:
             v2_ref = None
-        if 'V3_REF' in intensity_metadata.keys():
+        if 'V3_REF' in list(intensity_metadata.keys()):
             v3_ref = intensity_metadata['V3_REF']
         else:
             v3_ref = None
-        if 'VPARITY' in intensity_metadata.keys():
+        if 'VPARITY' in list(intensity_metadata.keys()):
             vparity = intensity_metadata['VPARITY']
         else:
             vparity = None
@@ -2722,19 +2723,19 @@ class SensorChipAssembly(object):
             v3yangle = intensity_metadata['V3I_YANG']
         else:
             v3yangle = None
-        if 'RA_REF' in intensity_metadata.keys():
+        if 'RA_REF' in list(intensity_metadata.keys()):
             ra_ref = intensity_metadata['RA_REF']
         else:
             ra_ref = None
-        if 'S_REGION' in intensity_metadata.keys():
+        if 'S_REGION' in list(intensity_metadata.keys()):
             s_region = intensity_metadata['S_REGION']
         else:
             s_region = None
-        if 'DEC_REF' in intensity_metadata.keys():
+        if 'DEC_REF' in list(intensity_metadata.keys()):
             dec_ref = intensity_metadata['DEC_REF']
         else:
             dec_ref = None
-        if 'ROLL_REF' in intensity_metadata.keys():
+        if 'ROLL_REF' in list(intensity_metadata.keys()):
             roll_ref = intensity_metadata['ROLL_REF']
         else:
             roll_ref = None
@@ -5303,7 +5304,7 @@ if __name__ == '__main__':
         mode = 'SLOW'
         inttime = 60.0
         print("\nTesting simulate_files with all readout modes...\n" + (50 * "*"))
-        for mode in detector_properties['READOUT_MODE'].keys():    
+        for mode in list(detector_properties['READOUT_MODE'].keys()):    
             # Use a longer integration time for SLOW mode.
             if mode == 'SLOW':
                 inttime = 60.0

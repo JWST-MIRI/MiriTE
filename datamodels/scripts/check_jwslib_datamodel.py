@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 #
 # 27 May 2015: Replaced pyfits with astropy.io.fits
-
+# 17 May 2018: Python 3: Converted dictionary keys return into a list.
 
 """
 
@@ -56,7 +56,7 @@ def save_old_data( filename, data, header=None, overwrite=False, add_comment=Fal
         fitsheader.add_comment("This is a comment in the original header.")
             
     if header is not None:
-        for key in header.keys():
+        for key in list(header.keys()):
             fitsheader.update(key, header[key], "")
             
     hdulist = pyfits.HDUList([])

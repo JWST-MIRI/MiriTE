@@ -83,7 +83,7 @@ def get_cdp_metadata( filename  ):
 
         if hdulist is not None:
             header = hdulist[0].header
-            header_keys = header.keys()
+            header_keys = list(header.keys())
             if 'REFTYPE' in header or 'REFTYPE' in header_keys:
                 # There is a new data type keyword in the header.
                 datatype = header['REFTYPE']

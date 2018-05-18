@@ -98,6 +98,7 @@ http://miri.ster.kuleuven.be/bin/view/Internal/DataQualityFlags
              pipeline specification.
 17 Mar 2017: Corrected some documentation typos.
 14 Nov 2017: Added some new DQ flags.
+17 May 2018: Python 3: Converted dictionary keys return into a list.
 
 @author: Ruyman Azzollini (DIAS), Steven Beard (UKATC)
 
@@ -798,7 +799,7 @@ class FlagsTable(object):
         """
         # Convert the flag values dictionary into a numpy array.
         valuesarray = []
-        for key in self.flagvalues.keys():
+        for key in list(self.flagvalues.keys()):
             valuesarray.append(self.flagvalues[key])
         valuesarray = np.array(valuesarray)
         # Make a unique version of the array. If all the entries are
