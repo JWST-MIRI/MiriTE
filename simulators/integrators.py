@@ -147,6 +147,7 @@ effects simulated by SCASim.
 27 Apr 2018: In Python 3 all integers are long. Removed "L" syntax.
              Changed sys.maxint for sys.maxsize for Python 3. Replaced
              xrange with range. Corrected bug in np.where statement.
+18 May 2018: Silence the FutureWarning from np.linalg.lstsq.
 
 @author: Steven Beard (UKATC)
 
@@ -189,7 +190,7 @@ def linear_regression(x, y):
     
     """
     matrix = np.vstack( [x, np.ones_like(x)] ).T
-    slope, intercept = np.linalg.lstsq(matrix,y)[0]
+    slope, intercept = np.linalg.lstsq(matrix,y,rcond=-1)[0]
     return (slope, intercept)
 
 
