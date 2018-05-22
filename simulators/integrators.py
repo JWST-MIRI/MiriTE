@@ -148,6 +148,9 @@ effects simulated by SCASim.
              Changed sys.maxint for sys.maxsize for Python 3. Replaced
              xrange with range. Corrected bug in np.where statement.
 18 May 2018: Silence the FutureWarning from np.linalg.lstsq.
+22 May 2018: Do not sample the Poisson function multiple times when reading
+             out quickly. The number of particles remains the same (Bug 439).
+             Rounding of extreme values changed from 4 to 6 decimal places.
 
 @author: Steven Beard (UKATC)
 
@@ -652,10 +655,13 @@ class PoissonIntegrator(object):
         Read the signal stored within the integrator and apply Poisson
         noise (if switched on).
         
+        NOTE: The nsamples parameter no longer has any effect on the
+        Poisson noise.
+                
         :Parameters:
         
         nsamples: int, optional, default=1
-            The number of samples from the Poisson distribution.
+            The number of samples made when reading out.
                 
         :Returns:
         
@@ -674,8 +680,7 @@ class PoissonIntegrator(object):
         if self.simulate_poisson_noise:
             # When the Poisson integrator is read out, the expected number of
             # particles is turned into an actual number of particles by making
-            # one or more samples from the Poisson distribution. The Poisson
-            # noise will be reduced in cases where more than one sample is made.
+            # a sample from the Poisson distribution.
             # Note that scipy.stats.poisson.rvs will report an exception if
             # any of the expected counts are zero or negative, so these are
             # filtered out. The function also fails with a domain error if it
@@ -687,7 +692,7 @@ class PoissonIntegrator(object):
                      self.expected_count.max())
                 self.logger.debug(strg)
             # Round extreme values.
-            rounded_diff = np.around(self.expected_count-self.last_count, 4)
+            rounded_diff = np.around(self.expected_count-self.last_count, 6)
             # Filter out zero, negative or bad values.
             where_zero = np.where(rounded_diff <= 0)
             if where_zero:
@@ -698,12 +703,15 @@ class PoissonIntegrator(object):
             try:
                 # Take a random sample from the Poisson distribution.
                 read_diff = scipy.stats.poisson.rvs(rounded_diff)
-                # If required, take more samples and average.
-                if nsamples > 1:
-                    for ii in range(1, nsamples):
-                        read_diff = read_diff + \
-                            scipy.stats.poisson.rvs(rounded_diff)
-                    read_diff = read_diff / float(nsamples)
+# The following code was making an incorrect assumption. Both the expected
+# number of particles and actual number of particles remain the same when
+# multiple reads are made in very quick succession.
+#                 # If required, take more samples and average.
+#                 if nsamples > 1:
+#                     for ii in range(1, nsamples):
+#                         read_diff = read_diff + \
+#                             scipy.stats.poisson.rvs(rounded_diff)
+#                     read_diff = read_diff / float(nsamples)
             except ValueError as e:
                 strg = "Poisson rvs error. Difference array:\n"
                 strg += str(rounded_diff)
