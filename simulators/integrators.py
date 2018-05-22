@@ -143,6 +143,9 @@ effects simulated by SCASim.
              every frame during Poisson noise calculation. Last readout
              should be with respect to the zeropoint. Some variables
              renamed to better names.
+22 May 2018: Do not sample the Poisson function multiple times when reading
+             out quickly. The number of particles remains the same (Bug 439).
+             Rounding of extreme values changed from 4 to 6 decimal places.
 
 @author: Steven Beard (UKATC)
 
@@ -679,7 +682,7 @@ class PoissonIntegrator(object):
                      self.expected_count.max())
                 self.logger.debug(strg)
             # Round extreme values.
-            rounded_diff = np.around(self.expected_count-self.last_count, 4)
+            rounded_diff = np.around(self.expected_count-self.last_count, 6)
             # Filter out zero, negative or bad values.
             where_zero = np.where(rounded_diff <= 0)
             if where_zero:
@@ -690,12 +693,15 @@ class PoissonIntegrator(object):
             try:
                 # Take a random sample from the Poisson distribution.
                 read_diff = scipy.stats.poisson.rvs(rounded_diff)
-                # If required, take more samples and average.
-                if nsamples > 1:
-                    for ii in range(1, nsamples):
-                        read_diff = read_diff + \
-                            scipy.stats.poisson.rvs(rounded_diff)
-                    read_diff = read_diff / float(nsamples)
+# The following code was making an incorrect assumption. Both the expected
+# number of particles and actual number of particles remain the same when
+# multiple reads are made in very quick succession.
+#                 # If required, take more samples and average.
+#                 if nsamples > 1:
+#                     for ii in range(1, nsamples):
+#                         read_diff = read_diff + \
+#                             scipy.stats.poisson.rvs(rounded_diff)
+#                     read_diff = read_diff / float(nsamples)
             except ValueError, e:
                 strg = "Poisson rvs error. Difference array:\n"
                 strg += str(rounded_diff)
