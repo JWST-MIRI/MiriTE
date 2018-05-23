@@ -263,4 +263,5 @@ setup(
              'simulators/scasim/scripts/plot_exposure_data.py',
              'simulators/scasim/scripts/scasim.py',
             ],
+    data_files=[('', ['LICENCE', 'README'])]
 )
