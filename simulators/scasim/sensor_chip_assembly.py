@@ -336,6 +336,7 @@ Calibration Data Products (CDPs).
              Corrected syntax of np.where() when looking for NaN values.
 17 May 2018: Python 3: Converted dictionary keys return into a list.
 18 May 2018: Changed deprecated logger.warn() to logger.warning().
+23 May 2018: Check for wait_time=None in Python 3.
 
 @author: Steven Beard
 
@@ -3516,7 +3517,7 @@ class SensorChipAssembly(object):
                 self.read_fringe_map(fringemap, ftype='FITS')
 
             # Wait for the given elapsed time.
-            if wait_time > 0.0:
+            if wait_time is not None and wait_time > 0.0:
                 self.wait(wait_time)
 
             # Simulate an exposure and return some simulated data.
@@ -3920,7 +3921,7 @@ class SensorChipAssembly(object):
             self.read_fringe_map(fringemap, ftype='FITS')
 
         # Wait for the given elapsed time.
-        if wait_time > 0.0:
+        if wait_time is not None and wait_time > 0.0:
             self.wait(wait_time)
     
         # Simulate an exposure and return some simulated data.
