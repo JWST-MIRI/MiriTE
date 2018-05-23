@@ -1789,8 +1789,12 @@ class MiriDataModel(DataModel):
         history_item = HistoryEntry({'description': history,
           'time': Time(datetime.datetime.now())})
 
-        # The data model stores history records in a list.
-        self.history.append(history_item)
+        # The data model can store history records in a list or in a dictionary
+        if isinstance(self.history, list):
+            self.history.append( history_item )
+        else:
+            #self.history = history_item
+            pass
         
     def get_history(self):
         """
@@ -1802,9 +1806,10 @@ class MiriDataModel(DataModel):
         
         """
         hlist = []
-        for hitem in self.history:
-            if 'description' in list(hitem.keys()):
-                hlist.append( str(hitem['description']) )
+        if isinstance(self.history, (tuple,list)):
+            for hitem in self.history:
+                if 'description' in list(hitem.keys()):
+                    hlist.append( str(hitem['description']) )
         return hlist
         
     def get_history_str(self):
@@ -1815,20 +1820,21 @@ class MiriDataModel(DataModel):
         
         """
         strg = ''
-        for hitem in self.history:
-            if 'description' in list(hitem.keys()):
-                hstrg = str(hitem['description'])
-            else:
-                hstrg = ''
-            if 'time' in list(hitem.keys()):
-                tstrg = str(hitem['time'])
-            else:
-                tstrg = ''
-            if hstrg:
-                strg += "HISTORY = \'" + hstrg + "\'"
-            if tstrg:
-                strg += "; TIME = \'" + tstrg + "\'"
-            strg += "\n"                        
+        if isinstance(self.history, (tuple,list)):
+            for hitem in self.history:
+                if 'description' in list(hitem.keys()):
+                    hstrg = str(hitem['description'])
+                else:
+                    hstrg = ''
+                if 'time' in list(hitem.keys()):
+                    tstrg = str(hitem['time'])
+                else:
+                    tstrg = ''
+                if hstrg:
+                    strg += "HISTORY = \'" + hstrg + "\'"
+                if tstrg:
+                    strg += "; TIME = \'" + tstrg + "\'"
+                strg += "\n"                        
         return strg
 
     #
