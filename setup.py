@@ -17,6 +17,7 @@ Setup file for installing the MiriTE software
 22 Jan 2018: Removed empty mirimsim simulator package.
 25 Jan 2018: Added missing url metadata.
 27 Apr 2018: Require Python 3.5.
+22 May 2018: Added README and LICENCE.
 
 @author: MIRI Software Team
 
