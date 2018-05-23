@@ -16,6 +16,7 @@ Setup file for installing the MiriTE software
 15 Jan 2018: MiriTools and MiriSimulators levels removed from package.
 22 Jan 2018: Removed empty mirimsim simulator package.
 25 Jan 2018: Added missing url metadata.
+22 May 2018: Added README and LICENCE.
 
 @author: MIRI Software Team
 
