@@ -162,7 +162,7 @@ class TestPoissonIntegrator(unittest.TestCase):
 
     def test_noise(self):
         # Test that the Poisson noise level is approximately the
-        # square root of the input signal.
+        # square root of the input signal (Bug 439).
         # The test is done using a 1024x1024 integrator to
         # eliminate the small number statistics.
         intnoise = PoissonIntegrator(1024, 1024, verbose=0)
@@ -239,7 +239,7 @@ class TestPoissonIntegrator(unittest.TestCase):
     def test_extreme(self):
         # Check that the integration and readout functions can accept
         # extremely small floating point values without raising an
-        # exception.
+        # exception (Bug 16).
         self.integrator.reset()
         flux = [[1.0e-9, 2.0e-9, -3.0e9], \
                 [4.0e-9, 5.0e-15, 6.0e-9], \

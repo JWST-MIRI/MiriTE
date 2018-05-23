@@ -151,6 +151,9 @@ effects simulated by SCASim.
 22 May 2018: Do not sample the Poisson function multiple times when reading
              out quickly. The number of particles remains the same (Bug 439).
              Rounding of extreme values changed from 4 to 6 decimal places.
+23 May 2018: Removed the zero substitution and rounding from the Poisson
+             noise calculation, as scipy no longer has the "domain error"
+             bug worked around on 12 Feb 2016 (Bug 16).
 
 @author: Steven Beard (UKATC)
 
@@ -692,14 +695,15 @@ class PoissonIntegrator(object):
                      self.expected_count.max())
                 self.logger.debug(strg)
             # Round extreme values.
-            rounded_diff = np.around(self.expected_count-self.last_count, 6)
+            #rounded_diff = np.around(self.expected_count-self.last_count, 6)
+            rounded_diff = self.expected_count - self.last_count
             # Filter out zero, negative or bad values.
             where_zero = np.where(rounded_diff <= 0)
             if where_zero:
-                rounded_diff[where_zero] = 1
+                rounded_diff[where_zero] = 0
             where_nan = np.where(np.isnan(rounded_diff))
             if where_nan:
-                rounded_diff[where_nan] = 1
+                rounded_diff[where_nan] = 0
             try:
                 # Take a random sample from the Poisson distribution.
                 read_diff = scipy.stats.poisson.rvs(rounded_diff)
@@ -717,9 +721,6 @@ class PoissonIntegrator(object):
                 strg += str(rounded_diff)
                 strg += "\n" + str(e)
                 raise ValueError(strg)
-            # Put the zero values back to zero.
-            if where_zero:
-                read_diff[where_zero] = 0
             readout_array = self.zeropoint + self.last_readout + read_diff
         else:
             readout_array = self.zeropoint + self.expected_count
@@ -1452,7 +1453,7 @@ class ImperfectIntegrator(PoissonIntegrator):
     def anneal(self):
         """
         
-        Anneal the (imperfect) integrator by leaking away the persistence.
+        Anneal the (imperfect) integrator by removing the persistence.
         
         :Parameters:
 
