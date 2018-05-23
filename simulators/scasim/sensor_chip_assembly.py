@@ -336,7 +336,7 @@ Calibration Data Products (CDPs).
              Corrected syntax of np.where() when looking for NaN values.
 17 May 2018: Python 3: Converted dictionary keys return into a list.
 18 May 2018: Changed deprecated logger.warn() to logger.warning().
-23 May 2018: Check for wait_time=None in Python 3.
+23 May 2018: Check for wait_time=None in Python 3. Added anneal function.
 
 @author: Steven Beard
 
@@ -423,9 +423,14 @@ def _report_sca_parameters(inputfile, outputfile, detectorid, readout_mode,
     """
     if inputfile:
         if isinstance(inputfile, (tuple,list)):
-            strg = "Simulating " + str(readout_mode) + \
-                " detector readout for " + str(detectorid) + \
-                " from list of illumination files:"
+            if readout_mode:
+                strg = "Simulating " + str(readout_mode) + \
+                    " detector readout for " + str(detectorid) + \
+                    " from list of illumination files:"
+            else:
+                strg = "Simulating default " + \
+                    " detector readout for " + str(detectorid) + \
+                    " from list of illumination files:"                        
             for thisfile in inputfile:
                 strg += "   %s" % thisfile
             logger.info( strg )
@@ -494,10 +499,11 @@ def _report_sca_parameters(inputfile, outputfile, detectorid, readout_mode,
         switched_off.append("Bias and Gain")
     if not simulate_nonlinearity:
         switched_off.append("Non-linearity")
-    if ('SLOW' in readout_mode) or (not simulate_drifts):
-        switched_off.append("Detector drifts")
-    if ('SLOW' in readout_mode) or (not simulate_latency):
-        switched_off.append("Detector latency")
+    if readout_mode:
+        if ('SLOW' in readout_mode) or (not simulate_drifts):
+            switched_off.append("Detector drifts")
+        if ('SLOW' in readout_mode) or (not simulate_latency):
+            switched_off.append("Detector latency")
     if switched_off:
         logger.debug( "NOTE: The following effects are switched off: %s" % \
             "\'" + "\', \'".join(switched_off) + "\'" )
@@ -1746,6 +1752,31 @@ class SensorChipAssembly(object):
 
         self.subarray_previous = self.subarray_str
         self.readout_mode_previous = self.readout_mode
+        
+    def anneal(self):
+        """
+        
+        If a detector object exists, anneal it to erase latency and
+        drift information.
+                
+        :Parameters:
+     
+        None.
+             
+        :Prerequisites:
+        
+        Can only be used after a detector object has been created.
+                
+        """
+        if self.detector is not None:
+            strg = "\n\t*** Detector annealed. "
+            strg += "NOTE: All latency and drift data erased."
+            self.logger.info( strg )
+            self.detector.pixels.anneal()
+        else:
+            strg = "\n\t*** Attempt to anneal detector object before it exists. "
+            strg += "Read some illumination data first."
+            self.logger.error( strg )
  
     def read_fringe_map(self, filename):
         """
