@@ -1796,7 +1796,10 @@ class MiriDataModel(DataModel):
         if isinstance(self.history, list):
             self.history.append( history_item )
         elif isinstance(self.history, dict):
-            self.history['entries'].append(history_item)
+            if 'entries' in self.history:
+                self.history['entries'].append(history_item)
+            else:
+                self.history['entries'] = [history_item]
         else:
             warnings.warn("Unrecognised self.history format! HISTORY record not added.")
         
@@ -1815,7 +1818,10 @@ class MiriDataModel(DataModel):
         if isinstance(self.history, (tuple,list)):
             history_list = self.history
         elif isinstance(self.history, dict):
-            history_list = list(self.history['entries'])
+            if 'entries' in self.history:
+                history_list = list(self.history['entries'])
+            else:
+                history_list = []
         else:
             history_list = []
             warnings.warn("Unrecognised self.history format! No history returned.")
@@ -1838,7 +1844,10 @@ class MiriDataModel(DataModel):
         if isinstance(self.history, (tuple,list)):
             history_list = self.history
         elif isinstance(self.history, dict):
-            history_list = list(self.history['entries'])
+            if 'entries' in self.history:
+                history_list = list(self.history['entries'])
+            else:
+                history_list = []
         else:
             history_list = []
             warnings.warn("Unrecognised self.history format! No history returned.")
