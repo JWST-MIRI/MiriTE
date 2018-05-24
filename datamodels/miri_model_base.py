@@ -148,6 +148,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 11 Apr 2018: FLENS added to filter list and "N/A" added to some options in
              data model metadata.
 17 May 2018: Python 3: Converted dictionary keys return into a list.
+24 May 2018: Modified to work with history records stored either as a list
+             or a dictionary (to cope with a change to the jwst library).
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -1789,12 +1791,14 @@ class MiriDataModel(DataModel):
         history_item = HistoryEntry({'description': history,
           'time': Time(datetime.datetime.now())})
 
-        # The data model can store history records in a list or in a dictionary
+        # The data model can store history records in a list or in a dictionary,
+        # depending on which version of the jwst library is being used.
         if isinstance(self.history, list):
             self.history.append( history_item )
+        elif isinstance(self.history, dict):
+            self.history['entries'].append(history_item)
         else:
-            #self.history = history_item
-            pass
+            warnings.warn("Unrecognised self.history format! HISTORY record not added.")
         
     def get_history(self):
         """
@@ -1806,10 +1810,19 @@ class MiriDataModel(DataModel):
         
         """
         hlist = []
+        # The data model can store history records in a list or in a dictionary,
+        # depending on which version of the jwst library is being used.
         if isinstance(self.history, (tuple,list)):
-            for hitem in self.history:
-                if 'description' in list(hitem.keys()):
-                    hlist.append( str(hitem['description']) )
+            history_list = self.history
+        elif isinstance(self.history, dict):
+            history_list = list(self.history['entries'])
+        else:
+            history_list = []
+            warnings.warn("Unrecognised self.history format! No history returned.")
+
+        for hitem in history_list:
+            if 'description' in list(hitem.keys()):
+                hlist.append( str(hitem['description']) )
         return hlist
         
     def get_history_str(self):
@@ -1820,21 +1833,29 @@ class MiriDataModel(DataModel):
         
         """
         strg = ''
+        # The data model can store history records in a list or in a dictionary,
+        # depending on which version of the jwst library is being used.
         if isinstance(self.history, (tuple,list)):
-            for hitem in self.history:
-                if 'description' in list(hitem.keys()):
-                    hstrg = str(hitem['description'])
-                else:
-                    hstrg = ''
-                if 'time' in list(hitem.keys()):
-                    tstrg = str(hitem['time'])
-                else:
-                    tstrg = ''
-                if hstrg:
-                    strg += "HISTORY = \'" + hstrg + "\'"
-                if tstrg:
-                    strg += "; TIME = \'" + tstrg + "\'"
-                strg += "\n"                        
+            history_list = self.history
+        elif isinstance(self.history, dict):
+            history_list = list(self.history['entries'])
+        else:
+            history_list = []
+            warnings.warn("Unrecognised self.history format! No history returned.")
+        for hitem in history_list:
+            if 'description' in list(hitem.keys()):
+                hstrg = str(hitem['description'])
+            else:
+                hstrg = ''
+            if 'time' in list(hitem.keys()):
+                tstrg = str(hitem['time'])
+            else:
+                tstrg = ''
+            if hstrg:
+                strg += "HISTORY = \'" + hstrg + "\'"
+            if tstrg:
+                strg += "; TIME = \'" + tstrg + "\'"
+            strg += "\n"                        
         return strg
 
     #
