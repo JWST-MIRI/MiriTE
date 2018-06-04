@@ -230,6 +230,7 @@ Calibration Data Products (CDPs).
 18 May 2018: Changed deprecated logger.warn() to logger.warning().
              CDP data models are now opened within a Python context structure
              where possible.
+04 Jun 2018: Added hard_reset function.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -2222,11 +2223,28 @@ class DetectorArray(object):
                 metadata.add_comment(strg)
 
         return metadata
-     
+
+    def hard_reset(self):
+        """
+        
+        Hard reset the detector.
+        
+        This function clears the persistence counters and restores the
+        detector to the state it had after its first reset.
+        It simulates the kind of reset which happens when the detector
+        is annealed.
+        
+        """
+        # Hard reset the underlying Poisson integrator.
+        if self._verbose > 3:
+            self.logger.info( "Hard resetting the detector" )
+        self.pixels.hard_reset()
+
+
     def reset(self, nresets=1, new_exposure=False):
         """
         
-        Reset the detector
+        Reset the detector. Persistence and drift are simulated.
         
         """            
         # Reset the underlying Poisson integrator.

@@ -336,7 +336,8 @@ Calibration Data Products (CDPs).
              Corrected syntax of np.where() when looking for NaN values.
 17 May 2018: Python 3: Converted dictionary keys return into a list.
 18 May 2018: Changed deprecated logger.warn() to logger.warning().
-23 May 2018: Check for wait_time=None in Python 3. Added anneal function.
+23 May 2018: Check for wait_time=None in Python 3.
+04 Jun 2018: Added hard_reset function.
 
 @author: Steven Beard
 
@@ -1753,11 +1754,14 @@ class SensorChipAssembly(object):
         self.subarray_previous = self.subarray_str
         self.readout_mode_previous = self.readout_mode
         
-    def anneal(self):
+    def hard_reset(self):
         """
         
-        If a detector object exists, anneal it to erase latency and
+        If a detector object exists, execute a hard reset to erase latency and
         drift information.
+        
+        This function simulates the kind of reset which happens when the
+        detector is annealed.
                 
         :Parameters:
      
@@ -1769,12 +1773,12 @@ class SensorChipAssembly(object):
                 
         """
         if self.detector is not None:
-            strg = "\n\t*** Detector annealed. "
-            strg += "NOTE: All latency and drift data erased."
+            strg = "\n\t*** Detector hard reset. "
+            strg += "NOTE: All latency and drift data will be erased."
             self.logger.info( strg )
-            self.detector.pixels.anneal()
+            self.detector.hard_reset()
         else:
-            strg = "\n\t*** Attempt to anneal detector object before it exists. "
+            strg = "\n\t*** Attempt to hard reset detector object before it exists. "
             strg += "Read some illumination data first."
             self.logger.error( strg )
  
