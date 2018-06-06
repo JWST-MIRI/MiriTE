@@ -18,6 +18,7 @@ Setup file for installing the MiriTE software
 25 Jan 2018: Added missing url metadata.
 27 Apr 2018: Require Python 3.5.
 22 May 2018: Added README and LICENCE.
+04 Jun 2018: Added warning if MIRICLE environment is not activated.
 
 @author: MIRI Software Team
 
@@ -61,6 +62,14 @@ def find_version(*file_paths):
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
 
+def get_conda_prefix():
+    import os
+    if 'CONDA_PREFIX' in list(os.environ.keys()):
+        conda_prefix = os.environ['CONDA_PREFIX']
+    else:
+        conda_prefix = ''
+    return conda_prefix
+
 
 # Test the command arguments given with this script.
 # Only unzip data files when building or installing, not when 
@@ -78,6 +87,10 @@ if "--quiet" in argv:
     verbose = False
 else:
     verbose = True
+
+conda_prefix = get_conda_prefix()
+if verbose:
+    print("CONDA_PREFIX is", conda_prefix)
 
 # ------------------------------------------------------------------
 # Unzip the data files contained in the simulators data directories.
@@ -267,3 +280,10 @@ setup(
             ],
     data_files=[('', ['LICENCE', 'README'])]
 )
+
+if not cleanflag:
+    if not ('miri' in conda_prefix):
+        print("\n*** WARNING: MIRI software installed into the root environment! ***")
+        print("If you didn't want to do this, remove the above package from site-packages, execute")
+        print("\n\tsource activate <name-of-miricle-environment>")
+        print("\nand try again.")
