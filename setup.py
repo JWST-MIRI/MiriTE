@@ -65,7 +65,7 @@ def find_version(*file_paths):
 def get_conda_prefix():
     import os
     if 'CONDA_PREFIX' in list(os.environ.keys()):
-        conda_prefix = os.environ['CONDA_PREFIX']
+        conda_prefix = str(os.environ['CONDA_PREFIX'])
     else:
         conda_prefix = ''
     return conda_prefix
@@ -282,7 +282,7 @@ setup(
 )
 
 if not cleanflag:
-    if not ('miri' in conda_prefix):
+    if not ('miri' in conda_prefix) and not ('MIRI' in conda_prefix):
         print("\n*** WARNING: MIRI software installed into the root environment! ***")
         print("If you didn't want to do this, remove the above package from site-packages, execute")
         print("\n\tsource activate <name-of-miricle-environment>")
