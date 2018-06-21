@@ -36,8 +36,8 @@ The STScI jwst.datamodels documentation.
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 import sys
 from astropy.extern import six
@@ -446,7 +446,7 @@ class HasData(object):
 
         return newobject
 
-    # Trap implementations that aren't using "from __future__ import division"
+    # In Python 3, division is the same as true division.
     def __div__(self, other):
         return self.__truediv__(other)
 
@@ -1098,7 +1098,7 @@ class HasDataErrAndDq(HasData):
 
         return newobject
 
-    # Trap implementations that aren't using "from __future__ import division"
+    # From Python 3, division is the same as true division.
     def __div__(self, other):
         return self.__truediv__(other)
 

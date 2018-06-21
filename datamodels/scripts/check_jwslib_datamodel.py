@@ -14,8 +14,8 @@ and shows the solutions to those problems recommended by the STScI team.
 The module can be rerun to make sure the solutions still work.
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 import os
 import numpy as np

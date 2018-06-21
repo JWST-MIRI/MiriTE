@@ -59,8 +59,8 @@ NOTE: Some tests within this module can take several minutes to run.
 @author: Steven Beard (UKATC)
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 # Python logging facility
 import logging

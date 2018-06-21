@@ -75,8 +75,8 @@ The command also takes the following options:
         Overwrite any existing SCA format FITS file.
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 # Python logging facility
 import logging

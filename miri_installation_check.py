@@ -27,7 +27,6 @@ of those modules (when such information is available).
 @author: Steven Beard (UKATC)
 
 """
-from __future__ import absolute_import, unicode_literals, division, print_function
 
 import warnings
 
