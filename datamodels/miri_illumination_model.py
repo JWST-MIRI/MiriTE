@@ -55,6 +55,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 15 Jun 2017: TYPE keyword replaced by DATAMODL.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 21 Sep 2017: Test World Coordinates.
+21 Jun 2018: Define the FILETYPE keyword.
 
 @author: Steven Beard (UKATC)
 
@@ -143,6 +144,7 @@ class MiriIlluminationModel(MiriDataModel):
 
         # Data type is illumination map.
         self.meta.model_type = 'ILLUMINATION'
+        self.meta.filetype = 'ILLUMINATION'
 
         if intensity is not None:
             self.intensity = intensity      
