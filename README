@@ -87,14 +87,19 @@ packages are installed.
 TESTING
 -------
 The unit tests included with the MIRI software can be run from the
-top-level directory using nosetests or pytests by running either of
-the scripts
+top-level directory using nosetests or pytest by running either of
+the commands
 
-   run_nosetests.sh
-   run_pytests.sh
+   nosetests
+   pytest
   
-from the top-level installation directory. Individual tests can also be run
-from within the "tests" directory. For example:
+from the top-level installation directory. If nosetests complains about
+the --with-xcoverage parameter not being recognised, try the command 
+ 
+   conda install nosexcover 
+
+Individual tests can also be run from within the "tests" directory.
+For example:
 
    cd MiriTE/datamodels/tests
    python test_measured_model.py
