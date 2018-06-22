@@ -188,6 +188,8 @@ allOf:
       ndim: 4
       units: ''
       datatype: uint8
+    group:
+      $ref: http://jwst.stsci.edu/schemas/group.schema.yaml
     pixeldq_def:
       $ref: pixeldq_def.schema.yaml
     groupdq_def:
