@@ -901,6 +901,7 @@ class MiriRampModel(MiriMeasuredModel):
 
     # TODO: The following function needs further work.
     # It's used during arithmetic operations.
+    # FIXME: This setter function no longer works! It is no longer called.
     @dq.setter
     def dq(self, data):
         # Alias dq for pixeldq, groupdq or both combined as specified.
@@ -911,6 +912,7 @@ class MiriRampModel(MiriMeasuredModel):
             logging.info("Mask results written to PIXELDQ array.")
             self.pixeldq = data
         else:
+            print("Setting NOTHING")
             # One set of data can't be used to update both the PIXELDQ
             # and GROUPDQ arrays.
             strg = "\n***DQ array is a combined view of PIXEL DQ and GROUPDQ. "
