@@ -120,7 +120,7 @@ from miri.datamodels.dqflags import master_flags, \
 
 # Import the MIRI base data model and utilities.
 from miri.datamodels.miri_model_base import MiriDataModel
-from miri.datamodels.operations import HasData, HasDataErrAndDq
+from miri.datamodels.operations import HasData, HasDataErrAndDq, HasDataErrAndGroups
 
 # List all classes and global functions here.
 __all__ = ['MiriSimpleModel', 'MiriMeasuredModel', 'MiriRampModel',
@@ -243,7 +243,7 @@ class MiriSimpleModel(MiriDataModel, HasData):
         else:
             return True
 
-
+# MiriMeasuredModel inherits mathematical operations from the HasDataErrAndDq class
 class MiriMeasuredModel(MiriDataModel, HasDataErrAndDq):
     """
     
@@ -315,8 +315,10 @@ class MiriMeasuredModel(MiriDataModel, HasDataErrAndDq):
         # data object.
         self.rampdata = rampdata
         if self.rampdata:
-            HasDataErrAndDq.__init__(self, data, None, dq, noerr=True)
+            # Data model has pixeldq and/or groupdq arrays for data quality.
+            HasDataErrAndGroups.__init__(self, data, None, noerr=True)
         else:
+            # Data model has dq array for data quality.
             HasDataErrAndDq.__init__(self, data, err, dq, noerr=False)
 
         # Copy the units of the data array from the schema, if defined.
@@ -468,7 +470,9 @@ class MiriMeasuredModel(MiriDataModel, HasDataErrAndDq):
         raise AttributeError("The flags_table object is read-only")
 
 
-class MiriRampModel(MiriMeasuredModel):
+# MiriRampModel inherits mathematical operations from MiriMeasuredModel but
+# some functions are overridden by the the HasDataErrAndGroups class
+class MiriRampModel(MiriMeasuredModel, HasDataErrAndGroups):
     """
     
     A data model for MIRI ramp data with error handling and masking, like
@@ -876,7 +880,8 @@ class MiriRampModel(MiriMeasuredModel):
 
     @property
     def dq(self):
-        # Alias dq for pixeldq, groupdq or both combined as specified.
+        # The dq attribute is an alias for pixeldq, groupdq or both combined,
+        # depending on the masking method.
         if self.maskwith == 'groupdq':
             if hasattr(self, 'groupdq'):
                 return self.groupdq
@@ -898,28 +903,6 @@ class MiriRampModel(MiriMeasuredModel):
                 return self.pixeldq
             else:
                 return None
-
-    # TODO: The following function needs further work.
-    # It's used during arithmetic operations.
-    # FIXME: This setter function no longer works! It is no longer called.
-    @dq.setter
-    def dq(self, data):
-        # Alias dq for pixeldq, groupdq or both combined as specified.
-        if self.maskwith == 'groupdq':
-            logging.info("Mask results written to GROUPDQ array.")
-            self.groupdq = data
-        elif self.maskwith == 'pixeldq':
-            logging.info("Mask results written to PIXELDQ array.")
-            self.pixeldq = data
-        else:
-            print("Setting NOTHING")
-            # One set of data can't be used to update both the PIXELDQ
-            # and GROUPDQ arrays.
-            strg = "\n***DQ array is a combined view of PIXEL DQ and GROUPDQ. "
-            strg += "Mask results written to GROUPDQ array only."
-            warnings.warn(strg)
-            # TODO: Create the pixeldq by shrinking the given array?
-            self.groupdq = data
 
 
 class MiriSlopeModel(MiriMeasuredModel):

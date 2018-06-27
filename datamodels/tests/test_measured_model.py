@@ -58,7 +58,7 @@ in the datamodels.miri_measured_model module.
 13 Sep 2017: Updated "not a file name" test to match the new behaviour of
              JWST pipeline version 0.7.8rc2
 27 Apr 2018: Corrected bug in get_history() length test.
-27 Jun 2018: Temporarily disable testing of arithmetic with MiriRampModel.
+27 Jun 2018: Removed unused arrays.
 
 @author: Steven Beard (UKATC)
 
@@ -820,45 +820,44 @@ class TestMiriRampModel(unittest.TestCase):
         self.assertTrue(np.all( mask3.dq == expected ))
         del mask3
 
-#    def test_arithmetic(self):
-#        # The ramp data model supports all the arithmetic operations
-#        # supported by the MiriMeasuredModel. The following are exceptions
-#        # specific to the ramp model.
-#        
-#        # Create a data model in which the DATA and DQ arrays have different
-#        # shapes.
-#        b1 = [[1,2,3,4],     [5,6,7,8],     [9,10,11,12]]
-#        testdp = MiriRampModel(data=self.ahyper, pixeldq=self.c1,
-#                               groupdq=self.chyper, maskwith='both')
-#        descr = str(testdp)
-#        self.assertIsNotNone(descr)
-#        del descr
-#        
-#        # Suppress warning about the DQ array being propagated only from GROUPDQ
-#        with warnings.catch_warnings():
-#            warnings.simplefilter("ignore")
-#
-#            # Check the product can be combined with itself
-#            double = testdp * 2.0
-#            self.assertIsNotNone(double.data)
-#            self.assertGreater(len(double.data), 0)
-#            expected = double.data * 2.0
-#            self.assertTrue(np.all( (double.data - expected) < 0.001 ))
-#            descr = str(double)
-#            self.assertIsNotNone(descr)
-#            del descr
-#        
-#            # When this is combined with another data product, the DATA
-#            # array is masked with both the pixeldq and groupdq arrays.
-#            warnings.simplefilter("ignore")
-#            result = self.dataproduct + testdp
-#            self.assertIsNotNone(result.data)
-#            self.assertGreater(len(result.data), 0)
-#            self.assertIsNotNone(result.dq)
-#            self.assertGreater(len(result.dq), 0)
-#            descr = str(result)
-#            self.assertIsNotNone(descr)
-#            del descr
+    def test_arithmetic(self):
+        # The ramp data model supports all the arithmetic operations
+        # supported by the MiriMeasuredModel. The following are exceptions
+        # specific to the ramp model.
+        
+        # Create a data model in which the DATA and DQ arrays have different
+        # shapes.
+        testdp = MiriRampModel(data=self.ahyper, pixeldq=self.c1,
+                               groupdq=self.chyper, maskwith='both')
+        descr = str(testdp)
+        self.assertIsNotNone(descr)
+        del descr
+        
+        # Suppress warning about the DQ array being propagated only from GROUPDQ
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+
+            # Check the product can be combined with itself
+            double = testdp * 2.0
+            self.assertIsNotNone(double.data)
+            self.assertGreater(len(double.data), 0)
+            expected = double.data * 2.0
+            self.assertTrue(np.all( (double.data - expected) < 0.001 ))
+            descr = str(double)
+            self.assertIsNotNone(descr)
+            del descr
+        
+            # When this is combined with another data product, the DATA
+            # array is masked with both the pixeldq and groupdq arrays.
+            warnings.simplefilter("ignore")
+            result = self.dataproduct + testdp
+            self.assertIsNotNone(result.data)
+            self.assertGreater(len(result.data), 0)
+            self.assertIsNotNone(result.dq)
+            self.assertGreater(len(result.dq), 0)
+            descr = str(result)
+            self.assertIsNotNone(descr)
+            del descr
         
     def test_fitsio(self):
         # Suppress metadata warnings
