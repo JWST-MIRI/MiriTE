@@ -105,7 +105,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 22 Jun 2018: Stop writing the PIXELDQ_DEF and GROUPDQ_DEF extensions in
              MiriRampModel. Added GROUP extension to the MiriRampModel
 28 Jun 2018: Switch to using get_title_and_metadata() to display data model
-             information.
+             information. Removed superflous functions from MiriSimpleModel.
 
 @author: Steven Beard (UKATC)
 
@@ -207,42 +207,6 @@ class MiriSimpleModel(MiriDataModel, HasData):
         strg += self.get_data_str('data', underline=True, underchar="-")
         return strg
 
-# EXTRA FUNCTIONS TEMPORARILY COPIED FROM HasData abstract class
-    def _check_for_data(self):
-        """
-        
-        Helper function which raises an exception if the object
-        does not contain a valid data array.
-        
-        """
-        if not self._isvalid(self.data):
-            strg = "%s object does not contain a valid data array" % \
-                self.__class__.__name__
-            raise AttributeError(strg)
-
-    def _isvalid(self, data):
-        """
-        
-        Helper function to verify that a given array, tuple or list is
-        not empty and has valid content.
-        
-        """
-        if data is None:
-            return False
-        elif isinstance(data, (list,tuple)):
-            if len(data) <= 0:
-                return False
-            else:
-                return True
-        elif isinstance(data, (ma.masked_array,np.ndarray)):
-            if data.size <= 0:
-                return False
-            else:
-                return True
-        elif not data:
-            return False
-        else:
-            return True
 
 # MiriMeasuredModel inherits mathematical operations from the HasDataErrAndDq class
 class MiriMeasuredModel(MiriDataModel, HasDataErrAndDq):
@@ -453,7 +417,6 @@ class MiriMeasuredModel(MiriDataModel, HasDataErrAndDq):
                                           underchar="-")
         return strg
 
-
     # "flags_table" is a FlagsTable object created on the fly
     # from the contents of the dq_def table
     @property
@@ -630,7 +593,6 @@ class MiriRampModel(MiriMeasuredModel, HasDataErrAndGroups):
                 # Explicitly create a GROUPDQ_DEF table with default values.
                 # TODO: Can the default declared in the schema be used?
                 self.groupdq_def = self._default_groupdq_def
-
 
     def plot_ramp(self, rows, columns, stime=1.0, tunit='', averaged=False,
                   show_ints=False, description=''):

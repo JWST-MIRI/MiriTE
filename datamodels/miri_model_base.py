@@ -160,7 +160,6 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 """
 # This module is now converted to Python 3.
 
-
 import os
 import datetime
 import warnings
@@ -191,7 +190,7 @@ __all__ = ['get_exp_type', 'MiriDataModel']
 # (first column, first row, number of columns, number of rows).
 # This dictionary is used by the set_subarray_metadata convenience
 # function.
-# TODO: Should this table be moved to a MIRI parameters file?
+# TODO: This table should be moved to a common MIRI parameters file.
 #
 SUBARRAY_DICT = {}
 SUBARRAY_DICT['FULL'] =          (   1,   1, 1032, 1024 )
@@ -206,9 +205,6 @@ SUBARRAY_DICT['SUB128'] =        (   1, 889,  136,  128 )
 SUBARRAY_DICT['SUB64'] =         (   1, 779,   72,   64 )
 SUBARRAY_DICT['SLITLESSPRISM'] = (   1, 529,   72,  416 )
 
-# Pre-BURST-mode versions of the subarrays
-#SUBARRAY_DICT['BRIGHTSKY'] =     (   1,  37,  968,  512 )
-#SUBARRAY_DICT['SUB256'] =        (   1,  37,  668,  256 )
 
 #
 # Public global function.
@@ -376,35 +372,6 @@ def _shape_to_string(shape, axes=None):
         # A much simpler implementation when there are no axis labels
         strg = ' x '.join(str(s) for s in shape)
     return strg
-
-# THIS CLASS HAS NOW BEEN IMPLEMENTED IN JWST.DATAMODELS
-# class JWSTExtension(AsdfExtension):
-#     """
-#     
-#     A class which defines an extension to the ASDF URI mapping
-#     which recognises the URI 'http://jwst.stsci.edu/schemas/'
-#     as a reference to the schemas belonging to the jwst.datamodels
-#     package.
-#     
-#     """
-#     @property
-#     def types(self):
-#         return []
-# 
-#     @property
-#     def tag_mapping(self):
-#         return []
-#
-#     @property
-#     def url_mapping(self):
-#         # Define the uri and directory containing the additional schemas
-#         schema_uri_base = 'http://jwst.stsci.edu/schemas/'
-#         schema_path = os.path.abspath(os.path.join( \
-#                             os.path.dirname(jwst.datamodels.__file__),
-#                             'schemas'))
-#         return [(schema_uri_base,
-#                  asdf.util.filepath_to_url(schema_path) +
-#                  '/{url_suffix}')]
 
 
 class MIRIExtension(AsdfExtension):
@@ -1495,7 +1462,6 @@ class MiriDataModel(DataModel):
                         tobecopied = False
                         break
                 if tobecopied:
-#                     print("Copying metadata key:", key)
                     # Ignore KeyError or AttributeError exceptions
                     # when metadata is not defined in both data models.
                     try:
@@ -1589,7 +1555,6 @@ class MiriDataModel(DataModel):
                         # Ensure each entry is made only once.
                         pathstr = '.'.join(path)
                         if pathstr not in results:
-#                             print("Found data table at", pathstr)
                             results.append(pathstr)
 
         # Walk through the schema and apply the search function.
@@ -1723,14 +1688,11 @@ class MiriDataModel(DataModel):
         """
         field_names = []
         dtypes = self.find_schema_components('datatype')
-#         print("Looking for", name, "in table components", dtypes)
         name_dt = name + ".datatype"
         if name in dtypes:
             dtype = dtypes[name]
-#             print("Found table component:", dtype, "for", name)
             if isinstance(dtype,(tuple,list)):
                 for element in dtype:
-#                     print("Testing element", element, "for", name)
                     if 'name' in element:
                         field_names.append(element['name'])
                 return field_names
@@ -1739,10 +1701,8 @@ class MiriDataModel(DataModel):
                 return []
         elif name_dt in dtypes:
             dtype = dtypes[name_dt]
-#             print("Found table component:", dtype, "for", name)
             if isinstance(dtype,(tuple,list)):
                 for element in dtype:
-#                     print("Testing element", element, "for", name)
                     if 'name' in element:
                         field_names.append(element['name'])
                 return field_names
@@ -1757,6 +1717,7 @@ class MiriDataModel(DataModel):
         """
         
         Add a comment to the metadata associated with the data product.
+        Obsolete function. Exists for backwards compatibility.
         
         :Parameters:
         
@@ -1774,6 +1735,7 @@ class MiriDataModel(DataModel):
         
         Return a structured string containing the comments
         associated with the data product.
+        Obsolete function. Exists for backwards compatibility.
         
         """
         # For now, just return the FITS comments.
@@ -1809,7 +1771,7 @@ class MiriDataModel(DataModel):
                         self.history['entries'] = [history_item]
                 else:
                     warnings.warn("Unrecognised self.history format! HISTORY record not added.")
-            except TypeError:
+            except (TypeError, KeyError, AttributeError):
                  warnings.warn("Unrecognised self.history format! HISTORY record not added.")
         else:
             warnings.warn("Data model contains no history attribute! HISTORY record not added.")
@@ -1851,13 +1813,19 @@ class MiriDataModel(DataModel):
             try:
                 if hasattr(self.history, 'append'):
                     history_list = []
-                    for hitem in self.history:
-                        if 'description' in list(hitem.keys()):
-                            history_list.append( str(hitem['description']) )
+                    for history_item in self.history:
+                        if isinstance(history_item, dict):
+                            if 'description' in list(history_item.keys()):
+                                history_list.append( str(history_item['description']) )
+                        else:
+                            history_list.append(str(history_item))
                 elif isinstance(self.history, dict):
                     if 'entries' in self.history:
                         hlist = list(self.history['entries'])
-            except TypeError:
+                        for history_item in hlist:
+                            if 'description' in list(history_item.keys()):
+                                history_list.append( str(history_item['description']) )
+            except (TypeError, KeyError, AttributeError):
                 # Unrecognised type. Return no history.
                 pass
         return history_list
@@ -1894,8 +1862,8 @@ class MiriDataModel(DataModel):
     # Convenience functions for locating, getting and setting items
     # associated with FITS keywords or FITS HDUs.
     #
-    # NOTE: These FITS functions will become obsolete when the underlying
-    # data model stops using the FITS storage object.
+    # NOTE: These FITS functions could become obsolete if the underlying
+    # JWST data model stops using the FITS storage object.
     #
     def fits_metadata_dict(self, include_comments=False, include_history=False,
                            include_builtin=False):
