@@ -102,7 +102,8 @@ class MiriMrsApertureCorrectionModel(MiriDataModel):
 #         
 #         # Copy the table column units, if defined.
 #         apercorr_units = self.set_table_units('apercorr_table')
-        
+
+    # TODO: Is this function needed?
     def __str__(self):
         """
         
@@ -110,9 +111,8 @@ class MiriMrsApertureCorrectionModel(MiriDataModel):
         as a readable string.
         
         """
-        # Start with the data object title and metadata
-        strg = self.get_title(underline=True, underchar="=") + "\n"
-        strg += self.get_meta_str(underline=True, underchar='-')
+        # Start with the data object title, metadata and history
+        strg = self.get_title_and_metadata()
 
         # Describe the aperture correction table
         if self.apercorr_table is not None:

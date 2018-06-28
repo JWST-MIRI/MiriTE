@@ -370,7 +370,7 @@ class MiriImagingDistortionModel(MiriDataModel):
         string.
         
         """
-        # Start with the data object title and metadata
+        # Start with the data object title, metadata and history
         strg = self.get_title(underline=True, underchar="=") + "\n"
         strg += self.get_meta_str(underline=True, underchar='-')
         if self.meta.fit.model is not None:
@@ -378,6 +378,7 @@ class MiriImagingDistortionModel(MiriDataModel):
         if self.meta.fit.reference is not None:
             strg += "See \'%s\' for a description of the fit.\n" % \
                 str(self.meta.fit.reference)
+        strg += self.get_history_str()
             
         strg += self.get_data_str('bmatrix', underline=True, underchar="-")
         strg += self.get_data_str('amatrix', underline=True, underchar="-")
@@ -478,6 +479,7 @@ class MiriLrsD2WModel(MiriDataModel):
         if not self.meta.exposure.type:
             self.set_exposure_type()
 
+    # TODO: Is this function needed?
     def __str__(self):
         """
         
@@ -486,8 +488,7 @@ class MiriLrsD2WModel(MiriDataModel):
         
         """
         # Start with the data object title and metadata
-        strg = self.get_title(underline=True, underchar="=") + "\n"
-        strg += self.get_meta_str(underline=True, underchar='-')
+        strg = self.get_title_and_metadata()
 
         # Describe the wavelength calibration table
         if self.wavelength_table is not None:
@@ -744,9 +745,10 @@ class MiriMrsDistortionModel12(MiriDataModel):
         string.
         
         """
-        # Start with the data object title and metadata
+        # Start with the data object title, metadata and history
         strg = self.get_title(underline=True, underchar="=") + "\n"
         strg += self.get_meta_str(underline=True, underchar='-')
+        strg += self.get_history_str()
             
         strg += self.get_data_str('slicenumber', underline=True, underchar="-")
 
@@ -1016,9 +1018,8 @@ class MiriMrsDistortionModel34(MiriDataModel):
         string.
         
         """
-        # Start with the data object title and metadata
-        strg = self.get_title(underline=True, underchar="=") + "\n"
-        strg += self.get_meta_str(underline=True, underchar='-')
+        # Start with the data object title, metadata and history
+        strg = self.get_title_and_metadata()
             
         strg += self.get_data_str('slicenumber', underline=True, underchar="-")
 

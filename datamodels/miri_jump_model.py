@@ -116,6 +116,7 @@ class MiriJumpModel(MiriDataModel):
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
         
+    # TODO: Is this function needed?
     def __str__(self):
         """
         
@@ -124,8 +125,7 @@ class MiriJumpModel(MiriDataModel):
         
         """
         # Start with the data object title and metadata
-        strg = self.get_title(underline=True, underchar="=") + "\n"
-        strg += self.get_meta_str(underline=True, underchar='-')
+        strg = self.get_title_and_metadata()
 
         # Describe the fine jump table
         strg += "\nColumn names: " + str(self.fieldnames) + "\n"

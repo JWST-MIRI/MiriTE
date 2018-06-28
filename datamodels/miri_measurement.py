@@ -477,9 +477,8 @@ class MiriMeasurement(MiriDataModel):
         Returns a string representation of the object MiriMeasurement
         
         """
-        # Start with the data object title and metadata
-        strg = self.get_title(underline=True, underchar="=") + "\n"
-        strg += self.get_meta_str(underline=True, underchar='-')
+        # Start with the data object title, metadata and history
+        strg = self.get_title_and_metadata()
 
         # Describe the filter transmission table
         strg += "\nColumn names: " + str(self.fieldnames) + "\n"

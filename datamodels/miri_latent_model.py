@@ -254,8 +254,7 @@ class MiriLatentDecayModel(MiriDataModel):
         
         """
         # Start with the data object title and metadata
-        strg = self.get_title(underline=True, underchar="=") + "\n"
-        strg += self.get_meta_str(underline=True, underchar='-')
+        strg = self.get_title_and_metadata()
 
         # Describe the latent decay tables
         tableno = 1

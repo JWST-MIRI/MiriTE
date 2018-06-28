@@ -73,6 +73,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              JWST build 7.1 data models release. meta.reffile.type also
              changed to meta.reftype. TYPE keyword replaced by DATAMODL.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+28 Jun 2018: Switch to using get_title_and_metadata() to display data model
+             information.
 
 @author: Steven Beard (UKATC), Michael Droettboom (STScI), Vincent Geers (UKATC)
 
@@ -294,9 +296,8 @@ class MiriBadPixelMaskModel(MiriDataModel, HasMask):
         string.
         
         """
-        # Start with the data object title and metadata
-        strg = self.get_title(underline=True, underchar="=") + "\n"
-        strg += self.get_meta_str(underline=True, underchar='-')
+        # Start with the data object title, metadata and history
+        strg = self.get_title_and_metadata()
 
         # Describe the mask array and dq_def table
         strg += self.get_data_str('dq', underline=True, underchar="-")

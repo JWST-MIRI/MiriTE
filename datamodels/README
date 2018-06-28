@@ -7,8 +7,19 @@ https://jwst-docs.stsci.edu/display/JDAT/JWST+File+Names%2C+Formats%2C+and+Data+
 YAML schemas describing each data model may be found in the "schemas"
 subdirectory.
 
+Data models may be imported in a number of ways. Some common examples:
+
+   import miri.datamodels as dm
+   model1 = dm.MiriFlatfieldModel( filename1 )
+   model1 = dm.MiriBadPixelMaskModel( filename2 )
+   
+   from miri.datamodels.cdp import MiriFlatfieldModel, MiriBadPixelMaskModel
+   model1 = MiriFlatfieldModel( filename1 )
+   model1 = MiriBadPixelMaskModel( filename2 )
+
 Documentation describing this software may be found within the "doc" 
-directory. The following commands will build a new set of documentation:
+directory. The following commands will build a new set of documentation
+(assuming you have a compatible version of latex installed on your workstation):
 
 cd doc
 make html

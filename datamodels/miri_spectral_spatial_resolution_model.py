@@ -146,6 +146,7 @@ class MiriMrsResolutionModel(MiriDataModel):
 #         psf_fwhm_alpha_units = self.set_table_units('psf_fwhm_alpha')
 #         psf_fwhm_beta_units = self.set_table_units('psf_fwhm_beta')
         
+    # TODO: Is this function needed?
     def __str__(self):
         """
         
@@ -154,8 +155,7 @@ class MiriMrsResolutionModel(MiriDataModel):
         
         """
         # Start with the data object title and metadata
-        strg = self.get_title(underline=True, underchar="=") + "\n"
-        strg += self.get_meta_str(underline=True, underchar='-')
+        strg = self.get_title_and_metadata()
 
         # Describe the spectral resolution tables
         if self.resolving_power is not None:

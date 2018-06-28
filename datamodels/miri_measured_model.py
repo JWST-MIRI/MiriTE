@@ -104,6 +104,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 04 Oct 2017: Define the meta.filetype metadata.
 22 Jun 2018: Stop writing the PIXELDQ_DEF and GROUPDQ_DEF extensions in
              MiriRampModel. Added GROUP extension to the MiriRampModel
+28 Jun 2018: Switch to using get_title_and_metadata() to display data model
+             information.
 
 @author: Steven Beard (UKATC)
 
@@ -198,9 +200,8 @@ class MiriSimpleModel(MiriDataModel, HasData):
             A string displaying the contents of the simple data object.
         
         """
-        # Start with the data object title and metadata
-        strg = self.get_title(underline=True, underchar="=") + "\n"
-        strg += self.get_meta_str(underline=True, underchar='-')
+        # Start with the data object title, metadata and history
+        strg = self.get_title_and_metadata()
         
         # Display the data array.
         strg += self.get_data_str('data', underline=True, underchar="-")
@@ -383,9 +384,8 @@ class MiriMeasuredModel(MiriDataModel, HasDataErrAndDq):
             A string displaying the contents of the measured data object.
         
         """
-        # Start with the data object title and metadata
-        strg = self.get_title(underline=True, underchar="=") + "\n"
-        strg += self.get_meta_str(underline=True, underchar='-')
+        # Start with the data object title, metadata and history
+        strg = self.get_title_and_metadata()
         
         # Display the data arrays, including their masked aliases
         # (unless the data quality array is full of good values).
@@ -808,9 +808,8 @@ class MiriRampModel(MiriMeasuredModel, HasDataErrAndGroups):
         string.
         
         """
-        # Start with the data object title and metadata
-        strg = self.get_title(underline=True, underchar="=") + "\n"
-        strg += self.get_meta_str(underline=True, underchar='-')
+        # Start with the data object title, metadata and history
+        strg = self.get_title_and_metadata()
         
         # Display the data arrays, including their masked aliases
         # (unless the data quality array is full of good values).

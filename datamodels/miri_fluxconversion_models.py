@@ -184,6 +184,7 @@ class MiriFluxconversionModel(MiriDataModel):
 #         # Copy the table column units from the schema, if defined.
 #         tableunits = self.set_table_units('flux_table')
         
+    # TODO: Is this function needed?
     def __str__(self):
         """
         
@@ -191,9 +192,8 @@ class MiriFluxconversionModel(MiriDataModel):
         string.
         
         """
-        # Start with the data object title and metadata
-        strg = self.get_title(underline=True, underchar="=") + "\n"
-        strg += self.get_meta_str(underline=True, underchar='-')
+        # Start with the data object title, metadata and history
+        strg = self.get_title_and_metadata()
 
         # Describe the flux conversion table
         if self.flux_table is not None:

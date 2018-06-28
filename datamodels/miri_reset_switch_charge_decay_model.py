@@ -129,6 +129,7 @@ class MiriResetSwitchChargeDecayModel(MiriDataModel):
 #         # Copy the table column units, if defined.
 #         rscd_units = self.set_table_units('rscd_table')
         
+    # TODO: Is this function needed?
     def __str__(self):
         """
         
@@ -137,8 +138,7 @@ class MiriResetSwitchChargeDecayModel(MiriDataModel):
         
         """
         # Start with the data object title and metadata
-        strg = self.get_title(underline=True, underchar="=") + "\n"
-        strg += self.get_meta_str(underline=True, underchar='-')
+        strg = self.get_title_and_metadata()
 
         # Describe the RSCD table
         if self.rscd_table is not None:

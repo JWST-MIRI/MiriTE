@@ -56,6 +56,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 21 Sep 2017: Test World Coordinates.
 21 Jun 2018: Define the FILETYPE keyword.
+28 Jun 2018: Switch to using get_title_and_metadata() to display data model
+             information.
 
 @author: Steven Beard (UKATC)
 
@@ -587,9 +589,10 @@ class MiriIlluminationModel(MiriDataModel):
         string.
         
         """
-        # Start with the data object title and metadata
-        strg = self.get_title(underline=True, underchar="=") + "\n"
-        strg += self.get_meta_str(underline=True, underchar='-')          
+        # Start with the data object title, metadata and history
+        strg = self.get_title_and_metadata()
+        
+        # Add the intensity and wavelength information.
         strg += self.get_data_str('intensity', underline=True, underchar="-")
         strg += self.get_data_str('wavelength', underline=True, underchar="-")
         return strg
