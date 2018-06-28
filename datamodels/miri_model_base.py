@@ -149,10 +149,9 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              data model metadata.
 17 May 2018: Python 3: Converted dictionary keys return into a list.
 24 May 2018: Modified to work with history records stored either as a list
-             of strings or a dictionary (to cope with a change to the JWST
-             library).
+              or a dictionary (to cope with a change to the JWST library).
 28 Jun 2018: Modified to work with history records stored either as a dictionary
-             or a HistoryList object (to cope with another change to the JWST
+             or a list-like object (to cope with another change to the JWST
              library). Added the get_title_and_metadata() function to display
              the history records along with metadata.
 
@@ -178,7 +177,6 @@ import jwst.datamodels
 import jwst.datamodels.fits_support as mfits
 import jwst.datamodels.schema as mschema
 from jwst.datamodels.model_base import DataModel
-from jwst.datamodels.history import HistoryList
 
 # Import the MIRI data models and the data model plotter.
 import miri.datamodels
@@ -1794,22 +1792,25 @@ class MiriDataModel(DataModel):
                         
         """
         # The data model can store history records in a list-like object or
-        # in a dictionary, depending on which version of the jwst library is
-        # being used.
+        # a dictionary, depending on which version of the JWST
+        # library is being used. Test for both, for backwards compatibility.
         if hasattr(self, 'history'):
-            if isinstance(self.history, (tuple, list, HistoryList)):
-                self.history.append( history )
-            elif isinstance(self.history, dict):  
-                # Wrap history string in an ASDF HistoryEntry object 
-                # and tag it with the current time.
-                history_item = HistoryEntry({'description': history,
-                'time': Time(datetime.datetime.now())})
-                if 'entries' in self.history:
-                    self.history['entries'].append(history_item)
+            try:
+                if hasattr(self.history, 'append'):
+                    self.history.append( history )
+                elif isinstance(self.history, dict):  
+                    # Wrap history string in an ASDF HistoryEntry object 
+                    # and tag it with the current time.
+                    history_item = HistoryEntry({'description': history,
+                    'time': Time(datetime.datetime.now())})
+                    if 'entries' in self.history:
+                        self.history['entries'].append(history_item)
+                    else:
+                        self.history['entries'] = [history_item]
                 else:
-                    self.history['entries'] = [history_item]
-            else:
-                warnings.warn("Unrecognised self.history format! HISTORY record not added.")
+                    warnings.warn("Unrecognised self.history format! HISTORY record not added.")
+            except TypeError:
+                 warnings.warn("Unrecognised self.history format! HISTORY record not added.")
         else:
             warnings.warn("Data model contains no history attribute! HISTORY record not added.")
 
@@ -1843,18 +1844,22 @@ class MiriDataModel(DataModel):
                 
         """
         # The data model can store history records in a list-like object or
-        # in a dictionary, depending on which version of the jwst library is
-        # being used.
+        # a dictionary, depending on which version of the JWST
+        # library is being used. Test for both, for backwards compatibility.
         history_list = []
         if hasattr(self, 'history'):
-            if isinstance(self.history, (tuple, list, HistoryList)):
-                history_list = []
-                for hitem in self.history:
-                    if 'description' in list(hitem.keys()):
-                        history_list.append( str(hitem['description']) )
-            elif isinstance(self.history, dict):
-                if 'entries' in self.history:
-                    hlist = list(self.history['entries'])
+            try:
+                if hasattr(self.history, 'append'):
+                    history_list = []
+                    for hitem in self.history:
+                        if 'description' in list(hitem.keys()):
+                            history_list.append( str(hitem['description']) )
+                elif isinstance(self.history, dict):
+                    if 'entries' in self.history:
+                        hlist = list(self.history['entries'])
+            except TypeError:
+                # Unrecognised type. Return no history.
+                pass
         return history_list
         
     def get_history_str(self):
