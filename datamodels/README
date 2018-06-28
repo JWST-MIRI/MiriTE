@@ -7,15 +7,26 @@ https://jwst-docs.stsci.edu/display/JDAT/JWST+File+Names%2C+Formats%2C+and+Data+
 YAML schemas describing each data model may be found in the "schemas"
 subdirectory.
 
-Data models may be imported in a number of ways. Some common examples:
+The basic data models may be imported from "datamodels", the MIRI calibration
+data products from "datamodels.cdp" and simulator support models from
+"datamodels.sim". Some common examples:
 
    import miri.datamodels as dm
-   model1 = dm.MiriFlatfieldModel( filename1 )
-   model1 = dm.MiriBadPixelMaskModel( filename2 )
+   model1 = dm.MiriDataModel( filename1 )
+   model2 = dm.MiriMeasuredModel( filename2 )
    
    from miri.datamodels.cdp import MiriFlatfieldModel, MiriBadPixelMaskModel
    model1 = MiriFlatfieldModel( filename1 )
-   model1 = MiriBadPixelMaskModel( filename2 )
+   model2 = MiriBadPixelMaskModel( filename2 )
+
+   from miri.datamodels.sim import MiriIlluminationModel
+   model1 = MiriIlluminationModel( filename1 )
+
+The open() function will open a file and attempt to match the contents to
+a known data model:
+
+   import miri.datamodels.open as open
+   model = open( filename )
 
 Documentation describing this software may be found within the "doc" 
 directory. The following commands will build a new set of documentation
