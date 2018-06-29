@@ -168,8 +168,9 @@ def nonLinFit(func, x_data, y_data, y_sigma=None, p_guess=None, plotting=False,
         for i,row in enumerate(cov):
             for j in range(len(p)) :
                 if verbose:
-                    print("%10f"%(cov[i,j]/np.sqrt(cov[i,i]*cov[j,j])), end=' ')
-                    # Note: comma at end of print statement suppresses new line
+                    # FIXME: The following print statement generates a syntax error!
+                    pass
+                    #print("%10f" % (cov[i,j]/np.sqrt(cov[i,i]*cov[j,j])), end=' ')
             if verbose:
                 print() 
         # Calculate Chi-squared
