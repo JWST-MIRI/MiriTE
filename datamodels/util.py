@@ -883,7 +883,7 @@ def verify_fits_file(filename, cdp_checks=False):
     None.
     
     """
-    assert isinstance(filename, (str,unicode))
+    assert isinstance(filename, str)
     
     failure_strg = ''
     with pyfits.open( filename ) as hdulist:
