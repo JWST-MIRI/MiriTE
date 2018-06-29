@@ -8,6 +8,7 @@
 # 30 Jun 2017: meta.reffile schema level removed to match changes in the
 #              JWST build 7.1 data models release. meta.reffile.type also
 #              changed to meta.reftype. TYPE keyword replaced by DATAMODL.
+# 26 Apr 2018: Corrected exception raising syntax for Python 3.
 #
 # @author: Steven Beard (UKATC)
 #
@@ -58,7 +59,7 @@ The command also takes the following options::
 
 """
 
-from __future__ import absolute_import, unicode_literals, division, print_function
+
 
 import optparse
 import sys, time
@@ -157,7 +158,7 @@ if __name__ == "__main__":
                     try:
                         test = time.strptime(useafter, '%Y-%m-%d')
                         datamodel.meta.useafter = useafter
-                    except ValueError, e:
+                    except ValueError as e:
                         strg = "Invalid USEAFTER string, \'%s\'. " % useafter
                         strg += "Please use the date format \'YYYY-MM-DD\', "
                         strg += "e.g. \'2015-11-20\'."

@@ -110,13 +110,17 @@ http://miri.ster.kuleuven.be/bin/view/Internal/CalDataProducts
 09 Apr 2018: Allow 'N/A' as an alias for 'ANY' when searching.
              Removed 'FLENS' from the filter doc strings and mentioned that
              F2550WR is a redundant filter.
+26 Apr 2018: Corrected exception raising syntax for Python 3.
+17 May 2018: Python 3: Converted dictionary keys return into a list.
+18 May 2018: Changed deprecated logger.warn() to logger.warning().
+29 Jun 2018: Global parameters moved to miri.parameters.
 
 Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
 
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 from astropy.extern import six
 import os
@@ -138,10 +142,11 @@ LOGGER = logging.getLogger("miri.cdplib") # Get a default parent logger
 # Logging level for the CDP classes
 LOGGING_LEVEL = logging.INFO # Choose ERROR, WARN, INFO or DEBUG
 
-# Import CDP utility functions and CDP dictionary.
-from miri.datamodels.util import MIRI_MODELS, MIRI_DETECTORS, \
+# Import global parameters, CDP utility functions and CDP dictionary.
+from miri.parameters import MIRI_MODELS, MIRI_DETECTORS, \
     MIRI_SETTINGS, MIRI_READPATTS, MIRI_SUBARRAYS, MIRI_CHANNELS, \
-    MIRI_BANDS, MIRI_FILTERS, get_data_class
+    MIRI_BANDS, MIRI_FILTERS
+from miri.datamodels.util import get_data_class
 from miri.datamodels.cdp import CDP_DICT
 
 # List all public classes and global functions here.
@@ -247,7 +252,7 @@ def cdp_version_decode( cdp_version ):
     """
     # Reject a null version code, a non-string or an empty string.
     if cdp_version is None or \
-       not isinstance(cdp_version, (str,unicode)) or \
+       not isinstance(cdp_version, str) or \
        len(cdp_version) < 1:
         return (None, None, None)
     
@@ -436,7 +441,7 @@ def get_cdp(cdptype, detector, model='FM', readpatt='ANY', channel='ANY',
         strg = "Data type \'%s\' is not a recognised MIRI CDP.\n" % cdptype
         strg += "It must be one of: "
         start = True
-        for key in CDP_DICT.keys():
+        for key in list(CDP_DICT.keys()):
             if start:
                 start = False
             else:
@@ -487,7 +492,7 @@ def get_cdp(cdptype, detector, model='FM', readpatt='ANY', channel='ANY',
                     detector = 'MIRIFULONG'
             strg = "Detector specification is ambiguous. Trying detector=%s" % \
                 str(detector)
-            mylogger.warn(strg)
+            mylogger.warning(strg)
 
         if detector:
             kwlist.append(detector)
@@ -605,7 +610,7 @@ class MiriCDPFolder(object):
         if self.sftp is not None:
             try:
                 self.sftp.chdir(self.ftp_path)
-            except IOError, e:
+            except IOError as e:
                 strg = "IOError: Failed to change directory to FTP folder \'%s\'\n" % self.ftp_path
                 strg += "  %s" % str(e)
                 raise IOError(strg)
@@ -644,7 +649,7 @@ class MiriCDPFolder(object):
         # Give a warning if no files have been found. This will cause
         # all subsequent attempts to match or get a CDP file to fail.
         if not self.cdp_files_available:
-            self.logger.warn("No CDP files available!")
+            self.logger.warning("No CDP files available!")
 
         # Find the documents associated with the calibration files
         self.cdp_docs_available = []
@@ -874,7 +879,7 @@ class MiriCDPFolder(object):
          
         """
         if self.sftp is None:
-            self.logger.warn("Matching against local CDP cache only.")
+            self.logger.warning("Matching against local CDP cache only.")
         
         # Build a list of substrings that must be contained and must be avoided.
         match_strings = []
@@ -1164,7 +1169,7 @@ class MiriCDPFolder(object):
                 # If the CDP names only differ in the version number, there will be no more than
                 # 2 characters different on average.
                 if _diff_count_list(candidates) > 2:
-                    self.logger.warn(strg)
+                    self.logger.warning(strg)
                 else:
                     self.logger.debug(strg)
                 return candidates[-1]
@@ -1435,9 +1440,9 @@ class MiriCDPInterface(object):
                 while not ftp_passwd:
                     # getpass does not work under Windows.
                     if sys.platform.startswith("win"):
-                        ftp_passwd = raw_input( \
+                        ftp_passwd = eval(input( \
                                     'Please enter ftp password for %s:' % \
-                                    ftp_user)
+                                    ftp_user))
                     else:
                         ftp_passwd = getpass.getpass( \
                                     'Please enter ftp password for %s: ' % \
@@ -1509,9 +1514,13 @@ class MiriCDPInterface(object):
         self.ftp_ok = False
         try:
             # First attempt to connect with hostkey checking
+            # FIXME: Disable host key checking for Python 3
+            cnopts = pysftp.CnOpts()
+            cnopts.hostkeys = None
             self.sftp = pysftp.Connection(self.ftp_host,
                                           username=self.ftp_user,
-                                          password=self.ftp_passwd)
+                                          password=self.ftp_passwd,
+                                          cnopts=cnopts)
             # If you get this far without an exception, the SFTP connection
             # has been successful.
             self.ftp_ok = True
@@ -1529,7 +1538,7 @@ class MiriCDPInterface(object):
                     strg += "*** on the command line and answer the prompt"
                     strg += " to create a hostkey.\n"
                     strg += 60 * "*"
-                    self.logger.warn(strg)
+                    self.logger.warning(strg)
                     cnopts = pysftp.CnOpts()
                     cnopts.hostkeys = None
                     # Connect without host checking
@@ -1920,7 +1929,7 @@ class MiriCDPInterface(object):
                         new_local_filename = local_filename.replace(os.path.sep, '/')
                         try:
                             self.sftp.chdir(ftp_path)
-                        except IOError, e:
+                        except IOError as e:
                             strg = "IOError: Failed to change directory to FTP folder \'%s\'\n" % ftp_path
                             strg += "  %s" % str(e)
                             raise IOError(strg)
@@ -1941,7 +1950,7 @@ class MiriCDPInterface(object):
                         self.logger.error(strg)
             else:
                 strg = " Ignoring empty file name \'%s\'" % str(cdp_file)
-                self.logger.warn(strg)
+                self.logger.warning(strg)
 #         # Ensure the connection is closed.
 #         self._close()
         return local_filename
@@ -2119,7 +2128,7 @@ class MiriCDPInterface(object):
                         new_local_filename = local_filename.replace(os.path.sep, '/')
                         try:
                             self.sftp.chdir(cdp_folder.ftp_path)
-                        except IOError, e:
+                        except IOError as e:
                             strg = "IOError: Failed to change directory to FTP folder \'%s\'\n" % cdp_folder.ftp_path
                             strg += "  %s" % str(e)
                             raise IOError(strg)
@@ -2131,7 +2140,7 @@ class MiriCDPInterface(object):
                         self.logger.debug(strg)
                 else:
                     strg = " Ignoring empty document name \'%s\'" % str(cdp_doc)
-                    self.logger.warn(strg)
+                    self.logger.warning(strg)
         # Ensure the connection is closed.
         self._close()
         return files_copied

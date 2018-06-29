@@ -32,8 +32,8 @@ The STScI jwst.dataproduct documentation.
 @author: Steven Beard (UKATC)
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 # Python logging facility
 import logging
@@ -246,6 +246,7 @@ class MiriFilter(MiriDataModel):
             (self.meta.instrument.filter_type, self.meta.instrument.filter)
         return strg
         
+    # TODO: Is this function needed?
     def __str__(self):
         """
         
@@ -253,9 +254,8 @@ class MiriFilter(MiriDataModel):
         string.
         
         """
-        # Start with the data object title and metadata
-        strg = self.get_title(underline=True, underchar="=") + "\n"
-        strg += self.get_meta_str(underline=True, underchar='-')
+        # Start with the data object title, metadata and history
+        strg = self.get_title_and_metadata()
 
         # Describe the filter transmission table
         strg += "\nColumn names: " + str(self.fieldnames) + "\n"

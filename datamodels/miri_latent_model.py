@@ -42,8 +42,8 @@ The STScI jwst.datamodels documentation.
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 import warnings
 #import numpy as np
@@ -254,8 +254,7 @@ class MiriLatentDecayModel(MiriDataModel):
         
         """
         # Start with the data object title and metadata
-        strg = self.get_title(underline=True, underchar="=") + "\n"
-        strg += self.get_meta_str(underline=True, underchar='-')
+        strg = self.get_title_and_metadata()
 
         # Describe the latent decay tables
         tableno = 1

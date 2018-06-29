@@ -28,8 +28,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 #import warnings
 #import numpy as np
@@ -139,6 +139,7 @@ class MiriMrsWavelengthCorrectionModel(MiriDataModel):
 #         wavcorr_xslice_units = self.set_table_units('wavcorr_xslice')
 #         wavcorr_shift_units = self.set_table_units('wavcorr_shift')
         
+    # TODO: Is this function needed?
     def __str__(self):
         """
         
@@ -147,8 +148,7 @@ class MiriMrsWavelengthCorrectionModel(MiriDataModel):
         
         """
         # Start with the data object title and metadata
-        strg = self.get_title(underline=True, underchar="=") + "\n"
-        strg += self.get_meta_str(underline=True, underchar='-')
+        strg = self.get_title_and_metadata()
 
         # Describe the wavelength correction tables
         if self.wavcorr_optical is not None:

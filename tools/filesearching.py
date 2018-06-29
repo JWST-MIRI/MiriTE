@@ -34,12 +34,13 @@ The class hierarchy is::
 30 Mar 2016: Added a search path parameter to the ParameterFileManager,
              so the search result can be made predictable.
 26 Mar 2018: Changed 'nosuchfile' to a name even less likely to exist.
+17 May 2018: Python 3: Converted dictionary keys return into a list.
 
 @author: Steven Beard (UKATC)
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 from astropy.extern import six 
 import sys, os, fnmatch
@@ -672,7 +673,7 @@ class ParameterFileManager(object):
         
         """
         keylist = []
-        for key in self._kwdict.keys():
+        for key in list(self._kwdict.keys()):
             # Ignore keywords beginning '__' and module and function
             # definitions containing '<module', '<function' or '<class.
             if key.find('__') != 0:
@@ -802,11 +803,11 @@ class ParameterFileManager(object):
         # List the values assiciated with each of the known
         # non-private keywords. If a keyword is another dictionary,
         # the values contained inside that are listed as well.
-        for key in self.keys():
+        for key in list(self.keys()):
             value = self._kwdict[key]
             if isinstance(value, dict):
                 strg += "%8s :\n" % key
-                for key2 in value.keys():
+                for key2 in list(value.keys()):
                     value2 = value[key2]
                     strg += "\t%8s (" % key2
                     strg += "\'%-8s\')\n" % str(value2)

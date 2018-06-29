@@ -332,12 +332,18 @@ Calibration Data Products (CDPs).
 19 Feb 2018: Non-linearity correction moved here.
 20 Apr 2018: Non-linearity correction is only possible when amplifier gain
              is also simulated.
+26 Apr 2018: Corrected exception raising syntax for Python 3.
+             Corrected syntax of np.where() when looking for NaN values.
+17 May 2018: Python 3: Converted dictionary keys return into a list.
+18 May 2018: Changed deprecated logger.warn() to logger.warning().
+23 May 2018: Check for wait_time=None in Python 3.
+04 Jun 2018: Added hard_reset function.
 
 @author: Steven Beard
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 from astropy.extern import six
 
 # Python logging facility
@@ -418,9 +424,14 @@ def _report_sca_parameters(inputfile, outputfile, detectorid, readout_mode,
     """
     if inputfile:
         if isinstance(inputfile, (tuple,list)):
-            strg = "Simulating " + str(readout_mode) + \
-                " detector readout for " + str(detectorid) + \
-                " from list of illumination files:"
+            if readout_mode:
+                strg = "Simulating " + str(readout_mode) + \
+                    " detector readout for " + str(detectorid) + \
+                    " from list of illumination files:"
+            else:
+                strg = "Simulating default " + \
+                    " detector readout for " + str(detectorid) + \
+                    " from list of illumination files:"                        
             for thisfile in inputfile:
                 strg += "   %s" % thisfile
             logger.info( strg )
@@ -489,10 +500,11 @@ def _report_sca_parameters(inputfile, outputfile, detectorid, readout_mode,
         switched_off.append("Bias and Gain")
     if not simulate_nonlinearity:
         switched_off.append("Non-linearity")
-    if ('SLOW' in readout_mode) or (not simulate_drifts):
-        switched_off.append("Detector drifts")
-    if ('SLOW' in readout_mode) or (not simulate_latency):
-        switched_off.append("Detector latency")
+    if readout_mode:
+        if ('SLOW' in readout_mode) or (not simulate_drifts):
+            switched_off.append("Detector drifts")
+        if ('SLOW' in readout_mode) or (not simulate_latency):
+            switched_off.append("Detector latency")
     if switched_off:
         logger.debug( "NOTE: The following effects are switched off: %s" % \
             "\'" + "\', \'".join(switched_off) + "\'" )
@@ -1001,7 +1013,7 @@ class SensorChipAssembly(object):
         if not simulate_gain and simulate_nonlinearity and NONLINEARITY_BY_TABLE:
             strg = "Cannot simulate nonlinearity unless amplifier gain is also simulated"
             strg += "\n   Nonlinearity simulation turned off."
-            self.logger.warn(strg)
+            self.logger.warning(strg)
             simulate_nonlinearity = False
             
         self.set_simulation_flags(readout_mode, qe_adjust=qe_adjust,
@@ -1139,7 +1151,7 @@ class SensorChipAssembly(object):
                 else:
                     strg = "***Cosmic ray library is not defined."
                 strg += " Falling back to RANDOM mode."
-                self.logger.warn(strg)
+                self.logger.warning(strg)
                 self.cosmic_ray_env = load_cosmic_ray_random(
                                                     cosmic_ray_mode=cr_mode,
                                                     verbose=self._verbose,
@@ -1259,7 +1271,7 @@ class SensorChipAssembly(object):
            self.simulate_drifts != simulate_drifts or \
            self.simulate_latency != simulate_latency:
             if self.detector is not None:
-                self.logger.warn("Simulation flags have changed. " + \
+                self.logger.warning("Simulation flags have changed. " + \
                         "Restarting simulation with a new detector. " + \
                         "Latent effects up to this point will be erased.")
                 del self.detector
@@ -1325,7 +1337,7 @@ class SensorChipAssembly(object):
                 illum_shape
             strg += "Truncating to detector size of %d x %d pixels." % \
                 (self._sca['ILLUMINATED_COLUMNS'], self._sca['ILLUMINATED_ROWS'])
-            self.logger.warn(strg)
+            self.logger.warning(strg)
             self.illumination_map.truncate([self._sca['ILLUMINATED_COLUMNS'],
                                             self._sca['ILLUMINATED_ROWS']] )
 
@@ -1432,7 +1444,7 @@ class SensorChipAssembly(object):
                     strg += "may be too large for the bad pixel or dark "
                     strg += "frames, which expect up to %d x %d. " % fullframe
                     strg += "Try --nobadpixels --nodark."
-                    self.logger.warn( strg )
+                    self.logger.warning( strg )
                     
         # Give a warning if the input subarray mode is smaller than the
         # output subarray mode.
@@ -1443,7 +1455,7 @@ class SensorChipAssembly(object):
                     strg = "NOTE: Output subarray (%d x %d) " % oshape
                     strg += "is larger than input array (%d x %d)." % ishape
                     strg += " There will be some gaps in the output data."
-                    self.logger.warn( strg )
+                    self.logger.warning( strg )
        
         # The previous flux data is invalid.
         self.flux = None
@@ -1526,7 +1538,7 @@ class SensorChipAssembly(object):
                 illum_shape
             strg += "Truncating to detector size of %d x %d pixels." % \
                 (self._sca['ILLUMINATED_COLUMNS'], self._sca['ILLUMINATED_ROWS'])
-            self.logger.warn(strg)
+            self.logger.warning(strg)
             illumination_map.truncate([self._sca['ILLUMINATED_COLUMNS'],
                                        self._sca['ILLUMINATED_ROWS']] )
             
@@ -1741,6 +1753,34 @@ class SensorChipAssembly(object):
 
         self.subarray_previous = self.subarray_str
         self.readout_mode_previous = self.readout_mode
+        
+    def hard_reset(self):
+        """
+        
+        If a detector object exists, execute a hard reset to erase latency and
+        drift information.
+        
+        This function simulates the kind of reset which happens when the
+        detector is annealed.
+                
+        :Parameters:
+     
+        None.
+             
+        :Prerequisites:
+        
+        Can only be used after a detector object has been created.
+                
+        """
+        if self.detector is not None:
+            strg = "\n\t*** Detector hard reset. "
+            strg += "NOTE: All latency and drift data will be erased."
+            self.logger.info( strg )
+            self.detector.hard_reset()
+        else:
+            strg = "\n\t*** Attempt to hard reset detector object before it exists. "
+            strg += "Read some illumination data first."
+            self.logger.error( strg )
  
     def read_fringe_map(self, filename):
         """
@@ -2111,19 +2151,19 @@ class SensorChipAssembly(object):
             # Check the amount of flux is within a sensible range.
             # Give a warning if the flux is likely to saturate the
             # detector. Reject any truly silly flux levels.
-            wherenan = np.where( flux == np.nan )
+            wherenan = np.where( np.isnan(flux) )
             if len(wherenan[0]) > 0:
                 strg = "***Input flux array contains "
                 strg += "%d NaN values." % len(wherenan[0])
                 strg += " These will be replaced by 0.0."
-                self.logger.warn(strg)
+                self.logger.warning(strg)
                 flux[ wherenan ] = 0.0 
             
             if flux.min() < 0.0:
                 whereneg = np.where( flux < 0.0 )
                 strg = "***Input flux array contains "
                 strg += "%d negative values." % len(whereneg[0])
-                self.logger.warn(strg)
+                self.logger.warning(strg)
 
             # Calculate an approximate flux that would saturate the detectors
             # after only one frame time.
@@ -2168,7 +2208,7 @@ class SensorChipAssembly(object):
                 strg += "is greater than first frame "
                 strg += "saturation level of %g photons/s/pixel." % \
                     float(saturation)
-                self.logger.warn(strg)
+                self.logger.warning(strg)
             
             if self.fringe_map_data is None:
                 self.flux = flux
@@ -2383,7 +2423,7 @@ class SensorChipAssembly(object):
                 try:
                     self.exposure_data.add_dark( self.detector.dark_map,
                                                  clipvalue=None )
-                except ValueError, e:
+                except ValueError as e:
                     # Catch an exception and instead issue a log message.
                     strg = str(e)
                     strg += ": DARK addition skipped."
@@ -2411,7 +2451,7 @@ class SensorChipAssembly(object):
         metadata.from_data_object( self.illumination_map )
         
         # Import the primary metadata (but ignore the TYPE keyword)
-        for key in metadata.keys():
+        for key in list(metadata.keys()):
             if key == 'TYPE':
                 continue # Output data will have a different TYPE
             self.metadata[key] = metadata[key]
@@ -2595,7 +2635,7 @@ class SensorChipAssembly(object):
             self.logger.debug( str(self.metadata) )
 
         # Copy primary metadata to the exposure data FITS header.
-        for keyw in self.metadata.keys():
+        for keyw in list(self.metadata.keys()):
             value = self.metadata[keyw]
             try:
                 self.exposure_data.set_fits_keyword(keyw, value,
@@ -2604,12 +2644,12 @@ class SensorChipAssembly(object):
                 strg = "\nKeyword %s cannot be set to %s." % (keyw, str(value))
                 strg += " " + str(e)
                 strg += " Ignored."
-                self.logger.warn(strg)
+                self.logger.warning(strg)
             except ValueError as e:
                 strg = "\nKeyword %s cannot be set to %s." % (keyw, str(value))
                 strg += " " + str(e)
                 strg += " Ignored."
-                self.logger.warn(strg)
+                self.logger.warning(strg)
              
         # Copy comment and history records to the exposure data FITS header.
         comments = self.metadata.get_comments()
@@ -2629,7 +2669,7 @@ class SensorChipAssembly(object):
         # to the exposure data FITS header.
         # NOTE: Only the first 2 axes of the illumination model WCS
         # parameters are relevant.
-        if 'WCSAXES' in intensity_metadata.keys():
+        if 'WCSAXES' in list(intensity_metadata.keys()):
             wcsaxes = intensity_metadata['WCSAXES']
         else:
             wcsaxes = 2
@@ -2654,23 +2694,23 @@ class SensorChipAssembly(object):
             ctype_kw = 'CTYPE%d' % axis1
             cunit_kw = 'CUNIT%d' % axis1
             cdelt_kw = 'CDELT%d' % axis1
-            if crpix_kw in intensity_metadata.keys():
+            if crpix_kw in list(intensity_metadata.keys()):
                 crpix.append( intensity_metadata[crpix_kw] )
             else:
                 crpix.append( 0.0 )
-            if crval_kw in intensity_metadata.keys():
+            if crval_kw in list(intensity_metadata.keys()):
                 crval.append( intensity_metadata[crval_kw] )
             else:
                 crval.append( 0.0 )
-            if ctype_kw in intensity_metadata.keys():
+            if ctype_kw in list(intensity_metadata.keys()):
                 ctype.append( intensity_metadata[ctype_kw] )
             else:
                 ctype.append( '' )
-            if cunit_kw in intensity_metadata.keys():
+            if cunit_kw in list(intensity_metadata.keys()):
                 cunit.append( intensity_metadata[cunit_kw] )
             else:
                 cunit.append( '' )
-            if cdelt_kw in intensity_metadata.keys():
+            if cdelt_kw in list(intensity_metadata.keys()):
                 cdelt.append( intensity_metadata[cdelt_kw] )
             else:
                 cdelt.append( 1.0 )
@@ -2678,7 +2718,7 @@ class SensorChipAssembly(object):
             for other in range(0, 2):
                 other1 = other + 1
                 pc_kw = 'PC%d_%d' % (axis1, other1)
-                if pc_kw in intensity_metadata.keys():
+                if pc_kw in list(intensity_metadata.keys()):
                     pc_defined = True
                     pc[axis,other] = intensity_metadata[pc_kw]
 
@@ -2688,51 +2728,51 @@ class SensorChipAssembly(object):
             pc = None
 
         # Additional, WCS-related information.
-        if 'S_REGION' in intensity_metadata.keys():
+        if 'S_REGION' in list(intensity_metadata.keys()):
             s_region = intensity_metadata['S_REGION']
         else:
             s_region = None
-        if 'WAVSTART' in intensity_metadata.keys():
+        if 'WAVSTART' in list(intensity_metadata.keys()):
             waverange_start = intensity_metadata['WAVSTART']
         else:
             waverange_start = None
-        if 'WAVEND' in intensity_metadata.keys():
+        if 'WAVEND' in list(intensity_metadata.keys()):
             waverange_end = intensity_metadata['WAVEND']
         else:
             waverange_end = None
-        if 'SPORDER' in intensity_metadata.keys():
+        if 'SPORDER' in list(intensity_metadata.keys()):
             spectral_order = intensity_metadata['SPORDER']
         else:
             spectral_order = None
-        if 'V2_REF' in intensity_metadata.keys():
+        if 'V2_REF' in list(intensity_metadata.keys()):
             v2_ref = intensity_metadata['V2_REF']
         else:
             v2_ref = None
-        if 'V3_REF' in intensity_metadata.keys():
+        if 'V3_REF' in list(intensity_metadata.keys()):
             v3_ref = intensity_metadata['V3_REF']
         else:
             v3_ref = None
-        if 'VPARITY' in intensity_metadata.keys():
+        if 'VPARITY' in list(intensity_metadata.keys()):
             vparity = intensity_metadata['VPARITY']
         else:
             vparity = None
-        if 'V3I_YANG' in intensity_metadata.keys():
+        if 'V3I_YANG' in list(intensity_metadata.keys()):
             v3yangle = intensity_metadata['V3I_YANG']
         else:
             v3yangle = None
-        if 'RA_REF' in intensity_metadata.keys():
+        if 'RA_REF' in list(intensity_metadata.keys()):
             ra_ref = intensity_metadata['RA_REF']
         else:
             ra_ref = None
-        if 'S_REGION' in intensity_metadata.keys():
+        if 'S_REGION' in list(intensity_metadata.keys()):
             s_region = intensity_metadata['S_REGION']
         else:
             s_region = None
-        if 'DEC_REF' in intensity_metadata.keys():
+        if 'DEC_REF' in list(intensity_metadata.keys()):
             dec_ref = intensity_metadata['DEC_REF']
         else:
             dec_ref = None
-        if 'ROLL_REF' in intensity_metadata.keys():
+        if 'ROLL_REF' in list(intensity_metadata.keys()):
             roll_ref = intensity_metadata['ROLL_REF']
         else:
             roll_ref = None
@@ -3512,7 +3552,7 @@ class SensorChipAssembly(object):
                 self.read_fringe_map(fringemap, ftype='FITS')
 
             # Wait for the given elapsed time.
-            if wait_time > 0.0:
+            if wait_time is not None and wait_time > 0.0:
                 self.wait(wait_time)
 
             # Simulate an exposure and return some simulated data.
@@ -3916,7 +3956,7 @@ class SensorChipAssembly(object):
             self.read_fringe_map(fringemap, ftype='FITS')
 
         # Wait for the given elapsed time.
-        if wait_time > 0.0:
+        if wait_time is not None and wait_time > 0.0:
             self.wait(wait_time)
     
         # Simulate an exposure and return some simulated data.
@@ -4414,7 +4454,7 @@ def simulate_sca(inputfile, outputfile, detectorid, scale=1.0, fringemap=None,
     """
     strg = "\nsimulate_sca function is now deprecated. "
     strg += "Please use the SensorChipAssembly.simulate_files() class method."
-    logger.warn(strg)
+    logger.warning(strg)
     # Create an sca object and then run the simuation.
     sca = SensorChipAssembly1()
     sca.simulate_files(inputfile, outputfile, detectorid, scale=scale,
@@ -4712,7 +4752,7 @@ def simulate_sca_list(inputfile, outputfile, detectorid, scale=1.0,
     """
     strg = "\nsimulate_sca_list function is now deprecated. "
     strg += "Please use the SensorChipAssembly.simulate_files() class method."
-    logger.warn(strg)
+    logger.warning(strg)
     # Create an sca object and then run the simuation.
     sca = SensorChipAssembly1()
     sca.simulate_files(inputfile, outputfile, detectorid, scale=scale,
@@ -4993,7 +5033,7 @@ def simulate_sca_pipeline(illumination_map, scale=1.0,
     """
     strg = "\nsimulate_sca_pipeline function is now deprecated. "
     strg += "Please use the SensorChipAssembly.simulate_pipe() class method."
-    logger.warn(strg)
+    logger.warning(strg)
     # Create an sca object and then run the simuation.
     sca = SensorChipAssembly1()
     exposure_data = sca.simulate_pipe(illumination_map, scale=scale,
@@ -5301,7 +5341,7 @@ if __name__ == '__main__':
         mode = 'SLOW'
         inttime = 60.0
         print("\nTesting simulate_files with all readout modes...\n" + (50 * "*"))
-        for mode in detector_properties['READOUT_MODE'].keys():    
+        for mode in list(detector_properties['READOUT_MODE'].keys()):    
             # Use a longer integration time for SLOW mode.
             if mode == 'SLOW':
                 inttime = 60.0

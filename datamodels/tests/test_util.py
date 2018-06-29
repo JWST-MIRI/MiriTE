@@ -8,12 +8,13 @@ Simple tests of the data model utility functions in datamodels/util.py.
 :History:
 
 19 Jan 2018: created
+27 Apr 2018: Specify overwrite=True when calling util.verify_cdp_file
 
 @author: Steven Beard (UKATC)
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 import os
 import unittest
@@ -131,7 +132,7 @@ class TestFileIO(unittest.TestCase):
         # Check that the CDP verification function passes the simple
         # files created by this test.
         for (filename, datamodel) in self.cdp_models_to_test:
-            util.verify_cdp_file(filename)
+            util.verify_cdp_file(filename, overwrite=True)
 
 # If being run as a main program, run the tests.
 if __name__ == '__main__':

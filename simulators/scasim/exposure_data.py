@@ -99,12 +99,14 @@ It has been superceeded by the datamodels/miri_exposure_model.py
 08 Aug 2017: Log an error instead of raising an exception when there are
              missing header keywords.
 11 Sep 2017: Ensure EXPSTART, EXPMID and EXPEND keywords are MJD.
+30 Apr 2018: Replaced xrange with range for Python 3.
+17 May 2018: Python 3: Converted dictionary keys return into a list.
 
 @author: Steven Beard
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 # Python logging facility
 import logging
@@ -468,7 +470,7 @@ class Metadata(object):
             raise TypeError(strg)
 
         metadict = data_object.fits_metadata_dict()
-        metakeys = metadict.keys()
+        metakeys = list(metadict.keys())
         for keyw in metakeys:
             (fitshdu, fitskey, fitscomment) = metadict[keyw]
             value = data_object[keyw]
@@ -575,7 +577,7 @@ class Metadata(object):
         if add_description:
             fitsheader.add_comment(self.description)
         
-        for key in self.keys():
+        for key in list(self.keys()):
 
             # Check the keyword name is a valid FITS keyword.
             if not self._key_name_valid_fits(key):
@@ -640,7 +642,7 @@ class Metadata(object):
             strg += " \'%s\'" % self.description
         strg += ":\n"
         # Add a description for each known keyword
-        for key in self.keys():
+        for key in list(self.keys()):
             value = self._kwdict[key]
             strg += "%8s = %s\n" % (key, str(value))
         # Add any comment and history records contained in the
@@ -1226,7 +1228,7 @@ class ExposureData(object):
         """
         # Convert unusual values into a string
         if six.PY2:
-            usual_types = (str,unicode,float,int)
+            usual_types = (str,float,int)
         else:
             usual_types = (str,float,int)
         if not isinstance(value, usual_types):
@@ -1568,7 +1570,7 @@ class ExposureData(object):
             output = (self.data[:,-1,:,:] - self.data[:,0,:,:]) / float(timediff)
         else:
             # Full straight line fit
-            timearray = grptime * np.array( range(0, self.ngroups) )
+            timearray = grptime * np.array( list(range(0, self.ngroups)) )
             for intg in range(0, self.nints):
                 for row in range(0, self.rows):
                     for column in range(0, self.columns):
@@ -1605,9 +1607,9 @@ class ExposureData(object):
         count = np.zeros([self.nints_file, self.ngroups_file,
                             1, 1], dtype=np.float32)
         
-        for intg in xrange(0, self.nints):
+        for intg in range(0, self.nints):
             intg_file = intg // self.intavg
-            for grp in xrange(0, self.ngroups):
+            for grp in range(0, self.ngroups):
                 grp_file = grp // self.grpavg
                 output[intg_file,grp_file,:,:] += \
                     self.data[intg,grp,:,:]

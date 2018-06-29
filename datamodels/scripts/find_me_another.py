@@ -60,7 +60,7 @@ The command also takes the following options::
 
 """
 
-from __future__ import absolute_import, unicode_literals, division, print_function
+
 
 import optparse
 import sys, time
@@ -83,7 +83,7 @@ def get_cdp_metadata( filename  ):
 
         if hdulist is not None:
             header = hdulist[0].header
-            header_keys = header.keys()
+            header_keys = list(header.keys())
             if 'REFTYPE' in header or 'REFTYPE' in header_keys:
                 # There is a new data type keyword in the header.
                 datatype = header['REFTYPE']

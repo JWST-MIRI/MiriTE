@@ -82,12 +82,14 @@ d = thin diamond
 07 Oct 2016: Added equal_aspect parameter. Added plot_circles and plot_ellipses.
 04 Jan 2017: Make the module resilient to matplotlib import problems.
              Corrected references to old miri.miritools packages.
+18 May 2018: Changed deprecated logger.warn() to logger.warning(). Fixed
+             incorrect log statements.
 
 @author: Steven Beard (UKATC)
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 # Get a logger.
 import logging
@@ -225,7 +227,7 @@ def new_figure(page, figsize=(10,8), equal_aspect=False,
             fig.suptitle(stitle)
         return fig
     else:
-        logging.warn("matplotlib.pyplot not available")
+        logger.warning("matplotlib.pyplot not available")
         return None
 
 def add_subplot(plotfig, subrows=1, subcols=1, subno=1, **kwargs):
@@ -257,7 +259,7 @@ def add_subplot(plotfig, subrows=1, subcols=1, subno=1, **kwargs):
     if plotfig is not None:
         return plotfig.add_subplot(subrows, subcols, subno, **kwargs)
     else:
-#         logging.warn("matplotlib figure not available")
+#         logger.warning("matplotlib figure not available")
         return None
 
 def show_plot(pyplt=plt, prompt=''):
@@ -286,7 +288,7 @@ def show_plot(pyplt=plt, prompt=''):
         pyplt.clf()
         pyplt.close()
     else:
-        logging.warn("matplotlib.pyplot not available")
+        logger.warning("matplotlib.pyplot not available")
 
 def close(pyplt=plt):
     """
@@ -425,7 +427,7 @@ def plot_text(text, xpos=0.05, ypos=0.95, pyplt=plt, plotfig=None,
         # Return the axis object in which the text was added.
         return plotaxis
     else:
-        logging.warn("matplotlib.pyplot not available")
+        logger.warning("matplotlib.pyplot not available")
         return None
 
 def plot_xy(xdata, ydata, yerr=None, pyplt=plt, plotfig=None, plotaxis=None,
@@ -587,7 +589,7 @@ def plot_xy(xdata, ydata, yerr=None, pyplt=plt, plotfig=None, plotaxis=None,
         # Return the axis object in which the plot was created.
         return plotaxis
     else:
-        logging.warn("matplotlib.pyplot not available")
+        logger.warning("matplotlib.pyplot not available")
         return None
 
 def plot_circles(xdata, ydata, radii, pyplt=plt, plotfig=None, plotaxis=None,
@@ -773,7 +775,7 @@ def plot_circles(xdata, ydata, radii, pyplt=plt, plotfig=None, plotaxis=None,
         # Return the axis object in which the plot was created.
         return plotaxis
     else:
-        logging.warn("matplotlib.pyplot and matplotlib.patches not available")
+        logger.warning("matplotlib.pyplot and matplotlib.patches not available")
         return None
 
 def plot_ellipses(xdata, ydata, majors, minors, tilts, pyplt=plt, plotfig=None, plotaxis=None,
@@ -972,7 +974,7 @@ def plot_ellipses(xdata, ydata, majors, minors, tilts, pyplt=plt, plotfig=None, 
         # Return the axis object in which the plot was created.
         return plotaxis
     else:
-        logging.warn("matplotlib.pyplot not available")
+        logger.warning("matplotlib.pyplot not available")
         return None
 
 def plot_xycolumn(xdata, ylist, yerrlist=None, pyplt=plt, figsize=(8,10),
@@ -1152,7 +1154,7 @@ def plot_xycolumn(xdata, ylist, yerrlist=None, pyplt=plt, figsize=(8,10),
             pyplt.clf()
             pyplt.close()
     else:
-        logging.warn("matplotlib.pyplot not available")
+        logger.warning("matplotlib.pyplot not available")
 
 def plot_hist(data, bins=30, equalwidths=True, pyplt=plt, plotfig=None,
               plotaxis=None, figsize=(10,6), equal_aspect=False, showplot=None,
@@ -1263,7 +1265,7 @@ def plot_hist(data, bins=30, equalwidths=True, pyplt=plt, plotfig=None,
                 nbins = int(bins)
                 bins = np.logspace(lowlog, highlog, nbins)
             else:
-                logger.warn( "plot_hist: Equal width bins not possible - " + \
+                logger.warning( "plot_hist: Equal width bins not possible - " + \
                     "Negative X values and xscale=%s" % xscale )
     
         # If specified, the clipping parameters are expected to be in the range
@@ -1334,7 +1336,7 @@ def plot_hist(data, bins=30, equalwidths=True, pyplt=plt, plotfig=None,
         # Return the axis object in which the plot was created.
         return plotaxis
     else:
-        logging.warn("matplotlib.pyplot not available")
+        logger.warning("matplotlib.pyplot not available")
         return None
 
 def plot_image(data, pyplt=plt, plotfig=None, plotaxis=None, figsize=(10,10),
@@ -1494,7 +1496,7 @@ def plot_image(data, pyplt=plt, plotfig=None, plotaxis=None, figsize=(10,10),
             # For 3-D data there is no point in the caller providing a
             # figure or axis object.
             if plotaxis is not None:
-                logger.warn( "plot_image: The existing matplotlib axis is ignored " + \
+                logger.warning( "plot_image: The existing matplotlib axis is ignored " + \
                     "for 3-D data. The plot will start from a new figure." )
     
             # For a multiple plot, the default is to have no X,Y labels
@@ -1520,7 +1522,7 @@ def plot_image(data, pyplt=plt, plotfig=None, plotaxis=None, figsize=(10,10),
                 plotdata.ndim
             raise TypeError(strg)
     else:
-        logging.warn("matplotlib.pyplot not available")
+        logger.warning("matplotlib.pyplot not available")
 
 def plot_images(datalist, pyplt=plt, figsize=(10,10), equal_aspect=False,
                 showplot=True, datatype='matrix', datascales=None, cmap='hot',
@@ -1611,7 +1613,7 @@ def plot_images(datalist, pyplt=plt, figsize=(10,10), equal_aspect=False,
             strg = "plot_images: The full plot would require %d " % nfigs
             strg += "figures, but the maximum is 1."
             strg += "Some data will not be plotted."
-            logger.warn( strg )
+            logger.warning( strg )
         
         # The default labels for a single image are 'Columns' and 'Rows'.
         if len(datalist) < 2:
@@ -1661,7 +1663,7 @@ def plot_images(datalist, pyplt=plt, figsize=(10,10), equal_aspect=False,
 #             pyplt.clf()
 #             pyplt.close()
     else:
-        logging.warn("matplotlib.pyplot not available")
+        logger.warning("matplotlib.pyplot not available")
         return None
 
 def plot_image2D(data, pyplt=plt, plotfig=None, plotaxis=None, figsize=(10,10),
@@ -1856,7 +1858,7 @@ def plot_image2D(data, pyplt=plt, plotfig=None, plotaxis=None, figsize=(10,10),
         # Return the axis object in which the plot was created.
         return plotaxis
     else:
-        logging.warn("matplotlib.pyplot not available")
+        logger.warning("matplotlib.pyplot not available")
         return None
 
 def plot_image3D(data, pyplt=plt, plotfig=None, figsize=(10,10),
@@ -1969,7 +1971,7 @@ def plot_image3D(data, pyplt=plt, plotfig=None, figsize=(10,10),
             strg = "plot_image3D: The full plot would require %d " % nfigs
             strg += "figures, but the maximum is %d. " % maxfigures
             strg += "Some data will not be plotted."
-            logger.warn( strg )
+            logger.warning( strg )
             
         # Step through each slice of the 3-D data and display each one
         # in a separate subplot.
@@ -2005,7 +2007,7 @@ def plot_image3D(data, pyplt=plt, plotfig=None, figsize=(10,10),
 #             pyplt.clf()
 #             pyplt.close()
     else:
-        logging.warn("matplotlib.pyplot not available")
+        logger.warning("matplotlib.pyplot not available")
 
 #
 # Other display utilities can be added here. Here are some examples...
@@ -2080,7 +2082,7 @@ def plot( *args ):
             strg = "plot: The full plot would require %d " % nfigs
             strg += "figures, but the maximum is 1. "
             strg += "Some data will not be plotted."
-            logger.warn( strg )
+            logger.warning( strg )
         
         # The maximum title length depends on the number of columns.
         tlen = 80 // pltrows
@@ -2104,7 +2106,7 @@ def plot( *args ):
             ax = fig.add_subplot(pltrows, pltcols, count)
             
             # Check the data type.
-            if isinstance(obj,(str,unicode)):
+            if isinstance(obj, str):
                 
                 # Text is simply written within an otherwise empty axis.
                 ax.set_title( obj.__class__.__name__ )
@@ -2162,7 +2164,7 @@ def plot( *args ):
         plt.show()
         del largs
     else:
-        logging.warn("matplotlib plotting utilities are not available")
+        logger.warning("matplotlib plotting utilities are not available")
 
 
 #

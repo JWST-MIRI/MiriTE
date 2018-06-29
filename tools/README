@@ -3,13 +3,22 @@ and utilities software developed by the MIRI European Consortium
 software team.
 
 Documentation describing this software may be found within the "doc" 
-directory. The following commands will build a new set of documentation:
+directory. The following commands will build a new set of documentation
+(assuming you have a compatible version of latex installed on your workstation):
 
 cd doc
 make html
-make latex
-cd build/latex
-make all-pdf
+make latex         # Requires latex
+make latexpdf      # Requires latex and latexmk
+
+If you don't have latexmk installed, the following commands can be used to
+build the PDF document manually:
+
+pushd build/latex
+latex miri_tools.tex
+latex miri_tools.tex
+pdflatex miri_tools.tex
+popd
 
 After executing these commands you will find a reference manual in 
 "build/latex/miri_tools.pdf" and more readable set of HTML pages in

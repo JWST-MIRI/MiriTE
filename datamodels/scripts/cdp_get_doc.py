@@ -7,6 +7,7 @@
 #              JWST build 7.1 data models release. meta.reffile.type also
 #              changed to meta.reftype. TYPE keyword replaced by DATAMODL.
 # 26 Jun 2017: Added cdp_ftp_path parameter and set to default if not specified.
+# 17 May 2018: Python 3: Converted dictionary keys return into a list.
 #
 # @author: Steven Beard (UKATC)
 #
@@ -59,7 +60,7 @@ The command also takes the following options::
 
 """
 
-from __future__ import absolute_import, unicode_literals, division, print_function
+
 
 import optparse
 import sys, time
@@ -156,7 +157,7 @@ if __name__ == "__main__":
         document_string = ''
         history_list = datamodel.get_history()
         for history in history_list:
-            parts = history.keys()
+            parts = list(history.keys())
             for key in parts:
                 hist_string = str( history[key] )
                 if 'DOCUMENT' in hist_string:

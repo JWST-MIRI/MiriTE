@@ -32,12 +32,13 @@ The STScI jwst.datamodels documentation.
              following changes to jwst.datamodels.model_base.DataModel.
 04 May 2016: noerr option added to HasDataErrAndDq.
 12 Jul 2017: set_data_fill and set_err_fill options added to HasDataErrAndDq.
+27 Jun 2018: Added HasDataErrAndGroups class to be used with ramp data.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 import sys
 from astropy.extern import six
@@ -69,7 +70,6 @@ class HasMask(object):
     def __init__(self, dq):
         if dq is not None:
             self.dq = dq
-#             self.dq = np.asarray(dq)  # Is this needed?
  
     # "mask" is an alias for the "dq" attribute.
     @property
@@ -246,7 +246,6 @@ class HasData(object):
     def __init__(self, data):
         if data is not None:
             self.data = data
-#             self.data = np.asarray(data)  # Is this needed?
 
     def _check_for_data(self):
         """
@@ -446,7 +445,7 @@ class HasData(object):
 
         return newobject
 
-    # Trap implementations that aren't using "from __future__ import division"
+    # In Python 3, division is the same as true division.
     def __div__(self, other):
         return self.__truediv__(other)
 
@@ -478,7 +477,6 @@ class HasDataErrAndDq(HasData):
 
         if dq is not None:
             self.dq = dq
-#             self.dq = np.asarray(dq)  # Is this needed?
 
     def set_data_fill(self, data_fill):
         """
@@ -501,7 +499,6 @@ class HasDataErrAndDq(HasData):
         
         """
         self._data_fill = data_fill
-
 
     def set_err_fill(self, err_fill):
         """
@@ -843,18 +840,6 @@ class HasDataErrAndDq(HasData):
         
         """
         return combine_quality(dq1, dq2)
-#         # The end product will have a DQ unit as long as one of the
-#         # products has one.
-#         if dq1 is not None and dq2 is not None:
-#             # There are two quality arrays - merge them.
-#             newdq = dq1 | dq2
-#         elif dq1 is not None:
-#             newdq = dq1
-#         elif dq2 is not None:
-#             newdq = dq2
-#         else:
-#             newdq = None
-#         return newdq
 
     def __add__(self, other):
         """
@@ -1098,7 +1083,7 @@ class HasDataErrAndDq(HasData):
 
         return newobject
 
-    # Trap implementations that aren't using "from __future__ import division"
+    # From Python 3, division is the same as true division.
     def __div__(self, other):
         return self.__truediv__(other)
 
@@ -1159,6 +1144,281 @@ class HasDataErrAndDq(HasData):
             return masked.filled(self._err_fill_value)
         else:
             return self.err
+
+
+class HasDataErrAndGroups(HasDataErrAndDq):
+    """
+    
+    An abstract class which overrides the data quality masking functions
+    of HasDataErrAndDq for ramp data which contains PIXELDQ and RAMPDQ
+    arrays instead of DQ. The DQ array for ramp data is read-only.
+
+    """
+    def __init__(self, data, err, noerr=False):
+        super(HasDataErrAndGroups, self).__init__(data=data, err=err, dq=None,
+                                                  noerr=noerr )
+
+    def __add__(self, other):
+        """
+        
+        Add a scalar, an array or another DataModel object to
+        this MiriMeasuredModel object.
+        
+        """
+        # Check this object is capable of mathematical operation.
+        self._check_for_data()
+        # Start with an empty version of the current object and clone
+        # the metadata.
+        newobject = self.__class__()
+        newobject.update( self )
+        
+        if isinstance(other,(float,int)):
+            # A scalar quantity is being added. Add to the SCI array but
+            # leave the ERR and DQ arrays as they are.
+            newobject.data = self.data + other
+            if not self.noerr:
+                newobject.err = self.err
+            newobject.pixeldq = self.pixeldq
+            newobject.groupdq = self.groupdq
+            
+        elif isinstance(other, (ma.masked_array,np.ndarray,list,tuple)):
+            # A data array is being added to this product. This should
+            # work provided the two arrays are broadcastable.
+            newobject.data = self.data + np.asarray(other)
+            # Adding a plain data array erases the error information.
+            if not self.noerr:
+                newobject.err = np.zeros_like(self.err)
+            newobject.pixeldq = self.pixeldq
+            newobject.groupdq = self.groupdq
+             
+        elif isinstance(other, DataModel):
+            # Two data products are being added together. Ensure they
+            # both have a valid primary data array.
+            if hasattr(other, 'data') and self._isvalid(other.data):
+                newobject.data = self.data + other.data
+                if not self.noerr:
+                    if hasattr(other, 'err') and self._isvalid(other.err):
+                        newobject.err = \
+                            self._combine_errors_quadrature(self.err,
+                                                            other.err)
+                    else:
+                        # If only one error array is known, the combined error
+                        # becomes unknown.
+                        newobject.err = np.zeros_like(self.err)
+                    
+                if hasattr(other, 'pixeldq') and self._isvalid(other.pixeldq):
+                    newobject.pixeldq = self._combine_quality(self.pixeldq, other.pixeldq)
+                if hasattr(other, 'groupdq') and self._isvalid(other.groupdq):
+                    newobject.groupdq = self._combine_quality(self.groupdq, other.groupdq)
+            else:
+                raise TypeError("Both data products must contain a " + \
+                                "primary data array.")            
+        else:
+            strg = "Cannot add " + str(self.__class__.__name__)
+            strg += " and " + str(other.__class__.__name__) + "objects."
+            del newobject
+            raise TypeError(strg)
+        
+        return newobject
+
+    def __sub__(self, other):
+        """
+        
+        Subtract a scalar, an array or another DataModel object from
+        this MiriMeasuredModel object.
+        
+        """  
+        # Check this object is capable of mathematical operation.
+        self._check_for_data()
+        # Start with an empty version of the current object and clone
+        # the metadata.
+        newobject = self.__class__()
+        newobject.update( self )
+
+        if isinstance(other,(float,int)):
+            # A scalar quantity is being subtracted. Subtract from the SCI
+            # array but leave the ERR and DQ arrays as they are.
+            newobject.data = self.data - other
+            if not self.noerr:
+                newobject.err = self.err
+            newobject.pixeldq = self.pixeldq
+            newobject.groupdq = self.groupdq
+            
+        elif isinstance(other, (ma.masked_array,np.ndarray,list,tuple)):
+            # A data array is being subtracted to this product. This should
+            # work provided the two arrays are broadcastable.
+            newobject.data = self.data - np.asarray(other)
+            # Adding a plain data array erases the error information.
+            if not self.noerr:
+                newobject.err = np.zeros_like(self.err)
+            newobject.pixeldq = self.pixeldq
+            newobject.groupdq = self.groupdq
+            
+        elif isinstance(other, DataModel):
+            # Two data products are being subtracted. Ensure they
+            # both have a valid primary data array.
+            if hasattr(other, 'data') and self._isvalid(other.data):
+                newobject.data = self.data - other.data
+                if not self.noerr:
+                    if hasattr(other, 'err') and self._isvalid(other.err):
+                        newobject.err = \
+                            self._combine_errors_quadrature(self.err, other.err)
+                    else:
+                        # If only one error array is known, the combined error
+                        # becomes unknown.
+                        newobject.err = np.zeros_like(self.err)
+                    
+                if hasattr(other, 'pixeldq') and self._isvalid(other.pixeldq):
+                    newobject.pixeldq = self._combine_quality(self.pixeldq, other.pixeldq)
+                if hasattr(other, 'groupdq') and self._isvalid(other.groupdq):
+                    newobject.groupdq = self._combine_quality(self.groupdq, other.groupdq)
+            else:
+                raise TypeError("Both data products must contain a " + \
+                                "primary data array.")            
+        else:
+            strg = "Cannot subtract " + str(self.__class__.__name__)
+            strg += " and " + str(other.__class__.__name__) + "objects."
+            del newobject
+            raise TypeError(strg)
+
+        return newobject
+
+    def __mul__(self, other):
+        """
+        
+        Multiply this MiriMeasuredModel object by a scalar, an array or
+        another DataModel object.
+        
+        """  
+        # Check this object is capable of mathematical operation.
+        self._check_for_data()
+        # Start with an empty version of the current object and clone
+        # the metadata.
+        newobject = self.__class__()
+        newobject.update( self )
+
+        if isinstance(other,(float,int)):
+            # A scalar quantity is being multiplied. Multiply the SCI and ERR
+            # arrays but leave the DQ array as it is.
+            newobject.data = self.data * other
+            if not self.noerr:
+                newobject.err = self.err * other
+            newobject.pixeldq = self.pixeldq
+            newobject.groupdq = self.groupdq
+            
+        elif isinstance(other, (ma.masked_array,np.ndarray,list,tuple)):
+            # A data array is being multiplied to this product. This should
+            # work provided the two arrays are broadcastable.
+            newobject.data = self.data * np.asarray(other)
+            # Multiplying a plain data array erases the error information.
+            if not self.noerr:
+                newobject.err = np.zeros_like(self.err)
+            newobject.pixeldq = self.pixeldq
+            newobject.groupdq = self.groupdq
+            
+        elif isinstance(other, DataModel):
+            # Two data products are being multiplied together. Ensure they
+            # both have a valid primary data array.
+            if hasattr(other, 'data') and self._isvalid(other.data):
+                newobject.data = self.data * other.data
+                if not self.noerr:
+                    if hasattr(other, 'err') and self._isvalid(other.err):
+                        newobject.err = self._combine_errors_multiplicative( \
+                                            self.err, other.err, self.data,
+                                            other.data)
+                    else:
+                        # If only one error array is known, the combined error
+                        # becomes unknown.
+                        newobject.err = np.zeros_like(self.err)
+
+                if hasattr(other, 'pixeldq') and self._isvalid(other.pixeldq):
+                    newobject.pixeldq = self._combine_quality(self.pixeldq, other.pixeldq)
+                if hasattr(other, 'groupdq') and self._isvalid(other.groupdq):
+                    newobject.groupdq = self._combine_quality(self.groupdq, other.groupdq)
+            else:
+                raise TypeError("Both data products must contain a " + \
+                                "primary data array.")            
+        else:
+            strg = "Cannot multiply " + str(self.__class__.__name__)
+            strg += " and " + str(other.__class__.__name__) + "objects."
+            del newobject
+            raise TypeError(strg)
+
+        return newobject
+       
+    def __truediv__(self, other):
+        """
+        
+        Divide this MiriMeasuredModel object by a scalar, an array or
+        another DataModel object.
+        
+        """  
+        # Check this object is capable of mathematical operation.
+        self._check_for_data()
+        # Start with an empty version of the current object and clone
+        # the metadata.
+        newobject = self.__class__()
+        newobject.update( self )
+
+        if isinstance(other,(float,int)):
+            # A scalar quantity is being divided. Divide the SCI and ERR
+            # arrays but leave the DQ array as it is.
+            # Trap a divide by zero..
+            if np.abs(other) <= sys.float_info.epsilon:
+                strg = "%s: Divide by scalar zero!" % self.__class__.__name__
+                del newobject
+                raise ValueError(strg)
+            newobject.data = self.data / other
+            if not self.noerr:
+                newobject.err = self.err / other
+            newobject.pixeldq = self.pixeldq
+            newobject.groupdq = self.groupdq
+            
+        elif isinstance(other, (ma.masked_array,np.ndarray,list,tuple)):
+            # A data array is being multiplied to this product. This should
+            # work provided the two arrays are broadcastable.
+            # NOTE: Any divide by zero operations will be trapped by numpy.
+            newobject.data = self.data / np.asarray(other)
+            # Dividing by a plain data array erases the error information.
+            if not self.noerr:
+                newobject.err = np.zeros_like(self.err)
+            newobject.pixeldq = self.pixeldq
+            newobject.groupdq = self.groupdq
+            
+        elif isinstance(other, DataModel):
+            # The data product is being divided by another. Ensure they
+            # both have a valid primary data array.
+            # NOTE: Any divide by zero operations will be trapped by numpy.
+            if hasattr(other, 'data') and self._isvalid(other.data):
+                newobject.data = self.data / other.data
+                if not self.noerr:
+                    if hasattr(other, 'err') and self._isvalid(other.err):
+                        newobject.err = self._combine_errors_divisive( \
+                                            self.err, other.err, self.data,
+                                            other.data)
+                    else:
+                        # If only one error array is known, the combined error
+                        # becomes unknown.
+                        newobject.err = np.zeros_like(self.err)
+
+                if hasattr(other, 'pixeldq') and self._isvalid(other.pixeldq):
+                    newobject.pixeldq = self._combine_quality(self.pixeldq, other.pixeldq)
+                if hasattr(other, 'groupdq') and self._isvalid(other.groupdq):
+                    newobject.groupdq = self._combine_quality(self.groupdq, other.groupdq)
+            else:
+                raise TypeError("Both data products must contain a " + \
+                                "primary data array.")            
+        else:
+            strg = "Cannot divide " + str(self.__class__.__name__)
+            strg += " and " + str(other.__class__.__name__) + "objects."
+            del newobject
+            raise TypeError(strg)
+
+        return newobject
+
+    # From Python 3, division is the same as true division.
+    def __div__(self, other):
+        return self.__truediv__(other)
 
 #
 # A minimal test is run when this file is run as a main program.

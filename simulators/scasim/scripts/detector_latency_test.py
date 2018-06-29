@@ -30,8 +30,8 @@ The script may be edited to try out different simulation parameters.
 There are no command line arguments.
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 import os
 import numpy as np
@@ -76,7 +76,7 @@ def ramps_to_slopes( array4d, grptime=1.0, diff_only=False ):
         
     else:
         # A full slope derived from linear regression.
-        timearray = grptime * np.array( range(0, ngroups) )
+        timearray = grptime * np.array( list(range(0, ngroups)) )
         for intg in range(0, nints):
             for row in range(0, rows):
                 for column in range(0, columns):
