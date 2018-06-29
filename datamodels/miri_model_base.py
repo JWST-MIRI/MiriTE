@@ -57,7 +57,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              'None' is equivalent to a null string.
 09 Dec 2014: Added ability to set detector settings and reference file
              metadata.
-16 Jan 2015: SUBARRAY_DICT modified so that SUBSTRTi and SUBSIZEi keywords
+16 Jan 2015: SUBARRAY modified so that SUBSTRTi and SUBSIZEi keywords
              are written even for full-frame data.
 06 Feb 2015: Define DATE-OBS and TIME-OBS metadata separately.
 04 Mar 2015: Improve the error message from set_fits_keyword.
@@ -180,31 +180,10 @@ from jwst.datamodels.model_base import DataModel
 # Import the MIRI data models and the data model plotter.
 import miri.datamodels
 from miri.datamodels.plotting import DataModelPlotVisitor
-
+from miri.parameters import SUBARRAY
 
 # List all classes and global functions here.
 __all__ = ['get_exp_type', 'MiriDataModel']
-
-#
-# Dictionary of available subarray options. Each tuple contains
-# (first column, first row, number of columns, number of rows).
-# This dictionary is used by the set_subarray_metadata convenience
-# function.
-# TODO: This table should be moved to a common MIRI parameters file.
-#
-SUBARRAY_DICT = {}
-SUBARRAY_DICT['FULL'] =          (   1,   1, 1032, 1024 )
-SUBARRAY_DICT['GENERIC'] =       (   1,   1, 1032, 1024 )
-SUBARRAY_DICT['MASK1065'] =      (   1,  19,  288,  224 )
-SUBARRAY_DICT['MASK1140'] =      (   1, 245,  288,  224 )
-SUBARRAY_DICT['MASK1550'] =      (   1, 467,  288,  224 )
-SUBARRAY_DICT['MASKLYOT'] =      (   1, 717,  320,  304 )
-SUBARRAY_DICT['BRIGHTSKY'] =     ( 457,  51,  512,  512 )
-SUBARRAY_DICT['SUB256'] =        ( 413,  51,  256,  256 )
-SUBARRAY_DICT['SUB128'] =        (   1, 889,  136,  128 )
-SUBARRAY_DICT['SUB64'] =         (   1, 779,   72,   64 )
-SUBARRAY_DICT['SLITLESSPRISM'] = (   1, 529,   72,  416 )
-
 
 #
 # Public global function.
@@ -1146,7 +1125,7 @@ class MiriDataModel(DataModel):
             if isinstance(subarray, six.string_types):
                 subarray = subarray.strip() # Strip off superflous white space
                 self.meta.subarray.name = subarray
-                subtuple = SUBARRAY_DICT[subarray]
+                subtuple = SUBARRAY[subarray]
                 if subtuple is not None:
                     self.meta.subarray.xstart = subtuple[0]
                     self.meta.subarray.ystart = subtuple[1]

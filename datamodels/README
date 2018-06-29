@@ -34,9 +34,17 @@ directory. The following commands will build a new set of documentation
 
 cd doc
 make html
-make latex
-cd build/latex
-make all-pdf
+make latex         # Requires latex
+make latexpdf      # Requires latex and latexmk
+
+If you don't have latexmk installed, the following commands can be used to
+build the PDF document manually:
+
+pushd build/latex
+latex miri_datamodels.tex
+latex miri_datamodels.tex
+pdflatex miri_datamodels.tex
+popd
 
 After executing these commands you will find a reference manual in 
 "build/latex/miri_datamodels.pdf" and more readable set of HTML pages in

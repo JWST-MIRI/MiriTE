@@ -113,6 +113,7 @@ http://miri.ster.kuleuven.be/bin/view/Internal/CalDataProducts
 26 Apr 2018: Corrected exception raising syntax for Python 3.
 17 May 2018: Python 3: Converted dictionary keys return into a list.
 18 May 2018: Changed deprecated logger.warn() to logger.warning().
+29 Jun 2018: Global parameters moved to miri.parameters.
 
 Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -141,10 +142,11 @@ LOGGER = logging.getLogger("miri.cdplib") # Get a default parent logger
 # Logging level for the CDP classes
 LOGGING_LEVEL = logging.INFO # Choose ERROR, WARN, INFO or DEBUG
 
-# Import CDP utility functions and CDP dictionary.
-from miri.datamodels.util import MIRI_MODELS, MIRI_DETECTORS, \
+# Import global parameters, CDP utility functions and CDP dictionary.
+from miri.parameters import MIRI_MODELS, MIRI_DETECTORS, \
     MIRI_SETTINGS, MIRI_READPATTS, MIRI_SUBARRAYS, MIRI_CHANNELS, \
-    MIRI_BANDS, MIRI_FILTERS, get_data_class
+    MIRI_BANDS, MIRI_FILTERS
+from miri.datamodels.util import get_data_class
 from miri.datamodels.cdp import CDP_DICT
 
 # List all public classes and global functions here.

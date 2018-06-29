@@ -74,7 +74,7 @@ See http://miri.ster.kuleuven.be/bin/view/Public/MirisimInstallation.
 
 The software can also be extracted directly from the
 
-     https://github.com/JWST-MIRI
+   https://github.com/JWST-MIRI
 
 repository and built and installed manually with the command
 
@@ -83,6 +83,25 @@ repository and built and installed manually with the command
 but in this case the user is responsible for ensuring all other dependent
 packages are installed.
 
+TROUBLESHOOTING
+---------------
+Installation and build problems are commonly caused by having incompatible or
+old versions of the software installed in an anaconda environment. Make sure
+you use the "source activate" command to enable the correct anaconda
+environment before building the software. If you have a problem, try the
+following commands (where "<>" means insert the text appropriate to your own
+circumstance):
+
+1) Remove any MIRI software accidentally installed into your root environment
+
+   \rm -rf <...>/anaconda/lib/python3.5/site-packages/miri-*
+
+2) Remove old versions of the MIRI software from the current anaconda
+   environment before building a new version
+
+   source activate <environment>
+   \rm -rf ${CONDA_PREFIX}/lib/python3.5/site-packages/miri-*
+   python setup.py install
 
 TESTING
 -------

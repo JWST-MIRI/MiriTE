@@ -64,6 +64,7 @@ processing the MIRI data models.
              Replaced deprecated boolean - operator with logical_xor
              in assert_products_equal function. 
 17 May 2018: Python 3: Converted dictionary keys return into a list.
+29 Jun 2018: Global parameters moved to miri.parameters.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -83,72 +84,13 @@ import astropy.io.fits as pyfits
 
 # Import the JWST data models and the CDP and SIM dictionaries
 import jwst.datamodels
+from miri.parameters import CDP_METADATA, CDP_SUBARRAY, CDP_HISTORY
 from miri.datamodels.miri_model_base import MiriDataModel
 from miri.datamodels.cdp import CDP_DICT
 from miri.datamodels.sim import SIM_DICT
 
 #
-# 1) Global constants
-#
-# Lists of selections, as defined on the "MiriCalfileMetaData" page.
-MIRI_MODELS = ['VM', 'JPL', 'FM']
-
-MIRI_DETECTORS = ['MIRIMAGE', 'MIRIFULONG', 'MIRIFUSHORT']
-MIRI_DETECTORS_EXTRAS = ['IM', 'LW', 'SW'] # For backwards compatibility only.
-
-MIRI_SETTINGS = ['RAL1', 'JPL1']
-
-MIRI_READPATTS = ['SLOW', 'FAST', 'FASTGRPAVG']
-
-MIRI_SUBARRAYS = ['MASK1140', 'MASK1550', 'MASK1065', 'MASKLYOT',
-                  'BRIGHTSKY', 'SUB256', 'SUB128', 'SUB64', 'SLITLESSPRISM']
-
-MIRI_CHANNELS = ['1', '2', '3', '4', '12', '34']
-
-MIRI_BANDS = ['SHORT', 'MEDIUM', 'LONG', 'SHORT-MEDIUM',  'SHORT-LONG',
-              'MEDIUM-SHORT', 'MEDIUM-LONG', 'LONG-SHORT', 'LONG-MEDIUM']
-MIRI_BANDS_EXTRAS = ['A', 'B', 'C'] # For backwards compatibility only.
-
-# Note that 'FLENS' and 'F2550WR' are allowed values for the filter metadata,
-# but there are no CDP files for these filters.
-MIRI_FILTERS = ['F560W','F770W','F1000W','F1130W', 'F1280W','F1500W','F1800W',
-                'F2100W', 'F2550W', 'F2550WR','F1065C', 'F1140C', 'F1550C',
-                'F2300C','P750L','FLENS', 'FND', 'OPAQUE']
-
-# Rules for testing compulsory CDP metadata
-CDP_METADATA = [['TELESCOP', 'JWST'],
-                ['INSTRUME', 'MIRI'],
-                ['MODELNAM', MIRI_MODELS + ['N/A']],
-                ['DETECTOR', MIRI_DETECTORS + ['N/A']],
-                # DETSETNG is removed from STSCI CDP specification
-#                 ['DETSETNG', MIRI_SETTINGS + ['ANY']],
-                ['READPATT', MIRI_READPATTS + ['ANY', 'N/A']],
-                ['SUBARRAY', MIRI_SUBARRAYS + ['FULL', 'GENERIC', 'N/A']],
-                ['FASTAXIS', 1],
-                ['SLOWAXIS', 2],
-                ['PEDIGREE', ['GROUND', 'DUMMY', 'SIMULATION']],
-                ['USEAFTER', []],  # Empty list means any value accepted.
-                ['DESCRIP', []],  # Empty list means any value accepted.
-                ['AUTHOR', []],  # Empty list means any value accepted.
-                ['DATE', []],  # Empty list means any value accepted.
-                ['VERSION', []],  # Empty list means any value accepted.
-                ]
-# Additional compulsory metadata for non-GENERIC subarrays
-CDP_SUBARRAY = [['SUBSTRT1', []], # Empty list means any value accepted.
-                ['SUBSTRT2', []], # Empty list means any value accepted.
-                ['SUBSIZE1', []], # Empty list means any value accepted.
-                ['SUBSIZE2', []], # Empty list means any value accepted.
-                ]
-# Keywords used in HISTORY records
-CDP_HISTORY = ['DOCUMENT', 'SOFTWARE', 'DATA USED', 'DIFFERENCES']
-#
-# Dictionary of the relationship between known detector settings
-#                         Name -> (FRMRSETS, ROWRSETS, RPCDELAY)
-DETECTOR_SETTINGS_DICT = {'RAL1': (0, 3, 24),
-                          'JPL1': (3, 4, 90)}
-
-#
-# (2) Global functions
+# Common utility functions
 #
 def read_fits_header( fitsobject, keyword, hduname='' ):
     """

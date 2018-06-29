@@ -33,7 +33,6 @@ Sources:
 (5) JPL MIRI DFM 478 04.02, MIRI FPS Exposure Time Calculations (SCE FPGA2),
     M. E. Ressler, October 2014.
 
-
 :History:
 
 15 Jul 2010: Created
@@ -140,12 +139,16 @@ Sources:
 01 Nov 2017: Note that the detector drift and latent coefficients are only
              valid for FAST mode.
 13 Dec 2017: DARK_MAP property removed.
+29 Jun 2018: Global parameters moved to miri.parameters.
 
 @author: Steven Beard (UKATC)
 
 """
 # This module is now converted to Python 3.
 
+# Import global properties
+from miri.parameters import READOUT_MODE
+from miri.parameters import SUBARRAY as MIRI_SUBARRAY
 
 from miri.simulators.find_simulator_file import find_simulator_file
 
@@ -310,7 +313,7 @@ _sca495['DARK_CURRENT'] = 0.21 # Nominal dark current level (electrons/s)
 _sca495['QE_FILE'] = find_simulator_file('qe_measurementSW.fits')
 _sca495['NOISEFACTOR'] = 1.0   # Noise adjustment factor
 
-# Other detector descriptions (e.g. for other JWST instruments) can be
+# Other detector descriptions (e.g. for other JWST instruments) could be
 # added here.
 
 # The following constants may be imported by SCA simulator software modules.
@@ -319,74 +322,49 @@ _sca495['NOISEFACTOR'] = 1.0   # Noise adjustment factor
 # each FPM can be obtained by looking up its unique detector name in this
 # dictionary and using the result as another dictionary (i.e. the overall
 # data structure is a dictionary of dictionaries).
+#
 DETECTORS_DICT = {'MIRIMAGE'    : _sca493,
                   'MIRIFULONG'  : _sca494,
                   'MIRIFUSHORT' : _sca495}
 
-#
-# Available readout modes. The tuple contains default values for:
-# samplesum = number of A/D samples per reading
-# sampleskip = number of A/D samples skipped before reading a pixel.
-# refpixsampleskip = number of A/D samples skipped before reading a reference pixel.
-# nframes = number of frames averaged per group.
-# groupgap = number of frames dropped between groups.
-# ngroups  = default number of readout groups per integration.
-# nints    = default number of integrations per exposure.
-# avggrps  = number of groups averaged to reduce data rate.
-# avgints  = number of integrations averaged to reduce data rate.
-#
-#                                      r
-#                                      e
-#                                      f
-#                                      p
-#                                      i
-#                                      x
-#                                  s   s
-#                              s   a   a
-#                              a   m   m       g
-#                              m   p   p   n   r   n       a   a
-#                              p   l   l   f   o   g       v   v
-#                              l   e   e   r   u   r   n   g   g
-#                              e   s   s   a   p   o   i   g   i
-#                              s   k   k   m   g   u   n   r   n
-#                              u   i   i   e   a   p   t   p   t
-#                              m   p   p   s   p   s   s   s   s
-READOUT_MODE = {}
-READOUT_MODE['SLOW'] =       (8,   1,  3,  1,  0, 10,  1,  1,  1)
-READOUT_MODE['FAST'] =       (1,   0,  3,  1,  0,  1, 10,  1,  1)
-READOUT_MODE['FASTINTAVG'] = (1,   0,  3,  1,  0,  1,  4,  1,  4)
-READOUT_MODE['FASTGRPAVG'] = (1,   0,  3,  1,  0,  4,  1,  4,  1)
-# The following four readout modes were used for MIRI testing only, and they
-# will upset the JWST pipeline software if used.
-# READOUT_MODE['SLOWINTAVG'] = (8,   1,  3,  1,  0,  1,  4,  1,  4)
-# READOUT_MODE['SLOWGRPAVG'] = (8,   1,  3,  1,  0,  4,  1,  4,  1)
-# READOUT_MODE['SLOWGRPGAP'] = (8,   1,  3,  4,  8,  4,  1,  1,  1)
-# READOUT_MODE['FASTGRPGAP'] = (1,   0,  3,  4,  8,  4,  1,  1,  1)
+# The readout modes have been obtained from miri.parameters.
+# This is the default mode.
 DEFAULT_READOUT_MODE = 'FAST'
 
 
+def flip_subarray_params(input_params):
+    """
+    
+    Helper function to switch the row and column entries in a SUBARRAY tuple
+    
+    """
+    assert isinstance(input_params, (tuple,list))
+    assert len(input_params) == 4
+    output_params = [input_params[1],
+                     input_params[0],
+                     input_params[3],
+                     input_params[2]]
+    return output_params
+
 #
-# Available subarray options. Row and column numbers start at 1.
+# Convert subarray parameters to the ordering needed by SCASim.
+# TODO: Change SCASim to use the same ordering as the MIRI CDP software?
+# Row and column numbers start at 1.
 # The tuple contains (firstrow, firstcol, subrows, subcolumns)
 #
 SUBARRAY = {}
 SUBARRAY['FULL'] = None
-SUBARRAY['MASK1065'] =      (  19,    1,  224,  288)
-SUBARRAY['MASK1140'] =      ( 245,    1,  224,  288)
-SUBARRAY['MASK1550'] =      ( 467,    1,  224,  288)
-SUBARRAY['MASKLYOT'] =      ( 717,    1,  304,  320)
-# Old BRIGHTSKY, which touched the left column
-#SUBARRAY['BRIGHTSKY'] =     (  37,    1,  512,  968)
-SUBARRAY['BRIGHTSKY'] =     (  51,  457,  512,  512)
-# Old SUB256, which touched the left column
-#SUBARRAY['SUB256'] =        (  37,    1,  256,  668)
-SUBARRAY['SUB256'] =        (  51,  413,  256,  256)
-SUBARRAY['SUB128'] =        ( 889,    1,  128,  136)
-SUBARRAY['SUB64'] =         ( 779,    1,   64,   72)
-SUBARRAY['SLITLESSPRISM'] = ( 529,    1,  416,   72)
-# The following additional subarray options are used
-# for testing and simulation only. The detectors are
-# never read out using these modes.
+SUBARRAY['MASK1140'] =      flip_subarray_params( MIRI_SUBARRAY['MASK1140'] )
+SUBARRAY['MASK1550'] =      flip_subarray_params( MIRI_SUBARRAY['MASK1550'] )
+SUBARRAY['MASK1065'] =      flip_subarray_params( MIRI_SUBARRAY['MASK1065'] )
+SUBARRAY['MASKLYOT'] =      flip_subarray_params( MIRI_SUBARRAY['MASKLYOT'] )
+SUBARRAY['BRIGHTSKY'] =     flip_subarray_params( MIRI_SUBARRAY['BRIGHTSKY'] )
+SUBARRAY['SUB256'] =        flip_subarray_params( MIRI_SUBARRAY['SUB256'] )
+SUBARRAY['SUB128'] =        flip_subarray_params( MIRI_SUBARRAY['SUB128'] )
+SUBARRAY['SUB64'] =         flip_subarray_params( MIRI_SUBARRAY['SUB64'] )
+SUBARRAY['SLITLESSPRISM'] = flip_subarray_params( MIRI_SUBARRAY['SLITLESSPRISM'] )
+# The following additional subarray options can be uncommented for testing
+# special cases. The detectors are never actually read out using these modes.
 # SUBARRAY['LRS1'] =          (   1,    1, 1024,  420)
 # SUBARRAY['LRS2'] =          (   1,  292, 1024,  128)
 # SUBARRAY['LRS3'] =          (   1,  292,  512,   64)
@@ -403,7 +381,7 @@ DEFAULT_SUBARRAY = 'FULL'
 #
 # This fraction of cosmic ray events will cause charge leakage (negative jump)
 # rather than a charge increase.
-# NOTE: The negative jumps are more likely to be caused by a cosmic raye strike
+# NOTE: The negative jumps are more likely to be caused by a cosmic ray strike
 # on the readout electronics rather than a true charge leakage.
 #
 COSMIC_RAY_LEAKAGE_FRACTION = 0.002
