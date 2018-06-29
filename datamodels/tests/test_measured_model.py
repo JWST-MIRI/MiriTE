@@ -57,11 +57,14 @@ in the datamodels.miri_measured_model module.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 13 Sep 2017: Updated "not a file name" test to match the new behaviour of
              JWST pipeline version 0.7.8rc2
+27 Apr 2018: Corrected bug in get_history() length test.
+27 Jun 2018: Removed unused arrays.
+
 @author: Steven Beard (UKATC)
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 import os
 import unittest
@@ -284,7 +287,7 @@ class TestMiriMeasuredModel(unittest.TestCase):
         self.simpleproduct.add_history('History 1')
         self.simpleproduct.add_history('History 2')
         self.simpleproduct.add_history('History 3')
-        self.assertGreaterEqual(self.simpleproduct.get_history(), 3)
+        self.assertGreaterEqual(len(self.simpleproduct.get_history()), 3)
         strg = self.simpleproduct.get_history_str()
         self.assertIsNotNone(strg)
         self.assertGreater(len(strg), 0)
@@ -824,7 +827,6 @@ class TestMiriRampModel(unittest.TestCase):
         
         # Create a data model in which the DATA and DQ arrays have different
         # shapes.
-        b1 = [[1,2,3,4],     [5,6,7,8],     [9,10,11,12]]
         testdp = MiriRampModel(data=self.ahyper, pixeldq=self.c1,
                                groupdq=self.chyper, maskwith='both')
         descr = str(testdp)

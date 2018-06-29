@@ -55,12 +55,15 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 15 Jun 2017: TYPE keyword replaced by DATAMODL.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 21 Sep 2017: Test World Coordinates.
+21 Jun 2018: Define the FILETYPE keyword.
+28 Jun 2018: Switch to using get_title_and_metadata() to display data model
+             information.
 
 @author: Steven Beard (UKATC)
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 import sys
 import numpy as np
@@ -143,6 +146,7 @@ class MiriIlluminationModel(MiriDataModel):
 
         # Data type is illumination map.
         self.meta.model_type = 'ILLUMINATION'
+        self.meta.filetype = 'ILLUMINATION'
 
         if intensity is not None:
             self.intensity = intensity      
@@ -585,9 +589,10 @@ class MiriIlluminationModel(MiriDataModel):
         string.
         
         """
-        # Start with the data object title and metadata
-        strg = self.get_title(underline=True, underchar="=") + "\n"
-        strg += self.get_meta_str(underline=True, underchar='-')          
+        # Start with the data object title, metadata and history
+        strg = self.get_title_and_metadata()
+        
+        # Add the intensity and wavelength information.
         strg += self.get_data_str('intensity', underline=True, underchar="-")
         strg += self.get_data_str('wavelength', underline=True, underchar="-")
         return strg

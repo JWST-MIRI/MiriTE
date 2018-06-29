@@ -22,8 +22,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 import warnings
 #import numpy as np
@@ -101,6 +101,7 @@ class MiriMrsFringeFrequenciesModel(MiriDataModel):
 #         # Copy the table column units, if defined.
 #         fringefreq_units = self.set_table_units('fringefreq_table')
         
+    # TODO: Is this function needed?
     def __str__(self):
         """
         
@@ -108,9 +109,8 @@ class MiriMrsFringeFrequenciesModel(MiriDataModel):
         as a readable string.
         
         """
-        # Start with the data object title and metadata
-        strg = self.get_title(underline=True, underchar="=") + "\n"
-        strg += self.get_meta_str(underline=True, underchar='-')
+        # Start with the data object title, metadata and history
+        strg = self.get_title_and_metadata()
 
         # Describe the fringe frequencies table
         if self.fringefreq_table is not None:

@@ -7,14 +7,44 @@ https://jwst-docs.stsci.edu/display/JDAT/JWST+File+Names%2C+Formats%2C+and+Data+
 YAML schemas describing each data model may be found in the "schemas"
 subdirectory.
 
+The basic data models may be imported from "datamodels", the MIRI calibration
+data products from "datamodels.cdp" and simulator support models from
+"datamodels.sim". Some common examples:
+
+   import miri.datamodels as dm
+   model1 = dm.MiriDataModel( filename1 )
+   model2 = dm.MiriMeasuredModel( filename2 )
+   
+   from miri.datamodels.cdp import MiriFlatfieldModel, MiriBadPixelMaskModel
+   model1 = MiriFlatfieldModel( filename1 )
+   model2 = MiriBadPixelMaskModel( filename2 )
+
+   from miri.datamodels.sim import MiriIlluminationModel
+   model1 = MiriIlluminationModel( filename1 )
+
+The open() function will open a file and attempt to match the contents to
+a known data model:
+
+   import miri.datamodels.open as open
+   model = open( filename )
+
 Documentation describing this software may be found within the "doc" 
-directory. The following commands will build a new set of documentation:
+directory. The following commands will build a new set of documentation
+(assuming you have a compatible version of latex installed on your workstation):
 
 cd doc
 make html
-make latex
-cd build/latex
-make all-pdf
+make latex         # Requires latex
+make latexpdf      # Requires latex and latexmk
+
+If you don't have latexmk installed, the following commands can be used to
+build the PDF document manually:
+
+pushd build/latex
+latex miri_datamodels.tex
+latex miri_datamodels.tex
+pdflatex miri_datamodels.tex
+popd
 
 After executing these commands you will find a reference manual in 
 "build/latex/miri_datamodels.pdf" and more readable set of HTML pages in

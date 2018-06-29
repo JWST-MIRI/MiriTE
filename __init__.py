@@ -41,7 +41,9 @@ miri.simulators
 12 May 2017: MIRI software split into 4 pieces: MiriTools, MiriCalibration,
              MiriPipeline and MiriSimulators (V4.0)
 19 Jun 2017: MIRI software merged with build 7.1 utilities (V5.0)
-15 Jan 2018: MiriTools and MiriSimulators levels removed from package
+15 Jan 2018: MiriTools and MiriSimulators levels removed from package.
+21 Mar 2018: First public release to github (V7.0)
+21 Jun 2018: Python 3 release (V7.1)
 
 @author: MIRI Software Team
 
@@ -50,4 +52,4 @@ __project__ = 'MIRI Tool and Environment Software'
 __author__ = 'MIRI Software Team'
 __maintainer__ = 'MIRI Software Team: mirisim@roe.ac.uk'
 __copyright__ = '2018, %s' % __author__
-__version__ = '7.0'
+__version__ = '7.1'

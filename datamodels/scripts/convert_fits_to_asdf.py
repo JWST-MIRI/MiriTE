@@ -6,6 +6,7 @@
 # 30 Jun 2017: meta.reffile schema level removed to match changes in the
 #              JWST build 7.1 data models release. meta.reffile.type also
 #              changed to meta.reftype. TYPE keyword replaced by DATAMODL.
+# 18 May 2018: Changed deprecated logger.warn() to logger.warning().
 #
 # @author: Steven Beard (UKATC)
 #
@@ -34,7 +35,7 @@ The command also takes the following options::
 
 """
 
-from __future__ import absolute_import, unicode_literals, division, print_function
+
 
 import optparse
 import os, sys, time
@@ -76,8 +77,8 @@ if __name__ == "__main__":
             inputfile = inputfile + '.fits'
         elif ext != '.fits':
             # Otherwise the extension is supposed to be .fits.
-            LOGGER.warn("Input file is supposed to be of \'.fits\' type, " + \
-                        "not \'%s\'." % ext)
+            LOGGER.warning("Input file is supposed to be of \'.fits\' type, " + \
+                           "not \'%s\'." % ext)
         if len(args) > 1:
             outputfile = args[1]
             if '.asdf' not in outputfile:

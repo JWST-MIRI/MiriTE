@@ -31,6 +31,9 @@
 #              level 1 ramp data. Ensure all attempts to read a FITS
 #              keyword are within a try/except block.
 # 04 Dec 2017: Added missing "overwrite" parameter to functions.
+# 27 Apr 2018: Corrected exception syntax for Python 3.
+# 17 May 2018: Python 3: Converted dictionary keys return into a list.
+# 18 May 2018: Changed deprecated logger.warn() to logger.warning().
 # 
 # @author: Steven Beard (UKATC)
 #
@@ -72,8 +75,8 @@ The command also takes the following options:
         Overwrite any existing SCA format FITS file.
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 # Python logging facility
 import logging
@@ -118,7 +121,7 @@ def convert_dhas_to_level1b( inputfile, outputfile, verbose=0, overwrite=False )
             refrows = 0
     except KeyError:
         # No reference output
-        LOGGER.warn("No reference output data. Cannot deduce size of reference image.")
+        LOGGER.warning("No reference output data. Cannot deduce size of reference image.")
         refcolumns = 0
         refrows = 0
     
@@ -134,7 +137,7 @@ def convert_dhas_to_level1b( inputfile, outputfile, verbose=0, overwrite=False )
     # of the output model.
     # NOTE: No attempt is made to translate between different metadata standards.
     ignore = ['SIMPLE', 'EXTEND', 'BITPIX', 'NAXIS', 'BZERO', 'BSCALE', 'HISTORY', 'COMMENT']
-    for fitskw in input_model._primary_header.keys():
+    for fitskw in list(input_model._primary_header.keys()):
         addkw = True
         if not fitskw:
             continue
@@ -181,7 +184,7 @@ def convert_dhas_to_level1b( inputfile, outputfile, verbose=0, overwrite=False )
                     strg = "\n\tFailed to convert metadata item with "
                     strg += "FITS keyword \'%s\'. " % fitskw
                     LOGGER.error(strg)
-                except Exception, e:
+                except Exception as e:
                     strg = "\n\tFailed to convert metadata item with "
                     strg += "FITS keyword \'%s\'. " % fitskw
                     strg += "\n\t%s" % str(e)
@@ -273,7 +276,7 @@ def convert_level1b_to_dhas( inputfile, outputfile, verbose=0, overwrite=False )
     # NOTE: No attempt is made to translate between different metadata standards.
     newheader = pyfits.Header()
     fits_dict = input_model.fits_metadata_dict()
-    for kwd in fits_dict.keys():
+    for kwd in (list(fits_dict.keys())):
         (fitshdu, fitskw, fitscomment) = fits_dict[kwd]
         if fitshdu == 'PRIMARY':
             try:

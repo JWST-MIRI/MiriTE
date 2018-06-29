@@ -51,8 +51,8 @@ The command also takes the following options:
         Generate maximum output.
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 import optparse
 import os, sys, time

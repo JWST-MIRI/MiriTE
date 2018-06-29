@@ -1,10 +1,6 @@
 allOf:
 - $ref: miri_core.schema.yaml
 - type: object
-  properties:
-    meta:
-      $ref: miri_metadata_wcsprimary.schema.yaml
-- type: object
   title: MIRI measurement model
   properties:
     meta:

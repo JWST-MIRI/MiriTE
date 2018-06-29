@@ -227,12 +227,16 @@ Calibration Data Products (CDPs).
              non-linearity CDP.
 19 Feb 2018: Moved non-linearity correction to SensorChipAssembly class.
 28 Mar 2018: Use fail_message=False when searching for a linearity CDP.
+18 May 2018: Changed deprecated logger.warn() to logger.warning().
+             CDP data models are now opened within a Python context structure
+             where possible.
+04 Jun 2018: Added hard_reset function.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 # Python logging facility
 import logging
@@ -1113,65 +1117,74 @@ class DetectorArray(object):
 
         # Read a MIRI bad pixel mask in standard STScI CDP format
         # and ensure the mask refers to the correct detector.
-        bad_pixel_mask = get_cdp('MASK', detector=detector,
+#         bad_pixel_mask = get_cdp('MASK', detector=detector,
+#                                  ftp_path=cdp_ftp_path,
+#                                  ftp_user=SIM_CDP_FTP_USER, 
+#                                  ftp_passwd=SIM_CDP_FTP_PASSWD,
+#                                  cdprelease=cdprelease,
+#                                  cdpversion=cdpversion,
+#                                  cdpsubversion=cdpsubversion,
+#                                  logger=self.toplogger)
+        with get_cdp('MASK', detector=detector,
                                  ftp_path=cdp_ftp_path,
                                  ftp_user=SIM_CDP_FTP_USER, 
                                  ftp_passwd=SIM_CDP_FTP_PASSWD,
                                  cdprelease=cdprelease,
                                  cdpversion=cdpversion,
                                  cdpsubversion=cdpsubversion,
-                                 logger=self.toplogger)
-        if bad_pixel_mask is None:
-            strg = "Could not find a bad pixel mask CDP for detector %s." % detector
-            strg += " No bad pixels will be simulated."
-            self.logger.error(strg)
-            self.bad_pixels = None
-            self.pixels.set_pedestal( None )
-            self.bad_pixel_filename = ''
-            return
-
-        self.bad_pixel_filename = bad_pixel_mask.meta.filename
-        bp_detectorid = bad_pixel_mask.meta.instrument.detector
-        if bp_detectorid is not None:
-            if bp_detectorid != self.detectorid:
-                strg = "Bad pixel mask is for the wrong detector "
-                strg += "(%s rather than %s)." % (bp_detectorid,
-                                                  self.detectorid)
-                self.logger.warn( "***%s" % strg )
-                #raise ValueError(strg)
-
-        # Define reference columns (if any) as NON-SCIENCE.
-        if self.left_columns > 0:
-            bad_pixel_mask.dq[:,:self.left_columns] = MASK_NON_SCIENCE
-        if self.right_columns > 0:
-            bad_pixel_mask.dq[:,-self.right_columns:] = MASK_NON_SCIENCE
-
-        # Define the bad pixel array.
-        if self.bad_pixels is not None:
-            del self.bad_pixels
-        subarray_mask = bad_pixel_mask.get_subarray(window)
-        
-        # If there are any reference rows, extend the bad pixel array to
-        # include the additional pixels in the reference rows, otherwise
-        # use the bad pixel map as is.
-        if self.top_rows > 0:
-            self.bad_pixels = MASK_NON_SCIENCE * np.ones([self.detector_shape[0],
-                                self.detector_shape[1]],
-                                dtype=np.uint32)
-            self.bad_pixels[self.bottom_rows:-self.top_rows,:] = subarray_mask
-        elif self.bottom_rows > 0:
-            self.bad_pixels = MASK_NON_SCIENCE * np.ones([self.detector_shape[0],
-                                self.detector_shape[1]],
-                                dtype=np.uint32)
-            self.bad_pixels[self.bottom_rows:,:] = subarray_mask
-        else:
-            self.bad_pixels = subarray_mask
-        
-        # Plot the bad pixel map if requested.
-        if self._verbose > 1 and self._makeplot:
-            tstrg = "Bad pixel map obtained from " + \
-                os.path.basename(self.bad_pixel_filename)
-            mplt.plot_image(self.bad_pixels, title=tstrg)
+                                 logger=self.toplogger) as bad_pixel_mask:
+            if bad_pixel_mask is None:
+                strg = "Could not find a bad pixel mask CDP for detector %s." % detector
+                strg += " No bad pixels will be simulated."
+                self.logger.error(strg)
+                self.bad_pixels = None
+                self.pixels.set_pedestal( None )
+                self.bad_pixel_filename = ''
+                return
+    
+            self.bad_pixel_filename = bad_pixel_mask.meta.filename
+            bp_detectorid = bad_pixel_mask.meta.instrument.detector
+            if bp_detectorid is not None:
+                if bp_detectorid != self.detectorid:
+                    strg = "Bad pixel mask is for the wrong detector "
+                    strg += "(%s rather than %s)." % (bp_detectorid,
+                                                      self.detectorid)
+                    self.logger.warning( "***%s" % strg )
+                    #raise ValueError(strg)
+    
+            # Define reference columns (if any) as NON-SCIENCE.
+            if self.left_columns > 0:
+                bad_pixel_mask.dq[:,:self.left_columns] = MASK_NON_SCIENCE
+            if self.right_columns > 0:
+                bad_pixel_mask.dq[:,-self.right_columns:] = MASK_NON_SCIENCE
+    
+            # Define the bad pixel array.
+            if self.bad_pixels is not None:
+                del self.bad_pixels
+            subarray_mask = bad_pixel_mask.get_subarray(window)
+            
+            # If there are any reference rows, extend the bad pixel array to
+            # include the additional pixels in the reference rows, otherwise
+            # use the bad pixel map as is.
+            if self.top_rows > 0:
+                self.bad_pixels = MASK_NON_SCIENCE * np.ones([self.detector_shape[0],
+                                    self.detector_shape[1]],
+                                    dtype=np.uint32)
+                self.bad_pixels[self.bottom_rows:-self.top_rows,:] = subarray_mask
+            elif self.bottom_rows > 0:
+                self.bad_pixels = MASK_NON_SCIENCE * np.ones([self.detector_shape[0],
+                                    self.detector_shape[1]],
+                                    dtype=np.uint32)
+                self.bad_pixels[self.bottom_rows:,:] = subarray_mask
+            else:
+                self.bad_pixels = subarray_mask
+            
+            # Plot the bad pixel map if requested.
+            if self._verbose > 1 and self._makeplot:
+                tstrg = "Bad pixel map obtained from " + \
+                    os.path.basename(self.bad_pixel_filename)
+                mplt.plot_image(self.bad_pixels, title=tstrg)
+            del bad_pixel_mask
 
     def add_gain_map(self, detector, cdp_ftp_path=SIM_CDP_FTP_PATH,
                      cdp_version=''):
@@ -1209,55 +1222,63 @@ class DetectorArray(object):
         # relevant window from the map. The gain map includes the
         # normal detector pixels (including the reference columns) but does
         # not include the reference rows added to the level 1 FITS data.        
-        gain_model = get_cdp('GAIN', detector=detector,
+#         gain_model = get_cdp('GAIN', detector=detector,
+#                              ftp_path=cdp_ftp_path,
+#                              ftp_user=SIM_CDP_FTP_USER, 
+#                              ftp_passwd=SIM_CDP_FTP_PASSWD,
+#                              cdprelease=cdprelease,
+#                              cdpversion=cdpversion,
+#                              cdpsubversion=cdpsubversion,
+#                              logger=self.toplogger)
+        with get_cdp('GAIN', detector=detector,
                              ftp_path=cdp_ftp_path,
                              ftp_user=SIM_CDP_FTP_USER, 
                              ftp_passwd=SIM_CDP_FTP_PASSWD,
                              cdprelease=cdprelease,
                              cdpversion=cdpversion,
                              cdpsubversion=cdpsubversion,
-                             logger=self.toplogger)
-        if gain_model is None:
-            strg = "Could not find gain CDP for detector %s." % detector
-            strg += " A gain of 1.0 (e/DN) will be assumed."
-            self.logger.error(strg)
-            self.gain_map = None
-            self.gain_map_filename = ''
-            self.mean_gain = 1.0
-            return
-
-        self.gain_map_filename = gain_model.meta.filename
-        # The CDP data includes the reference columns but not the
-        # reference rows.
-        gain_map = gain_model.data[0:self.illuminated_shape[0],
-                                   0:self.detector_shape[1]]
-        mean_gain = np.mean(gain_map)
-
-        # If there are any reference rows, extend the gain map to
-        # include the additional pixels in the reference rows, otherwise
-        # use the gain map as is.
-        if self.top_rows > 0:
-            new_map = mean_gain * np.ones([self.detector_shape[0],
-                                           self.detector_shape[1]])
-            new_map[self.bottom_rows:-self.top_rows,:] = gain_map
-            gain_map = new_map
-        elif self.bottom_rows > 0:
-            new_map = mean_gain * np.ones([self.detector_shape[0],
-                                           self.detector_shape[1]])
-            new_map[self.bottom_rows:,:] = gain_map
-            gain_map = new_map
-
-        # Plot the gain map if requested.
-        if self._verbose > 1 and self._makeplot:
-            tstrg = "Gain map obtained from " + \
-                os.path.basename(self.gain_map_filename)
-            mplt.plot_image(gain_map, title=tstrg)
-
-        if self.gain_map is not None:
-            del self.gain_map
-        self.gain_map = gain_map
-        self.mean_gain = mean_gain
-        del gain_model
+                             logger=self.toplogger) as gain_model:
+            if gain_model is None:
+                strg = "Could not find gain CDP for detector %s." % detector
+                strg += " A gain of 1.0 (e/DN) will be assumed."
+                self.logger.error(strg)
+                self.gain_map = None
+                self.gain_map_filename = ''
+                self.mean_gain = 1.0
+                return
+    
+            self.gain_map_filename = gain_model.meta.filename
+            # The CDP data includes the reference columns but not the
+            # reference rows.
+            gain_map = gain_model.data[0:self.illuminated_shape[0],
+                                       0:self.detector_shape[1]]
+            mean_gain = np.mean(gain_map)
+    
+            # If there are any reference rows, extend the gain map to
+            # include the additional pixels in the reference rows, otherwise
+            # use the gain map as is.
+            if self.top_rows > 0:
+                new_map = mean_gain * np.ones([self.detector_shape[0],
+                                               self.detector_shape[1]])
+                new_map[self.bottom_rows:-self.top_rows,:] = gain_map
+                gain_map = new_map
+            elif self.bottom_rows > 0:
+                new_map = mean_gain * np.ones([self.detector_shape[0],
+                                               self.detector_shape[1]])
+                new_map[self.bottom_rows:,:] = gain_map
+                gain_map = new_map
+    
+            # Plot the gain map if requested.
+            if self._verbose > 1 and self._makeplot:
+                tstrg = "Gain map obtained from " + \
+                    os.path.basename(self.gain_map_filename)
+                mplt.plot_image(gain_map, title=tstrg)
+    
+            if self.gain_map is not None:
+                del self.gain_map
+            self.gain_map = gain_map
+            self.mean_gain = mean_gain
+            del gain_model
 
 # # Original version which used a dark supplied with the SCASim release.
 #     def add_dark_map_fixed(self, filename, readpatt=None):
@@ -1404,7 +1425,7 @@ class DetectorArray(object):
                                         ftp_user=SIM_CDP_FTP_USER, 
                                         ftp_passwd=SIM_CDP_FTP_PASSWD,
                                         logger=self.toplogger)
-         
+             
         # Refresh the interface if any parameters are different from when the
         # class was first created (necessary when the class is a singleton).
         CDPInterface.refresh(ftp_path=cdp_ftp_path,
@@ -1446,22 +1467,12 @@ class DetectorArray(object):
         else:
             # No CDPs were matched
             filename = None
-             
+         
         if filename:
             # Update the local CDP cache to make sure it contains the specified file,
             # and obtain the local file path and name.
             local_filename = CDPInterface.update_cache(filename, ftp_path)
-            if averaged:
-                strg = "Reading averaged DARK model from \'%s\'" % local_filename
-            else:
-                strg = "Reading DARK model from \'%s\'" % local_filename
-            self.logger.info(strg)
-            dark_model = MiriDarkReferenceModel( init=local_filename )
         else:
-            dark_model = None
- 
-        del CDPInterface
-        if dark_model is None:
             if averaged:
                 strg = "Could not find averaged DARK CDP for detector %s" % detector
             else:
@@ -1477,77 +1488,102 @@ class DetectorArray(object):
             self.mean_dark = 0.0
             self.dark_averaged = averaged
             return
-        
-        self.dark_map_filename = local_filename
-        nints = dark_model.data.shape[0]
-        # The dark map is managed differently when it is averaged.
-        if averaged:
-            #ngroups = dark_model.data.shape[0]
-            # Multiply by the gain to convert the read noise from DN into electrons.
-            # The CDP data includes the reference columns but not the
-            # reference rows.
-            dark_map = dark_model.data[:, 0:self.illuminated_shape[0],
-                                       0:self.detector_shape[1]] * self.mean_gain
- 
-            # Scale an averaged dark map to the expected level in electrons/s.
-            expected_level = self._sca['DARK_CURRENT']
-            pos_values = np.where(dark_map > 0.0)
-            actual_level = np.median(dark_map[pos_values])
-# CANNOT TEST THE FOLLOWING - MemoryError
-#             actual_std = np.std(dark_map[pos_values])
-#             good_values = np.where(pos_values < (actual_mean + 3.0*actual_std))
-#             good_mean = np.mean(dark_map[good_values])
-            if self._verbose > 1:
-                self.logger.debug("Scaling the DARK by %.4g" % \
-                                 (expected_level / actual_level))
-            dark_map = dark_map * expected_level / actual_level
- 
-            # Remove negative values from the dark map.
-            neg_values = np.where(dark_map < 0.0)
-            dark_map[neg_values] = 0.0
-            self.mean_dark = np.mean(dark_map)
-     
-            # If there are any reference rows, extend the dark map to
-            # include the additional pixels in the reference rows, otherwise
-            # use the dark map as is.
-            if self.top_rows > 0:
-                new_map = self.mean_dark * np.ones([nints, self.detector_shape[0],
-                                               self.detector_shape[1]])
-                new_map[:,self.bottom_rows:-self.top_rows,:] = dark_map
-                dark_map = new_map
-            elif self.bottom_rows > 0:
-                new_map = self.mean_dark * np.ones([nints, self.detector_shape[0],
-                                                self.detector_shape[1]])
-                new_map[:,self.bottom_rows:,:] = dark_map
-                dark_map = new_map
-            self.dark_averaged = True
- 
-            # Plot the dark map if requested.
-            if self._verbose > 1 and self._makeplot:
-                tstrg = "Dark map obtained from " + \
-                    os.path.basename(self.dark_map_filename)
-                mplt.plot_image(dark_map, title=tstrg)
-                #mplt.plot_hist(dark_map.ravel(), title=tstrg)
-        else:
-            # The full-sized DARK model is added to the final ramp data in DN,
-            # so it does not need to be scaled by the gain.
-            # Since the full-sized DARK is already very large, it is not
-            # extended to include reference rows.
-            self.dark_averaged = False
-            dark_map = dark_model.data
-            self.mean_dark = np.mean(dark_map[0,0,:,:])
+        del CDPInterface
 
-            # Plot the dark map if requested.
-            # Only a subset of the full data can be plotted.
-            if self._verbose > 1 and self._makeplot:
-                tstrg = "First group of dark map obtained from " + \
-                    os.path.basename(self.dark_map_filename)
-                mplt.plot_image(dark_map[0,0,:,:], title=tstrg)
- 
-        if self.dark_map is not None:
-            del self.dark_map
-        self.dark_map = dark_map
-        del dark_model
+        if averaged:
+            strg = "Reading averaged DARK model from \'%s\'" % local_filename
+        else:
+            strg = "Reading DARK model from \'%s\'" % local_filename
+        self.logger.info(strg)
+#         dark_model = MiriDarkReferenceModel( init=local_filename )
+        with MiriDarkReferenceModel( init=local_filename ) as dark_model:
+            if dark_model is None:
+                if averaged:
+                    strg = "Could not read averaged DARK CDP for detector %s" % detector
+                else:
+                    strg = "Could not read DARK CDP for detector %s" % detector
+                if readpatt:
+                    strg += " with %s readout mode" % readpatt
+                if subarray:
+                    strg += " for %s subarray" % subarray
+                strg += ". No dark current will be simulated."
+                self.logger.error(strg)
+                self.dark_map = None
+                self.dark_map_filename = ''
+                self.mean_dark = 0.0
+                self.dark_averaged = averaged
+                return
+            
+            self.dark_map_filename = local_filename
+            nints = dark_model.data.shape[0]
+            # The dark map is managed differently when it is averaged.
+            if averaged:
+                #ngroups = dark_model.data.shape[0]
+                # Multiply by the gain to convert the read noise from DN into electrons.
+                # The CDP data includes the reference columns but not the
+                # reference rows.
+                dark_map = dark_model.data[:, 0:self.illuminated_shape[0],
+                                           0:self.detector_shape[1]] * self.mean_gain
+     
+                # Scale an averaged dark map to the expected level in electrons/s.
+                expected_level = self._sca['DARK_CURRENT']
+                pos_values = np.where(dark_map > 0.0)
+                actual_level = np.median(dark_map[pos_values])
+# CANNOT TEST THE FOLLOWING - MemoryError
+#                 actual_std = np.std(dark_map[pos_values])
+#                 good_values = np.where(pos_values < (actual_mean + 3.0*actual_std))
+#                 good_mean = np.mean(dark_map[good_values])
+                if self._verbose > 1:
+                    self.logger.debug("Scaling the DARK by %.4g" % \
+                                     (expected_level / actual_level))
+                dark_map = dark_map * expected_level / actual_level
+     
+                # Remove negative values from the dark map.
+                neg_values = np.where(dark_map < 0.0)
+                dark_map[neg_values] = 0.0
+                self.mean_dark = np.mean(dark_map)
+         
+                # If there are any reference rows, extend the dark map to
+                # include the additional pixels in the reference rows, otherwise
+                # use the dark map as is.
+                if self.top_rows > 0:
+                    new_map = self.mean_dark * np.ones([nints, self.detector_shape[0],
+                                                   self.detector_shape[1]])
+                    new_map[:,self.bottom_rows:-self.top_rows,:] = dark_map
+                    dark_map = new_map
+                elif self.bottom_rows > 0:
+                    new_map = self.mean_dark * np.ones([nints, self.detector_shape[0],
+                                                    self.detector_shape[1]])
+                    new_map[:,self.bottom_rows:,:] = dark_map
+                    dark_map = new_map
+                self.dark_averaged = True
+     
+                # Plot the dark map if requested.
+                if self._verbose > 1 and self._makeplot:
+                    tstrg = "Dark map obtained from " + \
+                        os.path.basename(self.dark_map_filename)
+                    mplt.plot_image(dark_map, title=tstrg)
+                    #mplt.plot_hist(dark_map.ravel(), title=tstrg)
+            else:
+                # The full-sized DARK model is added to the final ramp data in DN,
+                # so it does not need to be scaled by the gain.
+                # Since the full-sized DARK is already very large, it is not
+                # extended to include reference rows.
+                self.dark_averaged = False
+                dark_map = dark_model.data
+                self.mean_dark = np.mean(dark_map[0,0,:,:])
+    
+                # Plot the dark map if requested.
+                # Only a subset of the full data can be plotted.
+                if self._verbose > 1 and self._makeplot:
+                    tstrg = "First group of dark map obtained from " + \
+                        os.path.basename(self.dark_map_filename)
+                    mplt.plot_image(dark_map[0,0,:,:], title=tstrg)
+     
+            if self.dark_map is not None:
+                del self.dark_map
+            self.dark_map = dark_map
+            del dark_model
 
     def add_flat_map(self, detector, readpatt=None, subarray=None,
                      mirifilter=None, miriband=None,
@@ -1677,7 +1713,7 @@ class DetectorArray(object):
             if subarray:
                 logstrg += " and subarray %s" % subarray
             logstrg += ". No flat-field will be applied."
-            self.logger.warn(logstrg)
+            self.logger.warning(logstrg)
             self.flat_map = None
             self.flat_map_filename = ''
             return
@@ -1696,7 +1732,7 @@ class DetectorArray(object):
                 alternative = True
             if alternative:
                 logstrg += ". An alternative is being used."
-            self.logger.warn(logstrg)
+            self.logger.warning(logstrg)
                 
         self.flat_map_filename = flat_model.meta.filename
         # Fill the masked parts of the flat-field. Do not reshape the
@@ -1911,7 +1947,16 @@ class DetectorArray(object):
         # relevant window from the map. The read noise map includes the
         # normal detector pixels (including the reference columns) but does
         # not include the reference rows added to the level 1 FITS data.
-        readnoise_model = get_cdp('READNOISE', detector=detector,
+#         readnoise_model = get_cdp('READNOISE', detector=detector,
+#                                   readpatt=readpatt,
+#                                   ftp_path=cdp_ftp_path,
+#                                   ftp_user=SIM_CDP_FTP_USER, 
+#                                   ftp_passwd=SIM_CDP_FTP_PASSWD,
+#                                   cdprelease=cdprelease,
+#                                   cdpversion=cdpversion,
+#                                   cdpsubversion=cdpsubversion,
+#                                   logger=self.toplogger)
+        with get_cdp('READNOISE', detector=detector,
                                   readpatt=readpatt,
                                   ftp_path=cdp_ftp_path,
                                   ftp_user=SIM_CDP_FTP_USER, 
@@ -1919,54 +1964,55 @@ class DetectorArray(object):
                                   cdprelease=cdprelease,
                                   cdpversion=cdpversion,
                                   cdpsubversion=cdpsubversion,
-                                  logger=self.toplogger)
-        if readnoise_model is None:
-            strg = "Could not find read noise CDP for detector %s" % detector
-            if readpatt:
-                strg += " with %s readout mode" % readpatt
-            strg += ". No read noise will be simulated."
-            self.logger.error(strg)
-            self.readnoise_map = None
-            self.readnoise_map_filename = ''
-            return
-
-        self.readnoise_map_filename = readnoise_model.meta.filename
-        # Multiply by the gain to convert the read noise from DN into electrons.
-        readnoise_map = readnoise_model.data[0:self.illuminated_shape[0],
-                                             0:self.detector_shape[1]] * \
-                                            self.mean_gain
-
-        rnshape = readnoise_map.shape
-        if rnshape[0] == self.illuminated_shape[0] and \
-           rnshape[1] == self.detector_shape[1]:
-            # If there are any reference rows, extend the readnoise map to
-            # include the additional pixels in the reference rows, otherwise
-            # use the dark map as is.
-            if self.top_rows > 0:
-                new_map = np.zeros([self.detector_shape[0],
-                                    self.detector_shape[1]])
-                new_map[self.bottom_rows:-self.top_rows,:] = readnoise_map
-                readnoise_map = new_map
-            elif self.bottom_rows > 0:
-                new_map = np.zeros([self.detector_shape[0],
-                                         self.detector_shape[1]])
-                new_map[self.bottom_rows:,:] = readnoise_map
-                readnoise_map = new_map
-        else:
-            strg = "Read noise map has the wrong size (%d x %d). " % rnshape
-            strg += "It should be %d x %d." % (self.illuminated_shape[0],
-                                               self.detector_shape[1])
-            raise TypeError(strg)
-
-        # Plot the readnoise map if requested.
-        if self._verbose > 1 and self._makeplot:
-            tstrg = "Read noise map obtained from " + \
-                os.path.basename(self.readnoise_map_filename)
-            mplt.plot_image(readnoise_map, title=tstrg)
-
-        if self.readnoise_map is not None:
-            del self.readnoise_map
-        self.readnoise_map = readnoise_map
+                                  logger=self.toplogger) as readnoise_model:
+            if readnoise_model is None:
+                strg = "Could not find read noise CDP for detector %s" % detector
+                if readpatt:
+                    strg += " with %s readout mode" % readpatt
+                strg += ". No read noise will be simulated."
+                self.logger.error(strg)
+                self.readnoise_map = None
+                self.readnoise_map_filename = ''
+                return
+    
+            self.readnoise_map_filename = readnoise_model.meta.filename
+            # Multiply by the gain to convert the read noise from DN into electrons.
+            readnoise_map = readnoise_model.data[0:self.illuminated_shape[0],
+                                                 0:self.detector_shape[1]] * \
+                                                self.mean_gain
+    
+            rnshape = readnoise_map.shape
+            if rnshape[0] == self.illuminated_shape[0] and \
+               rnshape[1] == self.detector_shape[1]:
+                # If there are any reference rows, extend the readnoise map to
+                # include the additional pixels in the reference rows, otherwise
+                # use the dark map as is.
+                if self.top_rows > 0:
+                    new_map = np.zeros([self.detector_shape[0],
+                                        self.detector_shape[1]])
+                    new_map[self.bottom_rows:-self.top_rows,:] = readnoise_map
+                    readnoise_map = new_map
+                elif self.bottom_rows > 0:
+                    new_map = np.zeros([self.detector_shape[0],
+                                             self.detector_shape[1]])
+                    new_map[self.bottom_rows:,:] = readnoise_map
+                    readnoise_map = new_map
+            else:
+                strg = "Read noise map has the wrong size (%d x %d). " % rnshape
+                strg += "It should be %d x %d." % (self.illuminated_shape[0],
+                                                   self.detector_shape[1])
+                raise TypeError(strg)
+    
+            # Plot the readnoise map if requested.
+            if self._verbose > 1 and self._makeplot:
+                tstrg = "Read noise map obtained from " + \
+                    os.path.basename(self.readnoise_map_filename)
+                mplt.plot_image(readnoise_map, title=tstrg)
+    
+            if self.readnoise_map is not None:
+                del self.readnoise_map
+            self.readnoise_map = readnoise_map
+            del readnoise_model
         
     def get_subarray_shape(self, subarray=None):
         """
@@ -2177,11 +2223,28 @@ class DetectorArray(object):
                 metadata.add_comment(strg)
 
         return metadata
-     
+
+    def hard_reset(self):
+        """
+        
+        Hard reset the detector.
+        
+        This function clears the persistence counters and restores the
+        detector to the state it had after its first reset.
+        It simulates the kind of reset which happens when the detector
+        is annealed.
+        
+        """
+        # Hard reset the underlying Poisson integrator.
+        if self._verbose > 3:
+            self.logger.info( "Hard resetting the detector" )
+        self.pixels.hard_reset()
+
+
     def reset(self, nresets=1, new_exposure=False):
         """
         
-        Reset the detector
+        Reset the detector. Persistence and drift are simulated.
         
         """            
         # Reset the underlying Poisson integrator.

@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 #
 # 27 May 2015: Replaced pyfits with astropy.io.fits
-
+# 17 May 2018: Python 3: Converted dictionary keys return into a list.
 
 """
 
@@ -14,8 +14,8 @@ and shows the solutions to those problems recommended by the STScI team.
 The module can be rerun to make sure the solutions still work.
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 import os
 import numpy as np
@@ -56,7 +56,7 @@ def save_old_data( filename, data, header=None, overwrite=False, add_comment=Fal
         fitsheader.add_comment("This is a comment in the original header.")
             
     if header is not None:
-        for key in header.keys():
+        for key in list(header.keys()):
             fitsheader.update(key, header[key], "")
             
     hdulist = pyfits.HDUList([])

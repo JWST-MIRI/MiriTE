@@ -57,7 +57,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              'None' is equivalent to a null string.
 09 Dec 2014: Added ability to set detector settings and reference file
              metadata.
-16 Jan 2015: SUBARRAY_DICT modified so that SUBSTRTi and SUBSIZEi keywords
+16 Jan 2015: SUBARRAY modified so that SUBSTRTi and SUBSIZEi keywords
              are written even for full-frame data.
 06 Feb 2015: Define DATE-OBS and TIME-OBS metadata separately.
 04 Mar 2015: Improve the error message from set_fits_keyword.
@@ -147,12 +147,18 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 24 Jan 2018: Added association metadata to set_observation_metadata.
 11 Apr 2018: FLENS added to filter list and "N/A" added to some options in
              data model metadata.
+17 May 2018: Python 3: Converted dictionary keys return into a list.
+24 May 2018: Modified to work with history records stored either as a list
+              or a dictionary (to cope with a change to the JWST library).
+28 Jun 2018: Modified to work with history records stored either as a dictionary
+             or a list-like object (to cope with another change to the JWST
+             library). Added the get_title_and_metadata() function to display
+             the history records along with metadata.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
 
 import os
 import datetime
@@ -174,34 +180,10 @@ from jwst.datamodels.model_base import DataModel
 # Import the MIRI data models and the data model plotter.
 import miri.datamodels
 from miri.datamodels.plotting import DataModelPlotVisitor
-
+from miri.parameters import SUBARRAY
 
 # List all classes and global functions here.
 __all__ = ['get_exp_type', 'MiriDataModel']
-
-#
-# Dictionary of available subarray options. Each tuple contains
-# (first column, first row, number of columns, number of rows).
-# This dictionary is used by the set_subarray_metadata convenience
-# function.
-# TODO: Should this table be moved to a MIRI parameters file?
-#
-SUBARRAY_DICT = {}
-SUBARRAY_DICT['FULL'] =          (   1,   1, 1032, 1024 )
-SUBARRAY_DICT['GENERIC'] =       (   1,   1, 1032, 1024 )
-SUBARRAY_DICT['MASK1065'] =      (   1,  19,  288,  224 )
-SUBARRAY_DICT['MASK1140'] =      (   1, 245,  288,  224 )
-SUBARRAY_DICT['MASK1550'] =      (   1, 467,  288,  224 )
-SUBARRAY_DICT['MASKLYOT'] =      (   1, 717,  320,  304 )
-SUBARRAY_DICT['BRIGHTSKY'] =     ( 457,  51,  512,  512 )
-SUBARRAY_DICT['SUB256'] =        ( 413,  51,  256,  256 )
-SUBARRAY_DICT['SUB128'] =        (   1, 889,  136,  128 )
-SUBARRAY_DICT['SUB64'] =         (   1, 779,   72,   64 )
-SUBARRAY_DICT['SLITLESSPRISM'] = (   1, 529,   72,  416 )
-
-# Pre-BURST-mode versions of the subarrays
-#SUBARRAY_DICT['BRIGHTSKY'] =     (   1,  37,  968,  512 )
-#SUBARRAY_DICT['SUB256'] =        (   1,  37,  668,  256 )
 
 #
 # Public global function.
@@ -233,8 +215,8 @@ def get_exp_type(detector, filter, subarray='FULL', datatype='SCIENCE'):
         The exposure type string (EXP_TYPE)
     
     """
-    assert isinstance(detector, (str,unicode))
-    assert isinstance(filter, (str,unicode))
+    assert isinstance(detector, str)
+    assert isinstance(filter, str)
     
     if 'MIRIFU' in detector:
         if (filter and 'OPAQUE' in filter) or (datatype == 'DARK'):
@@ -370,35 +352,6 @@ def _shape_to_string(shape, axes=None):
         strg = ' x '.join(str(s) for s in shape)
     return strg
 
-# THIS CLASS HAS NOW BEEN IMPLEMENTED IN JWST.DATAMODELS
-# class JWSTExtension(AsdfExtension):
-#     """
-#     
-#     A class which defines an extension to the ASDF URI mapping
-#     which recognises the URI 'http://jwst.stsci.edu/schemas/'
-#     as a reference to the schemas belonging to the jwst.datamodels
-#     package.
-#     
-#     """
-#     @property
-#     def types(self):
-#         return []
-# 
-#     @property
-#     def tag_mapping(self):
-#         return []
-#
-#     @property
-#     def url_mapping(self):
-#         # Define the uri and directory containing the additional schemas
-#         schema_uri_base = 'http://jwst.stsci.edu/schemas/'
-#         schema_path = os.path.abspath(os.path.join( \
-#                             os.path.dirname(jwst.datamodels.__file__),
-#                             'schemas'))
-#         return [(schema_uri_base,
-#                  asdf.util.filepath_to_url(schema_path) +
-#                  '/{url_suffix}')]
-
 
 class MIRIExtension(AsdfExtension):
     """
@@ -493,7 +446,8 @@ class MiriDataModel(DataModel):
         
         # Set the data product subtitle and history, if provided.
         self._subtitle = title
-        self.add_history("Created from: %s" % self.__class__.__name__)
+        created_strg = "Created from: %s" % self.__class__.__name__
+        self.add_unique_history(created_strg)
 
     #
     # Convenience functions for setting commonly associated blocks
@@ -1171,7 +1125,7 @@ class MiriDataModel(DataModel):
             if isinstance(subarray, six.string_types):
                 subarray = subarray.strip() # Strip off superflous white space
                 self.meta.subarray.name = subarray
-                subtuple = SUBARRAY_DICT[subarray]
+                subtuple = SUBARRAY[subarray]
                 if subtuple is not None:
                     self.meta.subarray.xstart = subtuple[0]
                     self.meta.subarray.ystart = subtuple[1]
@@ -1476,7 +1430,7 @@ class MiriDataModel(DataModel):
             # Copy all metadata apart from keyword matches specified
             # in the ignore list.
             fitskwdict = other.fits_metadata_dict()
-            metakeys = fitskwdict.keys()
+            metakeys = list(fitskwdict.keys())
             notcopied = 0
             names = []
             for key in metakeys:
@@ -1487,7 +1441,6 @@ class MiriDataModel(DataModel):
                         tobecopied = False
                         break
                 if tobecopied:
-#                     print("Copying metadata key:", key)
                     # Ignore KeyError or AttributeError exceptions
                     # when metadata is not defined in both data models.
                     try:
@@ -1581,7 +1534,6 @@ class MiriDataModel(DataModel):
                         # Ensure each entry is made only once.
                         pathstr = '.'.join(path)
                         if pathstr not in results:
-#                             print("Found data table at", pathstr)
                             results.append(pathstr)
 
         # Walk through the schema and apply the search function.
@@ -1715,14 +1667,11 @@ class MiriDataModel(DataModel):
         """
         field_names = []
         dtypes = self.find_schema_components('datatype')
-#         print("Looking for", name, "in table components", dtypes)
         name_dt = name + ".datatype"
         if name in dtypes:
             dtype = dtypes[name]
-#             print("Found table component:", dtype, "for", name)
             if isinstance(dtype,(tuple,list)):
                 for element in dtype:
-#                     print("Testing element", element, "for", name)
                     if 'name' in element:
                         field_names.append(element['name'])
                 return field_names
@@ -1731,10 +1680,8 @@ class MiriDataModel(DataModel):
                 return []
         elif name_dt in dtypes:
             dtype = dtypes[name_dt]
-#             print("Found table component:", dtype, "for", name)
             if isinstance(dtype,(tuple,list)):
                 for element in dtype:
-#                     print("Testing element", element, "for", name)
                     if 'name' in element:
                         field_names.append(element['name'])
                 return field_names
@@ -1749,6 +1696,7 @@ class MiriDataModel(DataModel):
         """
         
         Add a comment to the metadata associated with the data product.
+        Obsolete function. Exists for backwards compatibility.
         
         :Parameters:
         
@@ -1766,6 +1714,7 @@ class MiriDataModel(DataModel):
         
         Return a structured string containing the comments
         associated with the data product.
+        Obsolete function. Exists for backwards compatibility.
         
         """
         # For now, just return the FITS comments.
@@ -1783,28 +1732,82 @@ class MiriDataModel(DataModel):
             A string containing a history record.
                         
         """
-        # Wrap history string in an ASDF HistoryEntry object 
-        # and tag it with the current time.
-        history_item = HistoryEntry({'description': history,
-          'time': Time(datetime.datetime.now())})
+        # The data model can store history records in a list-like object or
+        # a dictionary, depending on which version of the JWST
+        # library is being used. Test for both, for backwards compatibility.
+        if hasattr(self, 'history'):
+            try:
+                if hasattr(self.history, 'append'):
+                    self.history.append( history )
+                elif isinstance(self.history, dict):  
+                    # Wrap history string in an ASDF HistoryEntry object 
+                    # and tag it with the current time.
+                    history_item = HistoryEntry({'description': history,
+                    'time': Time(datetime.datetime.now())})
+                    if 'entries' in self.history:
+                        self.history['entries'].append(history_item)
+                    else:
+                        self.history['entries'] = [history_item]
+                else:
+                    warnings.warn("Unrecognised self.history format! HISTORY record not added.")
+            except (TypeError, KeyError, AttributeError):
+                 warnings.warn("Unrecognised self.history format! HISTORY record not added.")
+        else:
+            warnings.warn("Data model contains no history attribute! HISTORY record not added.")
 
-        # The data model stores history records in a list.
-        self.history.append(history_item)
+    def add_unique_history(self, history):
+        """
         
+        Add a history record to the metadata associated with the
+        data product, but only if the same string doesn't already
+        exist.
+        
+        :Parameters:
+        
+        history: str
+            A string containing a history record.
+                        
+        """
+        history_list = self.get_history()
+        if history_list:
+            if history not in history_list:
+                # History entry does not already exist.
+                self.add_history(history)
+        else:
+            # This is the first history entry.
+            self.add_history(history)
+            
     def get_history(self):
         """
         
-        Return the history list. Exists for backwards compatibility.
-        
-        NOTE: self.history is a list of HistoryEntry objects.
-        This function needs to return a list of strings.
-        
+        Return the history list as a list of strings.
+        Exists for backwards compatibility.
+                
         """
-        hlist = []
-        for hitem in self.history:
-            if 'description' in hitem.keys():
-                hlist.append( str(hitem['description']) )
-        return hlist
+        # The data model can store history records in a list-like object or
+        # a dictionary, depending on which version of the JWST
+        # library is being used. Test for both, for backwards compatibility.
+        history_list = []
+        if hasattr(self, 'history'):
+            try:
+                if hasattr(self.history, 'append'):
+                    history_list = []
+                    for history_item in self.history:
+                        if isinstance(history_item, dict):
+                            if 'description' in list(history_item.keys()):
+                                history_list.append( str(history_item['description']) )
+                        else:
+                            history_list.append(str(history_item))
+                elif isinstance(self.history, dict):
+                    if 'entries' in self.history:
+                        hlist = list(self.history['entries'])
+                        for history_item in hlist:
+                            if 'description' in list(history_item.keys()):
+                                history_list.append( str(history_item['description']) )
+            except (TypeError, KeyError, AttributeError):
+                # Unrecognised type. Return no history.
+                pass
+        return history_list
         
     def get_history_str(self):
         """
@@ -1814,28 +1817,32 @@ class MiriDataModel(DataModel):
         
         """
         strg = ''
-        for hitem in self.history:
-            if 'description' in hitem.keys():
-                hstrg = str(hitem['description'])
+        history_list = self.get_history()
+        for hitem in history_list:
+            if isinstance(hitem, dict):
+                if 'description' in list(hitem.keys()):
+                    hstrg = str(hitem['description'])
+                else:
+                    hstrg = ''
+                if 'time' in list(hitem.keys()):
+                    tstrg = str(hitem['time'])
+                else:
+                    tstrg = ''
+                if hstrg:
+                    strg += "HISTORY = \'" + hstrg + "\'"
+                if tstrg:
+                    strg += "; TIME = \'" + tstrg + "\'"
             else:
-                hstrg = ''
-            if 'time' in hitem.keys():
-                tstrg = str(hitem['time'])
-            else:
-                tstrg = ''
-            if hstrg:
-                strg += "HISTORY = \'" + hstrg + "\'"
-            if tstrg:
-                strg += "; TIME = \'" + tstrg + "\'"
-            strg += "\n"                        
+                strg += "HISTORY = \'" + str(hitem) + "\'"
+            strg += "\n"
         return strg
 
     #
     # Convenience functions for locating, getting and setting items
     # associated with FITS keywords or FITS HDUs.
     #
-    # NOTE: These FITS functions will become obsolete when the underlying
-    # data model stops using the FITS storage object.
+    # NOTE: These FITS functions could become obsolete if the underlying
+    # JWST data model stops using the FITS storage object.
     #
     def fits_metadata_dict(self, include_comments=False, include_history=False,
                            include_builtin=False):
@@ -1969,7 +1976,7 @@ class MiriDataModel(DataModel):
         # TODO: Modify to use walk_schema
         if 'properties' in self.schema:
             # The schema has objects defined at the top level.
-            for subkey in self.schema['properties'].keys():
+            for subkey in list(self.schema['properties'].keys()):
                 if self.schema['properties'][subkey]['type'] == 'data':
                     fits_hdu = self.schema['properties'][subkey]['fits_hdu']
                     if hduname == fits_hdu:
@@ -1979,7 +1986,7 @@ class MiriDataModel(DataModel):
             # The schema objects can be found at the next level down.
             for sublevel in self.schema['allOf']:
                 if 'properties' in sublevel:
-                    for subkey in self.schema['properties'].keys():
+                    for subkey in list(self.schema['properties'].keys()):
                         if self.schema['properties'][subkey]['type'] == 'data':
                             fits_hdu = \
                                 self.schema['properties'][subkey]['fits_hdu']
@@ -2918,6 +2925,24 @@ class MiriDataModel(DataModel):
                                           underchar="-")
         return strg
 
+    def get_title_and_metadata(self):
+        """
+        
+        Return the title and metadata of a MIRI data object as a readable
+        string.
+        
+        :Returns:
+        
+        description: str
+            A string containing a description.
+        
+        """
+        # Start with the data object title, metadata and history
+        strg = self.get_title(underline=True, underchar="=") + "\n"
+        strg += self.get_meta_str(underline=True, underchar='-')
+        strg += self.get_history_str()
+        return strg
+
     def __str__(self):
         """
         
@@ -2930,9 +2955,8 @@ class MiriDataModel(DataModel):
             A string containing a summary of the contents.
         
         """
-        # Start with the data object title and metadata
-        strg = self.get_title(underline=True, underchar="=") + "\n"
-        strg += self.get_meta_str(underline=True, underchar='-')
+        # Start with the data object title, metadata and history
+        strg = self.get_title_and_metadata()
         
         # Display the data arrays.
         list_of_arrays = self.list_data_arrays()
@@ -2993,7 +3017,7 @@ class MiriDataModel(DataModel):
         """
         # Define a function to be applied at each level of the schema.
         def schema_to_string(subschema, path, combiner, ctx, recurse):
-            keys = subschema.keys()
+            keys = list(subschema.keys())
             #level = len(path.split('.'))
             for key in keys:
                 value = subschema.get(key)

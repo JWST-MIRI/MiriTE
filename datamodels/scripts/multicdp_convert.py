@@ -37,7 +37,7 @@ The command takes the following options:
 
 """
 
-from __future__ import absolute_import, unicode_literals, division, print_function
+
 
 import optparse
 import os

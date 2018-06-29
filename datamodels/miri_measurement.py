@@ -21,8 +21,8 @@ which vary with a variable.
 @author: Steven Beard (UKATC)
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 #import sys
 import numpy as np
@@ -287,7 +287,7 @@ class MiriMeasurement(MiriDataModel):
 #                     else:
 #                         strg = "%s file: %s" % \
 #                             (self.name, self.filename)
-#                 elif isinstance(self.vnames, (str,unicode)):
+#                 elif isinstance(self.vnames, str):
 #                     MAX_LEN = _MAX_COMMENT_LEN - len(self.vnames) - 8
 #                     if len(self.filename) > MAX_LEN:
 #                          The filename is truncated if it is too long
@@ -477,9 +477,8 @@ class MiriMeasurement(MiriDataModel):
         Returns a string representation of the object MiriMeasurement
         
         """
-        # Start with the data object title and metadata
-        strg = self.get_title(underline=True, underchar="=") + "\n"
-        strg += self.get_meta_str(underline=True, underchar='-')
+        # Start with the data object title, metadata and history
+        strg = self.get_title_and_metadata()
 
         # Describe the filter transmission table
         strg += "\nColumn names: " + str(self.fieldnames) + "\n"

@@ -57,12 +57,14 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              functions and updated the tests run in the main program.
 20 Apr 2018: Corrected a bug where the second to last entry of the reverse_table
              could end up containing zero.
+18 May 2018: Use explicit rounding when converting floating point to integer
+             in get_forwards_table and get_reverse_table.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 import numpy as np
 import numpy.ma as ma
@@ -377,7 +379,7 @@ class MiriLinearityModel(MiriMeasuredModel):
             farray += self.data[icoeff,row,column] * (inarray ** icoeff)
             
         # Convert the output array to integer.
-        outarray = np.round(farray).astype(np.int)
+        outarray = np.floor(farray+0.5).astype(np.int)
         return outarray
 
     def get_reverse_table(self, row, column, max_dn=65535, fill_gaps=True):
@@ -455,7 +457,7 @@ class MiriLinearityModel(MiriMeasuredModel):
                 rarray[max_dn_out-1] = (rarray[max_dn_out-2] + rarray[max_dn_out])/2.0
             
         # Convert the output array to integer.
-        reverse_array = np.round(rarray).astype(np.int)
+        reverse_array = np.floor(rarray+0.5).astype(np.int)
         return reverse_array
 
     # "coeffs" is an alias for the "data" attribute.

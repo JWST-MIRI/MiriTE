@@ -143,15 +143,25 @@ effects simulated by SCASim.
              every frame during Poisson noise calculation. Last readout
              should be with respect to the zeropoint. Some variables
              renamed to better names.
+26 Apr 2018: Corrected exception raising syntax for Python 3.
+27 Apr 2018: In Python 3 all integers are long. Removed "L" syntax.
+             Changed sys.maxint for sys.maxsize for Python 3. Replaced
+             xrange with range. Corrected bug in np.where statement.
+18 May 2018: Silence the FutureWarning from np.linalg.lstsq.
 22 May 2018: Do not sample the Poisson function multiple times when reading
              out quickly. The number of particles remains the same (Bug 439).
              Rounding of extreme values changed from 4 to 6 decimal places.
+23 May 2018: Removed the zero substitution and rounding from the Poisson
+             noise calculation, as scipy no longer has the "domain error"
+             bug worked around on 12 Feb 2016 (Bug 16).
+24 May 2018: Documentation update. Ensure _MAXEXPECTED is an integer.
+04 Jun 2018: anneal function renamed hard_reset.
 
 @author: Steven Beard (UKATC)
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 # Python logging facility
 import logging
@@ -167,27 +177,29 @@ import numpy as np
 # The maximum allowable signed integer value. This is the largest particle
 # count which can be read from a Poisson integrator. The bucket size
 # will be set to this value if not specified.
-_MAXINT = sys.maxint
+_MAXINT = sys.maxsize//2 # Python 3
 
 # The maximum level size of the expected count before the scipy.stats.poisson
 # function overflows. It must be significantly less than _MAXINT to prevent
 # an overflowing value being randomly generated.
-# TODO: This is an arbitrary level set by trial and error. Can it be more exact?
-_MAXEXPECTED = _MAXINT - (100L * math.sqrt(_MAXINT))
+_MAXEXPECTED = _MAXINT - (100 * int(math.sqrt(_MAXINT)))
 
-# The maximum clock time for which the slow zeropoint drift is valid.
-# The detector is assumed to settle after this time has elapsed.
+# The maximum clock time (in seconds) for which the slow zeropoint drift is
+# valid. The detector will stop drifting after this time has elapsed.
 _MAXCLOCK = 100000.0
 
 def linear_regression(x, y):
     """
     
     Linear regression function. Fit an intercept and a slope
-    to a set of x,y coordinates
+    to a set of x,y coordinates.
+    
+    This function can be used when testing to fit a slope to the
+    integrator output.
     
     """
     matrix = np.vstack( [x, np.ones_like(x)] ).T
-    slope, intercept = np.linalg.lstsq(matrix,y)[0]
+    slope, intercept = np.linalg.lstsq(matrix,y,rcond=-1)[0]
     return (slope, intercept)
 
 
@@ -316,28 +328,28 @@ class PoissonIntegrator(object):
             raise ValueError(strg)
         
         # Define the fundamental properties of the integrator: its shape,
-        # units and bucket depth.
+        # units, bucket depth and pedestal.
         self.shape = (int(rows), int(columns))
         self.particle = particle
         self.time_unit = time_unit
         self.bucket_size = bucket_size
-        self.pedestal = None
+        self.pedestal = None  # Fixed pedestal value added to the zeropoint.
                 
         # All the internal counters are initialised to zero.
         # NOTE: The expected count is maintained in a floating point
         # array which is truncated to integer when read out.
-        self.zeropoint = np.zeros(self.shape)
-        self.expected_count = np.zeros(self.shape)
-        self.last_count = np.zeros(self.shape)
-        self.last_readout = np.zeros(self.shape, dtype=np.uint32)
-        self.flux = np.zeros(self.shape)
+        self.zeropoint = np.zeros(self.shape)      # Zeropoint from which to begin counting.
+        self.expected_count = np.zeros(self.shape) # The expected count after an integration.
+        self.last_count = np.zeros(self.shape)     # The expected count at last readout
+        self.last_readout = np.zeros(self.shape, dtype=np.uint32) # The actual count at last readout
+        self.flux = np.zeros(self.shape)           # The flux (in particles per time unit) being integrated.
         self.nperiods = 0    # Number of integration periods since reset.
         self.nints = 0       # Number of integrations since creation or new exposure.
         self.readings = 0    # Number of readings/groups since reset.
-        self.nperiods_at_readout = 0
-        self.exposure_time = 0.0  # Exposure time since reset.
-        self.clock_time = 0.0     # Clock time since switch on.
-        self.time_at_reset = 0.0  # Clock time at last reset
+        self.nperiods_at_readout = 0 # Number of integration periods at last readout.
+        self.exposure_time = 0.0  # Exposure time (in time units) since reset.
+        self.clock_time = 0.0     # Clock time (in time units) since switch on.
+        self.time_at_reset = 0.0  # Clock time (in time units) at last reset
         
         # This flag controls whether Poisson noise is simulated
         self.simulate_poisson_noise = simulate_poisson_noise
@@ -367,7 +379,7 @@ class PoissonIntegrator(object):
     def get_title(self, description=''):
         """
         
-        Get a string giving a title for the measurements.
+        Get a string giving a title for the particle count.
         
         :Parameters:
         
@@ -428,6 +440,14 @@ class PoissonIntegrator(object):
         Apply the zero point function to a set of data.
         The perfect integrator has a zero point of exactly zero.
         
+        NOTE: The zeropoint is a dynamic property of the detector. It
+        represents a residual charge after a reset which means the
+        integrator doesn't start from a zero count.
+        
+        By contrast, the pedestal level is an arbitrary starting value,
+        which is a property of the readout mechanism rather than the
+        detector itself.
+        
         """
         # Data are zeroed perfectly.
         return data * 0.0
@@ -437,6 +457,8 @@ class PoissonIntegrator(object):
         
         Apply an integrator function to the data.
         This is a perfectly linear integrator.
+        
+        NOTE: data must be a numpy array.
         
         """
         if self.verbose > 6:
@@ -457,6 +479,14 @@ class PoissonIntegrator(object):
         Set a pedestal level which acts as the ultimate zero point
         for the integrator. All resets and integrations start from
         this level. By default, the pedestal is zero.
+
+        NOTE: The pedestal level is an arbitrary starting value for
+        all readings. It is a property of the readout mechanism rather
+        than the detector itself.
+
+        By contrast, the zeropoint is a dynamic property of the detector.
+        It represents a residual charge after a reset which means the
+        integrator doesn't start from a zero count.    
         
         :Parameters:
         
@@ -515,6 +545,8 @@ class PoissonIntegrator(object):
         # resets requested.
         signal = self.zeropoint + self.expected_count
         self.zeropoint = self._apply_zeropoint(signal, nresets=nresets)
+        # If necessary, shift the zeropoint by the pedestal.
+        # TODO: Wouldn't it be more natural to do this at the readout stage?
         if self.pedestal is not None:
             self.zeropoint = self.zeropoint + self.pedestal
         self.expected_count = self.expected_count * 0.0
@@ -579,7 +611,7 @@ class PoissonIntegrator(object):
             if self.flux.shape == self.shape:      
                 # The input flux array must always be positive.
                 # Replace negative values with zero.
-                arenegative = np.where(flux < 0.0)
+                arenegative = np.where(self.flux < 0.0)
                 self.flux[arenegative] = 0.0
        
                 # Apply the integrator function
@@ -605,7 +637,10 @@ class PoissonIntegrator(object):
     def wait(self, time, bgflux=0.0):
         """
         
-        Pause for a certain length of time without integrating.
+        Pause for a certain length of time without integrating on science flux.
+        
+        This function includes the option to integrate on a uniform
+        background flux which is internal to the instrument.
         
         :Parameters:
         
@@ -628,16 +663,16 @@ class PoissonIntegrator(object):
         """
         if self.verbose > 5:
             self.logger.debug("+++Wait for " + str(time) + " " + str(self.time_unit))
-        # The integration time must always be positive.
+        # The wait time must always be positive.
         if time < 0.0:
             raise ValueError("Wait time must be positive")
 
         # The clock time is always incremented.
         self.clock_time += float(time)
 
-        if bgflux > 0.001:
+        if bgflux > 0.0001:
             # Integrate the counter on the background flux.
-            # TODO: Improve this simulation.
+            # TODO: Use a non-uniform background illumination?
             self.expected_count = \
                 self._apply_integrator(self.expected_count, bgflux, time)
         
@@ -647,10 +682,13 @@ class PoissonIntegrator(object):
         Read the signal stored within the integrator and apply Poisson
         noise (if switched on).
         
+        NOTE: The nsamples parameter no longer has any effect on the
+        Poisson noise.
+                
         :Parameters:
         
         nsamples: int, optional, default=1
-            The number of samples from the Poisson distribution.
+            The number of samples made when reading out.
                 
         :Returns:
         
@@ -667,54 +705,59 @@ class PoissonIntegrator(object):
         
         # Simulate Poisson noise when the poisson_noise flag is True,
         if self.simulate_poisson_noise:
+            #
             # When the Poisson integrator is read out, the expected number of
             # particles is turned into an actual number of particles by making
-            # one or more samples from the Poisson distribution. The Poisson
-            # noise will be reduced in cases where more than one sample is made.
-            # Note that scipy.stats.poisson.rvs will report an exception if
-            # any of the expected counts are zero or negative, so these are
-            # filtered out. The function also fails with a domain error if it
-            # encounters very small negative floating point values. These are
-            # removed by rounding the expected count.
+            # a sample from the Poisson distribution.
+            # Note that the scipy.stats.poisson.rvs will report an exception
+            # if any of the expected counts are negative, so these are
+            # filtered out.
+            #
             if self.verbose > 5:
                 strg = "Readout %d: Expected count is %g to %g" % \
                     (self.readings+1, self.expected_count.min(), \
                      self.expected_count.max())
                 self.logger.debug(strg)
-            # Round extreme values.
-            rounded_diff = np.around(self.expected_count-self.last_count, 6)
+            filtered_diff = self.expected_count - self.last_count
             # Filter out zero, negative or bad values.
-            where_zero = np.where(rounded_diff <= 0)
+            where_zero = np.where(filtered_diff <= 0)
             if where_zero:
-                rounded_diff[where_zero] = 1
-            where_nan = np.where(np.isnan(rounded_diff))
+                filtered_diff[where_zero] = 0
+            where_nan = np.where(np.isnan(filtered_diff))
             if where_nan:
-                rounded_diff[where_nan] = 1
+                filtered_diff[where_nan] = 0
             try:
                 # Take a random sample from the Poisson distribution.
-                read_diff = scipy.stats.poisson.rvs(rounded_diff)
+                read_diff = scipy.stats.poisson.rvs(filtered_diff)
 # The following code was making an incorrect assumption. Both the expected
 # number of particles and actual number of particles remain the same when
-# multiple reads are made in very quick succession.
+# multiple reads are made in very quick succession. The code is only valid
+# when the samples take a significant time to complete.
 #                 # If required, take more samples and average.
 #                 if nsamples > 1:
 #                     for ii in range(1, nsamples):
 #                         read_diff = read_diff + \
-#                             scipy.stats.poisson.rvs(rounded_diff)
+#                             scipy.stats.poisson.rvs(filtered_diff)
 #                     read_diff = read_diff / float(nsamples)
-            except ValueError, e:
+            except ValueError as e:
                 strg = "Poisson rvs error. Difference array:\n"
-                strg += str(rounded_diff)
+                strg += str(filtered_diff)
                 strg += "\n" + str(e)
                 raise ValueError(strg)
-            # Put the zero values back to zero.
-            if where_zero:
-                read_diff[where_zero] = 0
+            #
+            # With Poisson noise enabled, the new readout is the zero-point
+            # level, plus the previous readout, plus the difference in
+            # readout with Poisson noise taken into account.
+            #
             readout_array = self.zeropoint + self.last_readout + read_diff
         else:
-            readout_array = self.zeropoint + self.expected_count
+            #
+            # Without Poisson noise, the new readout is simply the zero-point
+            # level plus the current expected count.
+            #
+             readout_array = self.zeropoint + self.expected_count
         
-        # The latest readout cannot be less than the previous readout or
+        # The latest readout cannot be less than zero or
         # (if specified) larger than the defined bucket size.
         if self.bucket_size is None:
             maxread = _MAXINT
@@ -722,11 +765,14 @@ class PoissonIntegrator(object):
             maxread = self.bucket_size
         readout_array = np.clip(readout_array, 0.0, maxread)
         
-        # Remember the last expected count
+        # Remember the last expected count. This will be used to determine
+        # a new filtered_diff the next time this function is called.
         self.last_count = deepcopy(self.expected_count)
         
         # Increment the reading/group counter and save the last readout.
-        # NOTE: The last readout is measured from the zeropoint.
+        # last_readout is used as a new base level the next time this
+        # function is called.
+        # NOTE: The last readout is measured from the zeropoint, which needs to be subtracted.
         self.readings += 1
         self.last_readout = readout_array.astype(np.uint32) - self.zeropoint
         self.nperiods_at_readout = self.nperiods
@@ -1439,10 +1485,12 @@ class ImperfectIntegrator(PoissonIntegrator):
         del temp_data, newcounts
         return newdata
 
-    def anneal(self):
+    def hard_reset(self):
         """
         
-        Anneal the (imperfect) integrator by leaking away the persistence.
+        Hard reset the (imperfect) integrator by removing the persistence.
+        This function clears the persistence counters and restores the
+        integrator to the state it had after its first reset.
         
         :Parameters:
 
@@ -1450,7 +1498,7 @@ class ImperfectIntegrator(PoissonIntegrator):
         
         """
         if self.verbose > 5:
-            self.logger.debug("+++Anneal ")
+            self.logger.debug("+++hard_reset ")
            
         # Remove latents and persistence 
         self.zeropoint = np.zeros(self.shape)
@@ -1534,9 +1582,9 @@ class ImperfectIntegrator(PoissonIntegrator):
                 # The energy array is partly inside the particle count array,
                 # so more complex assignment is needed. (This is a lot less
                 # efficient than numpy slicing.)
-                for rw in xrange(rowstart,rowend):
+                for rw in range(rowstart,rowend):
                     if rw >=0 and rw < self.expected_count.shape[0]:
-                        for cl in xrange(colstart,colend):
+                        for cl in range(colstart,colend):
                             if cl >=0 and cl < self.expected_count.shape[1]:
                                 erw = rw - rowstart
                                 ecl = cl - colstart
@@ -1591,7 +1639,7 @@ class ImperfectIntegrator(PoissonIntegrator):
     def __str__(self):
         """
         
-        Return a string describing a PoissonIntegator object.
+        Return a string describing an ImperfectIntegrator object.
         
         """
         strg = super(ImperfectIntegrator, self).__str__()

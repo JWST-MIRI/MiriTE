@@ -37,8 +37,8 @@ PoissonIntegrator and ImperfectIntegrator class.
 @author: Steven Beard (UKATC)
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 #import os, sys
 import copy
@@ -80,27 +80,25 @@ class TestPoissonIntegrator(unittest.TestCase):
         self.assertIsNotNone(descr)
         
     def test_integrate(self):
-        # The readings must never decrease following an integration,
-        # no matter how short the integration time.
-        # NOTE: This is no longer true. Tests commented out.
+        # Test that integrating on a flux works as expected.
         flux = [[1.0, 2.0, 3.0], \
                 [4.0, 5.0, 6.0], \
                 [7.0, 8.0, 9.0]]
         self.integrator.reset()
+        # Long integrations
         self.integrator.integrate(flux, 100.0)
         readout1 = self.integrator.readout().astype(np.int32)
         self.integrator.integrate(flux, 100.0)
         readout2 = self.integrator.readout().astype(np.int32)
+        # Short integration
         self.integrator.integrate(flux, 1.0)
         readout3 = self.integrator.readout().astype(np.int32)
+        # Even a zero-length integration is valid.
         self.integrator.integrate(flux, 0.0)
         readout4 = self.integrator.readout().astype(np.int32)
+        # The readout for the long integration must increase.
         diff1 = readout2 - readout1
-#        diff2 = readout3 - readout2
-#        diff3 = readout4 - readout3
         self.assertTrue(diff1.min() >= 0)
-#        self.assertTrue(diff2.min() >= 0)
-#        self.assertTrue(diff3.min() >= 0)
         # The final exposure time must be the sum of all the
         # integration times.
         expected = 100.0 + 100.0 + 1.0 + 0.0
@@ -162,7 +160,7 @@ class TestPoissonIntegrator(unittest.TestCase):
 
     def test_noise(self):
         # Test that the Poisson noise level is approximately the
-        # square root of the input signal.
+        # square root of the input signal (Bug 439).
         # The test is done using a 1024x1024 integrator to
         # eliminate the small number statistics.
         intnoise = PoissonIntegrator(1024, 1024, verbose=0)
@@ -239,7 +237,7 @@ class TestPoissonIntegrator(unittest.TestCase):
     def test_extreme(self):
         # Check that the integration and readout functions can accept
         # extremely small floating point values without raising an
-        # exception.
+        # exception (Bug 16).
         self.integrator.reset()
         flux = [[1.0e-9, 2.0e-9, -3.0e9], \
                 [4.0e-9, 5.0e-15, 6.0e-9], \
@@ -275,7 +273,7 @@ class TestPoissonIntegrator(unittest.TestCase):
 class TestImperfectIntegrator(unittest.TestCase):
     
     def setUp(self):
-        # Create a very simple 3 x 3 Poisson integrator object
+        # Create a very simple 3 x 3 imperfect Poisson integrator object
         self.integrator = ImperfectIntegrator(3, 3, verbose=0)
         self.integrator.set_seed(42)
         
@@ -297,53 +295,56 @@ class TestImperfectIntegrator(unittest.TestCase):
         self.assertIsNotNone(descr)
         
     def test_integrate(self):
-        # The readings must never decrease following an integration,
-        # no matter how short the integration time.
-        # NOTE: This is no longer true. Tests commented out.
+        # Test that integrating on a flux works as expected.
         flux = [[1.0, 2.0, 3.0], \
                 [4.0, 5.0, 6.0], \
                 [7.0, 8.0, 9.0]]
-        self.integrator.reset()
-        self.integrator.integrate(flux, 100.0)
-        readout1 = self.integrator.readout().astype(np.int32)
-        self.integrator.integrate(flux, 100.0)
-        readout2 = self.integrator.readout().astype(np.int32)
-        self.integrator.integrate(flux, 1.0)
-        readout3 = self.integrator.readout().astype(np.int32)
-        self.integrator.integrate(flux, 0.0)
-        readout4 = self.integrator.readout().astype(np.int32)
-        diff1 = readout2 - readout1
-#        diff2 = readout3 - readout2
-#        diff3 = readout4 - readout3
-        self.assertTrue(diff1.min() >= 0)
-#        self.assertTrue(diff2.min() >= 0)
-#        self.assertTrue(diff3.min() >= 0)
-        # The final exposure time must be the sum of all the
-        # integration times.
-        expected = 100.0 + 100.0 + 1.0 + 0.0
-        actual = self.integrator.exposure_time
-        self.assertAlmostEqual(expected, actual)
-        # An integration with no flux, or a wait, does not
-        # increases the exposure time.
-        before = self.integrator.exposure_time
-        self.integrator.integrate(None, 100.0)
-        after = self.integrator.exposure_time
-        self.assertAlmostEqual(before, after)
-        before = self.integrator.exposure_time
-        self.integrator.wait(100.0)
-        after = self.integrator.exposure_time
-        self.assertAlmostEqual(before, after)
-        # Defining a persistence will make the reset
-        # leave behind some a residual count.
-        self.integrator.set_persistence(0.1)
-        self.integrator.reset()
-        readout6 = self.integrator.readout()
-        self.assertTrue(np.all(readout6 > 0))
-        # Turning off the persistence allows a perfect reset.
-        self.integrator.set_persistence(0.0)
-        self.integrator.reset()
-        readout7 = self.integrator.readout()
-        self.assertTrue(np.all(readout7 == 0))
+        # Simulate 3 simulator sessions with 3 integrations each
+        for session in range(0,3):
+            # FIXME: hard_reset function not recognised. Why?
+            #self.integrator.hard_reset()
+            for integration in range(0,3):
+                self.integrator.reset()
+                # Long integrations
+                self.integrator.integrate(flux, 100.0)
+                readout1 = self.integrator.readout().astype(np.int32)
+                self.integrator.integrate(flux, 100.0)
+                readout2 = self.integrator.readout().astype(np.int32)
+                # Short integration
+                self.integrator.integrate(flux, 1.0)
+                readout3 = self.integrator.readout().astype(np.int32)
+                # Even a zero-length integration is valid.
+                self.integrator.integrate(flux, 0.0)
+                readout4 = self.integrator.readout().astype(np.int32)
+                # The readout for the long integration must increase.
+                diff1 = readout2 - readout1
+                self.assertTrue(diff1.min() >= 0)
+                # The final exposure time must be the sum of all the
+                # integration times.
+                expected = 100.0 + 100.0 + 1.0 + 0.0
+                actual = self.integrator.exposure_time
+                self.assertAlmostEqual(expected, actual)
+                # An integration with no flux, or a wait, does not
+                # increases the exposure time.
+                before = self.integrator.exposure_time
+                self.integrator.integrate(None, 100.0)
+                after = self.integrator.exposure_time
+                self.assertAlmostEqual(before, after)
+                before = self.integrator.exposure_time
+                self.integrator.wait(100.0)
+                after = self.integrator.exposure_time
+                self.assertAlmostEqual(before, after)
+                # Defining a persistence will make the reset
+                # leave behind some a residual count.
+                self.integrator.set_persistence(0.1)
+                self.integrator.reset()
+                readout6 = self.integrator.readout()
+                self.assertTrue(np.all(readout6 > 0))
+                # Turning off the persistence allows a perfect reset.
+                self.integrator.set_persistence(0.0)
+                self.integrator.reset()
+                readout7 = self.integrator.readout()
+                self.assertTrue(np.all(readout7 == 0))
  
     def test_flux(self):
         # Check that the flux level is still approximately correct when noise,

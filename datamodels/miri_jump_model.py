@@ -28,8 +28,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 @author: Vincent Geers (DIAS)
 
 """
-# For consistency, import the same Python V3 features as the STScI data model.
-from __future__ import absolute_import, unicode_literals, division, print_function
+# This module is now converted to Python 3.
+
 
 #import warnings
 #import numpy as np
@@ -116,6 +116,7 @@ class MiriJumpModel(MiriDataModel):
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
         
+    # TODO: Is this function needed?
     def __str__(self):
         """
         
@@ -124,8 +125,7 @@ class MiriJumpModel(MiriDataModel):
         
         """
         # Start with the data object title and metadata
-        strg = self.get_title(underline=True, underchar="=") + "\n"
-        strg += self.get_meta_str(underline=True, underchar='-')
+        strg = self.get_title_and_metadata()
 
         # Describe the fine jump table
         strg += "\nColumn names: " + str(self.fieldnames) + "\n"

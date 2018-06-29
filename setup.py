@@ -16,7 +16,9 @@ Setup file for installing the MiriTE software
 15 Jan 2018: MiriTools and MiriSimulators levels removed from package.
 22 Jan 2018: Removed empty mirimsim simulator package.
 25 Jan 2018: Added missing url metadata.
+27 Apr 2018: Require Python 3.5.
 22 May 2018: Added README and LICENCE.
+04 Jun 2018: Added warning if MIRICLE environment is not activated.
 
 @author: MIRI Software Team
 
@@ -39,7 +41,7 @@ except ImportError:
 try:
     from setuptools import setup
 except ImportError:
-    from ez_setup import use_setuptools
+    from .ez_setup import use_setuptools
     use_setuptools()
     from setuptools import setup
 
@@ -60,6 +62,14 @@ def find_version(*file_paths):
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
 
+def get_conda_prefix():
+    import os
+    if 'CONDA_PREFIX' in list(os.environ.keys()):
+        conda_prefix = str(os.environ['CONDA_PREFIX'])
+    else:
+        conda_prefix = ''
+    return conda_prefix
+
 
 # Test the command arguments given with this script.
 # Only unzip data files when building or installing, not when 
@@ -77,6 +87,10 @@ if "--quiet" in argv:
     verbose = False
 else:
     verbose = True
+
+conda_prefix = get_conda_prefix()
+if verbose:
+    print("CONDA_PREFIX is", conda_prefix)
 
 # ------------------------------------------------------------------
 # Unzip the data files contained in the simulators data directories.
@@ -204,7 +218,7 @@ setup(
     author_email="mirisim@roe.ac.uk",
     license="See LICENCE file",
     platforms=["Linux", "Mac OS X"],
-    python_requires='~=2.7',
+    python_requires='>=3.5',
     packages=['miri',
               'miri.tools', 'miri.tools.tests',
               'miri.datamodels', 'miri.datamodels.tests',
@@ -266,3 +280,10 @@ setup(
             ],
     data_files=[('', ['LICENCE', 'README'])]
 )
+
+if not cleanflag:
+    if not ('miri' in conda_prefix) and not ('MIRI' in conda_prefix):
+        print("\n*** WARNING: MIRI software installed into the root environment! ***")
+        print("If you didn't want to do this, remove the above package from site-packages, execute")
+        print("\n\tsource activate <name-of-miricle-environment>")
+        print("\nand try again.")
