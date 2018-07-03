@@ -154,6 +154,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              or a list-like object (to cope with another change to the JWST
              library). Added the get_title_and_metadata() function to display
              the history records along with metadata.
+02 Jul 2018: Bug 479: Additional sequencing and pointing metadata added to
+             set_observation_metadata and set_exposure_metadata functions.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -351,7 +353,6 @@ def _shape_to_string(shape, axes=None):
         # A much simpler implementation when there are no axis labels
         strg = ' x '.join(str(s) for s in shape)
     return strg
-
 
 class MIRIExtension(AsdfExtension):
     """
@@ -602,9 +603,12 @@ class MiriDataModel(DataModel):
                 self.add_history(str(history))
                     
     def set_observation_metadata(self, dateobs=None, timeobs=None, obsid=None,
-                                 obsnumber=None, programnumber=None,
-                                 visitid=None, visitnumber=None, visitgroup=None,
-                                 activityid=None, exposurenumber=None):
+                                 observation_number=None, program_number=None,
+                                 visit_id=None, visit_number=None,
+                                 visit_group=None, sequence_id=None,
+                                 activity_id=None, exposure_number=None,
+                                 bkgdtarg=None, template=None,
+                                 observation_label=None):
         """
         
         Convenience function to define observation and association metadata.
@@ -622,20 +626,28 @@ class MiriDataModel(DataModel):
             If not given the current time will be used.
         obsid: str, optional
             Observation ID.
-        obsnumber: number, optional
+        observation_number: number, optional
             Observation number
-        programnumber: str, optional
+        program_number: str, optional
             Program number
-        visitid: str, optional
+        visit_id: str, optional
             Visit ID
-        visitnumber: str, optional
+        visit_number: str, optional
             Visit number
-        visitgroup: str, optional
-            Visit group
-        activityid: str, optional
+        visit_group: str, optional
+            Visit group identifier
+        sequence_id: str, optional
+            Parallel sequence identified
+        activity_id: str, optional
             Activity ID
-        exposurenumber: str, optional
+        exposure_number: str, optional
             Exposure number
+        bkgdtarg: bool, optional
+            Background target flag
+        template: str
+            Observation template used
+        observation_label: str, optional
+            Proposer label for the observation
             
         """
         from datetime import datetime
@@ -654,20 +666,28 @@ class MiriDataModel(DataModel):
                 self.meta.observation.time = str(timeobs)
             if obsid is not None:
                 self.meta.observation.obs_id = str(obsid)
-            if obsnumber is not None:
-                self.meta.observation.observation_number = str(obsnumber)
-            if programnumber is not None:
-                self.meta.observation.program_number  = str(programnumber)
-            if visitid is not None:
-                self.meta.observation.visit_id = str(visitid)
-            if visitnumber is not None:
-                self.meta.observation.visit_number = str(visitnumber)
-            if visitgroup is not None:
-                self.meta.observation.visit_group = str(visitgroup)
-            if activityid is not None:
-                self.meta.observation.activity_id  = str(activityid)
-            if exposurenumber is not None:
-                self.meta.observation.exposure_number  = str(exposurenumber)
+            if observation_number is not None:
+                self.meta.observation.observation_number = str(observation_number)
+            if program_number is not None:
+                self.meta.observation.program_number  = str(program_number)
+            if visit_id is not None:
+                self.meta.observation.visit_id = str(visit_id)
+            if visit_number is not None:
+                self.meta.observation.visit_number = str(visit_number)
+            if visit_group is not None:
+                self.meta.observation.visit_group = str(visit_group)
+            if sequence_id is not None:
+                self.meta.observation.sequence_id  = str(sequence_id)
+            if activity_id is not None:
+                self.meta.observation.activity_id  = str(activity_id)
+            if exposure_number is not None:
+                self.meta.observation.exposure_number  = str(exposure_number)
+            if bkgdtarg is not None:
+                self.meta.observation.bkgdtarg  = bkgdtarg
+            if template is not None:
+                self.meta.observation.template  = str(template)
+            if observation_label is not None:
+                self.meta.observation.observation_label  = str(observation_label)
         else:
             strg = "Observation metadata attributes missing from data model"
             raise AttributeError(strg)
@@ -781,8 +801,8 @@ class MiriDataModel(DataModel):
             self.meta.telescope = 'JWST'
 
     def set_instrument_metadata(self, detector, modelnam='FM', detsetng='ANY',
-                                filt='', channel='', band='',
-                                ccc_pos='OPEN', deck_temperature=None,
+                                filt='', channel='', band='', coronagraph='',
+                                deck_temperature=None, ccc_pos='OPEN', 
                                 detector_temperature=None):
         """
         
@@ -805,6 +825,8 @@ class MiriDataModel(DataModel):
             Name of instrument band (if any)
         ccc_pos: str, optional
             MIRI CCC position (if not 'OPEN')
+        coronagraph, str, optional
+            Name of coronagraphic mask (if any)
         deck_temperature: number, optional
             MIRI deck temperature in K.
         detector_temperature: number, optional
@@ -826,7 +848,9 @@ class MiriDataModel(DataModel):
             if band:
                 self.meta.instrument.band = band
             if ccc_pos:
-                self.meta.instrument.ccc_pos = ccc_pos
+                self.meta.instrument.ccc_state = ccc_pos
+            if coronagraph:
+                self.meta.instrument.coronagraph = coronagraph
             if deck_temperature is not None:
                 self.meta.instrument.deck_temperature = deck_temperature
             if detector_temperature is not None:
@@ -914,7 +938,8 @@ class MiriDataModel(DataModel):
                               integration_time=None, exposure_time=None,
                               group_time=None, groupgap=0, grpavg=1, intavg=1,
                               reset_time=0, frame_resets=3, start_time='NOW',
-                              end_time=None):
+                              end_time=None, pointing_sequence=None, count=None,
+                              prime_parallel=None):
         """
         
         Convenience function to define exposure metadata.
@@ -959,6 +984,12 @@ class MiriDataModel(DataModel):
             Date/time of start of exposure. Strings other than 'NOW' are
             converted to floating point. If set to 'NOW', the current
             date-time is used. By default this is not set.
+        pointing_sequence: int, optional
+            Pointing sequence number
+        count: int, optional
+            Running count of exposures in visit
+        prime_parallel: str, optional
+            Prime or parallel exposure
         
         """
         import time
@@ -1000,6 +1031,13 @@ class MiriDataModel(DataModel):
                 self.meta.exposure.start_time = float(start_time)
             if end_time is not None:
                 self.meta.exposure.end_time = float(end_time)
+            if pointing_sequence is not None:
+                self.meta.exposure.pointing_sequence = int(pointing_sequence)
+            if count is not None:
+                self.meta.exposure.count = int(count)
+            if prime_parallel is not None:
+                self.meta.exposure.prime_parallel = int(prime_parallel)
+                
         else:
             strg = "Exposure metadata attributes missing from data model"
             raise AttributeError(strg)
@@ -3061,9 +3099,10 @@ if __name__ == '__main__':
         testdata.set_housekeeping_metadata('UKATC', 'Joe Bloggs', 'GROUND', 'V1.0')
         #testdata.set_observation_metadata() # Use current data/time
         testdata.set_observation_metadata(obsid='001',
-                                 obsnumber='001', programnumber='1235',
-                                 visitid='001', visitnumber='001', visitgroup='01',
-                                 activityid='01', exposurenumber='0001')
+                                 observation_number='001', program_number='12345',
+                                 visit_id='001', visit_number='001',
+                                 visit_group='01', sequence_id='1',
+                                 activity_id='01', exposure_number='00001')
         testdata.set_pointing_metadata(ra_v1=12.20, dec_v1=-7.15, pa_v3=2.0)
         testdata.set_target_metadata(ra=12.0, dec=-7.0)
         testdata.set_instrument_metadata(detector='MIRIMAGE', filt='F560W',
@@ -3073,7 +3112,8 @@ if __name__ == '__main__':
         testdata.set_wcs_metadata(wcsaxes=2, waverange_start=5.0,
                                   waverange_end=25.0, ra_ref=12.10,
                                   dec_ref=-7.03)
-        testdata.set_exposure_metadata(readpatt='SLOW', nints=1, ngroups=3)
+        testdata.set_exposure_metadata(readpatt='SLOW', nints=1, ngroups=3,
+                                       pointing_sequence=1)
         testdata.set_exposure_type()
         testdata.set_subarray_metadata('FULL')
         testdata.set_subarray_metadata('GENERIC')
