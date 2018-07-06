@@ -59,6 +59,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              could end up containing zero.
 18 May 2018: Use explicit rounding when converting floating point to integer
              in get_forwards_table and get_reverse_table.
+06 Jul 2018: Merged schema with JWST software.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 

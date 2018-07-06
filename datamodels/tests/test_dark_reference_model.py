@@ -34,6 +34,8 @@ in the datamodels.miri_dark_reference_model module.
 15 Jun 2017: Do not set observation or target metadata. Neither are
              appropriate for a reference file.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+06 Jul 2018: Merged schema with JWST software. DARK data is now only
+             accepted with 4-D data, err and dq arrays.
 
 @author: Steven Beard (UKATC)
 
@@ -61,19 +63,19 @@ class TestMiriDarkReferenceModel(unittest.TestCase):
     
     def setUp(self):
         # Create a typical dark reference product.
-        self.a1 = [[0.01,0.02,0.03,0.04], [0.05,0.05,0.07,0.08], [0.09,0.1,0.11,0.12]]
-        self.b1 = [[1,2,3,4],     [5,6,7,8],     [9,10,11,12]]
-        self.c1 = [[1,0,0,0],     [0,1,0,1],     [1,0,1,0]]
+        a1 = [[0.01,0.02,0.03,0.04], [0.05,0.05,0.07,0.08], [0.09,0.1,0.11,0.12]]
+        b1 = [[1,2,3,4],     [5,6,7,8],     [9,10,11,12]]
+        c1 = [[1,0,0,0],     [0,1,0,1],     [1,0,1,0]]
         self.dqdef = dark_reference_flags
-        self.acube = [self.a1,self.a1,self.a1]
-        self.bcube = [self.b1,self.b1,self.b1]
-#         self.ccube = [self.c1,self.c1,self.c1]
-#         self.ahyper = [self.acube,self.acube]#
-#         self.bhyper = [self.bcube,self.bcube]
-#         self.chyper = [self.ccube,self.ccube]
-        self.dataproduct = MiriDarkReferenceModel(data=self.acube,
-                                                  err=self.bcube,
-                                                  dq=self.c1,
+        acube = [a1,a1,a1]
+        bcube = [b1,b1,b1]
+        ccube = [c1,c1,c1]
+        self.ahyper = [acube,acube]#
+        self.bhyper = [bcube,bcube]
+        self.chyper = [ccube,ccube]
+        self.dataproduct = MiriDarkReferenceModel(data=self.ahyper,
+                                                  err=self.bhyper,
+                                                  dq=self.chyper,
                                                   dq_def=self.dqdef)
         # Add some example metadata.
         self.dataproduct.set_instrument_metadata(detector='MIRIFUSHORT',
@@ -92,9 +94,7 @@ class TestMiriDarkReferenceModel(unittest.TestCase):
     def tearDown(self):
         # Tidy up
         del self.dataproduct
-#         del self.ahyper, self.bhyper, self.chyper
-        del self.acube, self.bcube
-        del self.a1, self.b1, self.c1
+        del self.ahyper, self.bhyper, self.chyper
         # Remove temporary file, if able to.
         if os.path.isfile(self.testfile):
             try:
@@ -116,26 +116,26 @@ class TestMiriDarkReferenceModel(unittest.TestCase):
 
     def test_creation(self):
         # 3-D data, 3-D err and 2-D dq must be accepted
-        testproduct = MiriDarkReferenceModel(data=self.acube,
-                                            err=self.bcube,
-                                            dq=self.c1)
+        testproduct = MiriDarkReferenceModel(data=self.ahyper,
+                                            err=self.bhyper,
+                                            dq=self.chyper)
         descr = str(testproduct)
         del testproduct, descr
         
-        # 3-D data withour err must be acceptable
-        testproduct = MiriDarkReferenceModel(data=self.acube, dq=self.c1)
+        # 3-D data without err must be acceptable
+        testproduct = MiriDarkReferenceModel(data=self.ahyper, dq=self.chyper)
         descr = str(testproduct)
         del testproduct, descr
 
-        # 3-D data withour err or dq be acceptable
-        testproduct = MiriDarkReferenceModel(data=self.acube)
+        # 3-D data without err or dq be acceptable
+        testproduct = MiriDarkReferenceModel(data=self.ahyper)
         descr = str(testproduct)
         del testproduct, descr
         
-        # The main data array must be 3-D or 4-D. Other shapes must be rejected.
+        # The main data array must be 4-D. Other shapes must be rejected.
         data1d = [1, 2, 3, 4, 5, 6]
         self.assertRaises(TypeError, MiriDarkReferenceModel, data=data1d,
-                          err=self.b1, dq=self.c1)
+                          err=self.bhyper, dq=self.chyper)
 
     def test_copy(self):
         # Test that a copy can be made of the data product.

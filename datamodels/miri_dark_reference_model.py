@@ -55,6 +55,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              Added average_groups function.
 07 Jul 2017: Added averaged flag.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+06 Jul 2018: Merged schema with JWST software. DARK data is now only
+             accepted with 4-D data, err and dq arrays.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -590,12 +592,15 @@ if __name__ == '__main__':
     data3x3 = np.array([[1.,2.,3.],[4.,5.,6.],[7.,8.,9.]])
     err3x3 = np.array([[1.,1.,1.],[2.,2.,2.],[1.,1.,1.]])
     err3x3x2 = [err3x3, err3x3]
+    err3x3x2x2 = [err3x3x2, err3x3x2]
     dq3x3 = np.array([[0,1,0],[1,0,1],[0,1,0]])
+    dq3x3x2 = [dq3x3, dq3x3]
+    dq3x3x2x2 = [dq3x3x2, dq3x3x2]
     data3x3x2 = [data3x3,data3x3]
-#     data3x3x2x2 = [data3x3x2,data3x3x2]
+    data3x3x2x2 = [data3x3x2,data3x3x2]
 
     print("Dark data with data + err + dq:")
-    with MiriDarkReferenceModel(data=data3x3x2, err=err3x3x2, dq=dq3x3, \
+    with MiriDarkReferenceModel(data=data3x3x2x2, err=err3x3x2x2, dq=dq3x3x2x2, \
                                 dq_def=dark_reference_flags) \
             as testdata1:
         print(testdata1)
@@ -606,7 +611,7 @@ if __name__ == '__main__':
         del testdata1
 
     print("Dark data with data + err + dq:")
-    with MiriDarkReferenceModel(data=data3x3x2, err=err3x3x2, dq=dq3x3,
+    with MiriDarkReferenceModel(data=data3x3x2x2, err=err3x3x2x2, dq=dq3x3x2x2,
                                 dq_def=dark_reference_flags,
                                 integration=42, fitted_after=39) as testdata2:
         print(testdata2)

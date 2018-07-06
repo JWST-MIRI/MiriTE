@@ -190,6 +190,8 @@ allOf:
       datatype: uint8
     group:
       $ref: http://jwst.stsci.edu/schemas/group.schema.yaml
+    int_times:
+      $ref: http://jwst.stsci.edu/schemas/int_times.schema.yaml
     pixeldq_def:
       $ref: pixeldq_def.schema.yaml
     groupdq_def:
