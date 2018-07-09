@@ -134,7 +134,7 @@ class TestMiriDarkReferenceModel(unittest.TestCase):
         
         # The main data array must be 4-D. Other shapes must be rejected.
         data1d = [1, 2, 3, 4, 5, 6]
-        self.assertRaises(TypeError, MiriDarkReferenceModel, data=data1d,
+        self.assertRaises(ValueError, MiriDarkReferenceModel, data=data1d,
                           err=self.bhyper, dq=self.chyper)
 
     def test_copy(self):

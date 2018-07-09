@@ -200,13 +200,13 @@ class MiriDarkReferenceModel(MiriMeasuredModel):
             if data.ndim < 2 or data.ndim > 4:
                 strg = "The main data array in a dark reference object must be "
                 strg += "2-D, 3-D or 4-D. %d-D data provided" % data.ndim
-                raise TypeError(strg)
+                raise ValueError(strg)
         elif self.data is not None and len(self.data) > 0 and \
              hasattr(self.data, 'ndim'):
             if self.data.ndim < 2 or self.data.ndim > 4:
                 strg = "The main data array in a dark reference object must be "
                 strg += "2-D, 3-D or 4-D. %d-D data provided" % self.data.ndim
-                raise TypeError(strg)
+                raise ValueError(strg)
 
 #        if fiterr is not None:
 #            self.fiterr = fiterr
