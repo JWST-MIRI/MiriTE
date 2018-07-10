@@ -1,5 +1,7 @@
 allOf:
 - $ref: miri_core.schema.yaml
+- $ref: http://jwst.stsci.edu/schemas/referencefile.schema.yaml
+- $ref: http://jwst.stsci.edu/schemas/keyword_gainfact.schema.yaml
 - type: object
   title: MIRI nonlinearity measurement
   properties:

@@ -9,7 +9,7 @@ allOf:
       $ref: miri_metadata_dataerr.schema.yaml
 - $ref: dark3D4D.schema.yaml
 - type: object
-  title: MIRI dark calibration data
+  title: MIRI DARK reference model
   properties:
     meta:
       type: object

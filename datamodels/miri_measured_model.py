@@ -106,6 +106,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              MiriRampModel. Added GROUP extension to the MiriRampModel
 28 Jun 2018: Switch to using get_title_and_metadata() to display data model
              information. Removed superflous functions from MiriSimpleModel.
+06 Jul 2018: group and int_times objects added to ramp data schema.
 
 @author: Steven Beard (UKATC)
 
