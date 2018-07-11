@@ -338,6 +338,8 @@ Calibration Data Products (CDPs).
 18 May 2018: Changed deprecated logger.warn() to logger.warning().
 23 May 2018: Check for wait_time=None in Python 3.
 04 Jun 2018: Added hard_reset function.
+11 Jul 2018: Explicitly convert a subarray list to a tuple when using it to
+             format a string.
 
 @author: Steven Beard
 
@@ -3202,7 +3204,7 @@ class SensorChipAssembly(object):
         else:
             strg += "\n%sDetector subarray mode is %s " % \
                 (prefix, self.subarray_str)
-            strg += "(%d %d %d %d)." % self.subarray
+            strg += "(%d %d %d %d)." % tuple(self.subarray)
         return strg
 
     def simulate_files(self, inputfile, outputfile, detectorid, scale=1.0,
