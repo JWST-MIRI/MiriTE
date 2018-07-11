@@ -29,6 +29,8 @@ subtractBackground - Subtracts the background from a spectrum, considers and
     avoids the latents (transients) by taken the median of the background, 
      and propagates the errors.
 
+lrs_round - round like in python2 built-in rounding way
+
 interpolWaveOnRows - interpolates the wavelengths and positions arrays from the wavelength calibration
     file to the detector rows
 
@@ -101,6 +103,10 @@ def condense(spec, chunk, method = "Median", running = True):
     rebinned/smoothed spectrum array
     
     """        
+    if not isinstance(chunk, int):
+        print("in condense: chunk parameter is not integer, will be rounded to integer:")
+        chunk = int(np.rint(chunk))
+        print(str(chunk))
     leng = len(spec)
     if leng < chunk:
         print("no of elements in spec is smaller than chunk value!")
@@ -617,7 +623,7 @@ def lrs_round(floatNumber):
     """
     rounding floats to integers in a way that python 2 did
     e.g. lrs_round(4.5) results in 5
-    :Paramters:
+    :Parameters:
     floatNumber: float to be rounded to integer
     :Returns:
     rounded number  
