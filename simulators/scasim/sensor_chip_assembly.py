@@ -339,7 +339,7 @@ Calibration Data Products (CDPs).
 23 May 2018: Check for wait_time=None in Python 3.
 04 Jun 2018: Added hard_reset function.
 11 Jul 2018: Explicitly convert a subarray list to a tuple when using it to
-             format a string.
+             format a string for printing.
 
 @author: Steven Beard
 
