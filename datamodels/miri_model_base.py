@@ -156,6 +156,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              the history records along with metadata.
 02 Jul 2018: Bug 479: Additional sequencing and pointing metadata added to
              set_observation_metadata and set_exposure_metadata functions.
+12 Jul 2018: Check the .data_filled attribute is not None before attempting
+             to fill it. Clarified warning when too many WCS axes are given.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -1304,31 +1306,31 @@ class MiriDataModel(DataModel):
                     if hasattr(wcsmetadata, crpix_name):
                         setattr(wcsmetadata, crpix_name, crpix[axis])
                     else:
-                        strg = "%s.%s does not exist! Too many axes?" % \
+                        strg = "%s.%s does not exist! Too many WCS axes for data model." % \
                             (wcsmetadata, crpix_name)
                         warnings.warn(strg)
                     if hasattr(wcsmetadata, crval_name):
                         setattr(wcsmetadata, crval_name, crval[axis])
                     else:
-                        strg = "%s.%s does not exist! Too many axes?" % \
+                        strg = "%s.%s does not exist! Too many WCS axes for data model." % \
                             (wcsmetadata, crval_name)
                         warnings.warn(strg)
                     if hasattr(wcsmetadata, ctype_name):
                         setattr(wcsmetadata, ctype_name, ctype[axis])
                     else:
-                        strg = "%s.%s does not exist! Too many axes?" % \
+                        strg = "%s.%s does not exist! Too many WCS axes for data model." % \
                             (wcsmetadata, ctype_name)
                         warnings.warn(strg)
                     if hasattr(wcsmetadata, cunit_name):
                         setattr(wcsmetadata, cunit_name, cunit[axis])
                     else:
-                        strg = "%s.%s does not exist! Too many axes?" % \
+                        strg = "%s.%s does not exist! Too many WCS axes for data model." % \
                             (wcsmetadata, cunit_name)
                         warnings.warn(strg)
                     if hasattr(wcsmetadata, cdelt_name):
                         setattr(wcsmetadata, cdelt_name, cdelt[axis])
                     else:
-                        strg = "%s.%s does not exist! Too many axes?" % \
+                        strg = "%s.%s does not exist! Too many WCS axes for data model." % \
                             (wcsmetadata, cdelt_name)
                         warnings.warn(strg)
             
@@ -2846,7 +2848,8 @@ class MiriDataModel(DataModel):
             if self.maskable() and hasattr(self, name + "_masked"):
                 data = getattr(self, name + "_masked")
                 # Fill a masked array to prevent a numpy warning.
-                data = data.filled()
+                if data is not None:
+                    data = data.filled()
                 strg += " - masked array"
             else:
                 data = getattr(self, name)
