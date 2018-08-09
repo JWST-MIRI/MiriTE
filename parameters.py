@@ -8,6 +8,7 @@ its capabilities and modes of operation. It exists to ensure the
 
 09 Oct 2013: Created within datamodels.util
 28 Jun 2018: Moved to miri.parameters
+09 Aug 2018: Single and cross-dichroic pass-band names defined separately.
 
 @author: Steven Beard (UKATC)
 
@@ -88,32 +89,57 @@ SUBARRAY['SUB64'] =         (   1, 779,   72,   64 )
 SUBARRAY['SLITLESSPRISM'] = (   1, 529,   72,  416 )
 
 # --------------------------------------------------------------------------
-# Lists of selections, as defined on the "MiriCalfileMetaData" page.
+# Lists of selections, as defined in
+# http://jwst-reffiles.stsci.edu/source/required_keywords.html
+#
+# Which MIRI model have the data come from (verification model, JPL model or
+# flight model)? 'VM' and 'JPL' will only be found in very old data.
 MIRI_MODELS = ['VM', 'JPL', 'FM']
 
+# The 3 detectors installed in the MIRI instrument.
 MIRI_DETECTORS = ['MIRIMAGE', 'MIRIFULONG', 'MIRIFUSHORT']
 MIRI_DETECTORS_EXTRAS = ['IM', 'LW', 'SW'] # For backwards compatibility only.
 
+# Detector electronic settings used. An old keyword no,longer used for
+# flight model data.
 MIRI_SETTINGS = ['RAL1', 'JPL1']
 
+# Available MIRI readout modes.
 MIRI_READPATTS = ['SLOW', 'FAST', 'FASTGRPAVG']
 
-# Also = list(SUBARRAY.keys()) - ['FULL', 'GENERIC']
+# Available MIRI subarray modes. Compare with the SUBARRAY dictionary
+# defined above. Also = list(SUBARRAY.keys()) - ['FULL', 'GENERIC']
 MIRI_SUBARRAYS = ['MASK1140', 'MASK1550', 'MASK1065', 'MASKLYOT',
                   'BRIGHTSKY', 'SUB256', 'SUB128', 'SUB64', 'SLITLESSPRISM']
 
-MIRI_CHANNELS = ['1', '2', '3', '4', '12', '34']
+# Available MIRI MRS channels. Calibration data can be relevant for a single
+# MRS channel or for a whole MRS detector containing two channels.
+MIRI_CHANNELS_SINGLE = ['1', '2', '3', '4']
+MIRI_CHANNELS_DOUBLE = ['12', '34']
+MIRI_CHANNELS = MIRI_CHANNELS_SINGLE + MIRI_CHANNELS_DOUBLE
 
-MIRI_BANDS = ['SHORT', 'MEDIUM', 'LONG', 'SHORT-MEDIUM',  'SHORT-LONG',
-              'MEDIUM-SHORT', 'MEDIUM-LONG', 'LONG-SHORT', 'LONG-MEDIUM']
+# Allowed settings for the two MIRI MRS dichroic grating wheels.
+MIRI_DGAA = ['SHORT', 'MEDIUM', 'LONG']
+MIRI_DGAB = ['SHORT', 'MEDIUM', 'LONG']
+
+# Single passband settings when the dichroic wheels have the same setting.
+MIRI_BANDS_SINGLE = ['SHORT', 'MEDIUM', 'LONG']
+# Cross-dichroic settings when the dichroic wheels have different settings.
+MIRI_BANDS_CROSS = ['SHORT-MEDIUM',  'SHORT-LONG',
+                    'MEDIUM-SHORT', 'MEDIUM-LONG',
+                    'LONG-SHORT', 'LONG-MEDIUM']
+# The BAND keyword can contain any single or cross-dichroic passband.
+MIRI_BANDS = MIRI_BANDS_SINGLE + MIRI_BANDS_CROSS
 MIRI_BANDS_EXTRAS = ['A', 'B', 'C'] # For backwards compatibility only.
 
+# Available MIRI imager filters.
 # Note that 'FLENS' and 'F2550WR' are allowed values for the filter metadata,
 # but there are no CDP files for these filters.
 MIRI_FILTERS = ['F560W','F770W','F1000W','F1130W', 'F1280W','F1500W','F1800W',
                 'F2100W', 'F2550W', 'F2550WR','F1065C', 'F1140C', 'F1550C',
                 'F2300C','P750L','FLENS', 'FND', 'OPAQUE']
 
+# --------------------------------------------------------------------------
 # Rules for testing compulsory CDP metadata
 CDP_METADATA = [['TELESCOP', 'JWST'],
                 ['INSTRUME', 'MIRI'],
@@ -140,6 +166,7 @@ CDP_SUBARRAY = [['SUBSTRT1', []], # Empty list means any value accepted.
                 ]
 # Keywords used in HISTORY records
 CDP_HISTORY = ['DOCUMENT', 'SOFTWARE', 'DATA USED', 'DIFFERENCES']
+
 #
 # Dictionary of the relationship between known detector settings
 #                         Name -> (FRMRSETS, ROWRSETS, RPCDELAY)
@@ -147,4 +174,24 @@ DETECTOR_SETTINGS_DICT = {'RAL1': (0, 3, 24),
                           'JPL1': (3, 4, 90)}
 
 
+if __name__ == '__main__':
+    print("Testing MIRI parameters:")
+    print(72 * "-")
+    print("MIRI_MODELS=", MIRI_MODELS)
+    print("MIRI_DETECTORS=", MIRI_DETECTORS)
+    print("MIRI_SETTINGS=", MIRI_SETTINGS)
+    print("MIRI_READPATTS=", MIRI_READPATTS)
+    print("MIRI_SUBARRAYS=", MIRI_SUBARRAYS)
+    print("MIRI_CHANNELS=", MIRI_CHANNELS)
+    print("MIRI_BANDS=", MIRI_BANDS)
+    print("MIRI_FILTERS=", MIRI_FILTERS)
+    
+    print(72 * "-")
+    print("CDP_METADATA=")
+    for item in CDP_METADATA:
+        print("   %s" % item)
+    print("CDP_SUBARRAY=", CDP_SUBARRAY)
+    print("CDP_HISTORY=", CDP_HISTORY)
 
+    print(72 * "-")
+    print("Test finished.")
