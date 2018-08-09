@@ -114,14 +114,16 @@ http://miri.ster.kuleuven.be/bin/view/Internal/CalDataProducts
 17 May 2018: Python 3: Converted dictionary keys return into a list.
 18 May 2018: Changed deprecated logger.warn() to logger.warning().
 29 Jun 2018: Global parameters moved to miri.parameters.
+09 Aug 2018: Made more resilient against a non-existent sftp folder in a search
+             path. Turned off the annoying stream of paramiko log messages.
+             Improved the handling of MRS cross-dichroic bands. Brought the
+             tests up to date and added tests for MRS cross-dichroic CDPs.
 
 Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
 
-# This module is now converted to Python 3.
-
-
+# TODO: Remove the 'six' stuff and just use Python 3 code.
 from astropy.extern import six
 import os
 import re
@@ -129,7 +131,7 @@ import time
 import sys, getpass
 import copy
 
-# Python utilities for accessing the Ftp repository.
+# Python utilities for accessing the sftp repository.
 # NOTE: Available for Python 2.7, 3.2, 3.3, 3.4
 import pysftp
 # NOTE: Available for Python 2.7, 3.4+
@@ -137,15 +139,22 @@ from paramiko import SSHException
 
 # Python logging facility.
 import logging
-logging.basicConfig(level=logging.INFO)   # Turn off verbose paramiko messages
-LOGGER = logging.getLogger("miri.cdplib") # Get a default parent logger
+# Set the default logging level.
+logging.basicConfig(level=logging.INFO)
+#
+# Turn off the verbose paramiko log messages messages.
+plogger = logging.getLogger("paramiko.transport")
+plogger.setLevel(logging.WARN) # SFTP warning messages only.
+
+# Get a default parent logger
+LOGGER = logging.getLogger("miri.cdplib") 
 # Logging level for the CDP classes
 LOGGING_LEVEL = logging.INFO # Choose ERROR, WARN, INFO or DEBUG
 
 # Import global parameters, CDP utility functions and CDP dictionary.
 from miri.parameters import MIRI_MODELS, MIRI_DETECTORS, \
     MIRI_SETTINGS, MIRI_READPATTS, MIRI_SUBARRAYS, MIRI_CHANNELS, \
-    MIRI_BANDS, MIRI_FILTERS
+    MIRI_BANDS_SINGLE, MIRI_BANDS_CROSS, MIRI_BANDS, MIRI_FILTERS
 from miri.datamodels.util import get_data_class
 from miri.datamodels.cdp import CDP_DICT
 
@@ -528,7 +537,6 @@ class Singleton(type):
                 super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
 
-
 class MiriCDPFolder(object):
     """
     
@@ -610,8 +618,8 @@ class MiriCDPFolder(object):
         if self.sftp is not None:
             try:
                 self.sftp.chdir(self.ftp_path)
-            except IOError as e:
-                strg = "IOError: Failed to change directory to FTP folder \'%s\'\n" % self.ftp_path
+            except (OSError, IOError, FileNotFoundError) as e:
+                strg = "%s: Failed to change directory to FTP folder \'%s\'\n" % (e.__class__.__name__, self.ftp_path)
                 strg += "  %s" % str(e)
                 raise IOError(strg)
             ftp_list = self.sftp.listdir()
@@ -928,6 +936,10 @@ class MiriCDPFolder(object):
             channel_band += str(channel)
         if (band is not None) and (band != 'ANY') and (band != 'N/A'):
             channel_band += band
+            # If the band is a single passband, exclude all the cross-dichroic bands.
+            if band in MIRI_BANDS_SINGLE:
+                for crossband in MIRI_BANDS_CROSS:
+                    avoid_strings.append(crossband)
         if channel_band:
             match_strings.append(channel_band)
 
@@ -1329,12 +1341,36 @@ class MiriCDPInterface(object):
         # Create a search list of FTP folders and initialise the list of
         # available CDPs within in each one. If the local cache is being
         # used, there is only one nominal FTP folder.
+        failed_folder = False
         self.cdp_folder_list = []
         if self.ftp_host != 'LOCAL' and self.ftp_ok:
             for ftpp in self.ftp_path.split(MiriCDPInterface.FTP_PATH_SEARCH):
-                cdp_folder = MiriCDPFolder( self.sftp, ftpp, self.cdp_dir )
-                cdp_folder.update_cdp_list()
-                self.cdp_folder_list.append(cdp_folder)
+                try:
+                    cdp_folder = MiriCDPFolder( self.sftp, ftpp, self.cdp_dir )
+                    cdp_folder.update_cdp_list()
+                except (OSError, IOError, FileNotFoundError) as e:
+                    failed_folder = True
+                    strg = "Error accessing CDP folder \'%s\'" % ftpp
+                    strg += "\n  %s" % str(e)
+                    strg += "\n  *** This folder will be ignored! ***"
+                    self.logger.error(strg)
+                else:
+                    # Only append this folder if an exception did NOT occur.
+                    self.cdp_folder_list.append(cdp_folder)
+            # Raise an exception if none of the specified folders can be accessed.
+            if len(self.cdp_folder_list) <= 0:
+                strg = "Could not access any CDP folder on host %s" % self.ftp_host
+                raise IOError(strg)
+            elif failed_folder:
+                # In the event of an error, show the user what the new search path looks like.
+                if len(self.cdp_folder_list) > 1:
+                    strg = "***Only the remaining folders in the search path:"
+                else:
+                    strg = "***Only the remaining folder in the search path:"
+                for cdp_folder in self.cdp_folder_list:
+                    strg += " \'%s\'," % str(cdp_folder.ftp_path)
+                strg += " will be used."
+                self.logger.warning(strg)
         else:
             cdp_folder = MiriCDPFolder( self.sftp, '/', self.cdp_dir )
             cdp_folder.update_cdp_list()
@@ -1388,6 +1424,7 @@ class MiriCDPInterface(object):
             self._close()
             for cdp_folder in self.cdp_folder_list:
                 del cdp_folder
+            failed_folder = False
             self.cdp_folder_list = []
                     
             # Set up the SFTP/CDP connection environment
@@ -1403,9 +1440,32 @@ class MiriCDPInterface(object):
             # used, there is only one nominal FTP folder.
             if self.ftp_host != 'LOCAL' and self.ftp_ok:
                 for ftpp in self.ftp_path.split(MiriCDPInterface.FTP_PATH_SEARCH):
-                    cdp_folder = MiriCDPFolder( self.sftp, ftpp, self.cdp_dir )
-                    cdp_folder.update_cdp_list()
-                    self.cdp_folder_list.append(cdp_folder)
+                    try:
+                        cdp_folder = MiriCDPFolder( self.sftp, ftpp, self.cdp_dir )
+                        cdp_folder.update_cdp_list()
+                    except (OSError, IOError, FileNotFoundError) as e:
+                        failed_folder = True
+                        strg = "Error accessing CDP folder \'%s\'" % ftpp
+                        strg += "\n  %s" % str(e)
+                        strg += "\n  *** This folder will be ignored! ***"
+                        self.logger.error(strg)
+                    else:
+                        # Only append this folder if an exception did NOT occur.
+                        self.cdp_folder_list.append(cdp_folder)
+                # Raise an exception if none of the specified folders can be accessed.
+                if len(self.cdp_folder_list) <= 0:
+                    strg = "Could not access any CDP folder on host %s" % self.ftp_host
+                    raise IOError(strg)
+                elif failed_folder:
+                    # In the event of an error, show the user what the new search path looks like.
+                    if len(self.cdp_folder_list) > 1:
+                        strg = "***Only the remaining folders in the search path:"
+                    else:
+                        strg = "***Only the remaining folder in the search path:"
+                    for cdp_folder in self.cdp_folder_list:
+                        strg += " \'%s\'," % str(cdp_folder.ftp_path)
+                    strg += " will be used."
+                    self.logger.warning(strg)
             else:
                 cdp_folder = MiriCDPFolder( self.sftp, '/', self.cdp_dir )
                 cdp_folder.update_cdp_list()
@@ -1506,10 +1566,11 @@ class MiriCDPInterface(object):
         hostkey is converted from a major error into a warning.
                 
         """
-        self.logger.debug("Opening connection")
         if self.ftp_host == 'LOCAL':
+            self.logger.debug("Using LOCAL host.")
             self.stfp = None
             return
+        self.logger.debug("Opening connection to %s" % str(self.ftp_host))
 
         self.ftp_ok = False
         try:
@@ -2226,7 +2287,7 @@ if __name__ == '__main__':
             miricdp.match_cdp_regexp(r'MIRI_[A-Za-z_]*Bad[A-Za-z_]*.+fits')
         print( str(filenames) )
         time.sleep(MEDIUM_DELAY)
-    
+                
         # Check availability of flat-fields.
         print( "\nFlat-fields available for various combinations" )
         for detector in ('MIRIMAGE', 'MIRIFUSHORT', 'MIRIFULONG'):
@@ -2243,9 +2304,43 @@ if __name__ == '__main__':
                     else:
                         print( "<not found>")
         time.sleep(SHORT_DELAY)
+
+        # Match the single and cross-dichroic fringe flats for the MRS
+        for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
+            print( "\nMRS fringe flats: detector=%s; band=ANY" % detector )
+            (newestfringe, ftp_path) = miricdp.match_cdp_latest('FRINGE',
+                                                    detector=detector,
+                                                    band='ANY')
+            if newestfringe:
+                print( newestfringe, ftp_path )
+            else:
+                print( "<not found>")
+
+            for banda in MIRI_BANDS_SINGLE:
+                print( "\nMRS fringe flats: detector=%s; band=%s" % (detector, banda) )
+                (newestfringe, ftp_path) = miricdp.match_cdp_latest('FRINGE',
+                                                        detector=detector,
+                                                        band=banda)
+                if newestfringe:
+                    print( newestfringe, ftp_path )
+                else:
+                    print( "<not found>")
+
+                for bandb in MIRI_BANDS_SINGLE:
+                    if bandb != banda:
+                        band = banda + '-' + bandb
+                        print( "\nMRS fringe flats: detector=%s; band=%s" % (detector, band) )
+                        (newestfringe, ftp_path) = miricdp.match_cdp_latest('FRINGE',
+                                                        detector=detector,
+                                                        band=band)
+                        if newestfringe:
+                            print( newestfringe, ftp_path )
+                        else:
+                            print( "<not found>")
+        time.sleep(SHORT_DELAY)
        
         # Get a list of bad pixel masks by matching specified criteria.
-        print( "\nFile names of new bad pixel masks for the imager:" )
+        print( "\nFile names of current bad pixel masks for the imager:" )
         (filenames, folders) = \
             miricdp.match_cdp_filename('MASK', detector='MIRIMAGE')
         print( str(filenames) )
@@ -2262,9 +2357,9 @@ if __name__ == '__main__':
             last_file = miricdp.update_cache(newestbad, ftp_path=ftp_path)
             time.sleep(LONG_DELAY)
     
-        print( "\nMost recent release 3 bad pixel mask for the imager" )
+        print( "\nMost recent release 5 bad pixel mask for the imager" )
         (newestbad, ftp_path) = miricdp.match_cdp_latest('MASK',
-                                            detector='MIRIMAGE', cdprelease=3)
+                                            detector='MIRIMAGE', cdprelease=5)
         print( newestbad, ftp_path )
         time.sleep(SHORT_DELAY)
         if GET_FILES and newestbad:
@@ -2307,12 +2402,6 @@ if __name__ == '__main__':
         print( newestflat, ftp_path )
         time.sleep(SHORT_DELAY)
     
-        # Get a list of all the CDPs for the JPL model.
-        print( "\nFile names for all the JPL model CDPs" )
-        (jpl_list, folder_list) = miricdp.match_cdp_filename('ANY', model='JPL')
-        print( str(jpl_list) )
-        time.sleep(SHORT_DELAY)
-    
         print( "\nFile names of any CDPs for the SUB64 subarray" )
         (sub64_list, folder_list) = miricdp.match_cdp_filename('ANY', detector='ANY',
                                             subarray='SUB64')
@@ -2329,15 +2418,15 @@ if __name__ == '__main__':
     
     if TEST_GET and GET_FILES:
         print("\nTesting general use of get_cdp")
-        print( "Getting the latest release 5 bad pixel mask for the imager from the CDP repository" )
-        datamodel = get_cdp('MASK', detector='MIRIMAGE', cdprelease=5)
+        print( "Getting the latest release 6 bad pixel mask for the imager from the CDP repository" )
+        datamodel = get_cdp('MASK', detector='MIRIMAGE', cdprelease=6)
         if datamodel is not None:
             if VERBOSE_MODELS:
                 print( datamodel )
             else:
                 print( datamodel.__class__.__name__, " obtained successfully." )                
             if PLOTTING:
-                datamodel.plot("Latest release 5 bad pixel mask")
+                datamodel.plot("Latest release 6 bad pixel mask")
             del datamodel
         time.sleep(LONG_DELAY)
 
@@ -2376,18 +2465,6 @@ if __name__ == '__main__':
                 datamodel.plot("Latest readnoise map")
             del datamodel
         time.sleep(LONG_DELAY)
-         
-        print( "Getting the release 2 SRF for the LRS from the CDP repository" )
-        datamodel = get_cdp('SRF', detector='IM', mirifilter='P750L')
-        if datamodel is not None:
-            if VERBOSE_MODELS:
-                print( datamodel )
-            else:
-                print( datamodel.__class__.__name__, " obtained successfully." )                
-            if PLOTTING:
-                datamodel.plot("Latest LRS SRF")
-            del datamodel
-        time.sleep(LONG_DELAY)
 
     if TEST_SIM and GET_FILES:
         print("\nTesting use of get_cdp by the simulators")
@@ -2395,7 +2472,7 @@ if __name__ == '__main__':
         cdps_not_found = []
 
         #ftp_path = 'CDPSIM'
-        FTP_PATH = '/CDPSIM/1.0/:/CDPSIM/'
+        FTP_PATH = '/CDPSIM/2.0/:/CDPSIM/'
         FTP_USER = 'cdpuser'
         FTP_PASS = 'R7ZWEXEEsAH7'
         miricdp = MiriCDPInterface(ftp_path=FTP_PATH, ftp_user=FTP_USER,

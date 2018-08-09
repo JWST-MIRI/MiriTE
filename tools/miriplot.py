@@ -402,6 +402,7 @@ def plot_text(text, xpos=0.05, ypos=0.95, pyplt=plt, plotfig=None,
             newaxis = True
         if plotaxis is None:
             # TODO: Can we remove the default tick marks created by this call?
+            # FIXME: This call needs a label. See MatplotlibDeprecationWarning
             plotaxis = plotfig.add_subplot(1,1,1)
             newaxis = True
         if newaxis and (showplot is None):
@@ -530,6 +531,7 @@ def plot_xy(xdata, ydata, yerr=None, pyplt=plt, plotfig=None, plotaxis=None,
                 plt.gca().set_aspect('equal', adjustable='box')
             newaxis = True
         if plotaxis is None:
+            # FIXME: This call needs a label. See MatplotlibDeprecationWarning
             plotaxis = plotfig.add_subplot(1,1,1)
             newaxis = True
         if newaxis and (showplot is None):
@@ -699,6 +701,7 @@ def plot_circles(xdata, ydata, radii, pyplt=plt, plotfig=None, plotaxis=None,
                 plt.gca().set_aspect('equal', adjustable='box')
             newaxis = True
         if plotaxis is None:
+            # FIXME: This call needs a label. See MatplotlibDeprecationWarning
             plotaxis = plotfig.add_subplot(1,1,1)
             newaxis = True
         if newaxis and (showplot is None):
@@ -890,6 +893,7 @@ def plot_ellipses(xdata, ydata, majors, minors, tilts, pyplt=plt, plotfig=None, 
                 plt.gca().set_aspect('equal', adjustable='box')
             newaxis = True
         if plotaxis is None:
+            # FIXME: This call needs a label. See MatplotlibDeprecationWarning
             plotaxis = plotfig.add_subplot(1,1,1)
             newaxis = True
         if newaxis and (showplot is None):
@@ -1107,6 +1111,7 @@ def plot_xycolumn(xdata, ylist, yerrlist=None, pyplt=plt, figsize=(8,10),
                     (subno+1 % plotydata.ndim)
                 raise TypeError(strg)
     
+             # FIXME: This call needs a label. See MatplotlibDeprecationWarning
             ax = thisfig.add_subplot(subcols, 1, subno+1)
             if ylabels is not None and len(ylabels)>plotno:
                 ystrg = ylabels[plotno]
@@ -1295,6 +1300,7 @@ def plot_hist(data, bins=30, equalwidths=True, pyplt=plt, plotfig=None,
                 plt.gca().set_aspect('equal', adjustable='box')
             newaxis = True
         if plotaxis is None:
+            # FIXME: This call needs a label. See MatplotlibDeprecationWarning
             plotaxis = plotfig.add_subplot(1,1,1)
             newaxis = True
         if newaxis and (showplot is None):
@@ -1465,6 +1471,7 @@ def plot_image(data, pyplt=plt, plotfig=None, plotaxis=None, figsize=(10,10),
                     plt.gca().set_aspect('equal', adjustable='box')
                 newaxis = True
             if plotaxis is None:
+                # FIXME: This call needs a label. See MatplotlibDeprecationWarning
                 plotaxis = plotfig.add_subplot(1,1,1)
                 newaxis = True
             if newaxis and (showplot is None):
@@ -1644,6 +1651,7 @@ def plot_images(datalist, pyplt=plt, figsize=(10,10), equal_aspect=False,
                     plotdata.ndim
                 raise TypeError(strg)
     
+            # FIXME: This call needs a label. See MatplotlibDeprecationWarning
             ax = fig.add_subplot(subrows, subcols , subno+1)
             if (subtitles is not None) and (len(subtitles) > subno):
                 strg = subtitles[subno]
@@ -1807,6 +1815,7 @@ def plot_image2D(data, pyplt=plt, plotfig=None, plotaxis=None, figsize=(10,10),
                 plt.gca().set_aspect('equal', adjustable='box')
             newaxis = True
         if plotaxis is None:
+            # FIXME: This call needs a label. See MatplotlibDeprecationWarning
             plotaxis = plotfig.add_subplot(1,1,1)
             newaxis = True
         if newaxis and (showplot is None):
@@ -1993,6 +2002,7 @@ def plot_image3D(data, pyplt=plt, plotfig=None, figsize=(10,10),
                         plt.gca().set_aspect('equal', adjustable='box')
                     if title:
                         fig.suptitle(title)
+            # FIXME: This call needs a label. See MatplotlibDeprecationWarning
             ax = fig.add_subplot(subrows, subcols , subno+1)
             plotslice = plotdata[slicenum,:,:]
             plot_image2D(plotslice, pyplt=pyplt, plotfig=fig, plotaxis=ax,
@@ -2103,6 +2113,7 @@ def plot( *args ):
         for obj in largs:
                 
             # Create a new subplot/
+            # FIXME: This call needs a label. See MatplotlibDeprecationWarning
             ax = fig.add_subplot(pltrows, pltcols, count)
             
             # Check the data type.
