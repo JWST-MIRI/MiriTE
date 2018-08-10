@@ -16,9 +16,6 @@ Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
 
-# This module is now converted to Python 3.
-
-
 # Python logging facility.
 import logging
 logging.basicConfig(level=logging.INFO)   # Choose ERROR, WARN, INFO or DEBUG 

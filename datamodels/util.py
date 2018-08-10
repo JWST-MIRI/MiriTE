@@ -89,6 +89,7 @@ from miri.datamodels.miri_model_base import MiriDataModel
 from miri.datamodels.cdp import CDP_DICT
 from miri.datamodels.sim import SIM_DICT
 
+# -----------------------------------------------------------------------------
 #
 # Common utility functions
 #
@@ -208,6 +209,10 @@ def get_data_class( kwlist, dictionary=CDP_DICT ):
     dataclass = lookup( kwlist, dictionary )
     return dataclass
 
+# -----------------------------------------------------------------------------
+#
+# Universal data model opening function
+#
 def open( init=None, astype=None):
     """
     
@@ -356,6 +361,10 @@ def open( init=None, astype=None):
 
     return mirimodel(init)
 
+# -----------------------------------------------------------------------------
+#
+# Data model testing support functions
+#
 def assert_recarray_equal(a, b, msg=None):
     """
     
@@ -910,10 +919,17 @@ def verify_fits_file(filename, cdp_checks=False):
     if failure_strg:
         raise TypeError("Not a valid JWST/MIRI data file: " + failure_strg)
         
+# -----------------------------------------------------------------------------
+#
+# Data format conversion utilities. Many of these functions exist only to
+# support old data formats.
+#
 def convert_detector(old_detector):
     """
     
     Convert an old detector string into a new string.
+    
+    NOTE: Only exists to support old data formats.
     
     """
     if old_detector:
@@ -933,6 +949,8 @@ def convert_band(old_band):
     
     Convert an old band string into a new string.
     
+    NOTE: Only exists to support old data formats.
+     
     """
     if old_band:
         old_band = old_band.strip() # Strip off superfluous white space
@@ -959,7 +977,9 @@ def convert_cdp_2to3(infile, outfile, datatype=None, settings=None,
     
     NOTE: The function will fail if the output file already exists,
     unless called with overwrite=True.
-        
+    
+    NOTE: Only exists to support old data formats.
+         
     :Parameters:
     
     infile: str

@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 #
+# NOTE: Although the conversion carried out by this script is obsolete
+# (CDP-2 to CDP-3) it could be reused for different conversions in the future.
+#
 # :History:
 # 
 # 30 Sep 2014: Created.
@@ -42,8 +45,6 @@ The command also takes the following options::
         Overwrite any existing FITS file.
 
 """
-
-
 
 import optparse
 import sys, time
@@ -111,8 +112,10 @@ if __name__ == "__main__":
         datatype = convert_cdp_2to3(inputfile, outputfile, datatype=datatype,
                                     settings=settings, printmodel=verb,
                                     overwrite=overwrite)
-        print("File \'%s\' of data type \'%s\'\n  has been converted to \'%s\'." % \
-              (inputfile, datatype, outputfile))
     except Exception as e:
         print("File \'%s\' failed to convert." % inputfile)
         print("  " + str(e))
+    else:
+        print("File \'%s\' of data type \'%s\'\n  has been converted to \'%s\'." % \
+              (inputfile, datatype, outputfile))
+        

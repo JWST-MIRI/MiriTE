@@ -37,8 +37,6 @@ The command takes the following options:
 
 """
 
-
-
 import optparse
 import os
 from pdb import set_trace as stop

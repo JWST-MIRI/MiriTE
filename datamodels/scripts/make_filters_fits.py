@@ -56,8 +56,6 @@ The command also takes the following options:
         Overwrite any existing FITS file.
 
 """
-# This module is now converted to Python 3.
-
 
 import optparse
 import os, sys, time

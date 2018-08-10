@@ -38,8 +38,6 @@ The command also takes the following options::
 
 """
 
-
-
 import warnings
 import optparse
 import sys, time

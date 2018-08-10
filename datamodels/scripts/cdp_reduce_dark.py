@@ -57,8 +57,6 @@ The command also takes the following options:
 
 """
 
-
-
 import optparse
 import sys, time
 
@@ -221,4 +219,3 @@ if __name__ == "__main__":
             newmodel.save( outputfile, overwrite=overwrite )
             del newmodel
             del datamodel
-

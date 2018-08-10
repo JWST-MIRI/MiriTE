@@ -14,12 +14,9 @@ Simple examples of functions and classes in "dqflags" module.
 
 """
 
-
-
 #from pdb import set_trace as stop
 
 import numpy as np
-
 
 #from miri.dataproducts.dqflags import flags as fl
 from miri.datamodels.dqflags import master_flags, FlagsTable
@@ -79,4 +76,5 @@ def mainx():
         sci[np.where(~flags_table.test_flags_any(dq,'NON_SCIENCE'))].mean() )
     
 
-if __name__ == '__main__': mainx()
+if __name__ == '__main__':
+    mainx()

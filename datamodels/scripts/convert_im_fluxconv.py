@@ -52,8 +52,6 @@ The command also takes the following options:
 
 """
 
-
-
 import optparse
 import os, sys, time
 

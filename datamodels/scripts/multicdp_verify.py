@@ -51,8 +51,6 @@ The command takes the following options::
 
 """
 
-
-
 import optparse
 import os, time
 from pdb import set_trace as stop

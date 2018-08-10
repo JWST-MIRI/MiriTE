@@ -55,8 +55,6 @@ The command also takes the following options:
 
 """
 
-
-
 import optparse
 import os, sys, time
 import astropy.io.fits as pyfits
@@ -209,4 +207,3 @@ if __name__ == "__main__":
     overwrite = options.overwrite
     
     mainx(inputfile,verb,makeplot,overwrite)
-    

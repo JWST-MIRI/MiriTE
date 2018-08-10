@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 #
+# NOTE: An obsolete script which was valid at the time of the CDP-3 release.
+#
 # :History:
 # 
 # 03 Oct 2014: Created.
@@ -32,8 +34,6 @@ The command also takes the following options:
         Overwrite any existing FITS file.
 
 """
-
-
 
 import optparse
 import os, sys, time

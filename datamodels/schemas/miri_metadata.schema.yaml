@@ -96,6 +96,16 @@ properties:
         title: MIRI channel relevant (MRS)
         enum: ['1', '2', '3', '4', '12', '34', ANY, N/A, '']
         fits_keyword: CHANNEL
+      dichroic_a:
+        type: string
+        title: MIRI dichroic wheel A setting (MRS)
+        enum: [SHORT, MEDIUM, LONG, N/A, '']
+        fits_keyword: DGAA
+      dichroic_b:
+        type: string
+        title: MIRI dichroic wheel B setting (MRS)
+        enum: [SHORT, MEDIUM, LONG, N/A, '']
+        fits_keyword: DGAB
       band:
         type: string
         title: MIRI sub-channel relevant (MRS)
