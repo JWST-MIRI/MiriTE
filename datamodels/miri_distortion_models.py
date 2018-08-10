@@ -77,6 +77,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              JWST build 7.1 data models release. meta.reffile.type also
              changed to meta.reftype. TYPE keyword replaced by DATAMODL.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+10 Aug 2018: Updated MRS distortion models to reflect CDP-7 format.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -1114,6 +1115,7 @@ if __name__ == '__main__':
                    [1,2,3,4],
                    [1,2,3,4]
                   ]
+    slicenumber3 = [slicenumber, slicenumber]
     fovdata = [(-2.95, 3.09),
                (-2.96, 3.00)]
     d2cdata = [(100.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0,
@@ -1128,10 +1130,10 @@ if __name__ == '__main__':
                (98.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0,
                 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0,
                 21.0, 22.0, 323.0, 24.0, 25.0)]
-    transform = [('T_CH3C,V2', 0.11, 0.21, 0.31, 0.41),
-                 ('T_CH3C,V3', 0.12, 0.22, 0.32, 0.42)]
+    transform = [('T_CH3C,V2', 0.11, 0.21, 0.31, 0.41, 0.51, 0.61, 0.71, 0.81, 0.91),
+                 ('T_CH3C,V3', 0.12, 0.22, 0.32, 0.42, 0.52, 0.62, 0.72, 0.82, 0.92)]
      
-    with MiriMrsDistortionModel12( slicenumber=slicenumber,
+    with MiriMrsDistortionModel12( slicenumber=slicenumber3,
                                  fov_ch1=fovdata, fov_ch2=fovdata,
                                  alpha_ch1=d2cdata, lambda_ch1=d2cdata,
                                  alpha_ch2=d2cdata, lambda_ch2=d2cdata,
@@ -1153,7 +1155,7 @@ if __name__ == '__main__':
 #             print(newmodel)
         del testdata1
 
-    with MiriMrsDistortionModel34( slicenumber=slicenumber,
+    with MiriMrsDistortionModel34( slicenumber=slicenumber3,
                                  fov_ch3=fovdata, fov_ch4=fovdata,
                                  alpha_ch3=d2cdata, lambda_ch3=d2cdata,
                                  alpha_ch4=d2cdata, lambda_ch4=d2cdata,
