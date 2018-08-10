@@ -26,8 +26,6 @@ old MIRI data model and the new one. The module serves two purposes:
 @author: Steven Beard (UKATC)
 
 """
-# This module is now converted to Python 3.
-
 
 import sys, os
 

@@ -69,8 +69,6 @@ processing the MIRI data models.
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
-# This module is now converted to Python 3.
-
 
 import os
 import copy

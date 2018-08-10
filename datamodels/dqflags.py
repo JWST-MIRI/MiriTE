@@ -104,8 +104,6 @@ http://miri.ster.kuleuven.be/bin/view/Internal/DataQualityFlags
 
 """
 
-
-
 import warnings
 import copy
 

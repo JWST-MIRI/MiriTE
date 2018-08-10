@@ -33,8 +33,6 @@ The miri.tools.miriplot module.
 @author: Steven Beard (UKATC)
 
 """
-# This module is now converted to Python 3.
-
 
 import warnings
 

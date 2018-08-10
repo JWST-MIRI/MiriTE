@@ -123,7 +123,6 @@ Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
 
-# TODO: Remove the 'six' stuff and just use Python 3 code.
 from astropy.extern import six
 import os
 import re

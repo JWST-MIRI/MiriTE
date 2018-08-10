@@ -68,8 +68,6 @@ http://ssb.stsci.edu/doc/jwst/jwst/introduction.html#crds-reference-files
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
 """
-# This module is now converted to Python 3.
-
 
 # Import CDP data products
 from miri.datamodels.miri_badpixel_model import \

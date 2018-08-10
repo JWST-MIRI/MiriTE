@@ -10,12 +10,11 @@ Module example_properties - an example MIRI parameters file.
 25 Oct 2011: Created
 28 Mar 2012: Recursion comment added.
 08 Sep 2015: Made compatible with Python 3.
+01 Jul 2018: Final conversion to Python 3.
 
 @author: Steven Beard (UKATC)
 
 """
-# This module is now converted to Python 3.
-
 
 # The file searching function, find_file, can be used to find a parameter
 # file with the specified name somewhere within the tree of directories

@@ -22,8 +22,6 @@ instead of needing to know the names of all the individual source files.
 @author: Steven Beard (UKATC)
 
 """
-# This module is now converted to Python 3.
-
 
 # Import simulator support data products
 from miri.datamodels.miri_illumination_model import MiriIlluminationModel

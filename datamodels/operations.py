@@ -37,8 +37,6 @@ The STScI jwst.datamodels documentation.
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
-# This module is now converted to Python 3.
-
 
 import sys
 from astropy.extern import six

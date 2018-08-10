@@ -82,7 +82,6 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 # This module is now converted to Python 3.
 
 
-# import warnings
 import numpy as np
 
 # Import the MIRI reserved data quality flags and flags table class
