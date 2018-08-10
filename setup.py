@@ -254,7 +254,6 @@ setup(
                                       'data/__init__.py'],
                  },
     scripts=['miri_installation_check.py',
-             'datamodels/scripts/check_jwslib_datamodel.py',
              'datamodels/scripts/cdp_add_history.py',
              'datamodels/scripts/cdp_add_subarray.py',
              'datamodels/scripts/cdp_get_doc.py',
