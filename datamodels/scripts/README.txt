@@ -1,8 +1,9 @@
 Overview of MIRI data product scripts in datamodels/scripts/
 
-These scripts are valid for the current data models
-and are installed by default.
-=================================================================
+
+The following scripts are valid for the current data models and are
+installed by default.
+===========================================================================
 
 CDP verification and testing
 ----------------------------
@@ -29,15 +30,16 @@ General examples
 ----------------
 dqflags_examples.py	- Some examples showing the use of DQ flags
 
-These scripts depend on specific versions of CDPs or data models.
-They are not currently relevant but have been saved to a
-"historical" folder from which they can be reused.
-=================================================================
+
+The following  scripts depend on specific versions of CDPs or data models.
+They are not currently installed or relevant but have been saved to a
+"historical" folder from which they can be reused in the future.
+===========================================================================
 
 Possibly reusable conversion scripts
 ------------------------------------
 cdp_convert.py		- Convert CDPs from one format to another
-			  (currently only CDP-2 to CDP-3)
+					  (currently only CDP-2 to CDP-3)
 multicdp_convert.py	- Run the above script on several files
 cdp_remove_junk.py	- Remove left over FITS extensions
 convert_bad_pixel_mask.py - Convert DHAS-format bad pixel mask to CDP
