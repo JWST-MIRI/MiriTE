@@ -19,6 +19,7 @@ Setup file for installing the MiriTE software
 27 Apr 2018: Require Python 3.5.
 22 May 2018: Added README and LICENCE.
 04 Jun 2018: Added warning if MIRICLE environment is not activated.
+10 Aug 2018: Removed datamodel scripts which are no longer relevant.
 
 @author: MIRI Software Team
 
@@ -261,13 +262,11 @@ setup(
              'datamodels/scripts/cdp_reduce_dark.py',
              'datamodels/scripts/cdp_verify.py',
              'datamodels/scripts/convert_fits_to_asdf.py',
+             'datamodels/scripts/convert_slope_data.py',
              'datamodels/scripts/find_me_another.py',
              'datamodels/scripts/dqflags_examples.py',
              'datamodels/scripts/multicdp_verify.py',
              'datamodels/scripts/multicdp_subarray.csh',
-             'datamodels/scripts/make_filters_fits.py',
-             'datamodels/scripts/make_measurements_fits.py',
-             'datamodels/scripts/make_qe_fits.py',
              'simulators/scasim/scripts/make_bad_pixel_mask.py',
              'simulators/scasim/scripts/make_fringe_map.py',
              'simulators/scasim/scripts/make_sca_calibration.py',
