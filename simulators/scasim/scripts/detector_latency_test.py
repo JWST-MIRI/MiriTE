@@ -30,8 +30,6 @@ The script may be edited to try out different simulation parameters.
 There are no command line arguments.
 
 """
-# This module is now converted to Python 3.
-
 
 import os
 import numpy as np

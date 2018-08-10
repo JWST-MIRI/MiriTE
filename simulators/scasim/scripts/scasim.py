@@ -255,8 +255,6 @@ The command also takes the following options:
         Simulation without detector latency effects.
 
 """
-# This module is now converted to Python 3.
-
 
 # Python logging facility
 import logging

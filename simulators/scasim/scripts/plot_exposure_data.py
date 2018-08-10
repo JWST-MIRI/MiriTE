@@ -51,8 +51,6 @@ The command also takes the following options:
         Generate maximum output.
 
 """
-# This module is now converted to Python 3.
-
 
 import optparse
 import os, sys, time

@@ -89,8 +89,6 @@ The command also takes the following options:
         Overwrite any existing bad pixel FITS file.
 
 """
-# This module is now converted to Python 3.
-
 
 import optparse
 import os, sys, time
