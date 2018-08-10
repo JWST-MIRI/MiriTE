@@ -95,8 +95,9 @@ def correct_band_metadata(datamodel, band='', filename=''):
 
         if hasattr(datamodel.meta.instrument, 'band'):
         
+            band_acceptable_values = MIRI_BANDS + ['ANY', 'N/A']
             if datamodel.meta.instrument.band is not None and \
-               str(datamodel.meta.instrument.band) in MIRI_BANDS:
+               str(datamodel.meta.instrument.band) in band_acceptable_values:
                 # The BAND keyword is already correct. Nothing needs to be done.
                 logger.info("BAND keyword already contains \'%s\'. No correction needed." % \
                       str(datamodel.meta.instrument.band))
