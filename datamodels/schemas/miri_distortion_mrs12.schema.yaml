@@ -1535,10 +1535,10 @@ allOf:
               fits_hdu: XANYAN_to_albe
               fits_keyword: TUNIT5
     slicenumber:
-      title: Slice number at a each pixel coordinate
+      title: Slice number at a each pixel coordinate vs transmission
       fits_hdu: Slice_Number
       default: 0.0
-      ndim: 2
+      ndim: 3
       units: ''
       datatype: float32
     fov_ch1:
@@ -2026,9 +2026,19 @@ allOf:
         datatype: float64
       - name: COEFF_0_1
         datatype: float64
+      - name: COEFF_0_2
+        datatype: float64
       - name: COEFF_1_0
         datatype: float64
       - name: COEFF_1_1
+        datatype: float64
+      - name: COEFF_1_2
+        datatype: float64
+      - name: COEFF_2_0
+        datatype: float64
+      - name: COEFF_2_1
+        datatype: float64
+      - name: COEFF_2_2
         datatype: float64
     xanyan_to_albe:
       title: Coefficients table for MRS coordinate transformation
@@ -2041,7 +2051,17 @@ allOf:
         datatype: float64
       - name: COEFF_0_1
         datatype: float64
+      - name: COEFF_0_2
+        datatype: float64
       - name: COEFF_1_0
         datatype: float64
       - name: COEFF_1_1
+        datatype: float64
+      - name: COEFF_1_2
+        datatype: float64
+      - name: COEFF_2_0
+        datatype: float64
+      - name: COEFF_2_1
+        datatype: float64
+      - name: COEFF_2_2
         datatype: float64
