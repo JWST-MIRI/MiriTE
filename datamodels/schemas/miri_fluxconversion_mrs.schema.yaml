@@ -31,11 +31,11 @@ allOf:
       title: Flux conversion data
       fits_hdu: SCI
       axes: [wavelength, rows, columns]
-      units: DN/s/mJy/pixel
+      units: DN sec^-1 mJy^-1 pixel
     err:
       fits_hdu: ERR
       axes: [wavelength, rows, columns]
-      units: DN/s/mJy/pixel
+      units: DN sec^-1 mJy^-1 pixel
     pixsiz:
       title: Pixel size data
       fits_hdu: PIXSIZ
