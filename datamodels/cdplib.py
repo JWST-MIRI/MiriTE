@@ -118,6 +118,10 @@ http://miri.ster.kuleuven.be/bin/view/Internal/CalDataProducts
              path. Turned off the annoying stream of paramiko log messages.
              Improved the handling of MRS cross-dichroic bands. Brought the
              tests up to date and added tests for MRS cross-dichroic CDPs.
+03 Sep 2018: Obsolete detector names removed. There should no longer be any
+             need for backwards compatibility to these old names.
+             Class matching keyword list extended to allow CDP-6 variants of
+             some data models to be accessed.
 
 Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -315,8 +319,6 @@ def get_cdp(cdptype, detector, model='FM', readpatt='ANY', channel='ANY',
     detector: str
         The MIRI detector required ('MIRIMAGE', 'MIRIFUSHORT',
         'MIRIFULONG' or 'ANY').
-        The old names ('IM', 'SW' or 'LW') may be used to find CDPs
-        prior to the CDP-3 release.
     model: str (optional)
         The MIRI model required ('VM', 'FM' or 'JPL').
         Defaults to 'FM'.
@@ -506,6 +508,17 @@ def get_cdp(cdptype, detector, model='FM', readpatt='ANY', channel='ANY',
             kwlist.append(detector)
         if mirifilter:
             kwlist.append(mirifilter)
+        # Some data models offer different variations of the data models with
+        # CDP release.
+        # TODO: Remove this complication after CDP-7 delivery.
+        if cdptype == 'DISTORTION':
+            # One of the data types for which there is a variation with
+            # CDP release.
+            if cdprelease:
+                kwlist.append(str(cdprelease))
+            else:
+                kwlist.append('ANY')
+            
         data_class = get_data_class(kwlist)
         strg = "Reading \'%s\' model from \'%s\'" % (cdptype, local_filename)
         mylogger.info(strg)
@@ -827,9 +840,7 @@ class MiriCDPFolder(object):
             Defaults to 'FM'.
         detector: str (optional)
             The MIRI detector required ('MIRIMAGE', 'MIRIFUSHORT',
-            'MIRIFULONG' or 'ANY'). The old names ('IM', 'SW' or 'LW')
-            may be used to find CDPs prior to the CDP-3 release.
-            By default, matches all detectors.
+            'MIRIFULONG' or 'ANY'). By default, matches all detectors.
         readpatt: str (optional)
             The MIRI readout pattern required ('FAST', 'SLOW' or 'ANY').
             By default, matches all readout patterns.  
@@ -1096,9 +1107,7 @@ class MiriCDPFolder(object):
             Defaults to 'FM'.
         detector: str (optional)
             The MIRI detector required ('MIRIMAGE', 'MIRIFUSHORT',
-            'MIRIFULONG' or 'ANY'). The old names ('IM', 'SW' or 'LW')
-            may be used to find CDPs prior to the CDP-3 release.
-            By default, matches any detector.
+            'MIRIFULONG' or 'ANY'). By default, matches any detector.
         readpatt: str (optional)
             The MIRI readout pattern required ('FAST', 'SLOW' or 'ANY').
             By default, matches any readout pattern.  
@@ -1744,9 +1753,7 @@ class MiriCDPInterface(object):
             Defaults to 'FM'.
         detector: str (optional)
             The MIRI detector required ('MIRIMAGE', 'MIRIFUSHORT',
-            'MIRIFULONG' or 'ANY'). The old names ('IM', 'SW' or 'LW')
-            may be used to find CDPs prior to the CDP-3 release.
-            By default, matches all detectors.
+            'MIRIFULONG' or 'ANY'). By default, matches all detectors.
         readpatt: str (optional)
             The MIRI readout pattern required ('FAST', 'SLOW' or 'ANY').
             By default, matches all readout patterns.  
@@ -1848,9 +1855,7 @@ class MiriCDPInterface(object):
             Defaults to 'FM'.
         detector: str (optional)
             The MIRI detector required ('MIRIMAGE', 'MIRIFUSHORT',
-            'MIRIFULONG' or 'ANY'). The old names ('IM', 'SW' or 'LW')
-            may be used to find CDPs prior to the CDP-3 release.
-            By default, matches any detector.
+            'MIRIFULONG' or 'ANY'). By default, matches any detector.
         readpatt: str (optional)
             The MIRI readout pattern required ('FAST', 'SLOW' or 'ANY').
             By default, matches any readout pattern.  
@@ -2551,7 +2556,7 @@ if __name__ == '__main__':
             (matched_files, matched_folders) = \
                 miricdp.match_cdp_substrings(mustcontain=must_contain,
                                              mustnotcontain=must_not_contain)
-             
+
             if len(matched_files) > 1:
                 # More than one match. Take the last file.
                 filename = matched_files[-1]
@@ -2563,7 +2568,7 @@ if __name__ == '__main__':
             else:
                 # No CDPs were matched
                 filename = None
-                 
+
             if filename:
                 print("Matched %s at ftp_path=%s" % (filename, ftp_path))
                 # Update the local CDP cache to make sure it contains the specified file,
@@ -2627,7 +2632,7 @@ if __name__ == '__main__':
                         print("*** CDP NOT FOUND ***")
                     del flatmodel
                     time.sleep(LONG_DELAY)
- 
+
         for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
             for readpatt in ('ANY', 'FAST', 'SLOW'):
                 strg = "PIXELFLAT for detector=%s" % detector
@@ -2648,7 +2653,7 @@ if __name__ == '__main__':
                     print("*** CDP NOT FOUND ***")
                 del flatmodel
                 time.sleep(LONG_DELAY)
- 
+
         print("Sky flat-fields")
         detector = 'MIRIMAGE'
         for mirifilter in ['ANY'] +  MIRI_FILTERS:
@@ -2670,7 +2675,7 @@ if __name__ == '__main__':
                 print("*** CDP NOT FOUND ***")
             del flatmodel
             time.sleep(LONG_DELAY)
- 
+
         for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
             for miriband in ['ANY'] + MIRI_BANDS:
                 strg = "SKYFLAT for detector=%s" % detector
@@ -2691,7 +2696,7 @@ if __name__ == '__main__':
                     print("*** CDP NOT FOUND ***")
                 del flatmodel
                 time.sleep(LONG_DELAY)
- 
+
         print("Fringe flat-fields")
         detector = 'MIRIMAGE'
         for mirifilter in ['ANY'] +  MIRI_FILTERS:
@@ -2713,7 +2718,7 @@ if __name__ == '__main__':
                 print("*** CDP NOT FOUND ***")
             del fringemodel
             time.sleep(LONG_DELAY)
- 
+
         for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
             for miriband in ['ANY'] + MIRI_BANDS:
                 strg = "FRINGE for detector=%s" % detector
@@ -2734,7 +2739,7 @@ if __name__ == '__main__':
                     print("*** CDP NOT FOUND ***")
                 del fringemodel
                 time.sleep(LONG_DELAY)
- 
+
         print("Read noise models")
         detector = 'MIRIMAGE'
         for readpatt in ('FAST', 'SLOW'):
@@ -2758,7 +2763,7 @@ if __name__ == '__main__':
                     print("*** CDP NOT FOUND ***")
                 del noisemodel
                 time.sleep(LONG_DELAY)
- 
+
         for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
             for readpatt in ('FAST', 'SLOW'):
                 strg = "READNOISE for detector=%s" % detector
@@ -2779,7 +2784,7 @@ if __name__ == '__main__':
                     print("*** CDP NOT FOUND ***")
                 del noisemodel
                 time.sleep(LONG_DELAY)
- 
+
         print("Distortion models")
         detector = 'MIRIMAGE'
         for mirifilter in ['ANY'] + MIRI_FILTERS:
@@ -2800,14 +2805,36 @@ if __name__ == '__main__':
                 print("*** CDP NOT FOUND ***")
             del distmodel
             time.sleep(LONG_DELAY)
- 
+
+        print("CDP6 variants") # TODO: Eventually remove this test
         for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
             for miriband in ['ANY'] + MIRI_BANDS:
                 strg = "DISTORTION for detector=%s" % detector
                 strg += " band=%s" % miriband
                 print("\n" + strg)
                 distmodel = get_cdp('DISTORTION', detector=detector,
-                                    band=miriband,
+                                    band=miriband, cdprelease='6', 
+                                    ftp_path=FTP_PATH, ftp_user=FTP_USER,
+                                    ftp_passwd=FTP_PASS)
+                if distmodel is not None:
+                    cdps_found.append(strg)
+                    if VERBOSE_MODELS:
+                        print( distmodel )
+                    if PLOTTING:
+                        distmodel.plot(strg)
+                else:
+                    cdps_not_found.append(strg)
+                    print("*** CDP NOT FOUND ***")
+                del distmodel
+                time.sleep(LONG_DELAY)
+        print("CDP7 variants") # TODO: Eventually remove this message
+        for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
+            for miriband in ['ANY'] + MIRI_BANDS:
+                strg = "DISTORTION for detector=%s" % detector
+                strg += " band=%s" % miriband
+                print("\n" + strg)
+                distmodel = get_cdp('DISTORTION', detector=detector,
+                                    band=miriband, 
                                     ftp_path=FTP_PATH, ftp_user=FTP_USER,
                                     ftp_passwd=FTP_PASS)
                 if distmodel is not None:
@@ -2839,7 +2866,7 @@ if __name__ == '__main__':
                 print("*** CDP NOT FOUND ***")
             del areamodel
             time.sleep(LONG_DELAY)
- 
+
         print("PSF models")
         detector = 'MIRIMAGE'
         for cdpmodel in ('PSF', 'PSF-OOF'):
@@ -2864,7 +2891,7 @@ if __name__ == '__main__':
                         print("*** CDP NOT FOUND ***")
                     del psfmodel
                     time.sleep(LONG_DELAY)
-         
+
         for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
             for miriband in ('SHORT', 'MEDIUM', 'LONG'):
                 strg = "PSF for detector=%s" % detector
@@ -2885,7 +2912,7 @@ if __name__ == '__main__':
                     print("*** CDP NOT FOUND ***")
                 del psfmodel
                 time.sleep(LONG_DELAY)
- 
+
         print("Photon Conversion Error (PCE) models")
         detector = 'MIRIMAGE'
         for mirifilter in ('ANY', 'P750L', 'F2100W'):
@@ -2910,7 +2937,7 @@ if __name__ == '__main__':
                     print("*** CDP NOT FOUND ***")
                 del pcemodel
                 time.sleep(SHORT_DELAY)
- 
+
         for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
             for miriband in ('SHORT', 'MEDIUM', 'LONG'):
                 strg = "PCE for detector=%s" % detector
@@ -2931,7 +2958,7 @@ if __name__ == '__main__':
                     print("*** CDP NOT FOUND ***")
                 del pcemodel
                 time.sleep(SHORT_DELAY)
-                
+
         print("The following %d simulator CDPs were successfully found:" % \
               len(cdps_found))
         for found in cdps_found:
@@ -2942,7 +2969,7 @@ if __name__ == '__main__':
         for notfound in cdps_not_found:
             print("\t" + notfound)
         time.sleep(SHORT_DELAY)
-            
+
     if TEST_ERRORS:
         # The class must not crash if it can't connect to the CDP repository
         print("Test an authorisation error")

@@ -78,6 +78,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              changed to meta.reftype. TYPE keyword replaced by DATAMODL.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 10 Aug 2018: Updated MRS distortion models to reflect CDP-7 format.
+03 Sep 2018: Old CDP-6 variants of the distortion models included.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -770,6 +771,47 @@ class MiriMrsDistortionModel12(MiriDataModel):
         strg += self.get_data_str('xanyan_to_albe', underline=True, underchar="-")
         return strg
 
+class MiriMrsDistortionModel12_CDP6(MiriMrsDistortionModel12):
+    """
+    
+    This class can be used to access the old CDP-6 version of the
+    MiriMrsDistortionModel12 data model.
+    
+    See the MiriMrsDistortionModel12 class for full documentation.
+    
+    """
+    schema_url = "miri_distortion_mrs12_CDP6.schema.yaml"
+    fieldnames_fov = ('alpha_min', 'alpha_max')
+    fieldnames_d2c = ['VAR1']
+    for i in (0,1,2,3,4):
+        for j in (0,1,2,3,4):
+            fieldnames_d2c.append('VAR2_%d_%d' % (i,j))
+    fieldnames_trans = ['Label']
+    for i in (0,1):
+        for j in (0,1):
+            fieldnames_trans.append('COEFF_%d_%d' % (i,j))
+
+    def __init__(self, init=None, slicenumber=None, fov_ch1=None, fov_ch2=None,
+                 alpha_ch1=None, lambda_ch1=None, alpha_ch2=None, lambda_ch2=None,
+                 x_ch1=None, y_ch1=None, x_ch2=None, y_ch2=None,
+                 albe_xanyan=None, xanyan_albe=None, bzero1=None, bdel1=None,
+                 bzero2=None, bdel2=None, **kwargs):
+        """
+        
+        Initialises the MiriMrsDistortionModel12_CDP6 class.
+        
+        Parameters: See class doc string.
+
+        """
+        super(MiriMrsDistortionModel12_CDP6, self).__init__(init=init,
+                slicenumber=None, fov_ch1=fov_ch1, fov_ch2=fov_ch2,
+                 alpha_ch1=alpha_ch1, lambda_ch1=lambda_ch1,
+                 alpha_ch2=alpha_ch2, lambda_ch2=lambda_ch2,
+                 x_ch1=x_ch1, y_ch1=y_ch1, x_ch2=x_ch2, y_ch2=y_ch2,
+                 albe_xanyan=albe_xanyan, xanyan_albe=xanyan_albe,
+                 bzero1=bzero1, bdel1=bdel1,
+                 bzero2=bzero2, bdel2=bdel2, **kwargs)
+
 
 # TODO: Over-complicated data structure needs to be simplified.
 class MiriMrsDistortionModel34(MiriDataModel):
@@ -1041,6 +1083,47 @@ class MiriMrsDistortionModel34(MiriDataModel):
         strg += self.get_data_str('xanyan_to_albe', underline=True, underchar="-")
         return strg
 
+
+class MiriMrsDistortionModel34_CDP6(MiriMrsDistortionModel34):
+    """
+    
+    This class can be used to access the old CDP-6 version of the
+    MiriMrsDistortionModel34 data model.
+    
+    See the MiriMrsDistortionModel34 class for full documentation.
+    
+    """
+    schema_url = "miri_distortion_mrs34_CDP6.schema.yaml"
+    fieldnames_fov = ('alpha_min', 'alpha_max')
+    fieldnames_d2c = ['VAR1']
+    for i in (0,1,2,3,4):
+        for j in (0,1,2,3,4):
+            fieldnames_d2c.append('VAR2_%d_%d' % (i,j))
+    fieldnames_trans = ['Label']
+    for i in (0,1):
+        for j in (0,1):
+            fieldnames_trans.append('COEFF_%d_%d' % (i,j))
+            
+    def __init__(self, init=None, slicenumber=None, fov_ch3=None, fov_ch4=None,
+                 alpha_ch3=None, lambda_ch3=None, alpha_ch4=None, lambda_ch4=None,
+                 x_ch3=None, y_ch3=None, x_ch4=None, y_ch4=None,
+                 albe_xanyan=None, xanyan_albe=None, bzero3=None, bdel3=None,
+                 bzero4=None, bdel4=None, **kwargs):
+        """
+        
+        Initialises the MiriMrsDistortionModel34_CDP6 class.
+        
+        Parameters: See class doc string.
+
+        """
+        super(MiriMrsDistortionModel34_CDP6, self).__init__(init=init,
+                 slicenumber=slicenumber, fov_ch3=fov_ch3, fov_ch4=fov_ch4,
+                 alpha_ch3=alpha_ch3, lambda_ch3=lambda_ch3,
+                 alpha_ch4=alpha_ch4, lambda_ch4=lambda_ch4,
+                 x_ch3=x_ch3, y_ch3=y_ch3, x_ch4=x_ch4, y_ch4=y_ch4,
+                 albe_xanyan=albe_xanyan, xanyan_albe=xanyan_albe,
+                 bzero3=bzero3, bdel3=bdel3,
+                 bzero4=bzero4, bdel4=bdel4, **kwargs)
 
 #
 # A minimal test is run when this file is run as a main program.

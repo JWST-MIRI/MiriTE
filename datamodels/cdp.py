@@ -64,6 +64,10 @@ http://ssb.stsci.edu/doc/jwst/jwst/introduction.html#crds-reference-files
              uses them).
 23 Jun 2016: Added MiriPceModel.
 01 Apr 2018: Separated the legacy models from the supported ones.
+03 Sep 2018: Obsolete detector names removed. There should no longer be any
+             need for backwards compatibility to these old names.
+             Dictionary extended to include CDP-6 variant of the MRS
+             distortion models.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -76,7 +80,8 @@ from miri.datamodels.miri_dark_reference_model import \
     MiriDarkReferenceModel
 from miri.datamodels.miri_distortion_models import \
     MiriImagingDistortionModel, MiriLrsD2WModel, MiriMrsDistortionModel12, \
-    MiriMrsDistortionModel34
+    MiriMrsDistortionModel34, MiriMrsDistortionModel12_CDP6, \
+    MiriMrsDistortionModel34_CDP6
 from miri.datamodels.miri_droop_model import MiriDroopModel
 from miri.datamodels.miri_flatfield_model import \
     MiriFlatfieldModel
@@ -133,15 +138,22 @@ CDP_DICT = { \
             # BAD is an alias of MASK
             'BAD'     : MiriBadPixelMaskModel, \
             'DARK'    : MiriDarkReferenceModel, \
-            'DISTORTION' : {'IM'  : {'P750L' : MiriLrsD2WModel, \
-                                     'ANY'   : MiriImagingDistortionModel}, \
-                         'SW'  : MiriMrsDistortionModel12, \
-                         'LW'  : MiriMrsDistortionModel34, \
-                         'MIRIMAGE'  : {'P750L' : MiriLrsD2WModel, \
-                                        'ANY'   : MiriImagingDistortionModel}, \
-                         'MIRIFUSHORT' : MiriMrsDistortionModel12, \
-                         'MIRIFULONG'  : MiriMrsDistortionModel34,
-                         'ANY' : MiriImagingDistortionModel }, \
+            # TODO: Remove this cdprelease complexity after CDP-7 release
+            'DISTORTION' : { 'MIRIMAGE'    : {'P750L' : MiriLrsD2WModel, \
+                                              'ANY'   : MiriImagingDistortionModel}, \
+                             'MIRIFUSHORT' : { 'ANY' : {'6'     : MiriMrsDistortionModel12_CDP6, \
+                                                        '7'     : MiriMrsDistortionModel12, \
+                                                        'ANY'   : MiriMrsDistortionModel12}}, \
+                             'MIRIFULONG'  : { 'ANY' : {'6'   : MiriMrsDistortionModel34_CDP6, \
+                                                        '7'   : MiriMrsDistortionModel34, \
+                                                        'ANY' : MiriMrsDistortionModel34}}, \
+                             'ANY' : MiriImagingDistortionModel}, \
+#             'DISTORTION' : {'MIRIMAGE'  : {'P750L' : MiriLrsD2WModel, \
+#                                         'ANY'   : MiriImagingDistortionModel}, \
+#                             'MIRIFUSHORT' : MiriMrsDistortionModel12, \
+#                             'MIRIFULONG'  : MiriMrsDistortionModel34, \
+#                             'ANY'         : MiriImagingDistortionModel }, \
+
             'DROOP'   : MiriDroopModel, \
             'FLAT'    : MiriFlatfieldModel, \
             # FRINGE, PIXELFLAT and SKYFLAT are all kinds of FLAT
@@ -159,11 +171,7 @@ CDP_DICT = { \
             'RESOL' : MiriMrsResolutionModel, \
             'APERCORR' : MiriMrsApertureCorrectionModel, \
             'PCE'     : MiriPceModel, \
-            'PHOTOM'  : {'IM'  : {'P750L' : MiriLrsFluxconversionModel, \
-                                  'ANY'   : MiriImagingPhotometricModel},
-                         'SW'  : MiriMrsFluxconversionModel, \
-                         'LW'  : MiriMrsFluxconversionModel, \
-                         'MIRIMAGE'  : {'P750L' : MiriLrsFluxconversionModel, \
+            'PHOTOM'  : {'MIRIMAGE'  : {'P750L' : MiriLrsFluxconversionModel, \
                                         'ANY'   : MiriImagingPhotometricModel},
                          'MIRIFUSHORT' : MiriMrsFluxconversionModel, \
                          'MIRIFULONG'  : MiriMrsFluxconversionModel}, \
@@ -179,20 +187,12 @@ CDP_DICT = { \
             'SATURATION' : MiriPixelSaturationModel, \
             # SAT is an alias for SATURATION
             'SAT'     : MiriPixelSaturationModel, \
-            'STRAYMASK' : {'SW'  : MiriMrsStraylightModel, \
-                         'LW'  : MiriMrsStraylightModel,
-                         'MIRIFUSHORT' : MiriMrsStraylightModel, \
-                         'MIRIFULONG'  : MiriMrsStraylightModel }, \
+            'STRAYMASK' : {'MIRIFUSHORT' : MiriMrsStraylightModel, \
+                           'MIRIFULONG'  : MiriMrsStraylightModel }, \
             # STRAY is an alias for STRAYMASK
-            'STRAY'   : {'SW'  : MiriMrsStraylightModel, \
-                         'LW'  : MiriMrsStraylightModel,
-                         'MIRIFUSHORT' : MiriMrsStraylightModel, \
+            'STRAY'   : {'MIRIFUSHORT' : MiriMrsStraylightModel, \
                          'MIRIFULONG'  : MiriMrsStraylightModel }, \
-            'PSF'     : {'IM'  : {'P750L' : MiriLrsPointSpreadFunctionModel, \
-                                  'ANY'   : MiriImagingPointSpreadFunctionModel}, \
-                         'SW'  : MiriMrsPointSpreadFunctionModel, \
-                         'LW'  : MiriMrsPointSpreadFunctionModel, \
-                         'MIRIMAGE'  : {'P750L' : MiriLrsPointSpreadFunctionModel, \
+            'PSF'     : {'MIRIMAGE'  : {'P750L' : MiriLrsPointSpreadFunctionModel, \
                                         'ANY'   : MiriImagingPointSpreadFunctionModel}, \
                          'MIRIFUSHORT' : MiriMrsPointSpreadFunctionModel, \
                          'MIRIFULONG'  : MiriMrsPointSpreadFunctionModel,
@@ -208,38 +208,23 @@ CDP_DICT = { \
             'D2W'     : MiriLrsD2WModel,  \
             'D2C'     : {'MIRIFUSHORT' : MiriMrsDistortionModel12, \
                          'MIRIFULONG'  : MiriMrsDistortionModel34},  \
-            'WCS'     : {'IM'  : {'P750L' : MiriLrsD2WModel, \
-                                  'ANY'   : MiriImagingDistortionModel}, \
-                         'SW'  : MiriMrsDistortionModel12, \
-                         'LW'  : MiriMrsDistortionModel12, \
-                         'MIRIMAGE'  : {'P750L' : MiriLrsD2WModel, \
+            'WCS'     : {'MIRIMAGE'  : {'P750L' : MiriLrsD2WModel, \
                                         'ANY'   : MiriImagingDistortionModel}, \
                          'MIRIFUSHORT' : MiriMrsDistortionModel12, \
                          'MIRIFULONG'  : MiriMrsDistortionModel34,
                          'ANY' : MiriImagingDistortionModel }, \
             'PIXFLAT' : MiriFlatfieldModel,  \
             'FRINGEFLAT' : MiriFlatfieldModel,  \
-            'FLUX'    : {'IM'  : {'P750L' : MiriLrsFluxconversionModel, \
-                                  'ANY'   : MiriImagingFluxconversionModel}, \
-                         'SW'  : MiriMrsFluxconversionModel, \
-                         'LW'  : MiriMrsFluxconversionModel, \
-                         'MIRIMAGE'  : {'P750L' : MiriLrsFluxconversionModel, \
+            'FLUX'    : {'MIRIMAGE'  : {'P750L' : MiriLrsFluxconversionModel, \
                                         'ANY'   : MiriImagingFluxconversionModel}, \
                          'MIRIFUSHORT' : MiriMrsFluxconversionModel, \
                          'MIRIFULONG'  : MiriMrsFluxconversionModel,
                          'ANY' : MiriFluxconversionModel }, \
-            'ABSFLUX' : {'IM'  : {'P750L' : MiriLrsFluxconversionModel, \
-                                  'ANY'   : MiriImagingFluxconversionModel},
-                         'SW' : MiriMrsFluxconversionModel, \
-                         'LW' : MiriMrsFluxconversionModel, \
-                         'MIRIMAGE'  : {'P750L' : MiriLrsFluxconversionModel, \
+            'ABSFLUX' : {'MIRIMAGE'  : {'P750L' : MiriLrsFluxconversionModel, \
                                         'ANY'   : MiriImagingFluxconversionModel},
                          'MIRIFUSHORT' : MiriMrsFluxconversionModel, \
                          'MIRIFULONG'  : MiriMrsFluxconversionModel}, \
-            'SRF'     : {'IM' : MiriLrsFluxconversionModel, \
-                         'SW' : MiriMrsFluxconversionModel, \
-                         'LW' : MiriMrsFluxconversionModel, \
-                         'MIRIMAGE' : MiriLrsFluxconversionModel, \
+            'SRF'     : {'MIRIMAGE' : MiriLrsFluxconversionModel, \
                          'MIRIFUSHORT' : MiriMrsFluxconversionModel, \
                          'MIRIFULONG'  : MiriMrsFluxconversionModel}, \
             'IMPSF'  : MiriImagingPointSpreadFunctionModel, \
