@@ -82,7 +82,7 @@ import astropy.io.fits as pyfits
 
 # Import the JWST data models and the CDP and SIM dictionaries
 import jwst.datamodels
-from miri.parameters import CDP_METADATA, CDP_SUBARRAY, CDP_HISTORY
+from miri.parameters import CDP_METADATA, CDP_METADATA_SUBSET, CDP_SUBARRAY, CDP_HISTORY
 from miri.datamodels.miri_model_base import MiriDataModel
 from miri.datamodels.cdp import CDP_DICT
 from miri.datamodels.sim import SIM_DICT
@@ -631,6 +631,10 @@ def verify_metadata(datamodel):
     subarray = datamodel.get_fits_keyword('SUBARRAY')
     if subarray is not None and 'GENERIC' not in subarray:
         check_list += CDP_SUBARRAY
+    # There are additional compulsory keywords for FLAT and LINEARITY data
+    if datamodel.meta.reftype == 'FLAT' or \
+       datamodel.meta.reftype == 'LINEARITY':
+        check_list += CDP_METADATA_SUBSET
     
     for (name,test_values) in check_list:
 #         print("Looking for %s with allowed values %s" % (name, str(test_values)))

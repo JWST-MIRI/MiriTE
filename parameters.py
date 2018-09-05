@@ -9,6 +9,8 @@ its capabilities and modes of operation. It exists to ensure the
 09 Oct 2013: Created within datamodels.util
 28 Jun 2018: Moved to miri.parameters
 09 Aug 2018: Single and cross-dichroic pass-band names defined separately.
+05 Sep 2018: FILTER, CHANNEL and BAND keywords are now compulsory in
+             some CDP metadata.
 
 @author: Steven Beard (UKATC)
 
@@ -145,8 +147,6 @@ CDP_METADATA = [['TELESCOP', 'JWST'],
                 ['INSTRUME', 'MIRI'],
                 ['MODELNAM', MIRI_MODELS + ['N/A']],
                 ['DETECTOR', MIRI_DETECTORS + ['N/A']],
-                # DETSETNG is removed from STSCI CDP specification
-#                 ['DETSETNG', MIRI_SETTINGS + ['ANY']],
                 ['READPATT', MIRI_READPATTS + ['ANY', 'N/A']],
                 ['SUBARRAY', MIRI_SUBARRAYS + ['FULL', 'GENERIC', 'N/A']],
                 ['FASTAXIS', 1],
@@ -158,6 +158,12 @@ CDP_METADATA = [['TELESCOP', 'JWST'],
                 ['DATE', []],  # Empty list means any value accepted.
                 ['VERSION', []],  # Empty list means any value accepted.
                 ]
+# The following keywords are compulsory in a subset of CDPs
+CDP_METADATA_SUBSET = [['FILTER', MIRI_FILTERS + ['ANY', 'N/A']],
+                ['CHANNEL', MIRI_CHANNELS + ['ANY', 'N/A']],
+                ['BAND', MIRI_BANDS + ['ANY', 'N/A']],
+                ]
+
 # Additional compulsory metadata for non-GENERIC subarrays
 CDP_SUBARRAY = [['SUBSTRT1', []], # Empty list means any value accepted.
                 ['SUBSTRT2', []], # Empty list means any value accepted.

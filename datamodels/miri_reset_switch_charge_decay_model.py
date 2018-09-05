@@ -84,8 +84,11 @@ class MiriResetSwitchChargeDecayModel(MiriDataModel):
         
     """
     schema_url = "miri_reset_switch_charge_decay.schema.yaml"
-    fieldnames = ('SUBARRAY', 'READPATT', 'ROWS', 'TAU1', 'SCALE1', 'TAU2', 'SCALE2')
-    
+    fieldnames = ('subarray', 'readpatt', 'rowtype', 'tau', 'ascale', 'pow',
+                  'illum_zp', 'illum_slope', 'illum2', 'param3',
+                  'crossopt', 'sat_zp', 'sat_slope', 'sat_2', 'sat_mzp',
+                  'sat_rowterm', 'sat_scale')
+   
     def __init__(self, init=None, rscd_table=None, detector=None, **kwargs):
         """
         
@@ -148,6 +151,31 @@ class MiriResetSwitchChargeDecayModel(MiriDataModel):
         return strg
 
 
+class MiriResetSwitchChargeDecayModel_CDP6(MiriResetSwitchChargeDecayModel):
+    """
+    
+    This class can be used to access the old CDP-6 version of the
+    MiriMrsDistortionModel12 data model.
+    
+    See the MiriMrsDistortionModel12 class for full documentation.
+    
+    """
+    schema_url = "miri_reset_switch_charge_decay_CDP6.schema.yaml"
+    fieldnames = ('SUBARRAY', 'READPATT', 'ROWS', 'TAU1', 'SCALE1', 'TAU2', 'SCALE2')
+    
+    def __init__(self, init=None, rscd_table=None, detector=None, **kwargs):
+        """
+        
+        Initialises the MiriResetSwitchChargeDecayModel class.
+        
+        Parameters: See class doc string.
+
+        """
+        super(MiriResetSwitchChargeDecayModel_CDP6, self).__init__(init=init,
+                                rscd_table=rscd_table, detector=detector,
+                                **kwargs)
+ 
+
 #
 # A minimal test is run when this file is run as a main program.
 # For a more substantial test see miri/datamodels/tests.
@@ -157,23 +185,23 @@ if __name__ == '__main__':
     
     PLOTTING = False
     SAVE_FILES = False
-    
-    rscddata = [('FULL',          'FAST', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4),
-                ('FULL',          'FAST', 'EVEN', 1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4),
-                ('FULL',          'SLOW', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4),
-                ('FULL',          'SLOW', 'EVEN', 1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4),
-                ('MASK1065',      'FAST', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4),
-                ('MASK1065',      'SLOW', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4),
-                ('MASK1140',      'FAST', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4),
-                ('MASK1140',      'SLOW', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4),
-                ('MASK1550',      'FAST', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4),
-                ('MASK1550',      'SLOW', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4),
-                ('MASKLYOT',      'FAST', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4),
-                ('MASKLYOT',      'SLOW', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4),
-                ('BRIGHTSKY',     'FAST', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4),
-                ('BRIGHTSKY',     'SLOW', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4),
-                ('SLITLESSPRISM', 'FAST', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4),
-                ('SLITLESSPRISM', 'SLOW', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4),
+     
+    rscddata = [('FULL',          'FAST', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4, 5.0e-5, 6.0e-6, 7.0e-7, 8.0e-8, 9.0e-9, 10.0e-2, 11.0e-4, 12.0e-6, 13.0e-8, 14.0),
+                ('FULL',          'FAST', 'EVEN', 1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4, 5.0e-5, 6.0e-6, 7.0e-7, 8.0e-8, 9.0e-9, 10.0e-2, 11.0e-4, 12.0e-6, 13.0e-8, 14.0),
+                ('FULL',          'SLOW', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4, 5.0e-5, 6.0e-6, 7.0e-7, 8.0e-8, 9.0e-9, 10.0e-2, 11.0e-4, 12.0e-6, 13.0e-8, 14.0),
+                ('FULL',          'SLOW', 'EVEN', 1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4, 5.0e-5, 6.0e-6, 7.0e-7, 8.0e-8, 9.0e-9, 10.0e-2, 11.0e-4, 12.0e-6, 13.0e-8, 14.0),
+                ('MASK1065',      'FAST', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4, 5.0e-5, 6.0e-6, 7.0e-7, 8.0e-8, 9.0e-9, 10.0e-2, 11.0e-4, 12.0e-6, 13.0e-8, 14.0),
+                ('MASK1065',      'SLOW', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4, 5.0e-5, 6.0e-6, 7.0e-7, 8.0e-8, 9.0e-9, 10.0e-2, 11.0e-4, 12.0e-6, 13.0e-8, 14.0),
+                ('MASK1140',      'FAST', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4, 5.0e-5, 6.0e-6, 7.0e-7, 8.0e-8, 9.0e-9, 10.0e-2, 11.0e-4, 12.0e-6, 13.0e-8, 14.0),
+                ('MASK1140',      'SLOW', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4, 5.0e-5, 6.0e-6, 7.0e-7, 8.0e-8, 9.0e-9, 10.0e-2, 11.0e-4, 12.0e-6, 13.0e-8, 14.0),
+                ('MASK1550',      'FAST', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4, 5.0e-5, 6.0e-6, 7.0e-7, 8.0e-8, 9.0e-9, 10.0e-2, 11.0e-4, 12.0e-6, 13.0e-8, 14.0),
+                ('MASK1550',      'SLOW', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4, 5.0e-5, 6.0e-6, 7.0e-7, 8.0e-8, 9.0e-9, 10.0e-2, 11.0e-4, 12.0e-6, 13.0e-8, 14.0),
+                ('MASKLYOT',      'FAST', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4, 5.0e-5, 6.0e-6, 7.0e-7, 8.0e-8, 9.0e-9, 10.0e-2, 11.0e-4, 12.0e-6, 13.0e-8, 14.0),
+                ('MASKLYOT',      'SLOW', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4, 5.0e-5, 6.0e-6, 7.0e-7, 8.0e-8, 9.0e-9, 10.0e-2, 11.0e-4, 12.0e-6, 13.0e-8, 14.0),
+                ('BRIGHTSKY',     'FAST', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4, 5.0e-5, 6.0e-6, 7.0e-7, 8.0e-8, 9.0e-9, 10.0e-2, 11.0e-4, 12.0e-6, 13.0e-8, 14.0),
+                ('BRIGHTSKY',     'SLOW', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4, 5.0e-5, 6.0e-6, 7.0e-7, 8.0e-8, 9.0e-9, 10.0e-2, 11.0e-4, 12.0e-6, 13.0e-8, 14.0),
+                ('SLITLESSPRISM', 'FAST', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4, 5.0e-5, 6.0e-6, 7.0e-7, 8.0e-8, 9.0e-9, 10.0e-2, 11.0e-4, 12.0e-6, 13.0e-8, 14.0),
+                ('SLITLESSPRISM', 'SLOW', 'ODD',  1.0e-1,  2.0e-2, 3.0e-3, 4.0e-4, 5.0e-5, 6.0e-6, 7.0e-7, 8.0e-8, 9.0e-9, 10.0e-2, 11.0e-4, 12.0e-6, 13.0e-8, 14.0),
                 ]
 
     print("\nRSCD calibration with factors derived from list of tuples:")

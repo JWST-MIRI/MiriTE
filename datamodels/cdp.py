@@ -139,17 +139,17 @@ CDP_DICT = { \
             'BAD'     : MiriBadPixelMaskModel, \
             'DARK'    : MiriDarkReferenceModel, \
             # TODO: Remove this cdprelease complexity after CDP-7 release
-            'DISTORTION' : { 'MIRIMAGE'    : {'P750L' : MiriLrsD2WModel, \
-                                              'ANY'   : MiriImagingDistortionModel}, \
-                             'MIRIFUSHORT' : { 'ANY' : {'6'     : MiriMrsDistortionModel12_CDP6, \
-                                                        '7'     : MiriMrsDistortionModel12, \
-                                                        'ANY'   : MiriMrsDistortionModel12}}, \
-                             'MIRIFULONG'  : { 'ANY' : {'6'   : MiriMrsDistortionModel34_CDP6, \
+            'DISTORTION' : {'MIRIMAGE'    : {'P750L' : MiriLrsD2WModel, \
+                                             'ANY'   : MiriImagingDistortionModel}, \
+                            'MIRIFUSHORT' : {'ANY'   : {'6'   : MiriMrsDistortionModel12_CDP6, \
+                                                        '7'   : MiriMrsDistortionModel12, \
+                                                        'ANY' : MiriMrsDistortionModel12}}, \
+                            'MIRIFULONG'  : {'ANY'   : {'6'   : MiriMrsDistortionModel34_CDP6, \
                                                         '7'   : MiriMrsDistortionModel34, \
                                                         'ANY' : MiriMrsDistortionModel34}}, \
-                             'ANY' : MiriImagingDistortionModel}, \
+                            'ANY'         : MiriImagingDistortionModel }, \
 #             'DISTORTION' : {'MIRIMAGE'  : {'P750L' : MiriLrsD2WModel, \
-#                                         'ANY'   : MiriImagingDistortionModel}, \
+#                                            'ANY'   : MiriImagingDistortionModel}, \
 #                             'MIRIFUSHORT' : MiriMrsDistortionModel12, \
 #                             'MIRIFULONG'  : MiriMrsDistortionModel34, \
 #                             'ANY'         : MiriImagingDistortionModel }, \
@@ -162,19 +162,31 @@ CDP_DICT = { \
             'SKYFLAT' : MiriFlatfieldModel,  \
             'FRINGEFREQ' : MiriMrsFringeFrequenciesModel, \
             'RESET'   : MiriResetModel, \
+            # TODO: Remove this cdprelease complexity after CDP-7 release
+#             'RSCD'    : {'MIRIMAGE'    : {'ANY' : {'6'   : MiriResetSwitchChargeDecayModel_CDP6, \
+#                                                    '7'   : MiriResetSwitchChargeDecayModel, \
+#                                                    'ANY' : MiriResetSwitchChargeDecayModel}}, \
+#                          'MIRIFULONG'  : {'ANY' : {'6'   : MiriResetSwitchChargeDecayModel_CDP6, \
+#                          'MIRIFUSHORT' : {'ANY' : {'6'   : MiriResetSwitchChargeDecayModel_CDP6, \
+#                                                    '7'   : MiriResetSwitchChargeDecayModel, \
+#                                                    'ANY' : MiriResetSwitchChargeDecayModel}}, \
+#                          'MIRIFULONG'  : {'ANY' : {'6'   : MiriResetSwitchChargeDecayModel_CDP6, \
+#                                                    '7'   : MiriResetSwitchChargeDecayModel, \
+#                                                    'ANY' : MiriResetSwitchChargeDecayModel}}, \
+#                          'ANY'        : MiriResetSwitchChargeDecayModel }, \
             'RSCD'    : MiriResetSwitchChargeDecayModel, \
             'GAIN'    : MiriGainModel, \
             'IPC'     : MiriIPCModel, \
             'READNOISE' : MiriReadnoiseModel, \
             'TRACORR' : MiriMrsTransmissionCorrectionModel, \
             'WAVCORR' : MiriMrsWavelengthCorrectionModel, \
-            'RESOL' : MiriMrsResolutionModel, \
+            'RESOL'   : MiriMrsResolutionModel, \
             'APERCORR' : MiriMrsApertureCorrectionModel, \
             'PCE'     : MiriPceModel, \
-            'PHOTOM'  : {'MIRIMAGE'  : {'P750L' : MiriLrsFluxconversionModel, \
-                                        'ANY'   : MiriImagingPhotometricModel},
+            'PHOTOM'  : {'MIRIMAGE'    : {'P750L' : MiriLrsFluxconversionModel, \
+                                          'ANY'   : MiriImagingPhotometricModel},
                          'MIRIFUSHORT' : MiriMrsFluxconversionModel, \
-                         'MIRIFULONG'  : MiriMrsFluxconversionModel}, \
+                         'MIRIFULONG'  : MiriMrsFluxconversionModel }, \
             'AREA' : MiriPixelAreaModel, \
             'COLCORR' : MiriImagingColourCorrectionModel, \
             'COLCORRPL' : MiriPowerlawColourCorrectionModel, \
@@ -192,8 +204,8 @@ CDP_DICT = { \
             # STRAY is an alias for STRAYMASK
             'STRAY'   : {'MIRIFUSHORT' : MiriMrsStraylightModel, \
                          'MIRIFULONG'  : MiriMrsStraylightModel }, \
-            'PSF'     : {'MIRIMAGE'  : {'P750L' : MiriLrsPointSpreadFunctionModel, \
-                                        'ANY'   : MiriImagingPointSpreadFunctionModel}, \
+            'PSF'     : {'MIRIMAGE'    : {'P750L' : MiriLrsPointSpreadFunctionModel, \
+                                          'ANY'   : MiriImagingPointSpreadFunctionModel}, \
                          'MIRIFUSHORT' : MiriMrsPointSpreadFunctionModel, \
                          'MIRIFULONG'  : MiriMrsPointSpreadFunctionModel,
                          'ANY' : MiriPointSpreadFunctionModel }, \
@@ -208,29 +220,29 @@ CDP_DICT = { \
             'D2W'     : MiriLrsD2WModel,  \
             'D2C'     : {'MIRIFUSHORT' : MiriMrsDistortionModel12, \
                          'MIRIFULONG'  : MiriMrsDistortionModel34},  \
-            'WCS'     : {'MIRIMAGE'  : {'P750L' : MiriLrsD2WModel, \
-                                        'ANY'   : MiriImagingDistortionModel}, \
+            'WCS'     : {'MIRIMAGE'    : {'P750L' : MiriLrsD2WModel, \
+                                          'ANY'   : MiriImagingDistortionModel}, \
                          'MIRIFUSHORT' : MiriMrsDistortionModel12, \
                          'MIRIFULONG'  : MiriMrsDistortionModel34,
                          'ANY' : MiriImagingDistortionModel }, \
             'PIXFLAT' : MiriFlatfieldModel,  \
             'FRINGEFLAT' : MiriFlatfieldModel,  \
-            'FLUX'    : {'MIRIMAGE'  : {'P750L' : MiriLrsFluxconversionModel, \
-                                        'ANY'   : MiriImagingFluxconversionModel}, \
+            'FLUX'    : {'MIRIMAGE'    : {'P750L' : MiriLrsFluxconversionModel, \
+                                          'ANY'   : MiriImagingFluxconversionModel}, \
                          'MIRIFUSHORT' : MiriMrsFluxconversionModel, \
                          'MIRIFULONG'  : MiriMrsFluxconversionModel,
                          'ANY' : MiriFluxconversionModel }, \
-            'ABSFLUX' : {'MIRIMAGE'  : {'P750L' : MiriLrsFluxconversionModel, \
-                                        'ANY'   : MiriImagingFluxconversionModel},
+            'ABSFLUX' : {'MIRIMAGE'    : {'P750L' : MiriLrsFluxconversionModel, \
+                                          'ANY'   : MiriImagingFluxconversionModel},
                          'MIRIFUSHORT' : MiriMrsFluxconversionModel, \
-                         'MIRIFULONG'  : MiriMrsFluxconversionModel}, \
-            'SRF'     : {'MIRIMAGE' : MiriLrsFluxconversionModel, \
+                         'MIRIFULONG'  : MiriMrsFluxconversionModel }, \
+            'SRF'     : {'MIRIMAGE'    : MiriLrsFluxconversionModel, \
                          'MIRIFUSHORT' : MiriMrsFluxconversionModel, \
-                         'MIRIFULONG'  : MiriMrsFluxconversionModel}, \
-            'IMPSF'  : MiriImagingPointSpreadFunctionModel, \
-            'LRSPSF' : MiriLrsPointSpreadFunctionModel, \
-            'MRSPSF' : MiriMrsPointSpreadFunctionModel, \
-            'TelEm'  : MiriTelescopeEmissionModel, \
-            'TEL_EMISSION'  : MiriTelescopeEmissionModel, \
+                         'MIRIFULONG'  : MiriMrsFluxconversionModel }, \
+            'IMPSF'   : MiriImagingPointSpreadFunctionModel, \
+            'LRSPSF'  : MiriLrsPointSpreadFunctionModel, \
+            'MRSPSF'  : MiriMrsPointSpreadFunctionModel, \
+            'TelEm'   : MiriTelescopeEmissionModel, \
+            'TEL_EMISSION' : MiriTelescopeEmissionModel, \
             # -----------------------------------------------------------
             }

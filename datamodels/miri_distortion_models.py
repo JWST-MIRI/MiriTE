@@ -79,6 +79,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 10 Aug 2018: Updated MRS distortion models to reflect CDP-7 format.
 03 Sep 2018: Old CDP-6 variants of the distortion models included.
+             Updated units for imager distortion model.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 

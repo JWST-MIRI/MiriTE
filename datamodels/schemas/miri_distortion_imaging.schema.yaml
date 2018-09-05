@@ -16,7 +16,7 @@ allOf:
               fits_keyword: FITREF
             model:
               type: string
-              title: Model for fit - c.f. jwst_lib.modeling
+              title: Name of model for fit
               fits_keyword: FITMODEL
         bmatrix:
           type: object
@@ -117,21 +117,20 @@ allOf:
       fits_hdu: B matrix
       default: 0
       ndim: 2
-      units: mm^(1-ij)
+      units: mm arcsec^-(i+j)
       datatype: float64
     amatrix:
       title: A matrix of distortion coefficients
       fits_hdu: A matrix
       default: 0
       ndim: 2
-      units: mm^(1-ij)
+      units: mm arcsec^-(i+j)
       datatype: float64
     tmatrix:
       title: T matrix of distortion coefficients
       fits_hdu: T matrix
       default: 0
       ndim: 2
-      units: mm arcmin^-1
       datatype: float64
     mmatrix:
       title: M matrix of distortion coefficients
@@ -145,21 +144,20 @@ allOf:
       fits_hdu: BI matrix
       default: 0
       ndim: 2
-      units: mm^-(1-ij)
+      units: arcsec mm^-(i+j)
       datatype: float64
     aimatrix:
       title: Inverted A matrix of distortion coefficients
       fits_hdu: AI matrix
       default: 0
       ndim: 2
-      units: mm^-(1-ij)
+      units: arcsec mm^-(i+j)
       datatype: float64
     timatrix:
       title: Inverted T matrix of distortion coefficients
       fits_hdu: TI matrix
       default: 0
       ndim: 2
-      units: arcmin mm^-1
       datatype: float64
     mimatrix:
       title: Inverted M matrix of distortion coefficients
