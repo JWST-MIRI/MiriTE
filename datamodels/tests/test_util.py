@@ -9,6 +9,8 @@ Simple tests of the data model utility functions in datamodels/util.py.
 
 19 Jan 2018: created
 27 Apr 2018: Specify overwrite=True when calling util.verify_cdp_file
+05 Sep 2018: Flatfield CDPs must now include FILTER, CHANNEL and BAND.
+             Rewritten to use Python context manager.
 
 @author: Steven Beard (UKATC)
 
@@ -46,47 +48,48 @@ class TestFileIO(unittest.TestCase):
             [('TestUtilRamp.fits', sim.MiriRampModel)]
         self.models_to_test = self.cdp_models_to_test + self.sim_models_to_test
         
-        flatfield = cdp.MiriFlatfieldModel( data=sci2d )
-        flatfield.set_telescope()
-        flatfield.set_housekeeping_metadata(origin='UKATC', author='Joe Bloggs',
-                                            pedigree='GROUND', version='V1.0',
-                                            description='Dummy flat-field data')        
-        flatfield.set_instrument_metadata(detector='MIRIMAGE', filt='F560W')
-        flatfield.set_exposure_metadata(readpatt='SLOW', nints=2, ngroups=3)
-        flatfield.set_subarray_metadata((1,1,5,5))
-        flatfield.set_exposure_type()
-        flatfield.add_history('DOCUMENT: Marvel Comics')
-        flatfield.add_history('SOFTWARE: test_util.py')
-        flatfield.add_history('DATA USED: Lots')
-        flatfield.add_history('DIFFERENCES: Not a lot')
-        flatfield.save( self.cdp_models_to_test[0][0], overwrite=True )
+        with cdp.MiriFlatfieldModel( data=sci2d ) as flatfield:
+            flatfield.set_telescope()
+            flatfield.set_housekeeping_metadata(origin='UKATC', author='Joe Bloggs',
+                                                pedigree='GROUND', version='V1.0',
+                                                description='Dummy flat-field data')        
+            flatfield.set_instrument_metadata(detector='MIRIMAGE', filt='F560W',
+                                              channel='N/A', band='N/A')
+            flatfield.set_exposure_metadata(readpatt='SLOW', nints=2, ngroups=3)
+            flatfield.set_subarray_metadata((1,1,5,5))
+            flatfield.set_exposure_type()
+            flatfield.add_history('DOCUMENT: Marvel Comics')
+            flatfield.add_history('SOFTWARE: test_util.py')
+            flatfield.add_history('DATA USED: Lots')
+            flatfield.add_history('DIFFERENCES: Not a lot')
+            flatfield.save( self.cdp_models_to_test[0][0], overwrite=True )
         del flatfield
 
-        gain = cdp.MiriGainModel( data=sci2d )
-        gain.set_telescope()
-        gain.set_housekeeping_metadata(origin='UKATC', author='Joe Bloggs',
-                                       pedigree='GROUND', version='V1.0',
-                                       description='Dummy gain data')
-        gain.set_instrument_metadata(detector='MIRIMAGE', filt='F560W')
-        gain.set_exposure_metadata(readpatt='SLOW', nints=2, ngroups=3)
-        gain.set_subarray_metadata((1,1,5,5))
-        gain.set_exposure_type()
-        gain.add_history('DOCUMENT: Marvel Comics')
-        gain.add_history('SOFTWARE: test_util.py')
-        gain.add_history('DESCRIP: Dummy gain data')
-        gain.add_history('DATA USED: Lots')
-        gain.add_history('DIFFERENCES: Not a lot')
-        gain.save( self.cdp_models_to_test[1][0], overwrite=True )
+        with cdp.MiriGainModel( data=sci2d ) as gain:
+            gain.set_telescope()
+            gain.set_housekeeping_metadata(origin='UKATC', author='Joe Bloggs',
+                                           pedigree='GROUND', version='V1.0',
+                                           description='Dummy gain data')
+            gain.set_instrument_metadata(detector='MIRIMAGE', filt='F560W')
+            gain.set_exposure_metadata(readpatt='SLOW', nints=2, ngroups=3)
+            gain.set_subarray_metadata((1,1,5,5))
+            gain.set_exposure_type()
+            gain.add_history('DOCUMENT: Marvel Comics')
+            gain.add_history('SOFTWARE: test_util.py')
+            gain.add_history('DESCRIP: Dummy gain data')
+            gain.add_history('DATA USED: Lots')
+            gain.add_history('DIFFERENCES: Not a lot')
+            gain.save( self.cdp_models_to_test[1][0], overwrite=True )
         del gain
 
-        ramp = sim.MiriRampModel( data=sci4d )
-        ramp.set_telescope()
-        ramp.set_housekeeping_metadata('UKATC', 'Joe Bloggs', 'GROUND', 'V1.0')
-        ramp.set_instrument_metadata(detector='MIRIMAGE', filt='F560W')
-        ramp.set_exposure_metadata(readpatt='SLOW', nints=2, ngroups=3)
-        ramp.set_subarray_metadata((1,1,5,5))
-        ramp.set_exposure_type()
-        ramp.save( self.sim_models_to_test[0][0], overwrite=True )
+        with sim.MiriRampModel( data=sci4d ) as ramp:
+            ramp.set_telescope()
+            ramp.set_housekeeping_metadata('UKATC', 'Joe Bloggs', 'GROUND', 'V1.0')
+            ramp.set_instrument_metadata(detector='MIRIMAGE', filt='F560W')
+            ramp.set_exposure_metadata(readpatt='SLOW', nints=2, ngroups=3)
+            ramp.set_subarray_metadata((1,1,5,5))
+            ramp.set_exposure_type()
+            ramp.save( self.sim_models_to_test[0][0], overwrite=True )
         del ramp
        
     def tearDown(self):
@@ -100,11 +103,11 @@ class TestFileIO(unittest.TestCase):
         # by specifying its filename.
         for (filename, datamodel) in self.models_to_test:
             #print("Opening %s using filename" % filename)
-            model = util.open( filename )
-            #print(model)
-            self.assertIsNotNone(model)
-            self.assertIsNotNone(model.data)
-            self.assertTrue(isinstance(model, datamodel))
+            with util.open( filename ) as model:
+                #print(model)
+                self.assertIsNotNone(model)
+                self.assertIsNotNone(model.data)
+                self.assertTrue(isinstance(model, datamodel))
             del model
 
     def test_open_from_hdulist(self):
@@ -112,15 +115,15 @@ class TestFileIO(unittest.TestCase):
         # by specifying an hdulist.
         for (filename, datamodel) in self.models_to_test:
             #print("Opening %s using hdulist" % filename)
-            hdulist = pyfits.open( filename )
-            model = util.open( hdulist )
-            #print(model)
-            self.assertIsNotNone(model)
-            self.assertIsNotNone(model.data)
-            self.assertTrue(isinstance(model, datamodel))
-            hdulist.close()
-            del model
+            with pyfits.open( filename ) as hdulist:
+                model = util.open( hdulist )
+                #print(model)
+                self.assertIsNotNone(model)
+                self.assertIsNotNone(model.data)
+                self.assertTrue(isinstance(model, datamodel))
+                hdulist.close()
             del hdulist
+            del model
 
     def test_verify_fits_file(self):
         # Check that the FITS verification function passes the simple
