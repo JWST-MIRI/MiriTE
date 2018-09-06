@@ -65,6 +65,8 @@ processing the MIRI data models.
              in assert_products_equal function. 
 17 May 2018: Python 3: Converted dictionary keys return into a list.
 29 Jun 2018: Global parameters moved to miri.parameters.
+06 Sep 2018: Updated verify_metadata to check that FLAT, LINEARITY and PSF
+             CDPs contain both FILTER, CHANNEL and BAND keywords.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -633,7 +635,8 @@ def verify_metadata(datamodel):
         check_list += CDP_SUBARRAY
     # There are additional compulsory keywords for FLAT and LINEARITY data
     if datamodel.meta.reftype == 'FLAT' or \
-       datamodel.meta.reftype == 'LINEARITY':
+       datamodel.meta.reftype == 'LINEARITY' or \
+       datamodel.meta.reftype == 'PSF':
         check_list += CDP_METADATA_SUBSET
     
     for (name,test_values) in check_list:
