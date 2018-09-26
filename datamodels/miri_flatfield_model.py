@@ -43,6 +43,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              appropriate for a reference file.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 17 Nov 2017: Added more DQ flags.
+26 Sep 2018: Added a REFTYPE of 'FLAT-TA' for an on-board TA flat field.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -152,8 +153,10 @@ class MiriFlatfieldModel(MiriMeasuredModel):
                 self.meta.reftype = "FRINGE"
             elif "SKY" in ftupper:
                 self.meta.reftype = "SKYFLAT"
-            if "PIX" in ftupper:
+            elif "PIX" in ftupper:
                 self.meta.reftype = "PIXELFLAT"
+            elif "TA" in ftupper:
+                self.meta.reftype = "FLAT-TA"
             else:
                 # Pixel flat is just FLAT. 
                 self.meta.reftype = "FLAT"

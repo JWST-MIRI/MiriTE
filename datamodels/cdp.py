@@ -68,6 +68,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/introduction.html#crds-reference-files
              need for backwards compatibility to these old names.
              Dictionary extended to include CDP-6 variant of the MRS
              distortion models.
+26 Sep 2018: Added a REFTYPE of 'FLAT-TA' for an on-board TA flat field.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -148,6 +149,7 @@ CDP_DICT = { \
                                                         '7'   : MiriMrsDistortionModel34, \
                                                         'ANY' : MiriMrsDistortionModel34}}, \
                             'ANY'         : MiriImagingDistortionModel }, \
+# Previous code without the extra level for CDP version
 #             'DISTORTION' : {'MIRIMAGE'  : {'P750L' : MiriLrsD2WModel, \
 #                                            'ANY'   : MiriImagingDistortionModel}, \
 #                             'MIRIFUSHORT' : MiriMrsDistortionModel12, \
@@ -156,10 +158,11 @@ CDP_DICT = { \
 
             'DROOP'   : MiriDroopModel, \
             'FLAT'    : MiriFlatfieldModel, \
-            # FRINGE, PIXELFLAT and SKYFLAT are all kinds of FLAT
+            # FRINGE, PIXELFLAT, SKYFLAT and FLAT-TA are all kinds of FLAT
             'FRINGE' : MiriFlatfieldModel,  \
             'PIXELFLAT' : MiriFlatfieldModel,  \
             'SKYFLAT' : MiriFlatfieldModel,  \
+            'FLAT-TA' : MiriFlatfieldModel,  \
             'FRINGEFREQ' : MiriMrsFringeFrequenciesModel, \
             'RESET'   : MiriResetModel, \
             # TODO: Remove this cdprelease complexity after CDP-7 release
