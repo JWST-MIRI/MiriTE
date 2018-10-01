@@ -10,6 +10,9 @@ the datamodels.miri_spectral_spatial_resolution_model module.
 
 10 May 2017: Original version.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+26 Sep 2018: Major reorganisation of the data model by Jeb Bailey. The code
+             supports both the old and new models but will give a warning if
+             data structured according to the old model is detected.
 
 @author: Steven Beard (UKATC)
 
@@ -23,7 +26,7 @@ import warnings
 
 import numpy as np
 
-from miri.datamodels.miri_spectral_spatial_resolution_model import MiriMrsResolutionModel
+from miri.datamodels.miri_spectral_spatial_resolution_model import MiriMrsResolutionModel, MAX_NLEM
 from miri.datamodels.tests.util import assert_recarray_equal, \
     assert_products_equal
 
@@ -32,50 +35,51 @@ class TestMiriMrsResolutionModel(unittest.TestCase):
     # Test the MiriMrsResolutionModel class.
         
     def setUp(self):
-        # Create a typical MiriMrsResolutionModel data product.
-        # Sub-bands
-        sb = ['1SHORT', '1MEDIUM', '1LONG',
-              '2SHORT', '2MEDIUM', '2LONG',
-              '3SHORT', '3MEDIUM', '3LONG',
-              '4SHORT', '4MEDIUM', '4LONG'
-              ]
-    
-        # Centros
-        cntr = [5.3, 6.15, 7.1, 8.15, 9.4, 10.9, 12.5, 14.5, 16.75, 19.2, 22.25, 26.05]
-        
-        # Low limits
-        al = [2745.211671, 2737.58174, 2691.826643, 2716.566802, 2575.145064, 2563.664138, 2469.622611, 1864.309643, 2071.315475, 1899.989987, 1547.295843, 1220.329908]
-        bl = [541.3274075, 506.8427022, 393.1504096, 324.8195469, 280.4117705, 257.0795746, 128.1952696, -24.10526842, 268.5610664, -50.94618217, 12.23096891, -146.1678896]
-        cl = [310.8853084, 250.7537815, 35.05343649, -259.5669385, -182.4385113, -122.1030201, -279.8033748, -9.54407769, -23.40212084, -81.27269184, -12.23916046, -60.13030606]
-        
-        # High limits
-        ah = [4063.403427, 3934.231411, 3742.01575, 4748.404518, 4227.307398, 4067.791865, 3642.877564, 2768.145139, 2641.910569, 2158.932162, np.nan, np.nan]
-        bh = [193.251713, 151.0248429, 79.69070813, 476.6602166, 420.9441793, 227.7079654, 326.3927585, -86.76805885, 363.0089443, -70.19831027, np.nan, np.nan]
-        ch = [-191.9995708, -418.0899389, -360.9548965, -1804.289718, -611.3820685, -569.5866384, -601.634922, -206.1799239, -45.5071111, -109.3828766, np.nan, np.nan]
-        
-        # Use values
-        au = [3404.307549, 3335.906575, 3216.921197, 3732.48566, 3401.226231, 3315.728002, 3056.250087, 2316.227391, 2356.613022, 2029.461074, 1547.295843, 1220.329908]
-        bu = [367.2895603, 328.9337726, 236.4205589, 400.7398818, 350.6779749, 242.39377, 227.2940141, -55.43666364, 315.7850053, -60.57224622, 12.23096891, -146.1678896]
-        cu = [59.44286876, -83.66807868, -162.95073, -1031.928328, -396.9102899, -345.8448292, -440.7191484, -107.8620008, -34.45461597, -95.32778422, -12.23916046, -60.13030606]
-    
-        self.resolving_power = []
-        for ii in range(0, len(cntr)):
-            row = (sb [ii], cntr[ii], al[ii], bl[ii], cl[ii], ah[ii], bh[ii], ch[ii],
-                   au[ii], bu[ii], cu[ii])
-            self.resolving_power.append(row)
-        
+        # Create a typical MiriMrsResolutionModel data product.        
         self.psf_fwhm_alpha = [(8.0, 0.31, 0.0, 0.0, 0.03875)]
         self.psf_fwhm_beta = [(8.0, 0.0, 0.03875, 0.0, 0.03875)]
-
+    
+        self.resol_data = [(14.772, 0.00244, 1.8496, 1.4746, 2.0441, 2.3702, 6.22e-2, 1.59e-3),
+                           (11.513, 0.00243, 1.8501, 1.4703, 2.0448, 2.3716, 6.26e-2, 1.59e-3)]
+        
+        self.mlsf_data = [(1.144, 0.965, 0.359, -0.0214, -0.00265, -4.71e-4, 4.45e-5, 2.279e-7, 0.859),
+                          (1.147, 0.957, 0.378, -0.0244, -0.00285, -4.71e-4, 4.45e-5, 2.279e-7, 0.859)]
+        
+        self.phase1_data = [(-0.512, 11.441, 2.113),
+                            (-0.497, 11.441, 2.113)]
+        
+        NCOEFFS = 4
+        phase2_coeffs = MAX_NLEM * [0.0]
+        for coeff in range(0,NCOEFFS):
+            phase2_coeffs[coeff] = 0.1 + (0.1 * coeff)
+        self.phase2_data = [(11.4, 13.5, NCOEFFS, phase2_coeffs),
+                            (11.4, 13.5, NCOEFFS, phase2_coeffs),
+                            (11.4, 13.5, NCOEFFS, phase2_coeffs)
+                           ]
+    
+        NCOEFFS = 6
+        phase3_coeffs = MAX_NLEM * [0.0]
+        for coeff in range(0,NCOEFFS):
+            phase3_coeffs[coeff] = 0.01 + (0.01 * coeff)
+        self.phase3_data = [(NCOEFFS, phase3_coeffs),
+                            (NCOEFFS, phase3_coeffs),
+                            (NCOEFFS, phase3_coeffs)
+                           ]
+     
         self.dataproduct = MiriMrsResolutionModel( \
-                                        resolving_power=self.resolving_power,
                                         psf_fwhm_alpha=self.psf_fwhm_alpha,
-                                        psf_fwhm_beta=self.psf_fwhm_beta )
-        self.dataproduct.set_referencefile_metadata( author='Alvaro Labiano',
+                                        psf_fwhm_beta=self.psf_fwhm_beta,
+                                        resol_data=self.resol_data,
+                                        mlsf_data=self.mlsf_data,
+                                        phase1_data=self.phase1_data, \
+                                        phase2_data=self.phase2_data,
+                                        phase3_data=self.phase3_data \
+                                    )
+        self.dataproduct.set_referencefile_metadata( author='Jeb Bailey',
                     pedigree='GROUND', useafter='DEFAULT',
                     description='MIRI MRS Spectral and Spatial Resolution CDP')
         self.dataproduct.add_referencefile_history(
-                    document='MIRI-TN-00005-ETH Issue 1.0',
+                    document='MIRI-TN-00005-XXX Issue 2.0',
                     software='IDL and Python',
                     dataused='Derived from FM data',
                     differences='N/A')
@@ -89,7 +93,7 @@ class TestMiriMrsResolutionModel(unittest.TestCase):
     def tearDown(self):
         # Tidy up
         del self.dataproduct
-        del self.resolving_power
+        del self.resol_data
         del self.psf_fwhm_alpha
         del self.psf_fwhm_beta
         # Remove temporary file, if able to.
@@ -114,11 +118,6 @@ class TestMiriMrsResolutionModel(unittest.TestCase):
     def test_creation(self):
         # Check that the field names in the class variable are the same
         # as the ones declared in the schema.
-        class_names = list(MiriMrsResolutionModel.fieldnames_resolving)
-        schema_names = list(self.dataproduct.get_field_names('resolving_power'))
-        self.assertEqual(class_names, schema_names,
-                         "'fieldnames_resolving' class variable does not match schema")
-
         class_names = list(MiriMrsResolutionModel.fieldnames_alpha)
         schema_names = list(self.dataproduct.get_field_names('psf_fwhm_alpha'))
         self.assertEqual(class_names, schema_names,
@@ -136,8 +135,8 @@ class TestMiriMrsResolutionModel(unittest.TestCase):
             nulldp = MiriMrsResolutionModel( )
         descr1 = str(nulldp)
         self.assertIsNotNone(descr1)
-        nulldp.resolving_power = self.resolving_power
-        self.assertIsNotNone(nulldp.resolving_power)
+        nulldp.resol_data = self.resol_data
+        self.assertIsNotNone(nulldp.resol_data)
         descr2 = str(nulldp)
         self.assertIsNotNone(descr2)
         nulldp.psf_fwhm_alpha = self.psf_fwhm_alpha
@@ -156,12 +155,12 @@ class TestMiriMrsResolutionModel(unittest.TestCase):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             datacopy = self.dataproduct.copy()
-        self.assertIsNotNone(datacopy.resolving_power)
-        self.assertEqual( len(self.dataproduct.resolving_power),
-                          len(datacopy.resolving_power) )
+        self.assertIsNotNone(datacopy.resol_data)
+        self.assertEqual( len(self.dataproduct.resol_data),
+                          len(datacopy.resol_data) )
         # FIXME: Test fails!
-#         table1 = np.asarray(self.dataproduct.resolving_power)
-#         table2 = np.asarray(datacopy.resolving_power)
+#         table1 = np.asarray(self.dataproduct.resol_data)
+#         table2 = np.asarray(datacopy.resol_data)
 #         assert_recarray_equal(table1, table2)
         
         self.assertIsNotNone(datacopy.psf_fwhm_alpha)
@@ -193,7 +192,7 @@ class TestMiriMrsResolutionModel(unittest.TestCase):
                 # FIXME: Test fails!
 #                 assert_products_equal( self, self.dataproduct, readback,
 #                                        arrays=[],
-#                                        tables=['resolving_power',
+#                                        tables=['resol_data',
 #                                                'psf_fwhm_alpha',
 #                                                'psf_fwhm_beta'] )
                 del readback
@@ -210,7 +209,7 @@ class TestMiriMrsResolutionModel(unittest.TestCase):
         del descr
         
         # Attempt to access the tables through attributes.
-        descr = str(self.dataproduct.resolving_power)
+        descr = str(self.dataproduct.resol_data)
         self.assertIsNotNone(descr)
         del descr
         descr = str(self.dataproduct.psf_fwhm_alpha)
