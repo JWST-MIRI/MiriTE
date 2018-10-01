@@ -144,8 +144,166 @@ allOf:
               default: arcsec/micron
               fits_hdu: PSF_FWHM_BETA
               fits_keyword: TUNIT5
+        resol_data:
+          type: object
+          title: Information about the spectral resolution data
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: micron
+              fits_hdu: RESOL_DATA
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: micron/pixel
+              fits_hdu: RESOL_DATA
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: pixel
+              fits_hdu: RESOL_DATA
+              fits_keyword: TUNIT3
+            tunit4:
+              type: string
+              title: Column 4 units
+              default: pixel
+              fits_hdu: RESOL_DATA
+              fits_keyword: TUNIT4
+            tunit5:
+              type: string
+              title: Column 5 units
+              default: pixel
+              fits_hdu: RESOL_DATA
+              fits_keyword: TUNIT5
+            tunit6:
+              type: string
+              title: Column 6 units
+              default: pixel
+              fits_hdu: RESOL_DATA
+              fits_keyword: TUNIT6
+            tunit7:
+              type: string
+              title: Column 7 units
+              default: pixel
+              fits_hdu: RESOL_DATA
+              fits_keyword: TUNIT7
+            tunit8:
+              type: string
+              title: Column 8 units
+              default: micron
+              fits_hdu: RESOL_DATA
+              fits_keyword: TUNIT8
+        mslf_data:
+          type: object
+          title: Information about the spectral resolution data
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: micron
+              fits_hdu: MLSF_DATA
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: micron
+              fits_hdu: MLSF_DATA
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: ''
+              fits_hdu: MLSF_DATA
+              fits_keyword: TUNIT3
+            tunit4:
+              type: string
+              title: Column 4 units
+              default: pixel
+              fits_hdu: MLSF_DATA
+              fits_keyword: TUNIT4
+            tunit5:
+              type: string
+              title: Column 5 units
+              default: ''
+              fits_hdu: MLSF_DATA
+              fits_keyword: TUNIT5
+            tunit6:
+              type: string
+              title: Column 6 units
+              default: ''
+              fits_hdu: MLSF_DATA
+              fits_keyword: TUNIT6
+            tunit7:
+              type: string
+              title: Column 7 units
+              default: ''
+              fits_hdu: MLSF_DATA
+              fits_keyword: TUNIT7
+            tunit8:
+              type: string
+              title: Column 8 units
+              default: ''
+              fits_hdu: MLSF_DATA
+              fits_keyword: TUNIT8
+            tunit9:
+              type: string
+              title: Column 9 units
+              default: ''
+              fits_hdu: MLSF_DATA
+              fits_keyword: TUNIT9
+        phase1_data:
+          type: object
+          title: Information about the spectral resolution data
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: micron
+              fits_hdu: PHASE1_DATA
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: micron
+              fits_hdu: PHASE1_DATA
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: pixel
+              fits_hdu: PHASE1_DATA
+              fits_keyword: TUNIT3
+        phase2_data:
+          type: object
+          title: Information about the spectral resolution data
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: micron
+              fits_hdu: PHASE2_DATA
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: micron
+              fits_hdu: PHASE2_DATA
+              fits_keyword: TUNIT2
+        etalon_data:
+          type: object
+          title: Information about the spectral resolution data
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: micron
+              fits_hdu: ETALON_DATA
+              fits_keyword: TUNIT1
     resolving_power:
-      title: Spectral resolution
+      title: Spectral resolution - OLD MODEL
       fits_hdu: RESOLVING_POWER
       datatype:
       - name: SUB_BAND
@@ -197,4 +355,106 @@ allOf:
       - name: B_A_LONG
         datatype: float64
       - name: B_B_LONG
+        datatype: float64
+    resol_data:
+      title: Spectral resolution data
+      fits_hdu: RESOL_DATA
+      datatype:
+      - name: LAMBDA
+        datatype: float64
+      - name: DL_DP
+        datatype: float64
+      - name: DLSF_WID
+        datatype: float64
+      - name: DSLF_NO_ETA_WID
+        datatype: float64
+      - name: MLSF_WIDTH
+        datatype: float64
+      - name: ROBERT_WIDTH
+        datatype: float64
+      - name: PHASEWIDTH
+        datatype: float64
+      - name: EST_ETALON_WID
+        datatype: float64
+    mlsf_data:
+      title: Parameters describing the MLSF profile
+      fits_hdu: MLSF_DATA
+      datatype:
+      - name: wavelength
+        datatype: float64
+      - name: s
+        datatype: float64
+      - name: co
+        datatype: float64
+      - name: c1
+        datatype: float64
+      - name: c2
+        datatype: float64
+      - name: c3
+        datatype: float64
+      - name: c4
+        datatype: float64
+      - name: c5
+        datatype: float64
+      - name: amplitude
+        datatype: float64
+    phase1_data:
+      title: Samples for constructing the Phase1 spline
+      fits_hdu: PHASE1_DATA
+      datatype:
+      - name: phase
+        datatype: float64
+      - name: wavelength
+        datatype: float64
+      - name: gausswid
+        datatype: float64
+    phase2_data:
+      title: Coefficients for constructing the Phase2 polynomials
+      fits_hdu: PHASE2_DATA
+      datatype:
+      - name: domain_low
+        datatype: float64
+      - name: domain_high
+        datatype: float64
+      - name: norder
+        datatype: int16
+      - name: lcoeff 
+        shape: [50]
+        datatype: float64
+    phase3_data:
+      title: Coefficients for constructing the Phase3 polynomials
+      fits_hdu: PHASE3_DATA
+      datatype:
+      - name: norder
+        datatype: int16
+      - name: lcoeff 
+        shape: [50]
+        datatype: float64
+    etalon_data:
+      title: Description of the etalon line fit
+      fits_hdu: ETALON_DATA
+      datatype:
+      - name: peakwave
+        datatype: float64
+      - name: amplitude_0
+        datatype: float64
+      - name: x_0_0
+        datatype: float64
+      - name: fwhm_0
+        datatype: float64
+      - name: s_1
+        datatype: float64
+      - name: c0_1
+        datatype: float64
+      - name: c1_1
+        datatype: float64
+      - name: c2_1
+        datatype: float64
+      - name: c3_1
+        datatype: float64
+      - name: c4_1
+        datatype: float64
+      - name: c5_1
+        datatype: float64
+      - name: amplitude_2
         datatype: float64
