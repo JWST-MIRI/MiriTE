@@ -20,6 +20,7 @@ Setup file for installing the MiriTE software
 22 May 2018: Added README and LICENCE.
 04 Jun 2018: Added warning if MIRICLE environment is not activated.
 10 Aug 2018: Removed datamodel scripts which are no longer relevant.
+08 Oct 2018: Added convert_mrs_resolution script.
 
 @author: MIRI Software Team
 
@@ -264,6 +265,7 @@ setup(
              'datamodels/scripts/cdp_reduce_dark.py',
              'datamodels/scripts/cdp_verify.py',
              'datamodels/scripts/convert_fits_to_asdf.py',
+             'datamodels/scripts/convert_mrs_resolution.py',
              'datamodels/scripts/convert_slope_data.py',
              'datamodels/scripts/find_me_another.py',
              'datamodels/scripts/dqflags_examples.py',

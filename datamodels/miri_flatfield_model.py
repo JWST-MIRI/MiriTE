@@ -43,7 +43,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              appropriate for a reference file.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 17 Nov 2017: Added more DQ flags.
-26 Sep 2018: Added a REFTYPE of 'FLAT-TA' for an on-board TA flat field.
+26 Sep 2018: Added a REFTYPE of 'FLAT-TA' for an on-board TA flat field,
+             with DATATYPE defined as 'TARGET'.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -141,6 +142,7 @@ class MiriFlatfieldModel(MiriMeasuredModel):
         HasDataErrAndDq.set_data_fill( self, 1.0 )
 
         # Data type is flat-field.
+        datatype = 'FLAT'
         if not flattype:
             # Set to the default type, if not already defined
             if not self.meta.reftype:
@@ -157,6 +159,7 @@ class MiriFlatfieldModel(MiriMeasuredModel):
                 self.meta.reftype = "PIXELFLAT"
             elif "TA" in ftupper:
                 self.meta.reftype = "FLAT-TA"
+                datatype = 'TARGET'
             else:
                 # Pixel flat is just FLAT. 
                 self.meta.reftype = "FLAT"
@@ -182,7 +185,7 @@ class MiriFlatfieldModel(MiriMeasuredModel):
         # NOTE: This will only define an exposure type when a valid detector
         # is defined in the metadata.
         if not self.meta.exposure.type:
-            self.set_exposure_type( datatype='FLAT' )
+            self.set_exposure_type( datatype=datatype )
                 
         # The fill value for a flat-field is 1.0
         self._data_fill = 1.0

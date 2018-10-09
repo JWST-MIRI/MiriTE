@@ -464,7 +464,7 @@ class MiriDataModel(DataModel):
         
         Convenience function to define housekeeping metadata.
         
-        Useful for setting up test data.
+        Useful for setting up test data and converting data models.
 
         NOTE: The author, pedigree, useafter and descroption parameters are
         only valid for data models which define the reference file metadata
@@ -616,7 +616,7 @@ class MiriDataModel(DataModel):
         Convenience function to define observation and association metadata.
         By default it sets the observation date to the current date and time
         and leaves the other fields empty.
-        Useful for setting up test data.
+        Useful for setting up test data and converting data models.
         
         :Parameters:
         
@@ -698,7 +698,7 @@ class MiriDataModel(DataModel):
         """
         
         Convenience function to define target metadata.
-        Useful for setting up test data.
+        Useful for setting up test data and converting data models.
         
         :Parameters:
         
@@ -742,7 +742,7 @@ class MiriDataModel(DataModel):
         """
         
         Convenience function to define telescope pointing metadata.
-        Useful for setting up test data.
+        Useful for setting up test data and converting data models.
         
         :Parameters:
         
@@ -809,7 +809,7 @@ class MiriDataModel(DataModel):
         """
         
         Convenience function to define instrument metadata.
-        Useful for setting up test data.
+        Useful for setting up test data and converting data models.
         
         :Parameters:
         
@@ -945,7 +945,7 @@ class MiriDataModel(DataModel):
         """
         
         Convenience function to define exposure metadata.
-        Useful for setting up test data.
+        Useful for setting up test data and converting data models.
         
         :Parameters:
         
@@ -1142,11 +1142,11 @@ class MiriDataModel(DataModel):
         else:
             return None
 
-    def set_subarray_metadata(self, subarray):
+    def set_subarray_metadata(self, subarray, fastaxis=1, slowaxis=2):
         """
         
         Convenience function to define subarray metadata.
-        Useful for setting up test data.
+        Useful for setting up test data and converting data models.
         
         :Parameters:
         
@@ -1159,9 +1159,16 @@ class MiriDataModel(DataModel):
             * ystart is the starting pixel in the Y direction.
             * xsize is the number of pixels in the X direction (columns).
             * ysize is the number of pixels in the Y direction (rows).
+        fastaxis: int (optional)
+            Axis number for fast readout. Default 1
+        slowaxis: int (optional)
+            Axis number for slow readout. Default 2.
         
         """
         if hasattr(self, 'meta') and hasattr(self.meta, 'subarray'):
+            # First define the fast and slow axes.
+            self.meta.subarray.fastaxis = fastaxis
+            self.meta.subarray.slowaxis = slowaxis
             if isinstance(subarray, six.string_types):
                 subarray = subarray.strip() # Strip off superflous white space
                 self.meta.subarray.name = subarray
@@ -1217,7 +1224,7 @@ class MiriDataModel(DataModel):
         """
         
         Convenience function to define world coordinates metadata.
-        Useful for setting up test data.
+        Useful for setting up test data and converting data models.
         
         NOTE: Data models may define different numbers of WCS axes.
         For example, the core data model defines 3 axes, but ramp data
@@ -1364,7 +1371,7 @@ class MiriDataModel(DataModel):
         
         Convenience function to define the optional range subset of the
         world coordinates metadata.
-        Useful for setting up test data.
+        Useful for setting up test data and converting data models.
         
         :Parameters:
         
@@ -1398,7 +1405,7 @@ class MiriDataModel(DataModel):
         
         Convenience function to define the optional reference subset of the
         world coordinates metadata.
-        Useful for setting up test data.
+        Useful for setting up test data and converting data models.
         
         :Parameters:
         

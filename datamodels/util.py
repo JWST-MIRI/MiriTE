@@ -67,6 +67,8 @@ processing the MIRI data models.
 29 Jun 2018: Global parameters moved to miri.parameters.
 06 Sep 2018: Updated verify_metadata to check that FLAT, LINEARITY and PSF
              CDPs contain both FILTER, CHANNEL and BAND keywords.
+04 Oct 2018: Added DISTORTION to the list of CDPs which must contain both
+             FILTER, CHANNEL and BAND keywords.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -633,10 +635,12 @@ def verify_metadata(datamodel):
     subarray = datamodel.get_fits_keyword('SUBARRAY')
     if subarray is not None and 'GENERIC' not in subarray:
         check_list += CDP_SUBARRAY
-    # There are additional compulsory keywords for FLAT and LINEARITY data
+    # There are additional compulsory keywords for FLAT, LINEARITY, PSF and
+    # DISTORTION data.
     if datamodel.meta.reftype == 'FLAT' or \
        datamodel.meta.reftype == 'LINEARITY' or \
-       datamodel.meta.reftype == 'PSF':
+       datamodel.meta.reftype == 'PSF' or \
+       datamodel.meta.reftype == 'DISTORTION':
         check_list += CDP_METADATA_SUBSET
     
     for (name,test_values) in check_list:

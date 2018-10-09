@@ -31,6 +31,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 26 Sep 2018: Major reorganisation of the data model by Jeb Bailey. The code
              supports both the old and new models but will give a warning if
              data structured according to the old model is detected.
+04 Oct 2018: Define exposure type.
 
 @author: Steven Beard (UKATC)
 
@@ -100,6 +101,14 @@ class MiriMrsResolutionModel(MiriDataModel):
     fieldnames_resol = ('LAMBDA', 'DL_DP', 'DLSF_WD', 'DLSF_NO_ETA_WD',
                         'MSLF_WIDTH', 'ROBERT_WIDTH', 'PHASEWIDTH',
                         'EST_ETALON_WID')
+    fieldnames_mlsf = ('wavelength', 's', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5',
+                       'amplitude')
+    fieldnames_phase1 = ('phase', 'wavelength', 'gausswid')
+    fieldnames_phase2 = ('domain_low', 'domain_high', 'norder', 'lcoeff')
+    fieldnames_phase3 = ('norder', 'lcoeff')
+    fieldnames_etalon = ('peakwave', 'amplitude_0', 'x_0_0', 'fwhm_0', 's_1',
+                         'c0_1', 'c1_1', 'c2_1', 'c3_1', 'c4_1', 'c5_1',
+                         'amplitude_2')
     
     def __init__(self, init=None, resolving_power=None, psf_fwhm_alpha=None,
                  psf_fwhm_beta=None, resol_data=None, mlsf_data=None,
@@ -125,7 +134,7 @@ class MiriMrsResolutionModel(MiriDataModel):
         # A USEAFTER date must exist. If not relevant, set it to the
         # creation date of this data model.
         if not self.meta.useafter:
-            self.meta.useafter = '2018-10-01T00:00:00'
+            self.meta.useafter = '2018-06-01T00:00:00'
         
         if resolving_power is not None:
             try:
@@ -186,6 +195,19 @@ class MiriMrsResolutionModel(MiriDataModel):
                 strg = "phase3_data must be a numpy record array or list of records."
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
+        if etalon_data is not None:
+            try:
+                self.etalon_data = etalon_data
+            except (ValueError, TypeError) as e:
+                strg = "etalon_data must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+
+        # Define the exposure type (if not already contained in the data model)
+        # NOTE: This will only define an exposure type when a valid detector
+        # is defined in the metadata.
+        if not self.meta.exposure.type:
+            self.set_exposure_type()
         
 #         # Copy the table column units, if defined.
 #         resolving_power_units = self.set_table_units('resolving_power')

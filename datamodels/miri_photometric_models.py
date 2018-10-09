@@ -27,6 +27,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              Do not set observation or target metadata. Neither are
              appropriate for a reference file.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+04 Oct 2018: Define exposure type.
 
 @author: Steven Beard (UKATC)
 
@@ -154,6 +155,12 @@ class MiriPhotometricModel(MiriDataModel):
             # Should both keywords be written?
 #             self.meta.photometry.pixelarea_steradians = \
 #                 pixar_s2 / ARCSEC2_PER_STERADIAN
+
+        # Define the exposure type (if not already contained in the data model)
+        # NOTE: This will only define an exposure type when a valid detector
+        # is defined in the metadata.
+        if not self.meta.exposure.type:
+            self.set_exposure_type()
 
 
 class MiriImagingPhotometricModel(MiriPhotometricModel):

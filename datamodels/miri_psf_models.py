@@ -73,6 +73,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              JWST build 7.1 data models release. meta.reffile.type also
              changed to meta.reftype. TYPE keyword replaced by DATAMODL.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+04 Oct 2018: Define exposure type.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -212,6 +213,12 @@ class MiriPointSpreadFunctionModel(MiriMeasuredModel):
         if xfield is not None and yfield is not None:
             self.meta.xfield = xfield
             self.meta.yfield = xfield
+
+        # Define the exposure type (if not already contained in the data model)
+        # NOTE: This will only define an exposure type when a valid detector
+        # is defined in the metadata.
+        if not self.meta.exposure.type:
+            self.set_exposure_type()
 
     def __str__(self):
         """
