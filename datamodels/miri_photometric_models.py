@@ -29,6 +29,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 04 Oct 2018: Define exposure type.
 10 Oct 2018: Added MiriLrsPhotometricModel class, append and append_srf methods.
+             Corrected __all__.
 
 @author: Steven Beard (UKATC)
 
@@ -45,7 +46,7 @@ from miri.datamodels.operations import HasData
 
 # List all classes and global functions here.
 __all__ = ['MiriPhotometricModel', 'MiriImagingPhotometricModel',
-           'MiriPixelAreaModel']
+           'MiriLrsPhotometricModel', 'MiriPixelAreaModel', 'MAX_NELEM']
 
 # Useful constants
 ARCSEC2_PER_STERADIAN = ((180.0/math.pi) * 3600.0)**2 # Square arcsec per steradian
@@ -249,6 +250,41 @@ class MiriPhotometricModel(MiriDataModel):
                           nelem, tuple(wavelength), tuple(relresponse)))
         self.phot_table = new_phot_table
 
+    def append_lrs(self, lrs_models):
+        """
+        
+        Append the SRF tables contained in one or more
+        MiriLrsFluxconversionModel data models to the phot_table of this model.
+        Each data mode given results in a new row added at the end of the
+        existing table.
+        
+        :Parameters:
+            
+        lrs_models. MiriLrsFluxconversionModel or list of MiriLrsFluxconversionModel
+            A list of MiriLrsFluxconversionModel data models to be appended
+            to this one.
+            
+        :Attributes:
+        
+        phot_table: numpy recarray
+            New row appended.
+        
+        """
+        if not isinstance(lrs_models, (tuple,list)):
+            lrs_models = [lrs_models]
+            
+        for lrs_model in lrs_models:
+            if hasattr( lrs_model, 'flux_table'):
+                if hasattr(lrs_model, 'meta') and hasattr(lrs_model.meta, 'subarray'):
+                    subarray = lrs_model.meta.subarray.name
+                else:
+                    subarray = 'GENERIC'
+                # Add the SRF table to the data model.
+                self.append_srf( subarray=subarray, srf_table=lrs_model.flux_table)
+            else:
+                raise TypeError("Parameter is not a MiriFluxconversionModel")
+
+ 
 class MiriImagingPhotometricModel(MiriPhotometricModel):
     """
     
@@ -334,7 +370,7 @@ class MiriImagingPhotometricModel(MiriPhotometricModel):
                                                           pixar_a2=pixar_a2,
                                                           **kwargs)
         self.meta.model_type = 'PHOTOM (Imaging)'
-        self.add_comment("WAVELENGTH and RELRESPONSE arrays are all zero.")
+        self.add_comment("WAVELENGTH and RELRESPONSE arrays are all zero for imager.")
 
 
 class MiriLrsPhotometricModel(MiriPhotometricModel):

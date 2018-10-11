@@ -21,6 +21,7 @@ Setup file for installing the MiriTE software
 04 Jun 2018: Added warning if MIRICLE environment is not activated.
 10 Aug 2018: Removed datamodel scripts which are no longer relevant.
 08 Oct 2018: Added convert_mrs_resolution script.
+11 Oct 2018: Added append_lrs_photom script.
 
 @author: MIRI Software Team
 
@@ -256,6 +257,7 @@ setup(
                                       'data/__init__.py'],
                  },
     scripts=['miri_installation_check.py',
+             'datamodels/scripts/append_lrs_photom.py',
              'datamodels/scripts/cdp_add_filter_band.py',
              'datamodels/scripts/cdp_add_history.py',
              'datamodels/scripts/cdp_add_subarray.py',

@@ -47,7 +47,7 @@ import scipy
 from miri.datamodels.miri_model_base import MiriDataModel
 
 # List all classes and global functions here.
-__all__ = ['MiriMrsResolutionModel']
+__all__ = ['MiriMrsResolutionModel', 'MAX_NELEM']
 
 MAX_NELEM = 50 # Maximum size of the lcoeff arrays
 

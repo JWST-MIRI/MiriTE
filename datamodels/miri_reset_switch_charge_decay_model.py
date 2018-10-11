@@ -36,7 +36,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 from miri.datamodels.miri_model_base import MiriDataModel
 
 # List all classes and global functions here.
-__all__ = ['MiriResetSwitchChargeDecayModel']
+__all__ = ['MiriResetSwitchChargeDecayModel', 'MiriResetSwitchChargeDecayModel_CDP6']
 
 
 class MiriResetSwitchChargeDecayModel(MiriDataModel):

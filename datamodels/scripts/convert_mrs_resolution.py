@@ -35,8 +35,6 @@ The command also takes the following options:
         Override the version number in the file and provide a new one.
     --verbose or -v:
         Generate more output.
-    --plot or -p:
-        Plot the dark data.
     --overwrite or -o:
         Overwrite any existing FITS file.
 
@@ -56,7 +54,7 @@ from miri.datamodels.miri_spectral_spatial_resolution_model \
 if __name__ == "__main__":
     # Parse arguments
     help_text = __doc__
-    usage = "%prog [opt] inputfile outputfile\n"
+    usage = "%prog [opt] inputfile [outputfile]\n"
     usage += "Converts a Jeb Bailey format MRS spectral resolution file into "
     usage += "standard MIRI CDP-7 format."
     parser = optparse.OptionParser(usage)
@@ -68,9 +66,6 @@ if __name__ == "__main__":
                      )
     parser.add_option("-v", "--verbose", dest="verb", action="store_true",
                       help="Verbose mode"
-                     )
-    parser.add_option("-p", "--plot", dest="makeplot", action="store_true",
-                      help="Plot bad pixel mask"
                      )
     parser.add_option("-o", "--overwrite", dest="overwrite", action="store_true",
                       help="Overwrite the FITS file if it already exists"
@@ -93,7 +88,6 @@ if __name__ == "__main__":
     document = options.document
     version = options.version
     verb = options.verb
-    makeplot = options.makeplot
     overwrite = options.overwrite
 
     # Read the header and data from given file.
@@ -217,8 +211,6 @@ if __name__ == "__main__":
                 del resolmodel.resolving_power
             if verb:
                 print(resolmodel)
-            if makeplot:
-                resolmodel.plot()
     
             resolmodel.save( outputfile, overwrite=overwrite)
             if verb:

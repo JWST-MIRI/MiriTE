@@ -71,7 +71,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 10 Oct 2018: MiriLrsFluxconversionModel marked as deprecated. The JWST pipeline
              will use a combined MiriPhotometricModel after CDP-7, but
              MiriLrsFluxconversionModel will remain to support the existing
-             LRS-only files.
+             LRS-only files. Corrected __all__.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -96,7 +96,9 @@ from miri.datamodels.miri_measured_model import MiriMeasuredModel
 __all__ = ['MiriFluxconversionModel', \
            'MiriImagingFluxconversionModel', \
            'MiriImagingColourCorrectionModel', \
-           'MiriSpectroscopyFluxconversionModel']
+           'MiriPowerlawColourCorrectionModel', \
+           'MiriLrsFluxconversionModel', \
+           'MiriMrsFluxconversionModel']
 
 # class FluxModel(DataModel):
 #     """
@@ -313,7 +315,7 @@ class MiriLrsFluxconversionModel(MiriFluxconversionModel):
     by wavelength.
     
     NOTE: DEPRECATED DATA MODEL. VALID FOR INDIVIDUAL PRE-CDP-7
-    LRS DATA ONLY. After CDP-7, imager and LRS data are merged
+    LRS DATA ONLY. After CDP-7, the imager and LRS data are merged
     into a single MiriPhotometricModel.
     
     :Parameters:

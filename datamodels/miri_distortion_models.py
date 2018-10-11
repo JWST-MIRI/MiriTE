@@ -100,7 +100,8 @@ from miri.datamodels.miri_model_base import MiriDataModel
 
 # List all classes and global functions here.
 __all__ = ['MiriImagingDistortionModel', 'MiriLrsD2WModel', \
-           'MiriMrsDistortionModel12', 'MiriMrsDistortionModel34']
+           'MiriMrsDistortionModel12', 'MiriMrsDistortionModel34',
+           'MiriMrsDistortionModel12_CDP6', 'MiriMrsDistortionModel34_CDP6']
 
 
 class MiriImagingDistortionModel(MiriDataModel):
