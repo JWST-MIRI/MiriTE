@@ -32,6 +32,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              supports both the old and new models but will give a warning if
              data structured according to the old model is detected.
 04 Oct 2018: Define exposure type.
+08 Oct 2018: Added some reconstruction functions.
 
 @author: Steven Beard (UKATC)
 
@@ -40,6 +41,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 
 import warnings
 import numpy as np
+import scipy
 
 # Import the MIRI base data model and utilities.
 from miri.datamodels.miri_model_base import MiriDataModel
@@ -47,7 +49,7 @@ from miri.datamodels.miri_model_base import MiriDataModel
 # List all classes and global functions here.
 __all__ = ['MiriMrsResolutionModel']
 
-MAX_NLEM = 50 # Maximum size of the lcoeff arrays
+MAX_NELEM = 50 # Maximum size of the lcoeff arrays
 
 class MiriMrsResolutionModel(MiriDataModel):
     """
@@ -242,8 +244,98 @@ class MiriMrsResolutionModel(MiriDataModel):
             strg += self.get_data_str('phase2_data', underline=True, underchar="-")
         if self.phase2_data is not None:
             strg += self.get_data_str('phase3_data', underline=True, underchar="-")
+        if self.etalon_data is not None:
+            strg += self.get_data_str('etalon_data', underline=True, underchar="-")
         return strg
 
+    def reconstruct_mlsf_model(self):
+        """
+        
+        Reconstruct the best-fit MLSF profile using the code
+        provided in the MRS spectral resolution model document (3.1.6)
+        
+        """
+        raise NotImplementedError("Function reconstruct_mlsf_model not implemented yet")
+
+    def regenerate_phase1_spline(self):
+        """
+        
+        Regenerate the phase 1 spline using the formula
+        provided in the MRS spectral resolution model document (3.1.7)
+        
+        :Parameters:
+        
+        None
+            
+        :Returns:
+        
+        polynomial: Legendre
+            Legendre polynomial object
+        
+        """
+        col1_list = []
+        col2_list = []
+        col3_list = []
+        for (col1, col2, col3) in self.phase1_data:
+            col1_list.append(col1)
+            col2_list.append(col2)
+            col3_list.append(col3)
+            
+        return scipy.interpolate.SmoothBivariateSpline(col1_list, col2_list, col3_list)
+
+    def regenerate_phase2_model(self, slice):
+        """
+        
+        Regenerate the phase 2 model for the given slice using the formula
+        provided in the MRS spectral resolution model document (3.1.8)
+        
+        :Parameters:
+        
+        slice: int
+            The slice required
+            
+        :Returns:
+        
+        polynomial: Legendre
+            Legendre polynomial object
+        
+        """
+        phase2_slice = self.phase2_data[slice]
+        domain_low = phase2_slice[0]
+        domain_high = phase2_slice[1]
+        norder = phase2_slice[2]
+        return np.polynomial.legendre.Legendre(phase2_slice[3][:norder],
+                                               domain=[domain_low,domain_high])
+
+    def regenerate_phase3_model(self, slice):
+        """
+        
+        Regenerate the phase 3 model for the given slice using the formula
+        provided in the MRS spectral resolution model document (3.1.9)
+        
+        :Parameters:
+        
+        slice: int
+            The slice required
+            
+        :Returns:
+        
+        polynomial: Legendre
+            Legendre polynomial object
+        
+        """
+        phase3_slice = self.phase3_data[slice]
+        norder = phase3_slice[0]
+        return np.polynomial.legendre.Legendre(phase3_slice[1][:norder],
+                                               domain=[0,1])
+    def reconstruct_etalon_model(self):
+        """
+        
+        Reconstruct the etalon line fit using the code
+        provided in the MRS spectral resolution model document (3.1.10)
+        
+        """
+        raise NotImplementedError("Function reconstruct_etalon_model not implemented yet")
 
 #
 # A minimal test is run when this file is run as a main program.
@@ -300,7 +392,7 @@ if __name__ == '__main__':
                    (-0.497, 11.441, 2.113)]
     
     NCOEFFS = 4
-    phase2_coeffs = MAX_NLEM * [0.0]
+    phase2_coeffs = MAX_NELEM * [0.0]
     for coeff in range(0,NCOEFFS):
         phase2_coeffs[coeff] = 0.1 + (0.1 * coeff)
     phase2_data = [(11.4, 13.5, NCOEFFS, phase2_coeffs),
@@ -309,7 +401,7 @@ if __name__ == '__main__':
                    ]
 
     NCOEFFS = 6
-    phase3_coeffs = MAX_NLEM * [0.0]
+    phase3_coeffs = MAX_NELEM * [0.0]
     for coeff in range(0,NCOEFFS):
         phase3_coeffs[coeff] = 0.01 + (0.01 * coeff)
     phase3_data = [(NCOEFFS, phase3_coeffs),

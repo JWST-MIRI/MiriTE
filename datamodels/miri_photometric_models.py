@@ -18,16 +18,17 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              MRS model is TBD.
 11 Sep 2015: Added MiriPixelAreaModel class.
 06 Nov 2015: Corrected typo in definition of ARCSEC2_PER_STERADIAN.
-17 Nov 2015: SUBARRAY is GENERIC when photometric factors do not depend
-             on subarray.
+17 Nov 2015: SUBARRAY is GENERIC when photometric factors do not depend on
+             subarray.
 10 Dec 2015: TYPE and REFTYPE strings rationalised.
-15 Jun 2017: meta.reffile schema level removed to match changes in the
-             JWST build 7.1 data models release. meta.reffile.type also
-             changed to meta.reftype. TYPE keyword replaced by DATAMODL.
-             Do not set observation or target metadata. Neither are
-             appropriate for a reference file.
+15 Jun 2017: meta.reffile schema level removed to match changes in the JWST
+             build 7.1 data models release. meta.reffile.type also changed to
+             meta.reftype. TYPE keyword replaced by DATAMODL. Do not set
+             observation or target metadata. Neither are appropriate for a
+             reference file.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 04 Oct 2018: Define exposure type.
+10 Oct 2018: Added MiriLrsPhotometricModel class, append and append_srf methods.
 
 @author: Steven Beard (UKATC)
 
@@ -48,7 +49,7 @@ __all__ = ['MiriPhotometricModel', 'MiriImagingPhotometricModel',
 
 # Useful constants
 ARCSEC2_PER_STERADIAN = ((180.0/math.pi) * 3600.0)**2 # Square arcsec per steradian
-MAX_NLEM = 500 # Maximum size of the wavelength and relresponse arrays
+MAX_NELEM = 500 # Maximum size of the wavelength and relresponse arrays
 
 class MiriPhotometricModel(MiriDataModel):
     """
@@ -64,7 +65,6 @@ class MiriPhotometricModel(MiriDataModel):
     The data format for MIRI MRS photometry data is TBD.
     
     :Parameters:
-    
     
     init: shape tuple, file path, file object, pyfits.HDUList, numpy array
         An optional initializer for the data model, which can have one
@@ -162,6 +162,92 @@ class MiriPhotometricModel(MiriDataModel):
         if not self.meta.exposure.type:
             self.set_exposure_type()
 
+    def append(self, other):
+        """
+        
+        Append the phot_table from another MiriPhotometricModel to the
+        phot_table of this model. New rows are added at the end of the
+        existing table.
+         
+        :Parameters:
+        
+        other: MiriPhotometricModel
+            Other data model to be appended to this one.
+            
+        :Attributes:
+        
+        phot_table: numpy recarray
+            New rows appended.
+       
+        """
+        #import numpy.lib.recfunctions as rfn
+        assert isinstance(other, MiriPhotometricModel,
+                "append: must provide a MiriPhotometricModel object")
+        # TODO: A slow, brute force method. There is probably a faster way,
+        # but the function is not time critical for small CDPs..
+        new_phot_table = []
+        for this_row in self.phot_table:
+            new_phot_table.append( tuple(this_row) )
+        for other_row in other.phot_table:
+            new_phot_table.append( tuple(other_row) )
+        self.phot_table = new_phot_table
+
+    def append_srf(self, subarray, srf_table):
+        """
+        
+        Append a srf_table (e.g. from a MiriLrsFluxconversionModel) to the
+        phot_table of this model. A new row is added at the end of the
+        existing table.
+        
+        :Parameters:
+        
+        subarray: str
+            Subarray for which the following srf_table is valid. Expected
+            to be 'FULL' or 'SLITLESSPRISM'
+            
+        srf_table. list of tuples or numpy record array (optional)
+            A list of tuples, or a numpy record array, where each record
+            contains the following information:
+            
+            * WAVELENGTH: Wavelength.
+            * SRF: Spectral response function.
+            * UNCERTAINTY: Uncertainty in the spectral response function.
+    
+            The UNCERTAINTY data provided in the srf_table is ignored.
+            The WAVELENGTH and SRF columns are used to make new WAVELENGTH
+            and RELRESPONSE columns, and the FILTER, PHOTMJSR and UNCERTAINTY
+            columns in the phot_table are automatically initialised.
+            
+        :Attributes:
+        
+        phot_table: numpy recarray
+            New row appended.
+        
+        """
+        # TODO: A slow, brute force method. There is probably a faster way,
+        # but the function is not time critical for small CDPs.
+        # Initialise a new phot_table.
+        new_phot_table = []
+        for this_row in self.phot_table:
+            new_phot_table.append( tuple(this_row) )
+        # Construct a phot_table from the given subarray and srf_table and
+        # some dummy photmjsr and uncertainty arrays.
+        # TODO: A slow, brute force method. There is probably a faster way,
+        # but the function is not time critical for small CDPs..
+        filter = 'P750L'
+        photmjsr = 1.0
+        uncertainty = 0.0
+        wavelength = [0.0] * MAX_NELEM
+        relresponse = [0.0] * MAX_NELEM
+        ii = 0
+        for (wav, srf, unc) in srf_table:
+            wavelength[ii] = wav
+            relresponse[ii] = srf
+            ii += 1
+        nelem = len(srf_table)
+        new_phot_table.append( (filter, subarray, photmjsr, uncertainty,
+                          nelem, tuple(wavelength), tuple(relresponse)))
+        self.phot_table = new_phot_table
 
 class MiriImagingPhotometricModel(MiriPhotometricModel):
     """
@@ -227,10 +313,10 @@ class MiriImagingPhotometricModel(MiriPhotometricModel):
 
         """
         if phot_table is not None:
-            # Construct a phot_table from the given phot_table_img and
+            # Construct a new phot_table from the given phot_table and
             # some dummy wavelength and relreponse arrays.
-            wavelength = [0.0] * MAX_NLEM
-            relresponse = [0.0] * MAX_NLEM
+            wavelength = [0.0] * MAX_NELEM
+            relresponse = [0.0] * MAX_NELEM
             new_phot_table = []
             for (filter, subarray, photmjsr, uncertainty) in phot_table:
                 if not subarray:
@@ -250,6 +336,102 @@ class MiriImagingPhotometricModel(MiriPhotometricModel):
         self.meta.model_type = 'PHOTOM (Imaging)'
         self.add_comment("WAVELENGTH and RELRESPONSE arrays are all zero.")
 
+
+class MiriLrsPhotometricModel(MiriPhotometricModel):
+    """
+    
+    A data model for MIRI LRS mode photometric flux conversion data.
+    Flux factors are looked up by filter name and subarray.
+    
+    This alternative call to the photometric model initialises the
+    filter, photmjsr and uncertainty arrays, so they don't
+    need to be defined by the caller.
+    
+    :Parameters:
+    
+    init: shape tuple, file path, file object, pyfits.HDUList, numpy array
+        An optional initializer for the data model, which can have one
+        of the following forms:
+        
+        * None: A default data model with no shape. (If a data array is
+          provided in the phot_table parameter, the shape is derived from
+          the array.)
+        * Shape tuple: Initialize with empty data of the given shape.
+        * File path: Initialize from the given file.
+        * Readable file object: Initialize from the given file object.
+        * pyfits.HDUList: Initialize from the given pyfits.HDUList.
+        
+    subarray: str
+        Subarray for which the following srf_table is valid. Compulsory
+        if srf_table provided. Expected to be 'FULL' or 'SLITLESSPRISM'
+        
+    srf_table. list of tuples or numpy record array (optional)
+        A list of tuples, or a numpy record array, where each record
+        contains the following information:
+        
+        * WAVELENGTH: Wavelength.
+        * SRF: Spectral response function.
+        * UNCERTAINTY: Uncertainty in the spectral response function.
+
+        The UNCERTAINTY data provided in the srf_table is ignored.
+        All the FILTER, PHOTMJSR and UNCERTAINTY columns in the phot_table
+        are automatically initialised.
+        
+    pixar_sr: number (optional)
+        The nominal pixel area for the detector in steradians.
+        If provided, the value is written to the PIXAR_SR keyword.
+    pixel_a2: number (optional)
+        The nominal pixel area for the detector in square arcseconds
+        If provided, the value is written to the PIXAR_A2 keyword.
+    
+    """
+    # Both models use exactly the same schema.
+    schema_url = "miri_photom.schema.yaml"
+    fieldnames = ('filter', 'subarray', 'photmjsr', 'uncertainty', 'nelem',
+                  'wavelength', 'relresponse')
+
+    def __init__(self, init=None, subarray=None, srf_table=None,
+                 pixar_sr=None, pixar_a2=None, **kwargs):
+        """
+        
+        Initialises the MiriLrsPhotometricModel class.
+        
+        Parameters: See class doc string.
+
+        """
+        if srf_table is not None:
+            # Construct a phot_table from the given subarray and srf_table and
+            # some dummy photmjsr and uncertainty arrays.
+            # TODO: A slow, brute force method. There is probably a faster way,
+            # but the function is not time critical for small CDPs..
+            filter = 'P750L'
+            if subarray is None or not subarray:
+                strg = "If an srf_table is parameter provided, "
+                strg += "a subarray parameter must also be provided."
+                raise AttributeError(strg)
+            photmjsr = 1.0
+            uncertainty = 0.0
+            wavelength = [0.0] * MAX_NELEM
+            relresponse = [0.0] * MAX_NELEM
+            ii = 0
+            for (wav, srf, unc) in srf_table:
+                wavelength[ii] = wav
+                relresponse[ii] = srf
+                ii += 1
+            nelem = len(srf_table)
+            new_phot_table = [(filter, subarray, photmjsr, uncertainty,
+                              nelem, tuple(wavelength), tuple(relresponse))]
+        else:
+            new_phot_table = None
+
+        # Pass the phot_table to the generic model.
+        super(MiriLrsPhotometricModel, self).__init__(init=init,
+                                                      phot_table=new_phot_table,
+                                                      pixar_sr=pixar_sr,
+                                                      pixar_a2=pixar_a2,
+                                                      **kwargs)
+        self.meta.model_type = 'PHOTOM (LRS)'
+        self.add_comment("RELRESPONSE is absolute response so PHOTMJSR is 1.0.")
 
 class MiriPixelAreaModel(MiriDataModel, HasData):
     """
@@ -344,8 +526,8 @@ if __name__ == '__main__':
     
     # Imager photometric model. Dummy response values and blank (zero-filled)
     # wavelength and response arrays
-    wavelength = [0.0] * MAX_NLEM
-    relresponse = [0.0] * MAX_NLEM
+    wavelength = [0.0] * MAX_NELEM
+    relresponse = [0.0] * MAX_NELEM
     # There is a separate response record for each filter, valid for all
     # subarrays.
     phot_im1 = [('F560W',  'GENERIC', 2.41,  0.26,  0, wavelength, relresponse),
@@ -445,7 +627,7 @@ if __name__ == '__main__':
         wavelength.append(wav)
         relresponse.append(r10)
         nelm += 1
-    for ii in range(300,MAX_NLEM):
+    for ii in range(300,MAX_NELEM):
         # Pad unused elements with zero.
         wavelength.append(0.0)
         relresponse.append(0.0)

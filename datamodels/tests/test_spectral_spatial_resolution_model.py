@@ -26,7 +26,7 @@ import warnings
 
 import numpy as np
 
-from miri.datamodels.miri_spectral_spatial_resolution_model import MiriMrsResolutionModel, MAX_NLEM
+from miri.datamodels.miri_spectral_spatial_resolution_model import MiriMrsResolutionModel, MAX_NELEM
 from miri.datamodels.tests.util import assert_recarray_equal, \
     assert_products_equal
 
@@ -49,7 +49,7 @@ class TestMiriMrsResolutionModel(unittest.TestCase):
                             (-0.497, 11.441, 2.113)]
         
         NCOEFFS = 4
-        phase2_coeffs = MAX_NLEM * [0.0]
+        phase2_coeffs = MAX_NELEM * [0.0]
         for coeff in range(0,NCOEFFS):
             phase2_coeffs[coeff] = 0.1 + (0.1 * coeff)
         self.phase2_data = [(11.4, 13.5, NCOEFFS, phase2_coeffs),
@@ -58,7 +58,7 @@ class TestMiriMrsResolutionModel(unittest.TestCase):
                            ]
     
         NCOEFFS = 6
-        phase3_coeffs = MAX_NLEM * [0.0]
+        phase3_coeffs = MAX_NELEM * [0.0]
         for coeff in range(0,NCOEFFS):
             phase3_coeffs[coeff] = 0.01 + (0.01 * coeff)
         self.phase3_data = [(NCOEFFS, phase3_coeffs),

@@ -4,6 +4,8 @@
 # 
 # 04 Oct 2018: Created
 # 09 Oct 2018: Convert the PHASE2 and PHASE3 data.
+# 10 Oct 2018: Added --version and --document as parameters. Delete the
+#              resolving_power attribute left over from the old data model.
 #
 # @author: Steven Beard (UKATC)
 #
@@ -27,6 +29,10 @@ The following command arguments are defined by position:
 
 The command also takes the following options:
 
+    --document
+        Override the default document name and provide a new one.
+    --version
+        Override the version number in the file and provide a new one.
     --verbose or -v:
         Generate more output.
     --plot or -p:
@@ -43,7 +49,8 @@ import warnings
 import numpy as np
 import astropy.io.fits as pyfits
 
-from miri.datamodels.miri_spectral_spatial_resolution_model import MiriMrsResolutionModel, MAX_NLEM
+from miri.datamodels.miri_spectral_spatial_resolution_model \
+    import MiriMrsResolutionModel, MAX_NELEM
 
 
 if __name__ == "__main__":
@@ -53,6 +60,12 @@ if __name__ == "__main__":
     usage += "Converts a Jeb Bailey format MRS spectral resolution file into "
     usage += "standard MIRI CDP-7 format."
     parser = optparse.OptionParser(usage)
+    parser.add_option("", "--version", dest="version", type="string",
+                      default=None, help="New version number (overriding file contents)"
+                     )
+    parser.add_option("", "--document", dest="document", type="string",
+                      default=None, help="New document name (overriding default)"
+                     )
     parser.add_option("-v", "--verbose", dest="verb", action="store_true",
                       help="Verbose mode"
                      )
@@ -77,6 +90,8 @@ if __name__ == "__main__":
         parser.error("Not enough arguments provided")
         sys.exit(1)
 
+    document = options.document
+    version = options.version
     verb = options.verb
     makeplot = options.makeplot
     overwrite = options.overwrite
@@ -92,22 +107,39 @@ if __name__ == "__main__":
         fitsheader = hdulist[0].header
         
         # Read the spectral resolution tables and coefficients.
-        psf_fwhm_alpha = hdulist['PSF_FWHM_ALPHA'].data
-        psf_fwhm_beta = hdulist['PSF_FWHM_BETA'].data
-        resol_data = hdulist['RESOL_DATA'].data
-        mlsf_data = hdulist['MLSF_DATA'].data
-        phase1_data = hdulist['PHASE1_DATA'].data
-        phase2_data_orig = hdulist['PHASE2_DATA'].data
-        phase3_data_orig = hdulist['PHASE3_DATA'].data
-        etalon_data = hdulist['ETALON_DATA'].data
+        try:
+            psf_fwhm_alpha = hdulist['PSF_FWHM_ALPHA'].data
+            psf_fwhm_beta = hdulist['PSF_FWHM_BETA'].data
+        except KeyError as e:
+            strg = "%s does not contain MIRI MRS spectral resolution data." % inputfile
+            strg += "\n  %s" % str(e)
+            raise TypeError(strg)
+
+        try:
+            resol_data = hdulist['RESOL_DATA'].data
+            mlsf_data = hdulist['MLSF_DATA'].data
+            phase1_data = hdulist['PHASE1_DATA'].data
+            phase2_data_orig = hdulist['PHASE2_DATA'].data
+            phase3_data_orig = hdulist['PHASE3_DATA'].data
+            etalon_data = hdulist['ETALON_DATA'].data
+        except KeyError as e:
+            strg = "%s contains pre-CDP-7 MIRI MRS spectral resolution data." % inputfile
+            strg += "\n  Please give the name of a Jeb Bailey MRS spectral resolution file."
+            strg += "\n  %s" % str(e)
+            raise TypeError(strg)
         
         # The PHASE2 and PHASE3 data tables must be converted to the new format.
         phase2_data = []
         for phase2_row in phase2_data_orig:
+            if len(phase2_row) <= 4:
+                strg = "%s is not a Jeb Bailey MRS spectral resolution file." % inputfile
+                strg += "\n  PHASE2_DATA has only %d columns. " % len(phase2_row)
+                strg += "Has this file already been converted?"
+                raise TypeError(strg)
             phase2_domain_low = phase2_row[0]
             phase2_domain_high = phase2_row[1]
             phase2_norder = len(phase2_row) - 2
-            phase2_newcoeff = MAX_NLEM * [0.0]
+            phase2_newcoeff = MAX_NELEM * [0.0]
             for coeff in range(0, phase2_norder):
                 phase2_newcoeff[coeff] = phase2_row[2+coeff]
             phase2_data.append( (phase2_domain_low, phase2_domain_high, phase2_norder, phase2_newcoeff) )
@@ -115,7 +147,7 @@ if __name__ == "__main__":
         phase3_data = []
         for phase3_row in phase3_data_orig:
             phase3_norder = len(phase3_row)
-            phase3_newcoeff = MAX_NLEM * [0.0]
+            phase3_newcoeff = MAX_NELEM * [0.0]
             for coeff in range(0, phase3_norder):
                 phase3_newcoeff[coeff] = phase3_row[coeff]
             phase3_data.append( (phase3_norder, phase3_newcoeff) )
@@ -133,7 +165,8 @@ if __name__ == "__main__":
             origin = 'MIRI European Consortium'
             author = fitsheader['AUTHOR']
             pedigree = fitsheader['PEDIGREE']
-            version = fitsheader['VERSION']
+            if version is None or not version:
+                version = fitsheader['VERSION']
             date = fitsheader['DATE']
             useafter = fitsheader['USEAFTER']
             description = fitsheader['DESCRIP']
@@ -169,11 +202,19 @@ if __name__ == "__main__":
             resolmodel.set_subarray_metadata( subarray )
             resolmodel.set_exposure_type( detector=detector, subarray=subarray )
             
-            resolmodel.add_history('DOCUMENT: MIRI-TN-00005-LEI Issue 9/3/18')
+            if document is None or not document:
+                doc_strg = 'DOCUMENT: MIRI-RP-00514-NLC-FM-MRS-Spectral-Resolution Issue 9/3/18'
+            else:
+                doc_strg = 'DOCUMENT: %s' % document
+            resolmodel.add_history(doc_strg)
             resolmodel.add_history('SOFTWARE: IDL and Python')
             resolmodel.add_history('DATAUSED: Derived from FM data')
             resolmodel.add_history('DIFFERENCES: New data model format')
             
+            # Delete the RESOLVING_POWER HDU left over from the old data model
+            # before saving the file.
+            if hasattr(resolmodel, "resolving_power"):
+                del resolmodel.resolving_power
             if verb:
                 print(resolmodel)
             if makeplot:

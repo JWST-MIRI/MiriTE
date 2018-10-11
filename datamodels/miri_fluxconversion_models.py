@@ -68,6 +68,10 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              JWST build 7.1 data models release. meta.reffile.type also
              changed to meta.reftype. TYPE keyword replaced by DATAMODL.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+10 Oct 2018: MiriLrsFluxconversionModel marked as deprecated. The JWST pipeline
+             will use a combined MiriPhotometricModel after CDP-7, but
+             MiriLrsFluxconversionModel will remain to support the existing
+             LRS-only files.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -308,6 +312,10 @@ class MiriLrsFluxconversionModel(MiriFluxconversionModel):
     MiriFluxconversionModel, but with the flux factors looked up
     by wavelength.
     
+    NOTE: DEPRECATED DATA MODEL. VALID FOR INDIVIDUAL PRE-CDP-7
+    LRS DATA ONLY. After CDP-7, imager and LRS data are merged
+    into a single MiriPhotometricModel.
+    
     :Parameters:
     
     Exactly the same as MiriFluxconversionModel.
@@ -328,7 +336,7 @@ class MiriLrsFluxconversionModel(MiriFluxconversionModel):
                                                     flux_table=flux_table,
                                                     **kwargs)
 
-        # Data type is colour correction.
+        # Data type is LRS flux conversion.
         self.meta.model_type = 'PHOTOM (LRS)'
         self.meta.reftype = 'PHOTOM'
 
@@ -432,7 +440,7 @@ class MiriMrsFluxconversionModel(MiriMeasuredModel):
                                                          dq_def=dq_def,
                                                          **kwargs)
 
-        # Data type is colour correction.
+        # Data type is MRS flux conversion.
         self.meta.model_type = 'PHOTOM (MRS)'
         self.meta.reftype = 'PHOTOM'
         
