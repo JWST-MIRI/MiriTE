@@ -10,6 +10,8 @@ to be retrieved once.
 
 http://miri.ster.kuleuven.be/bin/view/Internal/CalDataProducts
 
+https://jwst-pipeline.readthedocs.io/en/latest/jwst/introduction.html#reference-files
+
 :History:
 
 25 Oct 2013: Created

@@ -4,6 +4,8 @@ based on the JWST data models, jwst.datamodels, which are described in the
 
 https://jwst-docs.stsci.edu/display/JDAT/JWST+File+Names%2C+Formats%2C+and+Data+Structures
 
+https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
+
 YAML schemas describing each data model may be found in the "schemas"
 subdirectory.
 
