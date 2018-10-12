@@ -22,6 +22,7 @@ Setup file for installing the MiriTE software
 10 Aug 2018: Removed datamodel scripts which are no longer relevant.
 08 Oct 2018: Added convert_mrs_resolution script.
 11 Oct 2018: Added append_lrs_photom script.
+12 Oct 2018: Added cdp_remove_junk script.
 
 @author: MIRI Software Team
 
@@ -265,6 +266,7 @@ setup(
              'datamodels/scripts/cdp_get_doc.py',
              'datamodels/scripts/cdp_print.py',
              'datamodels/scripts/cdp_reduce_dark.py',
+             'datamodels/scripts/cdp_remove_junk.py',
              'datamodels/scripts/cdp_verify.py',
              'datamodels/scripts/convert_fits_to_asdf.py',
              'datamodels/scripts/convert_mrs_resolution.py',

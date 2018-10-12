@@ -12,9 +12,12 @@
 Script `append_lrs_photom` creates a merged photometric CDP for the MIRI
 imager from 3 individual files:
 
-   * An imager-only photometric CDP, such as MIRI_FM_MIRIMAGE_PHOTOM_05.02.00.fits
-   * An LRS flux conversion CDP, such as MIRI_FM_MIRIMAGE_P750L_PHOTOM_05.02.00
-   * An LRS flux conversion CDP for SLITLESSPRISM, such as MIRI_FM_MIRIMAGE_P750L_SLITLESSPRISM_PHOTOM_05.02.00
+   * An imager-only photometric CDP, such as
+     MIRI_FM_MIRIMAGE_PHOTOM_05.02.00.fits
+   * An LRS flux conversion CDP, such as
+     MIRI_FM_MIRIMAGE_P750L_PHOTOM_05.02.00.fits
+   * An LRS flux conversion CDP for SLITLESSPRISM, such as
+     MIRI_FM_MIRIMAGE_P750L_SLITLESSPRISM_PHOTOM_05.02.00.fits
 
 The script relies on the MIRI imager photometric data models, which are
 based on the STScI JWST data models.
