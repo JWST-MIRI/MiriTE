@@ -193,76 +193,26 @@ class MiriPhotometricModel(MiriDataModel):
             new_phot_table.append( tuple(other_row) )
         self.phot_table = new_phot_table
 
-    def append_srf(self, subarray, srf_table):
+    def append_lrs(self, *args):
         """
         
-        Append a srf_table (e.g. from a MiriLrsFluxconversionModel) to the
-        phot_table of this model. A new row is added at the end of the
-        existing table.
+        Append the SRF tables contained in one or more MiriLrsFluxconversionModel
+        data models to the phot_table of this model. Each data mode given
+        results in a new row added at the end of the existing table.
         
-        :Parameters:
-        
-        subarray: str
-            Subarray for which the following srf_table is valid. Expected
-            to be 'FULL' or 'SLITLESSPRISM'
-            
-        srf_table. list of tuples or numpy record array (optional)
-            A list of tuples, or a numpy record array, where each record
-            contains the following information:
-            
-            * WAVELENGTH: Wavelength.
-            * SRF: Spectral response function.
-            * UNCERTAINTY: Uncertainty in the spectral response function.
-    
-            The UNCERTAINTY data provided in the srf_table is ignored.
-            The WAVELENGTH and SRF columns are used to make new WAVELENGTH
-            and RELRESPONSE columns, and the FILTER, PHOTMJSR and UNCERTAINTY
-            columns in the phot_table are automatically initialised.
-            
-        :Attributes:
-        
-        phot_table: numpy recarray
-            New row appended.
-        
-        """
-        # TODO: A slow, brute force method. There is probably a faster way,
-        # but the function is not time critical for small CDPs.
-        # Initialise a new phot_table.
-        new_phot_table = []
-        for this_row in self.phot_table:
-            new_phot_table.append( tuple(this_row) )
-        # Construct a phot_table from the given subarray and srf_table and
-        # some dummy photmjsr and uncertainty arrays.
-        # TODO: A slow, brute force method. There is probably a faster way,
-        # but the function is not time critical for small CDPs..
-        filter = 'P750L'
-        photmjsr = 1.0
-        uncertainty = 0.0
-        wavelength = [0.0] * MAX_NELEM
-        relresponse = [0.0] * MAX_NELEM
-        ii = 0
-        for (wav, srf, unc) in srf_table:
-            wavelength[ii] = wav
-            relresponse[ii] = srf
-            ii += 1
-        nelem = len(srf_table)
-        new_phot_table.append( (filter, subarray, photmjsr, uncertainty,
-                          nelem, tuple(wavelength), tuple(relresponse)))
-        self.phot_table = new_phot_table
-
-    def append_lrs(self, lrs_models):
-        """
-        
-        Append the SRF tables contained in one or more
-        MiriLrsFluxconversionModel data models to the phot_table of this model.
-        Each data mode given results in a new row added at the end of the
-        existing table.
+        NOTE: This function has a variable number of parameters. Each
+        parameter is assumed to be a MiriLrsFluxconversionModel to be
+        appended.
         
         :Parameters:
             
-        lrs_models. MiriLrsFluxconversionModel or list of MiriLrsFluxconversionModel
-            A list of MiriLrsFluxconversionModel data models to be appended
+        lrs_model1: MiriLrsFluxconversionModel
+            A MiriLrsFluxconversionModel data model to be appended
             to this one.
+        lrs_model2: MiriLrsFluxconversionModel
+            A MiriLrsFluxconversionModel data model to be appended
+            to this one.
+        etc...
             
         :Attributes:
         
@@ -270,19 +220,46 @@ class MiriPhotometricModel(MiriDataModel):
             New row appended.
         
         """
-        if not isinstance(lrs_models, (tuple,list)):
-            lrs_models = [lrs_models]
-            
-        for lrs_model in lrs_models:
-            if hasattr( lrs_model, 'flux_table'):
-                if hasattr(lrs_model, 'meta') and hasattr(lrs_model.meta, 'subarray'):
-                    subarray = lrs_model.meta.subarray.name
+        # The function only works is at least one MiriLrsFluxconversionModel
+        # has been specified
+        if len(args) > 0:
+            # Initialise a new phot_table.
+            new_phot_table = []
+            for this_row in self.phot_table:
+                new_phot_table.append( tuple(this_row) )
+                
+            # Append each LRS data model one at a time.
+            # All LRS models use the same filter and define an absolute
+            # response, so PHOTMJSR is 1.0 and UNCERTAINTY is 0.0.
+            filter = 'P750L'
+            photmjsr = 1.0
+            uncertainty = 0.0
+            argnum = 0
+            for lrs_model in args:
+                argnum += 1
+                if hasattr( lrs_model, 'flux_table'):
+                    if hasattr(lrs_model, 'meta') and hasattr(lrs_model.meta, 'subarray'):
+                        subarray = lrs_model.meta.subarray.name
+                    else:
+                        subarray = 'GENERIC'
+                    # Add the SRF flux table to the data model.
+                    # TODO: A slow but readable method. There is probably a
+                    # faster way, but the function is not time critical for
+                    # small CDPs.
+                    wavelength = [0.0] * MAX_NELEM
+                    relresponse = [0.0] * MAX_NELEM
+                    ii = 0
+                    for (wav, srf, unc) in lrs_model.flux_table:
+                        wavelength[ii] = wav
+                        relresponse[ii] = srf
+                        ii += 1
+                    nelem = len(lrs_model.flux_table)
+                    new_phot_table.append( (filter, subarray, photmjsr, uncertainty,
+                                      nelem, tuple(wavelength), tuple(relresponse)))
                 else:
-                    subarray = 'GENERIC'
-                # Add the SRF table to the data model.
-                self.append_srf( subarray=subarray, srf_table=lrs_model.flux_table)
-            else:
-                raise TypeError("Parameter is not a MiriFluxconversionModel")
+                    strg = "Function argument %d is not a MiriFluxconversionModel" % argnum
+                    raise TypeError(strg)
+            self.phot_table = new_phot_table
 
  
 class MiriImagingPhotometricModel(MiriPhotometricModel):
@@ -370,7 +347,7 @@ class MiriImagingPhotometricModel(MiriPhotometricModel):
                                                           pixar_a2=pixar_a2,
                                                           **kwargs)
         self.meta.model_type = 'PHOTOM (Imaging)'
-        self.add_comment("WAVELENGTH and RELRESPONSE arrays are all zero for imager.")
+        #self.add_comment("WAVELENGTH and RELRESPONSE arrays are all zero for imager.")
 
 
 class MiriLrsPhotometricModel(MiriPhotometricModel):
@@ -467,7 +444,7 @@ class MiriLrsPhotometricModel(MiriPhotometricModel):
                                                       pixar_a2=pixar_a2,
                                                       **kwargs)
         self.meta.model_type = 'PHOTOM (LRS)'
-        self.add_comment("RELRESPONSE is absolute response so PHOTMJSR is 1.0.")
+        #self.add_comment("RELRESPONSE is absolute response so PHOTMJSR is 1.0.")
 
 class MiriPixelAreaModel(MiriDataModel, HasData):
     """

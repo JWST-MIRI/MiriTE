@@ -103,7 +103,7 @@ if __name__ == "__main__":
     lrsslitless_model = MiriLrsFluxconversionModel( lrsslitless_file )
     
     # Append the two LRS models to the imager model.
-    imager_model.append_lrs( [lrsfull_model, lrsslitless_model])
+    imager_model.append_lrs( lrsfull_model, lrsslitless_model )
     
     # Update the history metadata
     merge_history = "Merged with %s" % lrsfull_file
@@ -120,7 +120,7 @@ if __name__ == "__main__":
     # If necessary, update the version metadata
     if version:
         imager_model.meta.version = version
-        
+    # Display the contents of the data model in verbose mode.
     if verb:
         print(imager_model)
          
@@ -128,4 +128,3 @@ if __name__ == "__main__":
     imager_model.save( outputfile, overwrite=overwrite)
     if verb:
         print("Combined data model saved to %s\n" % outputfile)
-    
