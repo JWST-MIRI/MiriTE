@@ -97,7 +97,7 @@ from miri.datamodels.miri_fluxconversion_models import \
     MiriLrsFluxconversionModel, MiriMrsFluxconversionModel
 from miri.datamodels.miri_photometric_models import \
     MiriPhotometricModel, MiriPhotometricModel_CDP5, MiriImagingPhotometricModel, \
-    MiriLRSPhotometricModel, MiriPixelAreaModel
+    MiriLrsPhotometricModel, MiriPixelAreaModel
 from miri.datamodels.miri_transmission_correction_model import \
     MiriMrsTransmissionCorrectionModel
 from miri.datamodels.miri_wavelength_correction_model import \
@@ -192,8 +192,8 @@ CDP_DICT = { \
             # TODO: Remove this cdprelease complexity after CDP-7 release
             'PHOTOM'  : {'MIRIMAGE'    : {'P750L' : {'5'   : MiriLrsFluxconversionModel, \
                                                      '6'   : MiriLrsFluxconversionModel, \
-                                                     '7'   : MiriLRSPhotometricModel, \
-                                                    ' ANY' : MiriLRSPhotometricModel}, \
+                                                     '7'   : MiriLrsPhotometricModel, \
+                                                    ' ANY' : MiriLrsPhotometricModel}, \
                                           'ANY'   : {'5'   : MiriPhotometricModel_CDP5, \
                                                      '6'   : MiriPhotometricModel_CDP5, \
                                                      '7'   : MiriImagingPhotometricModel, \

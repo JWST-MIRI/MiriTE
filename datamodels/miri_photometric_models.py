@@ -47,7 +47,7 @@ from miri.datamodels.miri_model_base import MiriDataModel
 from miri.datamodels.operations import HasData
 
 # List all classes and global functions here.
-__all__ = ['MiriPhotometricModel', 'MiriImagingPhotometricModel',
+__all__ = ['MiriPhotometricModel', 'MiriImagingPhotometricModel', 'MiriPhotometricModel_CDP5',
            'MiriLrsPhotometricModel', 'MiriPixelAreaModel', 'MAX_NELEM']
 
 # Useful constants
