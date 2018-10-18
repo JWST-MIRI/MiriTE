@@ -103,14 +103,8 @@ class MiriResetSwitchChargeDecayModel(MiriDataModel):
         self.meta.model_type = 'RSCD'
         self.meta.reftype = 'RSCD'
         
-        # The default pedigree is 'GROUND'
-        if not self.meta.pedigree:
-            self.meta.pedigree = 'GROUND'
-            
-        # A USEAFTER date must exist. If not relevant, set it to an
-        # impossibly early date.
-        if not self.meta.useafter:
-            self.meta.useafter = '2000-01-01T00:00:00'
+        # This is a reference data model.
+        self._reference_model()
         
         # Define the detector identifier, if specified. (N.B. The detector
         # ID is compulsory, so it must be specified either here, in the

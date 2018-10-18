@@ -168,14 +168,8 @@ class MiriBadPixelMaskModel(MiriDataModel, HasMask):
         self.meta.model_type = 'MASK (Bad pixel mask)'
         self.meta.reftype = 'MASK'
         
-        # The default pedigree is 'GROUND'
-        if not self.meta.pedigree:
-            self.meta.pedigree = 'GROUND'
-            
-        # A USEAFTER date must exist. If not relevant, set it to an
-        # impossibly early date.
-        if not self.meta.useafter:
-            self.meta.useafter = '2000-01-01T00:00:00'
+        # This is a reference data model.
+        self._reference_model()
 
         # Define the detector identifier, if specified.
         if detector is not None:

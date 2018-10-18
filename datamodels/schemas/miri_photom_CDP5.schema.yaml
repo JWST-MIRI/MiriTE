@@ -3,7 +3,7 @@ allOf:
   properties:
     meta:
       $ref: miri_metadata.schema.yaml
-- $ref: mirimg_photom.schema.yaml
+- $ref: http://jwst.stsci.edu/schemas/mirimg_photom.schema.yaml
 - type: object
   title: MIRI photometric flux conversion model
   properties:
@@ -56,10 +56,3 @@ allOf:
               default: ''
               fits_hdu: PHOTOM
               fits_keyword: TUNIT7
-            tunit8:
-              type: string
-              title: Column 8 units
-              default: ''
-              fits_hdu: PHOTOM
-              fits_keyword: TUNIT8
-              

@@ -81,14 +81,8 @@ class MiriIPCModel(MiriDataModel):
         self.meta.model_type = 'IPC'
         self.meta.reftype = 'IPC'
         
-        # The default pedigree is 'GROUND'
-        if not self.meta.pedigree:
-            self.meta.pedigree = 'GROUND'
-            
-        # A USEAFTER date must exist. If not relevant, set it to an
-        # impossibly early date.
-        if not self.meta.useafter:
-            self.meta.useafter = '2000-01-01T00:00:00'
+        # This is a reference data model.
+        self._reference_model()
             
         if data is not None:
             self.data = data

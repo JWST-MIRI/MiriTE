@@ -158,6 +158,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              set_observation_metadata and set_exposure_metadata functions.
 12 Jul 2018: Check the .data_filled attribute is not None before attempting
              to fill it. Clarified warning when too many WCS axes are given.
+18 Oct 2018: Added _reference_model() so that reference models can be flagged
+             not to save the ASDF FITS extension. Added USEAFTER_DICT.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -188,6 +190,22 @@ from miri.parameters import SUBARRAY
 
 # List all classes and global functions here.
 __all__ = ['get_exp_type', 'MiriDataModel']
+
+# A list of common dates for the USEAFTER keyword
+USEAFTER_DICT = {'DEFAULT'   : '2000-01-01T00:00:00',
+                 'FM'        : '2011-05-01T00:00:00',
+                 'CV1'       : '2013-09-26T05:00:00',
+                 'CV2'       : '2013-09-26T05:00:00',
+                 'CV3'       : '2013-09-26T05:00:00',
+                 'CV3_BURST' : '2015-08-01T00:00:00',
+                 'CDP1'      : '2013-03-01T00:00:00',
+                 'CDP2'      : '2013-11-01T00:00:00',
+                 'CDP3'      : '2014-11-01T00:00:00',
+                 'CDP4'      : '2015-06-15T00:00:00',
+                 'CDP5'      : '2015-12-18T00:00:00',
+                 'CDP6'      : '2016-06-30T00:00:00',
+                 'CDP7'      : '2018-12-01T00:00:00'
+                 }
 
 #
 # Public global function.
@@ -452,6 +470,31 @@ class MiriDataModel(DataModel):
         created_strg = "Created from: %s" % self.__class__.__name__
         self.add_unique_history(created_strg)
 
+    def _reference_model(self):
+        """
+        
+        A helper function which declares the current data model as a reference
+        data model. It defines default values for the PEDIGREE and USEAFTER
+        fields and requests that no ASDF extensions be written when the
+        data model is saved to a FITS file.
+        
+        :Parameters:
+        
+        None
+    
+        """         
+        if hasattr(self, 'meta'):
+            # The default pedigree is 'GROUND'
+            if hasattr(self.meta, 'pedigree'):
+                self.meta.pedigree = 'GROUND'
+
+            # A USEAFTER date must exist in a reference model. If not relevant,
+            # set it to an impossibly early date.
+            if hasattr(self.meta, 'useafter'):
+                self.meta.useafter = '2000-01-01T00:00:00'
+
+        self._no_asdf_extension = True
+
     #
     # Convenience functions for setting commonly associated blocks
     # of MIRI metadata. All these functions assume the metadata is
@@ -550,8 +593,9 @@ class MiriDataModel(DataModel):
                 self.meta.pedigree = pedigree
             if author is not None:
                 self.meta.author = author
-            if useafter == 'DEFAULT':
-                self.meta.useafter = '2000-01-01T00:00:00'
+            if useafter in list(USEAFTER_DICT.keys()):
+                # A recognised USEAFTER keyword
+                self.meta.useafter = USEAFTER_DICT[useafter]
             elif useafter == 'TODAY':
                 self.meta.useafter = str(datetime.date.today()) + \
                     'T00:00:00'

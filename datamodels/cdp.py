@@ -69,6 +69,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/introduction.html#crds-reference-files
              Dictionary extended to include CDP-6 variant of the MRS
              distortion models.
 26 Sep 2018: Added a REFTYPE of 'FLAT-TA' for an on-board TA flat field.
+18 Oct 2018: Dictionary extended to include CDP-5 variant of the MIRI
+             photometric models.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -94,7 +96,8 @@ from miri.datamodels.miri_fluxconversion_models import \
     MiriImagingColourCorrectionModel, MiriPowerlawColourCorrectionModel, \
     MiriLrsFluxconversionModel, MiriMrsFluxconversionModel
 from miri.datamodels.miri_photometric_models import \
-    MiriPhotometricModel, MiriImagingPhotometricModel, MiriPixelAreaModel
+    MiriPhotometricModel, MiriPhotometricModel_CDP5, MiriImagingPhotometricModel, \
+    MiriLRSPhotometricModel, MiriPixelAreaModel
 from miri.datamodels.miri_transmission_correction_model import \
     MiriMrsTransmissionCorrectionModel
 from miri.datamodels.miri_wavelength_correction_model import \
@@ -186,10 +189,22 @@ CDP_DICT = { \
             'RESOL'   : MiriMrsResolutionModel, \
             'APERCORR' : MiriMrsApertureCorrectionModel, \
             'PCE'     : MiriPceModel, \
-            'PHOTOM'  : {'MIRIMAGE'    : {'P750L' : MiriLrsFluxconversionModel, \
-                                          'ANY'   : MiriImagingPhotometricModel},
+            # TODO: Remove this cdprelease complexity after CDP-7 release
+            'PHOTOM'  : {'MIRIMAGE'    : {'P750L' : {'5'   : MiriLrsFluxconversionModel, \
+                                                     '6'   : MiriLrsFluxconversionModel, \
+                                                     '7'   : MiriLRSPhotometricModel, \
+                                                    ' ANY' : MiriLRSPhotometricModel}, \
+                                          'ANY'   : {'5'   : MiriPhotometricModel_CDP5, \
+                                                     '6'   : MiriPhotometricModel_CDP5, \
+                                                     '7'   : MiriImagingPhotometricModel, \
+                                                     'ANY' : MiriImagingPhotometricModel}}, \
                          'MIRIFUSHORT' : MiriMrsFluxconversionModel, \
                          'MIRIFULONG'  : MiriMrsFluxconversionModel }, \
+# Previous code without the extra level for CDP version
+#             'PHOTOM'  : {'MIRIMAGE'    : {'P750L' : MiriLrsFluxconversionModel, \
+#                                           'ANY'   : MiriImagingPhotometricModel},
+#                          'MIRIFUSHORT' : MiriMrsFluxconversionModel, \
+#                          'MIRIFULONG'  : MiriMrsFluxconversionModel }, \
             'AREA' : MiriPixelAreaModel, \
             'COLCORR' : MiriImagingColourCorrectionModel, \
             'COLCORRPL' : MiriPowerlawColourCorrectionModel, \

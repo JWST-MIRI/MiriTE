@@ -13,6 +13,7 @@ in the datamodels.miri_fluxconversion_model module.
 17 Nov 2015: SUBARRAY is GENERIC when photometric factors do not depend
              on subarray.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+17 Oct 2018: Added relresperror column to MiriPhotometricModel.
 
 @author: Steven Beard (UKATC)
 
@@ -45,6 +46,7 @@ class TestMiriPhotometricModel(unittest.TestCase):
         pixar_a2 = 0.136
         wavelength = []
         relresponse = []
+        relresperror = []
         resp = 0
         nelm = 0
         for ii in range(300):
@@ -53,27 +55,29 @@ class TestMiriPhotometricModel(unittest.TestCase):
             r10 = 0.1 + resp/35.0
             wavelength.append(wav)
             relresponse.append(r10)
+            relresperror.append(0.01)
             nelm += 1
         for ii in range(300,MAX_NLEM):
             wavelength.append(0.0)
             relresponse.append(0.0)
+            relresperror.append(0.0)
         self.phot_table = \
-              [('F560W',  'GENERIC', 2.41,  0.26,  0, wavelength, relresponse),
-               ('F770W',  'GENERIC', 1.32,  0.013, 0, wavelength, relresponse),
-               ('F1000W', 'GENERIC', 1.76,  0.12,  0, wavelength, relresponse),
-               ('F1130W', 'GENERIC', 5.76,  0.43,  0, wavelength, relresponse),
-               ('F1280W', 'GENERIC', 2.11,  0.16,  0, wavelength, relresponse),
-               ('F1500W', 'GENERIC', 1.84,  0.01,  0, wavelength, relresponse),
-               ('F1800W', 'GENERIC', 2.68,  0.23,  0, wavelength, relresponse),
-               ('F2100W', 'GENERIC', 2.04,  0.15,  0, wavelength, relresponse),
-               ('F2550W', 'GENERIC', 4.25,  0.4,   0, wavelength, relresponse),
-               ('F2550WR','GENERIC', 4.60,  0.24,  0, wavelength, relresponse),
-               ('F1065C', 'GENERIC', 1.37,  0.1,   0, wavelength, relresponse),
-               ('F1140C', 'GENERIC', 1.43,  0.11,  0, wavelength, relresponse),
-               ('F1550C', 'GENERIC', 1.81,  0.13,  0, wavelength, relresponse),
-               ('F2300C', 'GENERIC', 3.65,  0.23,  0, wavelength, relresponse),
-               ('P750L',  'GENERIC',       1.0,  0.0,  nelm, wavelength, relresponse),
-               ('P750L',  'SLITLESSPRISM', 0.9,  0.0,  nelm, wavelength, relresponse)
+              [('F560W',  'GENERIC', 2.41,  0.26,  0, wavelength, relresponse, relresperror),
+               ('F770W',  'GENERIC', 1.32,  0.013, 0, wavelength, relresponse, relresperror),
+               ('F1000W', 'GENERIC', 1.76,  0.12,  0, wavelength, relresponse, relresperror),
+               ('F1130W', 'GENERIC', 5.76,  0.43,  0, wavelength, relresponse, relresperror),
+               ('F1280W', 'GENERIC', 2.11,  0.16,  0, wavelength, relresponse, relresperror),
+               ('F1500W', 'GENERIC', 1.84,  0.01,  0, wavelength, relresponse, relresperror),
+               ('F1800W', 'GENERIC', 2.68,  0.23,  0, wavelength, relresponse, relresperror),
+               ('F2100W', 'GENERIC', 2.04,  0.15,  0, wavelength, relresponse, relresperror),
+               ('F2550W', 'GENERIC', 4.25,  0.4,   0, wavelength, relresponse, relresperror),
+               ('F2550WR','GENERIC', 4.60,  0.24,  0, wavelength, relresponse, relresperror),
+               ('F1065C', 'GENERIC', 1.37,  0.1,   0, wavelength, relresponse, relresperror),
+               ('F1140C', 'GENERIC', 1.43,  0.11,  0, wavelength, relresponse, relresperror),
+               ('F1550C', 'GENERIC', 1.81,  0.13,  0, wavelength, relresponse, relresperror),
+               ('F2300C', 'GENERIC', 3.65,  0.23,  0, wavelength, relresponse, relresperror),
+               ('P750L',  'FULL',          1.0,  0.0,  nelm, wavelength, relresponse, relresperror),
+               ('P750L',  'SLITLESSPRISM', 0.9,  0.0,  nelm, wavelength, relresponse, relresperror)
                ]
 
         self.dataproduct = MiriPhotometricModel( phot_table=self.phot_table, 

@@ -208,14 +208,8 @@ class MiriImagingDistortionModel(MiriDataModel):
         self.meta.model_type = 'DISTORTION (Imaging)'
         self.meta.reftype = 'DISTORTION'
         
-        # The default pedigree is 'GROUND'
-        if not self.meta.pedigree:
-            self.meta.pedigree = 'GROUND'
-            
-        # A USEAFTER date must exist. If not relevant, set it to an
-        # impossibly early date.
-        if not self.meta.useafter:
-            self.meta.useafter = '2000-01-01T00:00:00'
+        # This is a reference data model.
+        self._reference_model()
 
         # Verify the matrices have the correct shape. They are already
         # constrained to be 2-D in the schema.
@@ -457,14 +451,8 @@ class MiriLrsD2WModel(MiriDataModel):
         self.meta.model_type = 'DISTORTION (LRS)'
         self.meta.reftype = 'DISTORTION'
         
-        # The default pedigree is 'GROUND'
-        if not self.meta.pedigree:
-            self.meta.pedigree = 'GROUND'
-            
-        # A USEAFTER date must exist. If not relevant, set it to an
-        # impossibly early date.
-        if not self.meta.useafter:
-            self.meta.useafter = '2000-01-01T00:00:00'
+        # This is a reference data model.
+        self._reference_model()
 
         if wavelength_table is not None:
             try:
@@ -616,14 +604,8 @@ class MiriMrsDistortionModel12(MiriDataModel):
         self.meta.model_type = 'DISTORTION (MRS)'
         self.meta.reftype = 'DISTORTION'
         
-        # The default pedigree is 'GROUND'
-        if not self.meta.pedigree:
-            self.meta.pedigree = 'GROUND'
-            
-        # A USEAFTER date must exist. If not relevant, set it to an
-        # impossibly early date.
-        if not self.meta.useafter:
-            self.meta.useafter = '2000-01-01T00:00:00'
+        # This is a reference data model.
+        self._reference_model()
 
         if slicenumber is not None:
             self.slicenumber = slicenumber
@@ -930,14 +912,8 @@ class MiriMrsDistortionModel34(MiriDataModel):
         self.meta.model_type = 'DISTORTION (MRS)'
         self.meta.reftype = 'DISTORTION'
         
-        # The default pedigree is 'GROUND'
-        if not self.meta.pedigree:
-            self.meta.pedigree = 'GROUND'
-            
-        # A USEAFTER date must exist. If not relevant, set it to an
-        # impossibly early date.
-        if not self.meta.useafter:
-            self.meta.useafter = '2000-01-01T00:00:00'
+        # This is a reference data model.
+        self._reference_model()
 
         if slicenumber is not None:
             self.slicenumber = slicenumber

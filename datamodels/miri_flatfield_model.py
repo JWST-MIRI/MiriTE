@@ -163,6 +163,9 @@ class MiriFlatfieldModel(MiriMeasuredModel):
             else:
                 # Pixel flat is just FLAT. 
                 self.meta.reftype = "FLAT"
+        
+        # This is a reference data model.
+        self._reference_model()
        
         # The default pedigree is 'DUMMY' for a sky flat and 'GROUND'
         # for everything else.
@@ -171,11 +174,6 @@ class MiriFlatfieldModel(MiriMeasuredModel):
                 self.meta.pedigree = 'DUMMY'
             else:
                 self.meta.pedigree = 'GROUND'
-            
-        # A USEAFTER date must exist. If not relevant, set it to an
-        # impossibly early date.
-        if not self.meta.useafter:
-            self.meta.useafter = '2000-01-01T00:00:00'
 
         # Define the detector identifier, if specified.
         if detector is not None:

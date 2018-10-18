@@ -73,7 +73,7 @@ properties:
       model:
         type: string
         title: Instrument model name
-        enum: [FM, VM, JPL, ANY]
+        enum: [FM, VM, JPL, ANY, N/A]
         fits_keyword: MODELNAM
       filter:
         type: string
@@ -133,6 +133,7 @@ properties:
       detector_settings:
         type: string
         title: Detector settings used
+        fits_keyword: DETSETNG
         enum: [RAL1, JPL1, JPL2, JPL3, RUN1, RUN2, RUN3, RUN4, RUN5, RUN6,
                ANY, N/A]
       detector:
@@ -166,6 +167,26 @@ properties:
         title: Slow readout axis direction
         default: 2
         fits_keyword: SLOWAXIS
+      xstart:
+        title: Starting pixel in axis 1 direction
+        type: integer
+        fits_keyword: SUBSTRT1
+        blend_table: True
+      ystart:
+        title: Starting pixel in axis 2 direction
+        type: integer
+        fits_keyword: SUBSTRT2
+        blend_table: True
+      xsize:
+        title: Number of pixels in axis 1 direction
+        type: integer
+        fits_keyword: SUBSIZE1
+        blend_table: True
+      ysize:
+        title: Number of pixels in axis 2 direction
+        type: integer
+        fits_keyword: SUBSIZE2
+        blend_table: True
   exposure:
     type: object
     title: Information related to the exposure

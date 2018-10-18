@@ -11,6 +11,8 @@ its capabilities and modes of operation. It exists to ensure the
 09 Aug 2018: Single and cross-dichroic pass-band names defined separately.
 05 Sep 2018: FILTER, CHANNEL and BAND keywords are now compulsory in
              some CDP metadata.
+17 Oct 2018: The string 'ANY' is no longer recommended within CDP metadata.
+             'N/A' should be used instead.
 
 @author: Steven Beard (UKATC)
 
@@ -147,7 +149,7 @@ CDP_METADATA = [['TELESCOP', 'JWST'],
                 ['INSTRUME', 'MIRI'],
                 ['MODELNAM', MIRI_MODELS + ['N/A']],
                 ['DETECTOR', MIRI_DETECTORS + ['N/A']],
-                ['READPATT', MIRI_READPATTS + ['ANY', 'N/A']],
+                ['READPATT', MIRI_READPATTS + ['N/A']],
                 ['SUBARRAY', MIRI_SUBARRAYS + ['FULL', 'GENERIC', 'N/A']],
                 ['FASTAXIS', 1],
                 ['SLOWAXIS', 2],
@@ -159,9 +161,9 @@ CDP_METADATA = [['TELESCOP', 'JWST'],
                 ['VERSION', []],  # Empty list means any value accepted.
                 ]
 # The following keywords are compulsory in a subset of CDPs
-CDP_METADATA_SUBSET = [['FILTER', MIRI_FILTERS + ['ANY', 'N/A']],
-                ['CHANNEL', MIRI_CHANNELS + ['ANY', 'N/A']],
-                ['BAND', MIRI_BANDS + ['ANY', 'N/A']],
+CDP_METADATA_SUBSET = [['FILTER', MIRI_FILTERS + ['N/A']],
+                ['CHANNEL', MIRI_CHANNELS + ['N/A']],
+                ['BAND', MIRI_BANDS + ['N/A']],
                 ]
 
 # Additional compulsory metadata for non-GENERIC subarrays

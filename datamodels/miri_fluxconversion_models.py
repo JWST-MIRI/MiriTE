@@ -170,14 +170,8 @@ class MiriFluxconversionModel(MiriDataModel):
         self.meta.model_type = 'PHOTOM'
         self.meta.reftype = 'PHOTOM'
         
-        # The default pedigree is 'GROUND'
-        if not self.meta.pedigree:
-            self.meta.pedigree = 'GROUND'
-            
-        # A USEAFTER date must exist. If not relevant, set it to an
-        # impossibly early date.
-        if not self.meta.useafter:
-            self.meta.useafter = '2000-01-01T00:00:00'
+        # This is a reference data model.
+        self._reference_model()
 
         if flux_table is not None:
             try:
@@ -446,14 +440,8 @@ class MiriMrsFluxconversionModel(MiriMeasuredModel):
         self.meta.model_type = 'PHOTOM (MRS)'
         self.meta.reftype = 'PHOTOM'
         
-        # The default pedigree is 'GROUND'
-        if not self.meta.pedigree:
-            self.meta.pedigree = 'GROUND'
-            
-        # A USEAFTER date must exist. If not relevant, set it to an
-        # impossibly early date.
-        if not self.meta.useafter:
-            self.meta.useafter = '2000-01-01T00:00:00'
+        # This is a reference data model.
+        self._reference_model()
         
         # Set the metadata, if provided.
         if srf_at_reference is not None:

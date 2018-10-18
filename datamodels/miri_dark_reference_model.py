@@ -174,14 +174,8 @@ class MiriDarkReferenceModel(MiriMeasuredModel):
         self.meta.reftype = 'DARK'
         self.averaged = averaged
         
-        # The default pedigree is 'GROUND'
-        if not self.meta.pedigree:
-            self.meta.pedigree = 'GROUND'
-            
-        # A USEAFTER date must exist. If not relevant, set it to an
-        # impossibly early date.
-        if not self.meta.useafter:
-            self.meta.useafter = '2000-01-01T00:00:00'
+        # This is a reference data model.
+        self._reference_model()
 
         # Define the exposure type (if not already contained in the data model)
         if not self.meta.exposure.type:

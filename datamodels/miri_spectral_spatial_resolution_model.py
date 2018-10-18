@@ -129,14 +129,8 @@ class MiriMrsResolutionModel(MiriDataModel):
         self.meta.model_type = 'RESOL'
         self.meta.reftype = 'RESOL'
         
-        # The default pedigree is 'GROUND'
-        if not self.meta.pedigree:
-            self.meta.pedigree = 'GROUND'
-            
-        # A USEAFTER date must exist. If not relevant, set it to the
-        # creation date of this data model.
-        if not self.meta.useafter:
-            self.meta.useafter = '2018-06-01T00:00:00'
+        # This is a reference data model.
+        self._reference_model()
         
         if resolving_power is not None:
             try:

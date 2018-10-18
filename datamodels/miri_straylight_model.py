@@ -126,14 +126,8 @@ class MiriMrsStraylightModel(MiriBadPixelMaskModel):
         self.meta.model_type = 'STRAY'
         self.meta.reftype = 'STRAY'
         
-        # The default pedigree is 'GROUND'
-        if not self.meta.pedigree:
-            self.meta.pedigree = 'GROUND'
-            
-        # A USEAFTER date must exist. If not relevant, set it to an
-        # impossibly early date.
-        if not self.meta.useafter:
-            self.meta.useafter = '2000-01-01T00:00:00'
+        # This is a reference data model.
+        self._reference_model()
 
     def __str__(self):
         """
