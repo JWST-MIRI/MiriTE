@@ -13,6 +13,7 @@ the datamodels.miri_spectral_spatial_resolution_model module.
 26 Sep 2018: Major reorganisation of the data model by Jeb Bailey. The code
              supports both the old and new models but will give a warning if
              data structured according to the old model is detected.
+17 Oct 2018: 'N/A' used as a metadata wildcard instead of 'ANY'.
 
 @author: Steven Beard (UKATC)
 
@@ -84,9 +85,9 @@ class TestMiriMrsResolutionModel(unittest.TestCase):
                     dataused='Derived from FM data',
                     differences='N/A')
         self.dataproduct.set_instrument_metadata('MIRIFUSHORT', modelnam='FM',
-                    detsetng='ANY', filt='ANY', channel='12', band='ANY')
+                    detsetng='N/A', filt='N/A', channel='12', band='N/A')
         self.dataproduct.set_subarray_metadata('GENERIC')
-        self.dataproduct.meta.exposure.readpatt = 'ANY'
+        self.dataproduct.meta.exposure.readpatt = 'N/A'
         self.dataproduct.meta.exposure.type = 'MIR_MRS'
         self.testfile = "MiriSpectralSpatialResolution_test.fits"
         

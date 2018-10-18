@@ -10,6 +10,7 @@ Module test_miri_filters - unit tests for the MiriFilter classes.
 21 Jul 2014: Detector names changed to MIRIMAGE, MIRIFUSHORT and MIRIFULONG.
 08 Sep 2015: Made compatible with Python 3
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+17 Oct 2018: 'N/A' used as a metadata wildcard instead of 'ANY'.
 
 """
 # This module is now converted to Python 3.
@@ -51,10 +52,10 @@ class TestMiriFilter(unittest.TestCase):
                               (9.5, 0.5),
                               (10.0, 0.5)]
         self.filt = MiriFilter(filter_table=self.transmissions,
-                               filter_name='ANY', filter_type='ANY')
+                               filter_name='N/A', filter_type='N/A')
         # Add some typical metadata
         self.filt.set_instrument_metadata(detector='MIRIMAGE', modelnam='FM',
-                                filt='ANY', channel='', band='',
+                                filt='N/A', channel='', band='',
                                 ccc_pos='OPEN', deck_temperature=14.0,
                                 detector_temperature=6.7)
 
@@ -267,7 +268,7 @@ class TestMiriQuantumEfficiency(unittest.TestCase):
                                detector='MIRIMAGE', temperature=6.7)
         # Add some typical metadata
         self.filt.set_instrument_metadata(detector='MIRIMAGE', modelnam='FM',
-                                filt='ANY', channel='', band='',
+                                filt='N/A', channel='', band='',
                                 ccc_pos='OPEN', deck_temperature=14.0,
                                 detector_temperature=6.7)
 

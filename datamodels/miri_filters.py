@@ -28,6 +28,9 @@ The STScI jwst.dataproduct documentation.
              duplication of the parent class' "plot" method.
 15 Jun 2017: TYPE keyword replaced by DATAMODL.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+17 Oct 2018: The string 'ANY' is no longer recommended within CDP metadata.
+             'N/A' should be used instead.
+
 
 @author: Steven Beard (UKATC)
 
@@ -518,7 +521,7 @@ class MiriQuantumEfficiency(MiriFilter):
         """
         super(MiriQuantumEfficiency, self).__init__(init=init,
                                                     filter_table=qe_table,
-                                                    filter_name='ANY',
+                                                    filter_name='N/A',
                                                     filter_type='QE', **kwargs)
 
         # Data type is QE.
@@ -701,7 +704,7 @@ if __name__ == '__main__':
                     (6.00, 0.7985086)
                     ]
  
-    with MiriFilter( filter_table=transmissions, filter_name='ANY',
+    with MiriFilter( filter_table=transmissions, filter_name='N/A',
                      filter_type='LowPass' ) as testfilter1:
         print(testfilter1)
         if PLOTTING:

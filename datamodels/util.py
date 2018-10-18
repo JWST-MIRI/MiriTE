@@ -1006,7 +1006,7 @@ def convert_cdp_2to3(infile, outfile, datatype=None, settings=None,
         the TYPE or REFTYPE keyword in the file header.
     settings: str
         The detector settings used to create the CDP file.
-        Allowed values are 'RAL1', 'JPL1' or 'ANY'.
+        Allowed values are 'RAL1', 'JPL1' or 'ANY' or 'N/A'.
         If None, the detector settings are inferred from the MODELNAM
         and DETECTOR.
     printmodel: boolean (optional)
@@ -1080,14 +1080,14 @@ def convert_cdp_2to3(infile, outfile, datatype=None, settings=None,
                 if detector == 'JPL':
                     settings = 'JPL1'
                 else:
-                    settings = 'ANY'
+                    settings = 'N/A'
             print("Assumed detector settings: %s" % settings)
         else:
             print("Detector settings explicitly set to: %s" % settings)
             
         settings = settings.strip() # Strip off superflous whitespace
         datamodel.meta.instrument.detector_settings = settings
-        if settings == 'ANY':
+        if settings == 'ANY' or settings == 'N/A':
             # The detector settings do not matter.
             pass
         elif settings in DETECTOR_SETTINGS_DICT:

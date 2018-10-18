@@ -16,7 +16,7 @@ From CDP-7 onwards, the naming convention is changed so the string 'N/A' is
 used instead, which is more compatible with the JWST CRDS searching mechanism.
 
 This script checks the keywords contained in a CDP file and changes all
-occurrences of 'ANY' to 'N/A'.
+occurrences of THING='ANY' to THING='N/A'.
 
 The following command arguments are defined by position::
 

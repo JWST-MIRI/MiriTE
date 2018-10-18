@@ -33,6 +33,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              data structured according to the old model is detected.
 04 Oct 2018: Define exposure type.
 08 Oct 2018: Added some reconstruction functions.
+17 Oct 2018: The string 'ANY' is no longer recommended within CDP metadata.
+             'N/A' should be used instead.
 
 @author: Steven Beard (UKATC)
 
@@ -422,9 +424,9 @@ if __name__ == '__main__':
                     dataused='Derived from FM data',
                     differences='Restructured')
         testspecres1.set_instrument_metadata('MIRIFUSHORT', modelnam='FM',
-                    detsetng='ANY', filt='ANY', channel='12', band='ANY')
+                    detsetng='N/A', filt='N/A', channel='12', band='N/A')
         testspecres1.set_subarray_metadata('GENERIC')
-        testspecres1.meta.exposure.readpatt = 'ANY'
+        testspecres1.meta.exposure.readpatt = 'N/A'
         testspecres1.meta.exposure.type = 'MIR_MRS'
         print(testspecres1)
         if PLOTTING:
@@ -452,9 +454,9 @@ if __name__ == '__main__':
                     dataused='Derived from FM data',
                     differences='Restructured')
         testspecres2.set_instrument_metadata('MIRIFULONG', modelnam='FM',
-                    detsetng='ANY', filt='ANY', channel='34', band='ANY')
+                    detsetng='N/A', filt='N/A', channel='34', band='N/A')
         testspecres2.set_subarray_metadata('GENERIC')
-        testspecres2.meta.exposure.readpatt = 'ANY'
+        testspecres2.meta.exposure.readpatt = 'N/A'
         testspecres2.meta.exposure.type = 'MIR_MRS'
         print(testspecres2)
         if PLOTTING:

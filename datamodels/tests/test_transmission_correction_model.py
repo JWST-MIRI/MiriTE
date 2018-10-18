@@ -10,6 +10,7 @@ in the datamodels.miri_transmission_correction_model module.
 
 10 May 2017: Original version.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+17 Oct 2018: 'N/A' used as a metadata wildcard instead of 'ANY'.
 
 @author: Steven Beard (UKATC)
 
@@ -40,7 +41,7 @@ class TestMiriMrsTransmissionCorrectionModel(unittest.TestCase):
         # Add some typical metadata
         self.dataproduct.set_instrument_metadata(detector='MIRIMAGE',
                                 modelnam='FM',
-                                filt='ANY', channel='', band='',
+                                filt='N/A', channel='', band='',
                                 ccc_pos='OPEN', deck_temperature=14.0,
                                 detector_temperature=6.7)
 

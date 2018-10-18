@@ -160,6 +160,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              to fill it. Clarified warning when too many WCS axes are given.
 18 Oct 2018: Added _reference_model() so that reference models can be flagged
              not to save the ASDF FITS extension. Added USEAFTER_DICT.
+             Changed the metadata setting functions so that 'N/A' is used as
+             a default instead of 'ANY'.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -846,7 +848,7 @@ class MiriDataModel(DataModel):
         if hasattr(self, 'meta') and hasattr(self.meta, 'telescope'):
             self.meta.telescope = 'JWST'
 
-    def set_instrument_metadata(self, detector, modelnam='FM', detsetng='ANY',
+    def set_instrument_metadata(self, detector, modelnam='FM', detsetng='N/A',
                                 filt='', channel='', band='', coronagraph='',
                                 deck_temperature=None, ccc_pos='OPEN', 
                                 detector_temperature=None):
@@ -862,7 +864,7 @@ class MiriDataModel(DataModel):
         modelnam: str
             Name of instrument model (if not 'FM')
         detsetng: str
-            Detector settings used ('RAL1', 'JPL1' or 'ANY')
+            Detector settings used ('RAL1', 'JPL1' or 'N/A')
         filt: str, optional
             Name of instrument filter (if any).
         channel: str, optional

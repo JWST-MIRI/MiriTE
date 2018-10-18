@@ -10,6 +10,7 @@ the datamodels.miri_wavelength_correction_model module.
 
 10 May 2017: Original version.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+17 Oct 2018: 'N/A' used as a metadata wildcard instead of 'ANY'.
 
 @author: Steven Beard (UKATC)
 
@@ -46,9 +47,9 @@ class TestMiriMrsWavelengthCorrectionModel(unittest.TestCase):
                                         wavcorr_xslice=self.wavcorr_xslice,
                                         wavcorr_shift=self.wavcorr_shift )
         self.dataproduct.set_instrument_metadata('MIRIFUSHORT', modelnam='FM',
-                    detsetng='ANY', filt='ANY', channel='12', band='ANY')
+                    detsetng='N/A', filt='N/A', channel='12', band='N/A')
         self.dataproduct.set_subarray_metadata('GENERIC')
-        self.dataproduct.meta.exposure.readpatt = 'ANY'
+        self.dataproduct.meta.exposure.readpatt = 'N/A'
         self.dataproduct.meta.exposure.type = 'MIR_MRS'
         self.testfile = "MiriWavelengthCorrection_test.fits"
         

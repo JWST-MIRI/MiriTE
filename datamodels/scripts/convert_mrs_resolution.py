@@ -6,6 +6,7 @@
 # 09 Oct 2018: Convert the PHASE2 and PHASE3 data.
 # 10 Oct 2018: Added --version and --document as parameters. Delete the
 #              resolving_power attribute left over from the old data model.
+# 17 Oct 2018: 'ANY' replaced by 'N/A' in metadata wildcards.
 #
 # @author: Steven Beard (UKATC)
 #
@@ -176,11 +177,11 @@ if __name__ == "__main__":
             if 'BAND' in fitsheader:
                 band = fitsheader['BAND']
             else:
-                band = 'ANY'
+                band = 'N/A'
             if 'CHANNEL' in fitsheader:
                 channel = fitsheader['CHANNEL']
             else:
-                channel = 'ANY'
+                channel = 'N/A'
             filt = 'N/A'
             resolmodel.set_instrument_metadata(detector, modelnam=modelnam,
                         detsetng=detsetng, filt=filt, channel=channel,
@@ -202,7 +203,7 @@ if __name__ == "__main__":
                 doc_strg = 'DOCUMENT: %s' % document
             resolmodel.add_history(doc_strg)
             resolmodel.add_history('SOFTWARE: IDL and Python')
-            resolmodel.add_history('DATAUSED: Derived from FM data')
+            resolmodel.add_history('DATA USED: Derived from FM data')
             resolmodel.add_history('DIFFERENCES: New data model format')
             
             # Delete the RESOLVING_POWER HDU left over from the old data model

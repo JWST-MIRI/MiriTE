@@ -10,6 +10,7 @@ in the datamodels.miri_fringe_frequencies_model module.
 
 10 May 2017: Original version.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+17 Oct 2018: 'N/A' used as a metadata wildcard instead of 'ANY'.
 
 @author: Steven Beard (UKATC)
 
@@ -34,16 +35,16 @@ class TestMiriMrsFringeFrequenciesModel(unittest.TestCase):
         
     def setUp(self):
         # Create a MiriFilter object containing test data
-        self.fringefreq_table = [('ANY', 11.0,  0.1, 42.0),
-                      ('ANY', 12.0,  0.2, 22.0),
-                      ('ANY', 13.0,  0.3, 32.0),
-                      ('ANY', 14.0,  0.4, 12.0)]
+        self.fringefreq_table = [('N/A', 11.0,  0.1, 42.0),
+                      ('N/A', 12.0,  0.2, 22.0),
+                      ('N/A', 13.0,  0.3, 32.0),
+                      ('N/A', 14.0,  0.4, 12.0)]
         self.dataproduct = MiriMrsFringeFrequenciesModel( \
                                     fringefreq_table=self.fringefreq_table)
         # Add some typical metadata
         self.dataproduct.set_instrument_metadata(detector='MIRIFUSHORT',
-                                         ccc_pos='OPEN', channel='ANY',
-                                         band='ANY')
+                                         ccc_pos='OPEN', channel='N/A',
+                                         band='N/A')
         self.dataproduct.set_subarray_metadata('FULL')
         self.dataproduct.set_housekeeping_metadata('UK', author='MIRI team',
                                            version='1.0', useafter='2015-11-20',

@@ -4,6 +4,7 @@
 # 
 # 21 Jun 2016: Created.
 # 20 Jan 2017: Replaced "clobber" parameter with "overwrite".
+# 17 Oct 2018: Metadata wildcards now use 'N/A' instead of 'ANY'.
 #
 # @author: Steven Beard (UKATC)
 #
@@ -94,32 +95,32 @@ def get_cdp_metadata( filename  ):
                 # There is a detector keyword in the header.
                 detector = header['DETECTOR']
             else:
-                detector = 'ANY'
+                detector = 'N/A'
             if 'READPATT' in header or 'READPATT' in header_keys:
                 # There is a detector keyword in the header.
                 readpatt = header['READPATT']
             else:
-                readpatt = 'ANY'
+                readpatt = 'N/A'
             if 'SUBARRAY' in header or 'SUBARRAY' in header_keys:
                 # There is a detector keyword in the header.
                 subarray = header['SUBARRAY']
             else:
-                subarray = 'ANY'
+                subarray = 'N/A'
             if 'CHANNEL' in header or 'CHANNEL' in header_keys:
                 # There is a filter keyword in the header.
                 channel = header['CHANNEL']
             else:
-                channel = 'ANY'
+                channel = 'N/A'
             if 'BAND' in header or 'BAND' in header_keys:
                 # There is a filter keyword in the header.
                 band = header['BAND']
             else:
-                band = 'ANY'
+                band = 'N/A'
             if 'FILTER' in header or 'FILTER' in header_keys:
                 # There is a filter keyword in the header.
                 mirifilter = header['FILTER']
             else:
-                mirifilter = 'ANY'
+                mirifilter = 'N/A'
             if 'VERSION' in header or 'VERSION' in header_keys:
                 # There is a CDP version keyword in the header.
                 version = header['VERSION']
@@ -202,22 +203,21 @@ if __name__ == "__main__":
         cdpsubversion = None
 
     # Obtain metadata from the example data model.
-    (datatype, detector, readpatt, subarray, channel, band,
-        mirifilter, version) = \
-        get_cdp_metadata( inputfile )
+    (datatype, detector, readpatt, subarray, channel, band, \
+        mirifilter, version) = get_cdp_metadata( inputfile )
     
     if datatype:
         # Attempt to find an alternative version of this data model
         strg = "Searching for a " + str(datatype) + " CDP"
-        if detector != 'ANY':
+        if detector != 'ANY' and detector != 'N/A':
             strg += ", DETECTOR=" + str(detector)
-        if readpatt != 'ANY':
+        if readpatt != 'ANY' and readpatt != 'N/A':
             strg += ", READPATT=" + str(readpatt)
-        if subarray != 'ANY':
+        if subarray != 'ANY' and subarray != 'N/A':
             strg += ", SUBARRAY=" + str(subarray)
-        if band != 'ANY' or channel != 'ANY':
+        if (band != 'ANY' and band != 'N/A') or (channel != 'ANY' and channel != 'N/A'):
             strg += ", BAND=" + str(band) + ", CHANNEL=" + str(channel)
-        if mirifilter != 'ANY':
+        if mirifilter != 'ANY' and mirifilter != 'N/A':
             strg += ", FILTER=" + str(mirifilter)
         strg += "..."
         print(strg)

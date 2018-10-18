@@ -11,6 +11,7 @@ in the datamodels.miri_pce_model module.
 11 Jul 2014: Original version as test_miri_filters.py.
 22 Jun 2016: Converted to test the new PCE model, MiriPceModel.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+17 Oct 2018: 'N/A' used as a metadata wildcard instead of 'ANY'.
 
 @author: Steven Beard (UKATC)
 
@@ -55,11 +56,11 @@ class TestMiriPceModel(unittest.TestCase):
                           (9.5, 0.5, 1.0),
                           (10.0, 0.5, 1.0)]
         self.dataproduct = MiriPceModel(pce_table=self.pce_table,
-                                           component='ANY', detector='ANY')
+                                           component='N/A', detector='N/A')
         # Add some typical metadata
         self.dataproduct.set_instrument_metadata(detector='MIRIMAGE',
                                 modelnam='FM',
-                                filt='ANY', channel='', band='',
+                                filt='N/A', channel='', band='',
                                 ccc_pos='OPEN', deck_temperature=14.0,
                                 detector_temperature=6.7)
 
