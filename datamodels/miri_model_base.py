@@ -636,7 +636,7 @@ class MiriDataModel(DataModel):
             software_strg = 'SOFTWARE: ' + str(software)
             self.add_history(software_strg)
         if dataused is not None:
-            dataused_strg = 'DATAUSED: ' + str(dataused)
+            dataused_strg = 'DATA USED: ' + str(dataused)
             self.add_history(dataused_strg)
         if differences is not None:
             differences_strg = 'DIFFERENCES: ' + str(differences)
