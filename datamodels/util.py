@@ -307,6 +307,9 @@ def open( init=None, astype=None):
                 
                 header = hdulist[0].header
                 header_keys = list(header.keys())
+#                 for key in header_keys:
+#                     if key:
+#                         print("%s = %s" % (key, str(header[key])))
                 if datatype:
                     # The data type in the file header is overriden.
                     kwlist.append(datatype)
@@ -319,6 +322,9 @@ def open( init=None, astype=None):
                 elif 'DATAMODL' in header or 'DATAMODL' in header_keys:
                     # There is an old data type keyword in the header.
                     kwlist.append(header['DATAMODL'])
+                elif 'TYPE' in header or 'TYPE' in header_keys:
+                    # There is an old data type keyword in the header.
+                    kwlist.append(header['TYPE'])
                 if 'DETECTOR' in header or 'DETECTOR' in header_keys:
                     # There is a detector keyword in the header.
                     detector = header['DETECTOR']
@@ -356,7 +362,7 @@ def open( init=None, astype=None):
         if mirimodel is None:    
             # Unknown initialisers or data types are interpreted by jwst.datamodels
             strg = "\n***Data type could not be determined from metadata. "
-            strg += "Opening as a plain jwst.datamodel data model."
+            strg += "Opening as a plain jwst.datamodels data model."
             warnings.warn(strg)
             mirimodel = jwst.datamodels.open( init )
             return mirimodel

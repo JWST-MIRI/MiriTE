@@ -263,6 +263,7 @@ setup(
              'datamodels/scripts/cdp_add_history.py',
              'datamodels/scripts/cdp_add_subarray.py',
              'datamodels/scripts/cdp_correct_band.py',
+             'datamodels/scripts/cdp_correct_wildcard.py',
              'datamodels/scripts/cdp_get_doc.py',
              'datamodels/scripts/cdp_print.py',
              'datamodels/scripts/cdp_reduce_dark.py',

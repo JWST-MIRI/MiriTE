@@ -193,7 +193,7 @@ CDP_DICT = { \
             'PHOTOM'  : {'MIRIMAGE'    : {'P750L' : {'5'   : MiriLrsFluxconversionModel, \
                                                      '6'   : MiriLrsFluxconversionModel, \
                                                      '7'   : MiriLrsPhotometricModel, \
-                                                    ' ANY' : MiriLrsPhotometricModel}, \
+                                                     'ANY' : MiriLrsPhotometricModel}, \
                                           'ANY'   : {'5'   : MiriPhotometricModel_CDP5, \
                                                      '6'   : MiriPhotometricModel_CDP5, \
                                                      '7'   : MiriImagingPhotometricModel, \

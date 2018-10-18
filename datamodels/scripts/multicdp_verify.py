@@ -33,10 +33,13 @@ specified as a parameter. The temporary files will be removed unless
 
 The command takes the following options::
 
-    --path <type-string>
+    --path <string>
         The directory in which to look for MIRI CDP files. If not given
         the script will inspect the current directory and all directories
         below it.
+        
+    --pattern <string>
+        The file pattern to search for. The default is "*.fits".
 
     --overwrite or -o
         Overwrite any existing FITS file when making a temporary copy.
@@ -59,11 +62,16 @@ from pdb import set_trace as stop
 from miri.datamodels.util import verify_fits_file, verify_cdp_file
 from miri.tools.filesearching import find_files_matching
 
-def main(path, overwrite=False, keepfile=False, nopass=False):
+def verify_path(path, overwrite=False, pattern='*.fits', keepfile=False, nopass=False):
+    """
+    
+    Verify the CDP files contained within a given path.
+    
+    """
     # Search for FITS files in the given path.
     # single_level=False means all subfolders will be searched.
     filenames = []
-    for filename in find_files_matching( path, patterns='*.fits',
+    for filename in find_files_matching( path, patterns=pattern,
                                          single_level=False):
         filenames.append(filename)
     
@@ -105,8 +113,10 @@ if __name__ == "__main__":
     usage += "If no path is provided the current working directory is\n" 
     usage += "searched for fits files to be inspected."
     parser = optparse.OptionParser(usage)
-    parser.add_option("-p", "--path", dest="path", type="string",
+    parser.add_option("", "--path", dest="path", type="string",
                      default=None, help="path in which to search for the CDPs")
+    parser.add_option("", "--pattern", dest="pattern", type="string",
+                     default=None, help="File name matching pattern (default \'*.fits\')")
     parser.add_option("-o", "--overwrite", dest="overwrite", action="store_true",
                       help="Overwrite the copy of copy file if it already exists"
                      )
@@ -119,14 +129,21 @@ if __name__ == "__main__":
                      
     (options, args) = parser.parse_args()
     
-    if options.path != None:
+    if options.path is not None and options.path:
         path = options.path
     else:
-        print("Inspecting current directory... hope that was your intention!\n")
+        print("Inspecting current directory...\n")
         path = os.getcwd()
+
+    if options.pattern is not None and options.pattern:
+        print("Matching file name pattern \'%s\'...\n", options.pattern)
+        pattern = options.pattern
+    else:
+        pattern = '*.fits'
     
     overwrite = options.overwrite
     keepfile = options.keepfile   
     nopass = options.nopass 
     
-    main( path, overwrite=overwrite, keepfile=keepfile, nopass=nopass )
+    verify_path( path, overwrite=overwrite, pattern=pattern, keepfile=keepfile,
+                 nopass=nopass )

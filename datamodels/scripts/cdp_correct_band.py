@@ -164,11 +164,11 @@ def correct_band_metadata(datamodel, band='', filename=''):
                             logger.error(strg)
         else:
             strg = "MIRI MRS band metadata attributes missing from data model %s" % \
-                datamodel.__class__.__name_
+                datamodel.__class__.__name__
             raise TypeError(strg)
     else:
         strg = "MIRI instrument metadata attributes missing from data model %s" % \
-            datamodel.__class__.__name_
+            datamodel.__class__.__name__
         raise TypeError(strg)
     return band_modified
 
