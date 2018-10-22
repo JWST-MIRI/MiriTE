@@ -513,7 +513,7 @@ def get_cdp(cdptype, detector, model='FM', readpatt='ANY', channel='ANY',
         # Some data models offer different variations of the data models with
         # CDP release.
         # TODO: Remove this complication after CDP-7 delivery.
-        if cdptype == 'DISTORTION':
+        if cdptype == 'DISTORTION' or cdptype == 'PHOTOM': # and RSCD ?
             # One of the data types for which there is a variation with
             # CDP release.
             if cdprelease:
