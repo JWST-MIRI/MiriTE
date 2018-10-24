@@ -7,6 +7,7 @@
 # 10 Oct 2018: Added --version and --document as parameters. Delete the
 #              resolving_power attribute left over from the old data model.
 # 17 Oct 2018: 'ANY' replaced by 'N/A' in metadata wildcards.
+# 24 Oct 2018: Add the missing TELESCOP and INSTRUME keywords
 #
 # @author: Steven Beard (UKATC)
 #
@@ -51,6 +52,17 @@ import astropy.io.fits as pyfits
 from miri.datamodels.miri_spectral_spatial_resolution_model \
     import MiriMrsResolutionModel, MAX_NELEM
 
+def wildcard_filter( input_string ):
+    """
+    
+    A helper function which filters out a wildcard string containing
+    'ANY' and converts it to 'N/A'.
+    
+    """
+    if str(input_string).strip() == 'ANY':
+        return 'N/A'
+    else:
+        return input_string
 
 if __name__ == "__main__":
     # Parse arguments
@@ -171,23 +183,24 @@ if __name__ == "__main__":
             resolmodel.meta.filename_original = os.path.basename(inputfile)
             resolmodel.meta.filename = os.path.basename(outputfile)
             
-            modelnam = fitsheader['MODELNAM']
-            detector = fitsheader['DETECTOR']
-            detsetng = fitsheader['DETSETNG']
+            modelnam = wildcard_filter( fitsheader['MODELNAM'] )
+            detector = wildcard_filter( fitsheader['DETECTOR'] )
+            detsetng = wildcard_filter( fitsheader['DETSETNG'] )
             if 'BAND' in fitsheader:
-                band = fitsheader['BAND']
+                band = wildcard_filter( fitsheader['BAND'] )
             else:
                 band = 'N/A'
             if 'CHANNEL' in fitsheader:
-                channel = fitsheader['CHANNEL']
+                channel = wildcard_filter( fitsheader['CHANNEL'] )
             else:
                 channel = 'N/A'
             filt = 'N/A'
+            resolmodel.set_telescope()
             resolmodel.set_instrument_metadata(detector, modelnam=modelnam,
                         detsetng=detsetng, filt=filt, channel=channel,
                         band=band)
 
-            resolmodel.meta.exposure.readpatt = fitsheader['READPATT']
+            resolmodel.meta.exposure.readpatt = wildcard_filter( fitsheader['READPATT'] )
             resolmodel.meta.exposure.nframes = 1
     
             if 'SUBARRAY' in fitsheader:
@@ -198,7 +211,7 @@ if __name__ == "__main__":
             resolmodel.set_exposure_type( detector=detector, subarray=subarray )
             
             if document is None or not document:
-                doc_strg = 'DOCUMENT: MIRI-RP-00514-NLC-FM-MRS-Spectral-Resolution Issue 9/3/18'
+                doc_strg = 'DOCUMENT: MIRI-RP-00514-NLC FM-MRS-Spectral-Resolution Issue 9/3/18'
             else:
                 doc_strg = 'DOCUMENT: %s' % document
             resolmodel.add_history(doc_strg)

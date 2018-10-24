@@ -87,8 +87,13 @@ def remove_junk( infile, outfile, hdu_list=None, keyword_list=None,
                     changed = True
                     del hdulist[kill]
             
-        # Write the result to a new file
+        # Write the result to a new file (ensuring the original name
+        # is preserved in the header)
         if changed:
+            try:
+                hdulist[0].header['FILENAME'] = infile
+            except (KeyError, IndexError, AttributeError):
+                pass
             hdulist.writeto(outfile, overwrite=overwrite)
 
     # Close the hdulist and tidy up.

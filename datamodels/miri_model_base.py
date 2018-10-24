@@ -486,6 +486,12 @@ class MiriDataModel(DataModel):
     
         """         
         if hasattr(self, 'meta'):
+            # The telescope must be JWST and the instrument must me MIRI
+            if hasattr(self.meta, 'telescope'):
+                self.meta.telescope = 'JWST'
+            if hasattr(self.meta, 'instrument'):
+                self.meta.instrument.name = 'MIRI'
+            
             # The default pedigree is 'GROUND'
             if hasattr(self.meta, 'pedigree'):
                 self.meta.pedigree = 'GROUND'
