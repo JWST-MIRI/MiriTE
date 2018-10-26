@@ -129,9 +129,9 @@ MIRI_DGAB = ['SHORT', 'MEDIUM', 'LONG']
 # Single passband settings when the dichroic wheels have the same setting.
 MIRI_BANDS_SINGLE = ['SHORT', 'MEDIUM', 'LONG']
 # Cross-dichroic settings when the dichroic wheels have different settings.
-MIRI_BANDS_CROSS = ['SHORT-MEDIUM',  'SHORT-LONG',
+MIRI_BANDS_CROSS = ['SHORT-MEDIUM', 'SHORT-LONG',
                     'MEDIUM-SHORT', 'MEDIUM-LONG',
-                    'LONG-SHORT', 'LONG-MEDIUM']
+                    'LONG-SHORT',   'LONG-MEDIUM']
 # The BAND keyword can contain any single or cross-dichroic passband.
 MIRI_BANDS = MIRI_BANDS_SINGLE + MIRI_BANDS_CROSS
 MIRI_BANDS_EXTRAS = ['A', 'B', 'C'] # For backwards compatibility only.

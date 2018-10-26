@@ -32,13 +32,14 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              Corrected __all__.
 17 Oct 2018: Added relresperror column to MiriPhotometricModel. Old data model
              preserved as MiriPhotometricModel_CDP5.
+26 Oct 2018: Added get_srf() function.
 
 @author: Steven Beard (UKATC)
 
 """
 # This module is now converted to Python 3.
 
-
+import warnings
 import math
 import numpy as np
 
@@ -227,7 +228,7 @@ class MiriPhotometricModel(MiriDataModel):
             # Append each LRS data model one at a time.
             # All LRS models use the same filter and define an absolute
             # response, so PHOTMJSR is 1.0 and UNCERTAINTY is 0.0.
-            filter = 'P750L'
+            mirifilter = 'P750L'
             photmjsr = 1.0
             uncertainty = 0.0
             argnum = 0
@@ -252,13 +253,52 @@ class MiriPhotometricModel(MiriDataModel):
                         relresperror[ii] = unc
                         ii += 1
                     nelem = len(lrs_model.flux_table)
-                    new_phot_table.append( (filter, subarray, photmjsr, uncertainty,
+                    new_phot_table.append( (mirifilter, subarray, photmjsr, uncertainty,
                                       nelem, tuple(wavelength), tuple(relresponse),
                                       tuple(relresperror)))
                 else:
                     strg = "Function argument %d is not a MiriFluxconversionModel" % argnum
                     raise TypeError(strg)
             self.phot_table = new_phot_table
+            
+    def get_srf(self, filt, subarray):
+        """
+        
+        Return the SRF arrays associated with the given filter and subarray.
+        
+        This function is mainly designed for LRS data where filt='P750L'.
+        
+        :Parameters:
+            
+        filt: str
+            The MIRI filter whose SRF arrays are to be returned.
+            Use file='P750L' to obtain the LRS SRF arrays.
+        subarray: str
+            The subarray whose SRF arrays are to be returned.
+            Use subarray='FULL' or 'SLITLESSPRISM' to obtain the LRS SRF arrays.
+            
+        :Returned:
+        
+        srf_arrays: tuple of (wavelength, srf, uncertainty)
+            The wavelength, srf and uncertainty arrays
+        
+        """
+        # Find the relevant row in the PHOTOM table
+        for row in self.phot_table:
+            if str(row[0]).strip() == filt and str(row[1]).strip() == subarray:
+                # A matching row has been found
+                nelem = int(row[4])
+                if nelem > 0:
+                    return( row[5][:nelem], row[6][:nelem], row[7][:nelem] )
+                else:
+                    strg = "Table row for filter=\'%s\' subarray=\'%s\'" % (filt,subarray)
+                    strg += " has no spectral response data "
+                    warnings.warn(strg)
+                    return ([], [], [])
+        # No matching filter
+        strg = "No table row matching filter=\'%s\' subarray=\'%s\'" % (filt,subarray)
+        warnings.warn(strg)
+        return (None, None, None)
 
 class MiriPhotometricModel_CDP5(MiriDataModel):
     """
@@ -390,7 +430,7 @@ class MiriPhotometricModel_CDP5(MiriDataModel):
             # Append each LRS data model one at a time.
             # All LRS models use the same filter and define an absolute
             # response, so PHOTMJSR is 1.0 and UNCERTAINTY is 0.0.
-            filter = 'P750L'
+            mirifilter = 'P750L'
             photmjsr = 1.0
             uncertainty = 0.0
             argnum = 0
@@ -413,7 +453,7 @@ class MiriPhotometricModel_CDP5(MiriDataModel):
                         relresponse[ii] = srf
                         ii += 1
                     nelem = len(lrs_model.flux_table)
-                    new_phot_table.append( (filter, subarray, photmjsr, uncertainty,
+                    new_phot_table.append( (mirifilter, subarray, photmjsr, uncertainty,
                                       nelem, tuple(wavelength), tuple(relresponse)))
                 else:
                     strg = "Function argument %d is not a MiriFluxconversionModel" % argnum
@@ -492,14 +532,14 @@ class MiriImagingPhotometricModel(MiriPhotometricModel):
             relresperror = [0.0] * MAX_NELEM
             new_phot_table = []
             for phot_row in phot_table:
-                filter = phot_row[0]
+                mirifilter = phot_row[0]
                 subarray = phot_row[1]
                 photmjsr = phot_row[2]
                 uncertainty = phot_row[3]
                 if not subarray:
                     # Convert an empty SUBARRAY string to 'GENERIC'
                     subarray = 'GENERIC'
-                new_phot_table.append( (filter, subarray, photmjsr, uncertainty,
+                new_phot_table.append( (mirifilter, subarray, photmjsr, uncertainty,
                                     0, wavelength, relresponse, relresperror) )
         else:
             new_phot_table = None
@@ -581,7 +621,7 @@ class MiriLrsPhotometricModel(MiriPhotometricModel):
             # some dummy photmjsr and uncertainty arrays.
             # TODO: A slow, brute force method. There is probably a faster way,
             # but the function is not time critical for small CDPs..
-            filter = 'P750L'
+            mirifilter = 'P750L'
             if subarray is None or not subarray:
                 strg = "If an srf_table is parameter provided, "
                 strg += "a subarray parameter must also be provided."
@@ -598,7 +638,7 @@ class MiriLrsPhotometricModel(MiriPhotometricModel):
                 relresperror[ii] = unc
                 ii += 1
             nelem = len(srf_table)
-            new_phot_table = [(filter, subarray, photmjsr, uncertainty,
+            new_phot_table = [(mirifilter, subarray, photmjsr, uncertainty,
                               nelem, tuple(wavelength), tuple(relresponse),
                               tuple(relresperror))]
         else:

@@ -3,6 +3,7 @@
 # :History:
 # 
 # 10 Aug 2018: Created.
+# 26 Oct 2018: Correct some common BAND typos.
 #
 # @author: Steven Beard (UKATC)
 #
@@ -57,7 +58,13 @@ import optparse
 import sys, time
  
 from miri.parameters import MIRI_BANDS_SINGLE, MIRI_BANDS_CROSS, MIRI_BANDS
-import miri.datamodels        
+import miri.datamodels
+
+# Some common typos corrsponding to the entries in MIRI_BANDS_CROSS
+MIRI_BAND_TYPOS = ['SHORTMEDIUM', 'SHORTLONG',
+                   'MEDIUMSHORT', 'MEDIUMLONG',
+                   'LONGSHORT',   'LONGMEDIUM']
+
 
 def correct_band_metadata(datamodel, band='', filename=''):
     """
@@ -97,10 +104,19 @@ def correct_band_metadata(datamodel, band='', filename=''):
         
             band_acceptable_values = MIRI_BANDS + ['N/A']
             if datamodel.meta.instrument.band is not None and \
-               str(datamodel.meta.instrument.band) in band_acceptable_values:
+               str(datamodel.meta.instrument.band).strip() in band_acceptable_values:
                 # The BAND keyword is already correct. Nothing needs to be done.
                 logger.info("BAND keyword already contains \'%s\'. No correction needed." % \
                       str(datamodel.meta.instrument.band))
+            elif datamodel.meta.instrument.band is not None and \
+               str(datamodel.meta.instrument.band).strip() in MIRI_BAND_TYPOS:
+                # The BAND keyword contains a common typo, which must be corrected.
+                for ii in range(0, len(MIRI_BAND_TYPOS)):
+                    if str(datamodel.meta.instrument.band).strip() == MIRI_BAND_TYPOS[ii]:
+                        datamodel.meta.instrument.band = MIRI_BANDS_CROSS[ii]
+                        logger.info("BAND keyword corrected from \'%s\'to \'%s\'." % \
+                            (MIRI_BAND_TYPOS[ii], MIRI_BANDS_CROSS[ii]))
+                        break
             else:
                 # First attempt to use the BAND parameter provided
                 if band is not None and band in MIRI_BANDS:
@@ -114,11 +130,11 @@ def correct_band_metadata(datamodel, band='', filename=''):
                        hasattr(datamodel.meta.instrument, "dichroic_b") and \
                        datamodel.meta.instrument.dichroic_a is not None and \
                        datamodel.meta.instrument.dichroic_b is not None and \
-                       str(datamodel.meta.instrument.dichroic_a) in MIRI_BANDS_SINGLE and \
-                       str(datamodel.meta.instrument.dichroic_b) in MIRI_BANDS_SINGLE:
+                       str(datamodel.meta.instrument.dichroic_a).strip() in MIRI_BANDS_SINGLE and \
+                       str(datamodel.meta.instrument.dichroic_b).strip() in MIRI_BANDS_SINGLE:
                         # Valid DGAA and DGAB parameters. Construct a BAND keyword from them.
-                         dgaa = str(datamodel.meta.instrument.dichroic_a)
-                         dgab = str(datamodel.meta.instrument.dichroic_b)
+                         dgaa = str(datamodel.meta.instrument.dichroic_a).strip()
+                         dgab = str(datamodel.meta.instrument.dichroic_b).strip()
                          band = "%s-%s" % (dgaa, dgab)
                          datamodel.meta.instrument.band = band
                          logger.info("BAND keyword corrected to \'%s\' from DGAA and DGAB." % \

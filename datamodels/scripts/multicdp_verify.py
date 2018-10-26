@@ -11,6 +11,7 @@
 # 07 Dec 2015: Added a basic file structure test, to detect really
 #              strangely formatted CDP files.
 # 20 Jan 2017: Replaced "clobber" parameter with "overwrite".
+# 18 Oct 2018: Added --pattern parameter.
 #
 # @author: Ruyman Azzollini (DIAS), Steven Beard (UKATC)
 #
@@ -136,7 +137,7 @@ if __name__ == "__main__":
         path = os.getcwd()
 
     if options.pattern is not None and options.pattern:
-        print("Matching file name pattern \'%s\'...\n", options.pattern)
+        print("Matching file name pattern \'%s\'...\n" % options.pattern)
         pattern = options.pattern
     else:
         pattern = '*.fits'
