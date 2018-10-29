@@ -6,30 +6,30 @@ allOf:
     meta:
       type: object
       properties:
+        instrument:
+          type: object
+          title: Information about the instrument
+          properties:
+            imx:
+              type: number
+              title: x coord of ref position of MIRIM_SLIT aperture (pixels) 
+              fits_keyword: IMX
+            imy:
+              type: number
+              title: y coord of ref position of MIRIM_SLIT aperture (pixels)
+              fits_keyword: IMY
+            imxsltl:
+              type: number
+              title: x coord of ref position of MIRIM_SLITLESS aperture (pixels)
+              fits_keyword: IMXSLTL
+            imysltl:
+              type: number
+              title: y coord of ref position of MIRIM_SLITLESS aperture (pixels)
+              fits_keyword: IMYSLTL
         wavelength_table:
           type: object
           title: Information about distortion correction
           properties:
-            imx:
-              type: number
-              title: x position of zero point for source in slit center
-              fits_hdu: WAVETABLE
-              fits_keyword: IMX
-            imy:
-              type: number
-              title: y position of zero point for source in slit center
-              fits_hdu: WAVETABLE
-              fits_keyword: IMY
-            imxsltl:
-              type: number
-              title: x position of zero point for source at default slitless position
-              fits_hdu: WAVETABLE
-              fits_keyword: IMXSLTL
-            imysltl:
-              type: number
-              title: y position of zero point for source at default slitless position
-              fits_hdu: WAVETABLE
-              fits_keyword: IMYSLTL
             tunit1:
               type: string
               title: Column 1 units

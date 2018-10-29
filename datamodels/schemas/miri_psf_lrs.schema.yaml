@@ -6,6 +6,26 @@ allOf:
     meta:
       type: object
       properties:
+        instrument:
+          type: object
+          title: Information about the instrument
+          properties:
+            imx:
+              type: number
+              title: x coord of ref position of MIRIM_SLIT aperture (pixels) 
+              fits_keyword: IMX
+            imy:
+              type: number
+              title: y coord of ref position of MIRIM_SLIT aperture (pixels)
+              fits_keyword: IMY
+            imxsltl:
+              type: number
+              title: x coord of ref position of MIRIM_SLITLESS aperture (pixels)
+              fits_keyword: IMXSLTL
+            imysltl:
+              type: number
+              title: y coord of ref position of MIRIM_SLITLESS aperture (pixels)
+              fits_keyword: IMYSLTL
         crval1:
           type: number
           title: Value of the abscissa at CRPIX1
