@@ -1,3 +1,4 @@
+source make_links.sh
 make clean
 make html
 make latex
