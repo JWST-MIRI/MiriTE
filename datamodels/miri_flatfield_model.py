@@ -45,13 +45,16 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 17 Nov 2017: Added more DQ flags.
 26 Sep 2018: Added a REFTYPE of 'FLAT-TA' for an on-board TA flat field,
              with DATATYPE defined as 'TARGET'.
+30 Oct 2018: Reimplemented the flatfield models so the different varieties
+             are distinguished by inheritance rather than a constructor
+             parameter. PIXELFLAT is no longer used.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
 # This module is now converted to Python 3.
 
-
+import warnings
 import numpy as np
 #import numpy.ma as ma
 
@@ -60,7 +63,9 @@ from miri.datamodels.dqflags import insert_value_column
 from miri.datamodels.miri_measured_model import MiriMeasuredModel, HasDataErrAndDq
 
 # List all classes and global functions here.
-__all__ = ['flat_reference_flags', 'MiriFlatfieldModel']
+__all__ = ['flat_reference_flags', 'MiriFlatfieldModel',
+           'MiriTargetFlatfieldModel', 'MiriFringeFlatfieldModel',
+           'MiriTargetFlatfieldModel']
 
 # The new JWST flat-field reference flags
 flat_reference_setup = \
@@ -113,7 +118,7 @@ class MiriFlatfieldModel(MiriMeasuredModel):
         If not specified, it will default to the MIRI reserved flags.
     flattype: str (optional)
         A string giving the specific kind of flat-field contained
-        in the data object: 'SkyFlat', 'PixelFlat' or 'FringeFlat'.
+        in the data object: 'SkyFlat', 'PixelFlat' or 'FringeFlat' or 'Target'.
         If not given, the type defaults to the generic term 'FLAT'.
     detector: str (optional)
         The name of the detector associated with this fiat-field data.
@@ -122,11 +127,11 @@ class MiriFlatfieldModel(MiriMeasuredModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
     
     """
-    # There is no separate flat-field schema as yet.
+    # All flat-field models use exactly the same schema.
     schema_url = "miri_flatfield.schema.yaml"
     _default_dq_def = flat_reference_flags
 
-    def __init__(self, init=None, data=None, dq=None, err=None, fiterr=None,
+    def __init__(self, init=None, data=None, dq=None, err=None,
                  dq_def=None, flattype='', detector=None, **kwargs):
         """
         
@@ -149,6 +154,12 @@ class MiriFlatfieldModel(MiriMeasuredModel):
                 self.meta.model_type = 'FLAT'
                 self.meta.reftype = 'FLAT'
         else:
+            # Remember the existing reference type, if there is one
+            if self.meta.reftype is not None and self.meta.reftype:
+                existing_reftype = str(self.meta.reftype)
+            else:
+                existing_reftype = ''
+
             self.meta.model_type = flattype
             ftupper = flattype.upper()
             if "FRINGE" in ftupper:
@@ -156,13 +167,22 @@ class MiriFlatfieldModel(MiriMeasuredModel):
             elif "SKY" in ftupper:
                 self.meta.reftype = "SKYFLAT"
             elif "PIX" in ftupper:
-                self.meta.reftype = "PIXELFLAT"
+                # The reference type 'PIXELFLAT' is no longer used.
+                warnings.warn("PIXELFLAT is no longer used. REFTYPE set to FLAT.")
+                self.meta.reftype = "FLAT"
             elif "TA" in ftupper:
                 self.meta.reftype = "FLAT-TA"
                 datatype = 'TARGET'
             else:
                 # Pixel flat is just FLAT. 
                 self.meta.reftype = "FLAT"
+                
+            # Warn if an existing reference type is being changed.
+            if existing_reftype:
+                if self.meta.reftype != existing_reftype:
+                    strg = "Flat-field type will be changed from \'%s\' " % existing_reftype
+                    strg += "to \'%s\'." % str(self.meta.reftype)
+                    warnings.warn(strg)
         
         # This is a reference data model.
         self._reference_model()
@@ -189,6 +209,206 @@ class MiriFlatfieldModel(MiriMeasuredModel):
         self._data_fill = 1.0
         self._data_fill_value = 1.0
 
+
+class MiriSkyFlatfieldModel(MiriFlatfieldModel):
+    """
+    
+    A variation of MiriFlatfieldModel used to maintain SKY flats.
+    The structure is identical to MiriFlatfieldModel, except the
+    REFTYPE is defined as 'SKYFLAT'.
+    
+    :Parameters:
+    
+    init: shape tuple, file path, file object, pyfits.HDUList, numpy array
+        An optional initializer for the data model, which can have one
+        of the following forms:
+        
+        * None: A default data model with no shape. (If a data array is
+          provided in the mask parameter, the shape is derived from the
+          array.)
+        * Shape tuple: Initialize with empty data of the given shape.
+        * File path: Initialize from the given file.
+        * Readable file object: Initialize from the given file object.
+        * pyfits.HDUList: Initialize from the given pyfits.HDUList.
+        
+    data: numpy array (optional)
+        An array containing the flat-field data.
+        If a data parameter is provided, its contents overwrite the
+        data initialized by the init parameter.
+    err: numpy array (optional)
+        An array containing the error data.
+        Must be broadcastable onto the data array.
+    dq: numpy array (optional)
+        An array containing the quality data.
+        Must be broadcastable onto the data array.
+    dq_def: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (value:int, name:str, title:str),
+        giving the meaning of values stored in the data quality array. For
+        example: [(0, 'good','Good data'), (1, 'dead', 'Dead Pixel'),
+        (2, 'hot', 'Hot Pixel')];
+        Or: A numpy record array containing the same information as above.
+        If not specified, it will default to the MIRI reserved flags.
+    detector: str (optional)
+        The name of the detector associated with this fiat-field data.
+    \*\*kwargs:
+        All other keyword arguments are passed to the DataModel initialiser.
+        See the jwst.datamodels documentation for the meaning of these keywords.
+    
+    """
+    # All flat-field models use exactly the same schema.
+    schema_url = "miri_flatfield.schema.yaml"
+    _default_dq_def = flat_reference_flags
+
+    def __init__(self, init=None, data=None, dq=None, err=None,
+                 dq_def=None, detector=None, **kwargs):
+        """
+        
+        Initialises the MiriSkyFlatfieldModel class.
+        
+        Parameters: See class doc string.
+
+        """
+        # Call the parent constructor with the appropriate flat-field type.
+        super(MiriSkyFlatfieldModel, self).__init__(init=init, data=data,
+                                                    dq=dq, err=err,
+                                                    dq_def=dq_def,
+                                                    flattype='SKYFLAT',
+                                                    detector=detector,
+                                                    **kwargs)
+
+
+class MiriFringeFlatfieldModel(MiriFlatfieldModel):
+    """
+    
+    A variation of MiriFlatfieldModel used to maintain FRINGE flats.
+    The structure is identical to MiriFlatfieldModel, except the
+    REFTYPE is defined as 'FRINGE'.
+    
+    :Parameters:
+    
+    init: shape tuple, file path, file object, pyfits.HDUList, numpy array
+        An optional initializer for the data model, which can have one
+        of the following forms:
+        
+        * None: A default data model with no shape. (If a data array is
+          provided in the mask parameter, the shape is derived from the
+          array.)
+        * Shape tuple: Initialize with empty data of the given shape.
+        * File path: Initialize from the given file.
+        * Readable file object: Initialize from the given file object.
+        * pyfits.HDUList: Initialize from the given pyfits.HDUList.
+        
+    data: numpy array (optional)
+        An array containing the flat-field data.
+        If a data parameter is provided, its contents overwrite the
+        data initialized by the init parameter.
+    err: numpy array (optional)
+        An array containing the error data.
+        Must be broadcastable onto the data array.
+    dq: numpy array (optional)
+        An array containing the quality data.
+        Must be broadcastable onto the data array.
+    dq_def: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (value:int, name:str, title:str),
+        giving the meaning of values stored in the data quality array. For
+        example: [(0, 'good','Good data'), (1, 'dead', 'Dead Pixel'),
+        (2, 'hot', 'Hot Pixel')];
+        Or: A numpy record array containing the same information as above.
+        If not specified, it will default to the MIRI reserved flags.
+    detector: str (optional)
+        The name of the detector associated with this fiat-field data.
+    \*\*kwargs:
+        All other keyword arguments are passed to the DataModel initialiser.
+        See the jwst.datamodels documentation for the meaning of these keywords.
+    
+    """
+    # All flat-field models use exactly the same schema.
+    schema_url = "miri_flatfield.schema.yaml"
+    _default_dq_def = flat_reference_flags
+
+    def __init__(self, init=None, data=None, dq=None, err=None,
+                 dq_def=None, detector=None, **kwargs):
+        """
+        
+        Initialises the MiriFringeFlatfieldModel class.
+        
+        Parameters: See class doc string.
+
+        """
+        # Call the parent constructor with the appropriate flat-field type.
+        super(MiriFringeFlatfieldModel, self).__init__(init=init, data=data,
+                                                       dq=dq, err=err,
+                                                       dq_def=dq_def,
+                                                       flattype='FRINGE',
+                                                       detector=detector,
+                                                       **kwargs)
+
+
+class MiriTargetFlatfieldModel(MiriFlatfieldModel):
+    """
+    
+    A variation of MiriFlatfieldModel used to maintain TARGET flats.
+    The structure is identical to MiriFlatfieldModel, except the
+    REFTYPE is defined as 'TA-FLAT'.
+    
+    :Parameters:
+    
+    init: shape tuple, file path, file object, pyfits.HDUList, numpy array
+        An optional initializer for the data model, which can have one
+        of the following forms:
+        
+        * None: A default data model with no shape. (If a data array is
+          provided in the mask parameter, the shape is derived from the
+          array.)
+        * Shape tuple: Initialize with empty data of the given shape.
+        * File path: Initialize from the given file.
+        * Readable file object: Initialize from the given file object.
+        * pyfits.HDUList: Initialize from the given pyfits.HDUList.
+        
+    data: numpy array (optional)
+        An array containing the flat-field data.
+        If a data parameter is provided, its contents overwrite the
+        data initialized by the init parameter.
+    err: numpy array (optional)
+        An array containing the error data.
+        Must be broadcastable onto the data array.
+    dq: numpy array (optional)
+        An array containing the quality data.
+        Must be broadcastable onto the data array.
+    dq_def: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (value:int, name:str, title:str),
+        giving the meaning of values stored in the data quality array. For
+        example: [(0, 'good','Good data'), (1, 'dead', 'Dead Pixel'),
+        (2, 'hot', 'Hot Pixel')];
+        Or: A numpy record array containing the same information as above.
+        If not specified, it will default to the MIRI reserved flags.
+    detector: str (optional)
+        The name of the detector associated with this fiat-field data.
+    \*\*kwargs:
+        All other keyword arguments are passed to the DataModel initialiser.
+        See the jwst.datamodels documentation for the meaning of these keywords.
+    
+    """
+    # All flat-field models use exactly the same schema.
+    schema_url = "miri_flatfield.schema.yaml"
+    _default_dq_def = flat_reference_flags
+
+    def __init__(self, init=None, data=None, dq=None, err=None,
+                 dq_def=None, detector=None, **kwargs):
+        """
+        
+        Initialises the MiriTargetFlatfieldModel class.
+        
+        Parameters: See class doc string.
+
+        """
+        # Call the parent constructor with the appropriate flat-field type.
+        super(MiriTargetFlatfieldModel, self).__init__(init=init, data=data,
+                                                       dq=dq, err=err,
+                                                       dq_def=dq_def,
+                                                       flattype='TA',
+                                                       detector=detector,
+                                                       **kwargs)
 
 #
 # A minimal test is run when this file is run as a main program.
@@ -232,9 +452,9 @@ if __name__ == '__main__':
             testdata.save("test_flatfield_model1.fits", overwrite=True)
         del testdata
 
-    print("\nPIXEL Flat-field data with data + err + dq:")
-    with MiriFlatfieldModel(data=data3x3, err=err3x3, dq=dq3x3,
-                            dq_def=flat_reference_flags, flattype='PIXELFLAT',
+    print("\nFRINGE Flat-field data with data + err + dq:")
+    with MiriFringeFlatfieldModel(data=data3x3, err=err3x3, dq=dq3x3,
+                            dq_def=flat_reference_flags,
                             detector='MIRIFUSHORT') as testdata2:
         # Add some example metadata.
         testdata2.set_instrument_metadata(detector='MIRIFUSHORT',

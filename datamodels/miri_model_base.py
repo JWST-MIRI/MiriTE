@@ -492,15 +492,19 @@ class MiriDataModel(DataModel):
             if hasattr(self.meta, 'instrument'):
                 self.meta.instrument.name = 'MIRI'
             
-            # The default pedigree is 'GROUND'
+            # The default pedigree is 'GROUND' if not specified.
             if hasattr(self.meta, 'pedigree'):
-                self.meta.pedigree = 'GROUND'
+                if self.meta.pedigree is None:
+                    self.meta.pedigree = 'GROUND'
 
             # A USEAFTER date must exist in a reference model. If not relevant,
             # set it to an impossibly early date.
             if hasattr(self.meta, 'useafter'):
-                self.meta.useafter = '2000-01-01T00:00:00'
+                if self.meta.useafter is None:
+                    self.meta.useafter = '2000-01-01T00:00:00'
 
+        # Define the attribute which prevents the ASDF extension from
+        # being written.
         self._no_asdf_extension = True
 
     #
@@ -3136,6 +3140,16 @@ class MiriDataModel(DataModel):
         for line in results:
             strg += line + "\n"
         return strg
+ 
+    # "info" is a short alias for the string returned by the
+    # "get_title_and_metadata()" function.
+    @property
+    def info(self):
+        return self.get_title_and_metadata()
+
+    @info.setter
+    def info(self, value):
+        raise AttributeError(".info attribute is read-only")
 
 #
 # A minimal test is run when this file is run as a main program.

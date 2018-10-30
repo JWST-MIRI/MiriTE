@@ -71,6 +71,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/introduction.html#crds-reference-files
 26 Sep 2018: Added a REFTYPE of 'FLAT-TA' for an on-board TA flat field.
 18 Oct 2018: Dictionary extended to include CDP-5 variant of the MIRI
              photometric models.
+30 Oct 2018: There are now different classes for different types of flat-field.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -87,7 +88,8 @@ from miri.datamodels.miri_distortion_models import \
     MiriMrsDistortionModel34_CDP6
 from miri.datamodels.miri_droop_model import MiriDroopModel
 from miri.datamodels.miri_flatfield_model import \
-    MiriFlatfieldModel
+    MiriFlatfieldModel, MiriSkyFlatfieldModel, MiriFringeFlatfieldModel, \
+    MiriTargetFlatfieldModel
 from miri.datamodels.miri_fringe_frequencies_model import \
     MiriMrsFringeFrequenciesModel
 from miri.datamodels.miri_pce_model import MiriPceModel
@@ -162,10 +164,10 @@ CDP_DICT = { \
             'DROOP'   : MiriDroopModel, \
             'FLAT'    : MiriFlatfieldModel, \
             # FRINGE, PIXELFLAT, SKYFLAT and FLAT-TA are all kinds of FLAT
-            'FRINGE' : MiriFlatfieldModel,  \
+            'FRINGE' : MiriFringeFlatfieldModel,  \
             'PIXELFLAT' : MiriFlatfieldModel,  \
-            'SKYFLAT' : MiriFlatfieldModel,  \
-            'FLAT-TA' : MiriFlatfieldModel,  \
+            'SKYFLAT' : MiriSkyFlatfieldModel,  \
+            'FLAT-TA' : MiriTargetFlatfieldModel,  \
             'FRINGEFREQ' : MiriMrsFringeFrequenciesModel, \
             'RESET'   : MiriResetModel, \
             # TODO: Remove this cdprelease complexity after CDP-7 release
@@ -244,7 +246,7 @@ CDP_DICT = { \
                          'MIRIFULONG'  : MiriMrsDistortionModel34,
                          'ANY' : MiriImagingDistortionModel }, \
             'PIXFLAT' : MiriFlatfieldModel,  \
-            'FRINGEFLAT' : MiriFlatfieldModel,  \
+            'FRINGEFLAT' : MiriFringeFlatfieldModel,  \
             'FLUX'    : {'MIRIMAGE'    : {'P750L' : MiriLrsFluxconversionModel, \
                                           'ANY'   : MiriImagingFluxconversionModel}, \
                          'MIRIFUSHORT' : MiriMrsFluxconversionModel, \
