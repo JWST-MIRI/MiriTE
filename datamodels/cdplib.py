@@ -124,6 +124,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/introduction.html#reference-
              need for backwards compatibility to these old names.
              Class matching keyword list extended to allow CDP-6 variants of
              some data models to be accessed.
+30 Oct 2018: PIXELFLAT is no longer used as a reference type, but the strings
+             'FLAT' and 'PIXELFLAT' can both be used to search for a pixel
+             flat-field. Added missing SUBARRAYs to the module tests.
 
 Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -315,7 +318,7 @@ def get_cdp(cdptype, detector, model='FM', readpatt='ANY', channel='ANY',
     cdptype: str
         Data type of CDP to be obtained. Must be one of the defined
         MIRI CDP types. For example, 'MASK', 'DARK', 'LASTFRAME',
-        'DISTORTION', 'DROOP', 'PIXELFLAT', 'FRINGE', 'PHOTOM', 'IPC',
+        'DISTORTION', 'DROOP', 'FLAT' or 'PIXELFLAT', 'FRINGE', 'PHOTOM',
         'COLCORR', 'FLUX', 'JUMP', 'LATENT', 'LINEARITY', 'SATURATION',
         'PSF', 'STRAY', 'TRACORR', 'WAVCORR', 'TELEM', etc....
     detector: str
@@ -834,7 +837,7 @@ class MiriCDPFolder(object):
         cdptype: str
             Data type of CDP to be obtained. Must be one of the defined
             MIRI CDP types. For example, 'MASK', 'DARK', 'LASTFRAME',
-            'DISTORTION', 'DROOP', 'PIXELFLAT', 'FRINGE', 'PHOTOM', 'IPC',
+            'DISTORTION', 'DROOP', 'FLAT' or 'PIXELFLAT', 'FRINGE', 'PHOTOM',
             'COLCORR', 'FLUX', 'JUMP', 'LATENT', 'LINEARITY', 'SATURATION',
             'PSF', 'STRAY', 'TRACORR', 'WAVCORR', 'TELEM', etc....
         model: str (optional)
@@ -974,8 +977,16 @@ class MiriCDPFolder(object):
         # to the match string to prevent cdptype "MASK" from matching the
         # coronographic MASK filters.
         if (cdptype is not None) and (cdptype != 'ANY'):
-            match_strings.append(cdptype + "_")
-                
+            if cdptype == 'PIXELFLAT' or cdptype == 'FLAT':
+                # Special case. If the cdptype is 'PIXELFLAT' or 'FLAT' then
+                # the match 'FLAT_' but not 'SKYFLAT_' or 'FRINGE_'
+                match_strings.append("FLAT_")
+                avoid_strings.append("SKYFLAT")
+                avoid_strings.append("FRINGE")
+            else:
+                # Match any other CDP
+                match_strings.append(cdptype + "_")
+                     
         # An integration number is optional, but is always explicitly
         # included.  
         if integration is not None:
@@ -1747,7 +1758,7 @@ class MiriCDPInterface(object):
         cdptype: str
             Data type of CDP to be obtained. Must be one of the defined
             MIRI CDP types. For example, 'MASK', 'DARK', 'LASTFRAME',
-            'DISTORTION', 'DROOP', 'PIXELFLAT', 'FRINGE', 'PHOTOM', 'IPC',
+            'DISTORTION', 'DROOP', 'FLAT' or 'PIXELFLAT', 'FRINGE', 'PHOTOM',
             'COLCORR', 'FLUX', 'JUMP', 'LATENT', 'LINEARITY', 'SATURATION',
             'PSF', 'STRAY', 'TRACORR', 'WAVCORR', 'TELEM', etc....
         model: str (optional)
@@ -2039,7 +2050,7 @@ class MiriCDPInterface(object):
         cdptype: str
             Data type of CDP to be obtained. Must be one of the defined
             MIRI CDP types. For example, 'MASK', 'DARK', 'LASTFRAME',
-            'DISTORTION', 'DROOP', 'PIXELFLAT', 'FRINGE', 'PHOTOM', 'IPC',
+            'DISTORTION', 'DROOP', 'FLAT' or 'PIXELFLAT', 'FRINGE', 'PHOTOM',
             'COLCORR', 'FLUX', 'JUMP', 'LATENT', 'LINEARITY', 'SATURATION',
             'PSF', 'STRAY', 'TRACORR', 'WAVCORR', 'TELEM', etc....
         model: str (optional)
@@ -2610,9 +2621,10 @@ if __name__ == '__main__':
 
         print("Pixel flat-fields")
         detector = 'MIRIMAGE'
+        readpatt = 'SLOW'
         for detector in ('MIRIMAGE', 'MIRIFUSHORT', 'MIRIFULONG'):
             for mirifilter in ['ANY'] +  MIRI_FILTERS:
-                for subarray in MIRI_SUBARRAYS:
+                for subarray in ['FULL'] +  MIRI_SUBARRAYS:
                     strg = "PIXELFLAT for detector=%s" % detector
                     strg += " readpatt=%s" % readpatt
                     strg += " filter=%s" % mirifilter
@@ -2745,7 +2757,7 @@ if __name__ == '__main__':
         print("Read noise models")
         detector = 'MIRIMAGE'
         for readpatt in ('FAST', 'SLOW'):
-            for subarray in MIRI_SUBARRAYS:
+            for subarray in ['FULL'] +  MIRI_SUBARRAYS:
                 strg = "READNOISE for detector=%s" % detector
                 strg += " readpatt=%s" % readpatt
                 strg += " subarray=%s" % subarray
@@ -2836,7 +2848,7 @@ if __name__ == '__main__':
                 strg += " band=%s" % miriband
                 print("\n" + strg)
                 distmodel = get_cdp('DISTORTION', detector=detector,
-                                    band=miriband, 
+                                    band=miriband, cdprelease='7',
                                     ftp_path=FTP_PATH, ftp_user=FTP_USER,
                                     ftp_passwd=FTP_PASS)
                 if distmodel is not None:
@@ -2873,7 +2885,7 @@ if __name__ == '__main__':
         detector = 'MIRIMAGE'
         for cdpmodel in ('PSF', 'PSF-OOF'):
             for mirifilter in ['ANY'] + MIRI_FILTERS:
-                for subarray in MIRI_SUBARRAYS:
+                for subarray in ['FULL'] +  MIRI_SUBARRAYS:
                     strg = "%s for detector=%s" % (cdpmodel, detector)
                     strg += " filter=%s" % mirifilter
                     strg += " subarray=%s" % subarray
