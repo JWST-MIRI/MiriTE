@@ -15,13 +15,31 @@
 # 30 Jun 2017: meta.reffile schema level removed to match changes in the
 #              JWST build 7.1 data models release. meta.reffile.type also
 #              changed to meta.reftype. TYPE keyword replaced by DATAMODL.
+# 02 Nov 2018: Added ability to display metadata info and/or a data summary
+#              instead of the full data listing.
 #
 # @author: Steven Beard (UKATC)
 #
 """
 
-Script `cdp_print` lists the contents of any FITS file
-compatible with a MIRI calibration data product.
+Script `cdp_print` displays the contents of any FITS file containing a
+MIRI calibration data product.
+
+By default, the entire contents of the data model are displayed. If the
+full display is too long, a shorter summary will be displayed if the
+--info and/or --summary parameters are included. For example:
+
+    cdp_verify.py MIRI_FM_MIRIMAGE_GAIN_04.00.00.fits
+        Show the entire contents of the specified CDP
+
+    cdp_verify.py MIRI_FM_MIRIMAGE_GAIN_04.00.00.fits --info
+        Show the metadata contained in the specified CDP only
+
+    cdp_verify.py MIRI_FM_MIRIMAGE_GAIN_04.00.00.fits --summary
+        Show a summary of the data contained in the specified CDP only
+
+    cdp_verify.py MIRI_FM_MIRIMAGE_GAIN_04.00.00.fits --info --summary
+        Show a summary of the metadata and data contained in the specified CDP only
 
 The following command arguments are defined by position::
 
@@ -38,7 +56,9 @@ The command also takes the following options::
         Generate more verbose output.
     --plot or -p
         Plot the data.
-    --stats-only or -s
+    --info-only or --info or -i
+        Display metadata information only
+    --stats-only or --summary or -s
         Display statistics only
     --write or -w
         Write the data structure to a new file called <oldfile>_copy.fits
@@ -70,8 +90,17 @@ if __name__ == "__main__":
     parser.add_option("-p", "--plot", dest="makeplot", action="store_true",
                       help="Plot the data"
                      )
+    parser.add_option("-i", "--info-only", dest="infoonly", action="store_true",
+                      help="Display metadata info only"
+                     )
+    parser.add_option("", "--info", dest="info", action="store_true",
+                      help="Display metadata info only"
+                     )
     parser.add_option("-s", "--stats-only", dest="statsonly", action="store_true",
                       help="Display statistics only"
+                     )
+    parser.add_option("", "--summary", dest="summary", action="store_true",
+                      help="Display data summary only"
                      )
     parser.add_option("-w", "--write", dest="writefile", action="store_true",
                       help="Make a copy of the file"
@@ -92,7 +121,8 @@ if __name__ == "__main__":
 
     verb = options.verb
     makeplot = options.makeplot
-    statsonly = options.statsonly
+    infoonly = options.infoonly or options.info
+    statsonly = options.statsonly or options.summary
     writefile = options.writefile
     if writefile:
         outputfile = inputfile + "_copy.fits"
@@ -127,11 +157,18 @@ if __name__ == "__main__":
         if mirifilter:
             strg += " and filter \'%s\'" % str(mirifilter)
         print(strg)
+        displayed = False
+        if infoonly and hasattr(datamodel, 'get_title_and_metadata'):
+            if verb:
+                print("Showing metadata only...")
+            print( datamodel.get_title_and_metadata() )
+            displayed = True
         if statsonly and hasattr(datamodel, 'stats'):
             if verb:
                 print("Calculating statistics...")
             print( datamodel.stats() )
-        else:
+            displayed = True
+        if not displayed:
             print( str(datamodel) )
           
         if makeplot and hasattr(datamodel, 'plot'):

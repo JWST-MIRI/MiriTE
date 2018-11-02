@@ -162,6 +162,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              not to save the ASDF FITS extension. Added USEAFTER_DICT.
              Changed the metadata setting functions so that 'N/A' is used as
              a default instead of 'ANY'.
+02 Nov 2018: Improved data display facilities. "info" and "summary" defined
+             as aliases for get_title_and_metadata and stats functions.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -1618,7 +1620,7 @@ class MiriDataModel(DataModel):
         :Returns:
         
         tablelist: tuple of str
-            A list the names of the data tables found.
+            A list of the names of the data tables found.
         
         :Requires:
         
@@ -2175,7 +2177,7 @@ class MiriDataModel(DataModel):
         :Parameters:
         
         hdu_name: str, optional, default='ALL'
-            The name of the FITS HDU from whic to extract the comments.
+            The name of the FITS HDU from which to extract the comments.
             If 'ALL', all comments will be included, regardless of HDU.
         
         :Returns:
@@ -2315,7 +2317,7 @@ class MiriDataModel(DataModel):
         
         value: object
             An object containing the current value associated with the keyword.
-            If multiple occurences are matched, only the first will be returned.
+            If multiple occurrences are matched, only the first will be returned.
         
         """
         if hdu_name is None:
@@ -2591,8 +2593,10 @@ class MiriDataModel(DataModel):
         titles = self.find_schema_components('title')
         if name in titles:
             title = titles[name]
+        elif name in list(self.list_data_tables()):
+            title = "Data table \'" + name + "\'"
         else:
-            title = "Data array " + name
+            title = "Data array \'" + name + "\'"
    
         # Truncate and/or underline the title if needed.
         if maxlen is not None:
@@ -2996,6 +3000,9 @@ class MiriDataModel(DataModel):
         statistics for the range of values contained in those
         data arrays.
         
+        The string also contains a list of data tables contained
+        in the structure, together with the column names.
+        
         :Returns:
         
         description: str
@@ -3005,28 +3012,53 @@ class MiriDataModel(DataModel):
         # Start with the data object title
         strg = self.get_title(underline=True, underchar="=") + "\n"
 
-        # Display the data arrays.
+        # Count the data arrays.
         list_of_arrays = self.list_data_arrays()
         narrays = len(list_of_arrays)
-        for dataname in list_of_arrays:
-            strg += self.get_data_stats(dataname)
+        if narrays > 0:
+            if narrays > 1:
+                addstr = "%d data arrays:" % narrays
+            else:
+                addstr = "One data array:"
+            # Add a section title plus an underline.
+            strg += addstr + '\n' + (len(addstr) * '-') + '\n'
+            # Display statistics for each data array.
+            for dataname in list_of_arrays:
+                strg += self.get_data_stats(dataname)
         
         # Count the data tables.
         list_of_tables = self.list_data_tables()
         ntables = len(list_of_tables)
         if ntables > 0:
-            if ntables == 1:
-                ss = ''
-            else:
-                ss = 's'
+            strg += "\n"
             if narrays > 0:
-                strg += "Plus "
-            strg += "%d data table%.1s: \n  " % (ntables, ss)
-            strg += ', '.join(str(s) for s in list_of_tables)
-            if ntables == 1:
-                strg += "\n"
-                strg += self.get_data_str(list_of_tables[0], underline=True,
-                                          underchar="-")
+                addstr = "Plus "
+            else:
+                addstr = ""
+            if ntables > 1:
+                addstr += "%d data tables:" % ntables
+            else:
+                if narrays > 0:
+                    addstr += "one "
+                else:
+                    addstr += "One "
+                addstr += "data table:"
+            # Add a section title plus an underline.
+            strg += addstr + '\n' + (len(addstr) * '-') + '\n'
+                
+            # Display column names for each table.
+            for tablename in list_of_tables:
+                strg += "Data table \'%s\'\n" % tablename
+                fieldnames = self.get_field_names(tablename)
+                strg2 = ""
+                if fieldnames:
+                    strg2 += "  Columns: \'"
+                    strg2 += "\', \'".join(fieldnames)
+                    strg2 += "\'"
+                    strg += strg2
+                else:
+                    strg += "  NO TABLE COLUMNS DEFINED."
+                strg += '\n'
         return strg
 
     def get_title_and_metadata(self):
@@ -3150,6 +3182,16 @@ class MiriDataModel(DataModel):
     @info.setter
     def info(self, value):
         raise AttributeError(".info attribute is read-only")
+ 
+    # "summary" is a short alias for the string returned by the
+    # "stats()" function.
+    @property
+    def summary(self):
+        return self.stats()
+
+    @summary.setter
+    def summary(self, value):
+        raise AttributeError(".summary attribute is read-only")
 
 #
 # A minimal test is run when this file is run as a main program.
