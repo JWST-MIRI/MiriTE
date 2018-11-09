@@ -28,6 +28,11 @@ miri.datamodels
    .sim    - Data models supporting MIRI simulators
 See http://miri.ster.kuleuven.be/pub/Public/MIRISim_Public/miri_datamodels.pdf
 
+See also the following Jupyter notebooks:
+
+https://github.com/JWST-MIRI/MiriTE/blob/master/notebooks/How_to_use_the_data_models_to_obtain_calibration_reference_files.ipynb
+https://github.com/JWST-MIRI/MiriTE/blob/master/notebooks/Using_the_data_models_to_create_a_new_reference_file.ipynb
+
 MiriSimulators
 ~~~~~~~~~~~~~~
 A collection of MIRI data simulators.
