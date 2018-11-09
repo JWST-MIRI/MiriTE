@@ -72,7 +72,9 @@ http://ssb.stsci.edu/doc/jwst/jwst/introduction.html#crds-reference-files
 18 Oct 2018: Dictionary extended to include CDP-5 variant of the MIRI
              photometric models.
 30 Oct 2018: There are now different classes for different types of flat-field.
-             Added 'FRINGE_CALSOURCE' to the dictionary.
+09 Nov 2018: Added 'FRINGE_CALSOURCE' to the dictionary. Moved 'PSF-MONOCHROM',
+             'RESET' and 'IPC' into the OBSOLETE section. Reordered the CDPs
+             in the dictionary to reflect the order on the wiki.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -145,6 +147,38 @@ CDP_DICT = { \
             # BAD is an alias of MASK
             'BAD'     : MiriBadPixelMaskModel, \
             'DARK'    : MiriDarkReferenceModel, \
+            'LINEARITY' : MiriLinearityModel, \
+            # LIN is an alias for LINEARITY
+            'LIN'     : MiriLinearityModel,  \
+            'SATURATION' : MiriPixelSaturationModel, \
+            # SAT is an alias for SATURATION
+            'SAT'     : MiriPixelSaturationModel, \
+            'DROOP'   : MiriDroopModel, \
+            'LATENT'  : MiriLatentDecayModel, \
+            'JUMP'    : MiriJumpModel, \
+            'GAIN'    : MiriGainModel, \
+            'READNOISE' : MiriReadnoiseModel, \
+            'LASTFRAME' : MiriLastFrameModel, \
+            # TODO: Remove this cdprelease complexity after CDP-7 release
+#             'RSCD'    : {'MIRIMAGE'    : {'ANY' : {'6'   : MiriResetSwitchChargeDecayModel_CDP6, \
+#                                                    '7'   : MiriResetSwitchChargeDecayModel, \
+#                                                    'ANY' : MiriResetSwitchChargeDecayModel}}, \
+#                          'MIRIFULONG'  : {'ANY' : {'6'   : MiriResetSwitchChargeDecayModel_CDP6, \
+#                          'MIRIFUSHORT' : {'ANY' : {'6'   : MiriResetSwitchChargeDecayModel_CDP6, \
+#                                                    '7'   : MiriResetSwitchChargeDecayModel, \
+#                                                    'ANY' : MiriResetSwitchChargeDecayModel}}, \
+#                          'MIRIFULONG'  : {'ANY' : {'6'   : MiriResetSwitchChargeDecayModel_CDP6, \
+#                                                    '7'   : MiriResetSwitchChargeDecayModel, \
+#                                                    'ANY' : MiriResetSwitchChargeDecayModel}}, \
+#                          'ANY'        : MiriResetSwitchChargeDecayModel }, \
+            'RSCD'    : MiriResetSwitchChargeDecayModel, \
+            'PCE'     : MiriPceModel, \
+            'PSF'     : {'MIRIMAGE'    : {'P750L' : MiriLrsPointSpreadFunctionModel, \
+                                          'ANY'   : MiriImagingPointSpreadFunctionModel}, \
+                         'MIRIFUSHORT' : MiriMrsPointSpreadFunctionModel, \
+                         'MIRIFULONG'  : MiriMrsPointSpreadFunctionModel,
+                         'ANY' : MiriPointSpreadFunctionModel }, \
+            'PSF-OOF' : MiriImagingPointSpreadFunctionModel, \
             # TODO: Remove this cdprelease complexity after CDP-7 release
             'DISTORTION' : {'MIRIMAGE'    : {'P750L' : MiriLrsD2WModel, \
                                              'ANY'   : MiriImagingDistortionModel}, \
@@ -161,38 +195,7 @@ CDP_DICT = { \
 #                             'MIRIFUSHORT' : MiriMrsDistortionModel12, \
 #                             'MIRIFULONG'  : MiriMrsDistortionModel34, \
 #                             'ANY'         : MiriImagingDistortionModel }, \
-
-            'DROOP'   : MiriDroopModel, \
-            'FLAT'    : MiriFlatfieldModel, \
-            # FRINGE, PIXELFLAT, SKYFLAT and FLAT-TA are all kinds of FLAT
-            'FRINGE' : MiriFringeFlatfieldModel,  \
-            'FRINGE_CALSOURCE' : MiriFringeFlatfieldModel,  \
-            'PIXELFLAT' : MiriFlatfieldModel,  \
-            'SKYFLAT' : MiriSkyFlatfieldModel,  \
-            'FLAT-TA' : MiriTargetFlatfieldModel,  \
-            'FRINGEFREQ' : MiriMrsFringeFrequenciesModel, \
-            'RESET'   : MiriResetModel, \
-            # TODO: Remove this cdprelease complexity after CDP-7 release
-#             'RSCD'    : {'MIRIMAGE'    : {'ANY' : {'6'   : MiriResetSwitchChargeDecayModel_CDP6, \
-#                                                    '7'   : MiriResetSwitchChargeDecayModel, \
-#                                                    'ANY' : MiriResetSwitchChargeDecayModel}}, \
-#                          'MIRIFULONG'  : {'ANY' : {'6'   : MiriResetSwitchChargeDecayModel_CDP6, \
-#                          'MIRIFUSHORT' : {'ANY' : {'6'   : MiriResetSwitchChargeDecayModel_CDP6, \
-#                                                    '7'   : MiriResetSwitchChargeDecayModel, \
-#                                                    'ANY' : MiriResetSwitchChargeDecayModel}}, \
-#                          'MIRIFULONG'  : {'ANY' : {'6'   : MiriResetSwitchChargeDecayModel_CDP6, \
-#                                                    '7'   : MiriResetSwitchChargeDecayModel, \
-#                                                    'ANY' : MiriResetSwitchChargeDecayModel}}, \
-#                          'ANY'        : MiriResetSwitchChargeDecayModel }, \
-            'RSCD'    : MiriResetSwitchChargeDecayModel, \
-            'GAIN'    : MiriGainModel, \
-            'IPC'     : MiriIPCModel, \
-            'READNOISE' : MiriReadnoiseModel, \
-            'TRACORR' : MiriMrsTransmissionCorrectionModel, \
-            'WAVCORR' : MiriMrsWavelengthCorrectionModel, \
-            'RESOL'   : MiriMrsResolutionModel, \
-            'APERCORR' : MiriMrsApertureCorrectionModel, \
-            'PCE'     : MiriPceModel, \
+            'AREA' : MiriPixelAreaModel, \
             # TODO: Remove this cdprelease complexity after CDP-7 release
             'PHOTOM'  : {'MIRIMAGE'    : {'P750L' : {'5'   : MiriLrsFluxconversionModel, \
                                                      '6'   : MiriLrsFluxconversionModel, \
@@ -209,35 +212,32 @@ CDP_DICT = { \
 #                                           'ANY'   : MiriImagingPhotometricModel},
 #                          'MIRIFUSHORT' : MiriMrsFluxconversionModel, \
 #                          'MIRIFULONG'  : MiriMrsFluxconversionModel }, \
-            'AREA' : MiriPixelAreaModel, \
             'COLCORR' : MiriImagingColourCorrectionModel, \
             'COLCORRPL' : MiriPowerlawColourCorrectionModel, \
-            'JUMP'    : MiriJumpModel, \
-            'LASTFRAME' : MiriLastFrameModel, \
-            'LATENT'  : MiriLatentDecayModel, \
-            'LINEARITY' : MiriLinearityModel, \
-            # LIN is an alias for LINEARITY
-            'LIN'     : MiriLinearityModel,  \
-            'SATURATION' : MiriPixelSaturationModel, \
-            # SAT is an alias for SATURATION
-            'SAT'     : MiriPixelSaturationModel, \
+            'FLAT'    : MiriFlatfieldModel, \
+            # FRINGE, PIXELFLAT, SKYFLAT and FLAT-TA are all kinds of FLAT
+            'FRINGE' : MiriFringeFlatfieldModel,  \
+            'FRINGE_CALSOURCE' : MiriFringeFlatfieldModel,  \
+            'PIXELFLAT' : MiriFlatfieldModel,  \
+            'SKYFLAT' : MiriSkyFlatfieldModel,  \
+            'FLAT-TA' : MiriTargetFlatfieldModel,  \
+            'FRINGEFREQ' : MiriMrsFringeFrequenciesModel, \
             'STRAYMASK' : {'MIRIFUSHORT' : MiriMrsStraylightModel, \
                            'MIRIFULONG'  : MiriMrsStraylightModel }, \
             # STRAY is an alias for STRAYMASK
             'STRAY'   : {'MIRIFUSHORT' : MiriMrsStraylightModel, \
                          'MIRIFULONG'  : MiriMrsStraylightModel }, \
-            'PSF'     : {'MIRIMAGE'    : {'P750L' : MiriLrsPointSpreadFunctionModel, \
-                                          'ANY'   : MiriImagingPointSpreadFunctionModel}, \
-                         'MIRIFUSHORT' : MiriMrsPointSpreadFunctionModel, \
-                         'MIRIFULONG'  : MiriMrsPointSpreadFunctionModel,
-                         'ANY' : MiriPointSpreadFunctionModel }, \
-            'PSF-OOF' : MiriImagingPointSpreadFunctionModel, \
-            'PSF-MONOCHROM' : MiriLrsPointSpreadFunctionModel, \
+            'TRACORR' : MiriMrsTransmissionCorrectionModel, \
+            'WAVCORR' : MiriMrsWavelengthCorrectionModel, \
+            'RESOL'   : MiriMrsResolutionModel, \
+            'APERCORR' : MiriMrsApertureCorrectionModel, \
             # -----------------------------------------------------------
             # Legacy Keywords and Data Products - Backwards Compatibility Only
             # The following section could be removed without affecting the
             # JWST pipeline.
             # -----------------------------------------------------------
+            'RESET'   : MiriResetModel, \
+            'IPC'     : MiriIPCModel, \
             'DISTORT' : MiriImagingDistortionModel,  \
             'D2W'     : MiriLrsD2WModel,  \
             'D2C'     : {'MIRIFUSHORT' : MiriMrsDistortionModel12, \
@@ -263,6 +263,7 @@ CDP_DICT = { \
                          'MIRIFULONG'  : MiriMrsFluxconversionModel }, \
             'IMPSF'   : MiriImagingPointSpreadFunctionModel, \
             'LRSPSF'  : MiriLrsPointSpreadFunctionModel, \
+            'PSF-MONOCHROM' : MiriLrsPointSpreadFunctionModel, \
             'MRSPSF'  : MiriMrsPointSpreadFunctionModel, \
             'TelEm'   : MiriTelescopeEmissionModel, \
             'TEL_EMISSION' : MiriTelescopeEmissionModel, \
