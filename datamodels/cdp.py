@@ -72,6 +72,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/introduction.html#crds-reference-files
 18 Oct 2018: Dictionary extended to include CDP-5 variant of the MIRI
              photometric models.
 30 Oct 2018: There are now different classes for different types of flat-field.
+             Added 'FRINGE_CALSOURCE' to the dictionary.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -165,6 +166,7 @@ CDP_DICT = { \
             'FLAT'    : MiriFlatfieldModel, \
             # FRINGE, PIXELFLAT, SKYFLAT and FLAT-TA are all kinds of FLAT
             'FRINGE' : MiriFringeFlatfieldModel,  \
+            'FRINGE_CALSOURCE' : MiriFringeFlatfieldModel,  \
             'PIXELFLAT' : MiriFlatfieldModel,  \
             'SKYFLAT' : MiriSkyFlatfieldModel,  \
             'FLAT-TA' : MiriTargetFlatfieldModel,  \
