@@ -993,8 +993,8 @@ class MiriDataModel(DataModel):
         else:
                 return (None, None)
 
-    def set_exposure_metadata(self, readpatt, nints, ngroups, nframes=1,
-                              sample_time=10.0, frame_time=None,
+    def set_exposure_metadata(self, readpatt, nints=None, ngroups=None,
+                              nframes=1, sample_time=10.0, frame_time=None,
                               integration_time=None, exposure_time=None,
                               group_time=None, groupgap=0, grpavg=1, intavg=1,
                               reset_time=0, frame_resets=3, start_time='NOW',
@@ -1009,9 +1009,9 @@ class MiriDataModel(DataModel):
         
         readpatt: str
             Name of detector readout pattern.
-        nints: int
+        nints: int (optional)
             Number of integrations per exposure (missed out if set to None).
-        ngroups: int
+        ngroups: int (optional)
             Number of groups per integration (missed out if set to None).
         nframes: int, optional
             Number of frames coadded in group (always 1 for MIRI data)
