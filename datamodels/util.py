@@ -69,6 +69,8 @@ processing the MIRI data models.
              CDPs contain both FILTER, CHANNEL and BAND keywords.
 04 Oct 2018: Added DISTORTION to the list of CDPs which must contain both
              FILTER, CHANNEL and BAND keywords.
+12 Nov 2018: Added compulsory metadata for imager and MRS CDPs. Reworked the
+             metadata warning message so it doesn't appear twice in the output.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -86,7 +88,8 @@ import astropy.io.fits as pyfits
 
 # Import the JWST data models and the CDP and SIM dictionaries
 import jwst.datamodels
-from miri.parameters import CDP_METADATA, CDP_METADATA_SUBSET, CDP_SUBARRAY, CDP_HISTORY
+from miri.parameters import CDP_METADATA, CDP_METADATA_IMAGER, \
+    CDP_METADATA_MRS, CDP_SUBARRAY, CDP_HISTORY
 from miri.datamodels.miri_model_base import MiriDataModel
 from miri.datamodels.cdp import CDP_DICT
 from miri.datamodels.sim import SIM_DICT
@@ -641,14 +644,22 @@ def verify_metadata(datamodel):
     subarray = datamodel.get_fits_keyword('SUBARRAY')
     if subarray is not None and 'GENERIC' not in subarray:
         check_list += CDP_SUBARRAY
-    # There are additional compulsory keywords for FLAT, LINEARITY, PSF and
-    # DISTORTION data.
+        
+    # The FLAT, LINEARITY, PSF and DISTORTION data must contain both
+    # imager and MRS keywords
     if datamodel.meta.reftype == 'FLAT' or \
        datamodel.meta.reftype == 'LINEARITY' or \
        datamodel.meta.reftype == 'PSF' or \
        datamodel.meta.reftype == 'DISTORTION':
-        check_list += CDP_METADATA_SUBSET
-    
+        check_list += CDP_METADATA_IMAGER + CDP_METADATA_MRS
+    else:
+        # Otherwise the remaining compulsory keywords depend on the detector.
+        detector = datamodel.meta.instrument.detector
+        if detector == 'MIRIMAGE':
+            check_list += CDP_METADATA_IMAGER
+        elif detector == 'MIRIFUSHORT' or detector == 'MIRIFULONG':
+            check_list += CDP_METADATA_MRS
+            
     for (name,test_values) in check_list:
 #         print("Looking for %s with allowed values %s" % (name, str(test_values)))
         try:
@@ -747,10 +758,9 @@ def verify_cdp_file(filename, datatype=None, overwrite=False, keepfile=False):
                 (datamodel.__class__.__name__)
             metadata_strg += "\n  Incorrect metadata.\n"
             metadata_strg += failure_string
-            # For now only issue a warning, so the data content may
-            # also be checked. The flag will trigger an exception later.
+            # For now only set a flag, so the data content may also be checked.
+            # The flag will trigger a warning or an exception later.
             metadata_failure = True
-            warnings.warn(metadata_strg)
                 
         if isinstance(datamodel, MiriDataModel):
             dataarrays = datamodel.list_data_arrays()
@@ -758,6 +768,8 @@ def verify_cdp_file(filename, datatype=None, overwrite=False, keepfile=False):
 #             print("List of data arrays:", dataarrays)
 #             print("List of data tables:", datatables)
         else:
+            if metadata_failure:
+                warnings.warn(metadata_strg)   
             strg = "Data object \'%s\' has failed the test." % \
                 (datamodel.__class__.__name__)
             strg += "\n  Not a recognised MIRI data model."
@@ -766,6 +778,8 @@ def verify_cdp_file(filename, datatype=None, overwrite=False, keepfile=False):
         # The CDP must contain either at least one data array or
         # at least one data table.
         if len(dataarrays) <= 0 and len(datatables) <= 0:
+            if metadata_failure:
+                warnings.warn(metadata_strg)   
             strg = "Data object \'%s\' has failed the test." % \
                 (datamodel.__class__.__name__)
             strg += "\n  No data arrays and no data tables."
@@ -798,6 +812,8 @@ def verify_cdp_file(filename, datatype=None, overwrite=False, keepfile=False):
                     isempty = True
             
             if isempty:
+                if metadata_failure:
+                    warnings.warn(metadata_strg)   
                 strg = "Data object \'%s\' has failed the test." % \
                     (datamodel.__class__.__name__)
                 strg += "\n  Data array %s is empty." % dataarray             
@@ -811,6 +827,8 @@ def verify_cdp_file(filename, datatype=None, overwrite=False, keepfile=False):
                 if len(datamodel[datatable]) < 1:
                     isempty=True                
             if isempty:
+                if metadata_failure:
+                    warnings.warn(metadata_strg)   
                 strg = "Data object \'%s\' has failed the test." % \
                     (datamodel.__class__.__name__)
                 strg += "\n  Data table %s is empty." % datatable
@@ -833,6 +851,8 @@ def verify_cdp_file(filename, datatype=None, overwrite=False, keepfile=False):
                         data = getattr(datamodel, primary)
                         if data.ndim > 1 and \
                            (data.shape[-1] != xsize or data.shape[-2] != ysize):
+                            if metadata_failure:
+                                warnings.warn(metadata_strg)   
                             strg = "Data object \'%s\' has failed the test." % \
                                 (datamodel.__class__.__name__)
                             strg += "\n  Primary data array shape (%d x %d)" % \

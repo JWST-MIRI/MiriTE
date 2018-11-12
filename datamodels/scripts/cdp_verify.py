@@ -8,6 +8,8 @@
 # 07 Dec 2015: Added a basic file structure test, to detect really
 #              strangely formatted CDP files.
 # 20 Jan 2017: Replaced "clobber" parameter with "overwrite".
+# 12 Nov 2018: The tests are stricter now that compulsory parameters for
+#              imager and MRS CDPs are tested.
 #
 # @author: Steven Beard (UKATC), R. Azzollini (DIAS)
 #

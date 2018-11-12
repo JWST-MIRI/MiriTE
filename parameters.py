@@ -13,6 +13,7 @@ its capabilities and modes of operation. It exists to ensure the
              some CDP metadata.
 17 Oct 2018: The string 'ANY' is no longer recommended within CDP metadata.
              'N/A' should be used instead.
+12 Nov 2018: Added compulsory metadata for imager and MRS CDPs 
 
 @author: Steven Beard (UKATC)
 
@@ -104,8 +105,7 @@ MIRI_MODELS = ['VM', 'JPL', 'FM']
 MIRI_DETECTORS = ['MIRIMAGE', 'MIRIFULONG', 'MIRIFUSHORT']
 MIRI_DETECTORS_EXTRAS = ['IM', 'LW', 'SW'] # For backwards compatibility only.
 
-# Detector electronic settings used. An old keyword no,longer used for
-# flight model data.
+# Detector electronic settings used. This rarely changes.
 MIRI_SETTINGS = ['RAL1', 'JPL1']
 
 # Available MIRI readout modes.
@@ -149,6 +149,7 @@ CDP_METADATA = [['TELESCOP', 'JWST'],
                 ['INSTRUME', 'MIRI'],
                 ['MODELNAM', MIRI_MODELS + ['N/A']],
                 ['DETECTOR', MIRI_DETECTORS + ['N/A']],
+#                ['DETSETNG', MIRI_SETTINGS + ['N/A']],
                 ['READPATT', MIRI_READPATTS + ['N/A']],
                 ['SUBARRAY', MIRI_SUBARRAYS + ['FULL', 'GENERIC', 'N/A']],
                 ['FASTAXIS', 1],
@@ -160,7 +161,12 @@ CDP_METADATA = [['TELESCOP', 'JWST'],
                 ['DATE', []],  # Empty list means any value accepted.
                 ['VERSION', []],  # Empty list means any value accepted.
                 ]
-# The following keywords are compulsory in a subset of CDPs
+# The following keywords are compulsory for IMAGER and LRS CDPs
+CDP_METADATA_IMAGER = [['FILTER', MIRI_FILTERS + ['N/A']]]
+# The following keywords are compulsory for MRS CDPs
+CDP_METADATA_MRS = [['CHANNEL', MIRI_CHANNELS + ['N/A']],
+                ['BAND', MIRI_BANDS + ['N/A']],
+                ]
 CDP_METADATA_SUBSET = [['FILTER', MIRI_FILTERS + ['N/A']],
                 ['CHANNEL', MIRI_CHANNELS + ['N/A']],
                 ['BAND', MIRI_BANDS + ['N/A']],
