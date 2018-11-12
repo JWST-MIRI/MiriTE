@@ -173,6 +173,9 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 
 import os
 import datetime
+# import logging
+# logging.basicConfig(level=logging.INFO) # Default level is informational output 
+# LOGGER = logging.getLogger("miri.datamodels") # Get a default parent logger
 import warnings
 import numpy as np
 from astropy.extern import six
@@ -529,23 +532,29 @@ class MiriDataModel(DataModel):
         # TODO: If this test gets any more complicated it could be controlled
         # using a dictionary.
         INSTRUMENT_ATTRIBUTES = ('detector_settings', 'filter', 'channel', 'band')
-        EXPOSURE_ATTRIBUTES = ('readpatt')
         BAD_VALUE = 'ANY'
+        nwarnings = 0
+        strg = "\n  "
+        if self.meta.filename:
+            # Including the filename ensures there is a separate
+            # warning for each file.
+            strg += "%s: " % str(self.meta.filename)
         if hasattr(self, 'meta'):
             if hasattr(self.meta, 'instrument'):
                 for testatt in INSTRUMENT_ATTRIBUTES:
                     value = getattr( self.meta.instrument, testatt, None )
-                    if value is not None and value == BAD_VALUE:
-                        strg = "meta.instrument.%s = \'%s\'." % (testatt, str(value))
-                        strg += " <-- DEPRECATED VALUE. Please change."
-                        warnings.warn(strg)     
+                    if value is not None and str(value).strip() == BAD_VALUE:
+                        strg += "\n    meta.instrument.%s = \'%s\'." % (testatt, str(value))
+                        strg += " \t<-- DEPRECATED VALUE. Please change."
+                        nwarnings += 1
             if hasattr(self.meta, 'exposure'):
-                for testatt in EXPOSURE_ATTRIBUTES:
-                    value = getattr( self.meta.exposure, testatt, None )
-                    if value is not None and value == BAD_VALUE:
-                        strg = "meta.exposure.%s = \'%s\'." % (testatt, str(value))
-                        strg += " <-- DEPRECATED VALUE. Please change."
-                        warnings.warn(strg)
+                value = self.meta.exposure.readpatt
+                if value is not None and str(value).strip() == BAD_VALUE:
+                    strg += "\n    meta.exposure.readpatt = \'%s\'." % str(value)
+                    strg += " \t<-- DEPRECATED VALUE. Please change."
+                    nwarnings += 1
+        if nwarnings > 0:
+            warnings.warn(strg)
 
     #
     # Convenience functions for setting commonly associated blocks
