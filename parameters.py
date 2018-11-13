@@ -13,7 +13,8 @@ its capabilities and modes of operation. It exists to ensure the
              some CDP metadata.
 17 Oct 2018: The string 'ANY' is no longer recommended within CDP metadata.
              'N/A' should be used instead.
-12 Nov 2018: Added compulsory metadata for imager and MRS CDPs 
+12 Nov 2018: Added compulsory metadata for imager and MRS CDPs.
+             Updated list of detector settings.
 
 @author: Steven Beard (UKATC)
 
@@ -106,7 +107,8 @@ MIRI_DETECTORS = ['MIRIMAGE', 'MIRIFULONG', 'MIRIFUSHORT']
 MIRI_DETECTORS_EXTRAS = ['IM', 'LW', 'SW'] # For backwards compatibility only.
 
 # Detector electronic settings used. This rarely changes.
-MIRI_SETTINGS = ['RAL1', 'JPL1']
+MIRI_SETTINGS = ['RAL1', 'JPL1', 'JPL2', 'JPL3',
+                 'RUN1', 'RUN2', 'RUN3', 'RUN4', 'RUN5', 'RUN6']
 
 # Available MIRI readout modes.
 MIRI_READPATTS = ['SLOW', 'FAST', 'FASTGRPAVG']
