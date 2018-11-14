@@ -6,7 +6,7 @@ allOf:
     meta:
       type: object
       properties:
-        tracorr_table:
+        apercorr_table:
           type: object
           title: Information about the aperture correction table
           properties:

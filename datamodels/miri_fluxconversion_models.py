@@ -11,6 +11,8 @@ replaced by new photometric models contained in miri_photometric_models.py.
 The old models are defined here for backwards compatibility with
 CDPs released before CDP-4.
 
+The MRS flux conversion model, MiriMrsFluxconversionModel, is still in use.
+
 :Reference:
 
 The STScI jwst.datamodels documentation. See
@@ -72,6 +74,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              will use a combined MiriPhotometricModel after CDP-7, but
              MiriLrsFluxconversionModel will remain to support the existing
              LRS-only files. Corrected __all__.
+14 Nov 2018: Added PHOTMJSR and PHOTUJA2 keywords to the schema.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 

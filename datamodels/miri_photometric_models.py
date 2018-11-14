@@ -6,6 +6,9 @@
 Some extensions to the standard STScI data model which define
 MIRI photometric flux conversion models.
 
+NOTE: There is no MRS version of this data model.
+See MiriMrsFluxconversionModel within miri_fluxconversion_models.py
+
 :Reference:
 
 The STScI jwst.datamodels documentation. See

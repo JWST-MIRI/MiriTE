@@ -1,5 +1,7 @@
 allOf:
 - $ref: miri_measured.schema.yaml
+- $ref: http://jwst.stsci.edu/schemas/keyword_photmjsr.schema.yaml
+- $ref: keyword_photuja2.schema.yaml
 - type: object
   title: MIRI MRS flux conversion model
   properties:
@@ -8,11 +10,11 @@ allOf:
       properties:
         srf_at_reference:
           type: number
-          title: Spectral response fn at ref wavelength in (DN/s)/Jy
+          title: Spectral response fn at ref wavelength in DN sec^-1 mJy^-1
           fits_keyword: REFSRF
         srf_error:
           type: number
-          title: Uncertainty in REFSRF in (DN/s)/Jy
+          title: Uncertainty in REFSRF in DN sec^-1 mJy^-1
           fits_keyword: REFERR
         srf_wavelength:
           type: number

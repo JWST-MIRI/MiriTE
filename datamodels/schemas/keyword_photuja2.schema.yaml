@@ -1,0 +1,14 @@
+type: object
+properties:
+  meta:
+    type: object
+    properties:
+      photometry:
+        title: Photometry information
+        type: object
+        properties:
+          conversion_microjanskys:
+            title: Flux density (uJy/arcsec2) producing 1 cps
+            type: number
+            fits_keyword: PHOTUJA2
+            
