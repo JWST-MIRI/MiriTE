@@ -2979,11 +2979,11 @@ class MiriDataModel(DataModel):
                                     strg += "units from \'%s\' to \'%s\'" % \
                                         (str(fromunits), str(tableunits[ii]))
                                     warnings.warn(strg)
-                            strg = "Table %s: " % name
-                            strg += "Changing column \'%s\' " % fieldnames[ii]
-                            strg += "units from \'%s\' to \'%s\'" % \
-                                (str(fromunits), str(tableunits[ii]))
-                            print(strg)
+#                             strg = "Table %s: " % name
+#                             strg += "Changing column \'%s\' " % fieldnames[ii]
+#                             strg += "units from \'%s\' to \'%s\'" % \
+#                                 (str(fromunits), str(tableunits[ii]))
+#                             print(strg)
                             mytable.columns[fieldnames[ii]].unit = tableunits[ii]
                     # Write back the modified table
                     setattr(self, name, mytable)
