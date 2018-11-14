@@ -102,7 +102,6 @@ class MiriMrsStraylightModel(MiriBadPixelMaskModel):
         
     """
     schema_url = "miri_straylight_mrs.schema.yaml"
-    #schema_url = "miri_bad_pixel_mask.schema.yaml"
     
     # Set the default dq_def table to the JWST master flags
     # TODO: Can the default declared in the schema be used?

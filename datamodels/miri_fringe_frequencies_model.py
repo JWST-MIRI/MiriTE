@@ -18,6 +18,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              JWST build 7.1 data models release. meta.reffile.type also
              changed to meta.reftype. TYPE keyword replaced by DATAMODL.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+14 Nov 2018: Replaced 'ANY' with 'N/A'. Explicitly set table column units
+             based on the tunit definitions in the schema.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -91,9 +93,9 @@ class MiriMrsFringeFrequenciesModel(MiriDataModel):
                 strg = "fringefreq_table must be a numpy record array or list of records."
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
-#         
-#         # Copy the table column units, if defined.
-#         fringefreq_units = self.set_table_units('fringefreq_table')
+         
+        # Copy the table column units from the schema, if defined.
+        fringefreq_units = self.set_table_units('fringefreq_table')
         
     # TODO: Is this function needed?
     def __str__(self):
@@ -130,8 +132,8 @@ if __name__ == '__main__':
     print("\nFringe frequencies with factors derived from list of tuples:")
     with MiriMrsFringeFrequenciesModel( fringefreq_table=fringefreqdata ) as testfringefreq1:
         testfringefreq1.set_instrument_metadata(detector='MIRIFUSHORT',
-                                         ccc_pos='OPEN', channel='ANY',
-                                         band='ANY')
+                                         ccc_pos='OPEN', channel='N/A',
+                                         band='N/A')
         testfringefreq1.set_subarray_metadata('FULL')
         testfringefreq1.set_housekeeping_metadata('UK', author='MIRI team',
                                            version='1.0', useafter='2015-11-20',

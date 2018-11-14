@@ -122,8 +122,9 @@ class MiriResetSwitchChargeDecayModel(MiriDataModel):
                 strg = "rscd_table must be a numpy record array or list of records."
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
-#         
-#         # Copy the table column units, if defined.
+
+        # NOTE: The JWST schema does not define any units.
+#         # Copy the table column units from the schema, if defined.
 #         rscd_units = self.set_table_units('rscd_table')
         
     # TODO: Is this function needed?

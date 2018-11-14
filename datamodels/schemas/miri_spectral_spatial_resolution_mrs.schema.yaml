@@ -196,7 +196,7 @@ allOf:
               default: micron
               fits_hdu: RESOL_DATA
               fits_keyword: TUNIT8
-        mslf_data:
+        mlsf_data:
           type: object
           title: Information about the spectral resolution data
           properties:
@@ -209,7 +209,7 @@ allOf:
             tunit2:
               type: string
               title: Column 2 units
-              default: micron
+              default: pixel
               fits_hdu: MLSF_DATA
               fits_keyword: TUNIT2
             tunit3:
@@ -221,7 +221,7 @@ allOf:
             tunit4:
               type: string
               title: Column 4 units
-              default: pixel
+              default: ''
               fits_hdu: MLSF_DATA
               fits_keyword: TUNIT4
             tunit5:
@@ -292,6 +292,34 @@ allOf:
               default: micron
               fits_hdu: PHASE2_DATA
               fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: ''
+              fits_hdu: PHASE2_DATA
+              fits_keyword: TUNIT3
+            tunit4:
+              type: string
+              title: Column 4 units
+              default: ''
+              fits_hdu: PHASE2_DATA
+              fits_keyword: TUNIT4
+        phase3_data:
+          type: object
+          title: Information about the spectral resolution data
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: ''
+              fits_hdu: PHASE3_DATA
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: ''
+              fits_hdu: PHASE3_DATA
+              fits_keyword: TUNIT2
         etalon_data:
           type: object
           title: Information about the spectral resolution data
@@ -302,6 +330,72 @@ allOf:
               default: micron
               fits_hdu: ETALON_DATA
               fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: ''
+              fits_hdu: ETALON_DATA
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: ''
+              fits_hdu: ETALON_DATA
+              fits_keyword: TUNIT3
+            tunit4:
+              type: string
+              title: Column 4 units
+              default: ''
+              fits_hdu: ETALON_DATA
+              fits_keyword: TUNIT4
+            tunit5:
+              type: string
+              title: Column 5 units
+              default: ''
+              fits_hdu: ETALON_DATA
+              fits_keyword: TUNIT5
+            tunit6:
+              type: string
+              title: Column 6 units
+              default: ''
+              fits_hdu: ETALON_DATA
+              fits_keyword: TUNIT6
+            tunit7:
+              type: string
+              title: Column 7 units
+              default: ''
+              fits_hdu: ETALON_DATA
+              fits_keyword: TUNIT7
+            tunit8:
+              type: string
+              title: Column 8 units
+              default: ''
+              fits_hdu: ETALON_DATA
+              fits_keyword: TUNIT8
+            tunit9:
+              type: string
+              title: Column 9 units
+              default: ''
+              fits_hdu: ETALON_DATA
+              fits_keyword: TUNIT9
+            tunit10:
+              type: string
+              title: Column 10 units
+              default: ''
+              fits_hdu: ETALON_DATA
+              fits_keyword: TUNIT10
+            tunit11:
+              type: string
+              title: Column 11 units
+              default: ''
+              fits_hdu: ETALON_DATA
+              fits_keyword: TUNIT11
+            tunit12:
+              type: string
+              title: Column 12 units
+              default: ''
+              fits_hdu: ETALON_DATA
+              fits_keyword: TUNIT12
     resolving_power:
       title: Spectral resolution - OLD MODEL
       fits_hdu: RESOLVING_POWER

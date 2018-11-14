@@ -38,6 +38,8 @@ The STScI jwst.datamodels documentation.
              JWST build 7.1 data models release. meta.reffile.type also
              changed to meta.reftype. TYPE keyword replaced by DATAMODL.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+14 Nov 2018: Explicitly set table column units based on the tunit definitions
+             in the schema.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -232,8 +234,8 @@ class MiriLatentDecayModel(MiriDataModel):
             latent = getattr(self, tablename)
             if latent is not None and len(latent) > 1:
                 allempty = False
-#                 # Copy the table column units, if defined.
-#                 latent_units = self.set_table_units(tablename)
+                # Copy the table column units from the schema, if defined.
+                latent_units = self.set_table_units(tablename)
             tableno += 1
             tablename = "latent%d" % tableno
         if allempty:

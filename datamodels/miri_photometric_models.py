@@ -36,6 +36,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 17 Oct 2018: Added relresperror column to MiriPhotometricModel. Old data model
              preserved as MiriPhotometricModel_CDP5.
 26 Oct 2018: Added get_srf() function.
+14 Nov 2018: Explicitly set table column units based on the tunit definitions
+             in the schema.
 
 @author: Steven Beard (UKATC)
 
@@ -145,6 +147,9 @@ class MiriPhotometricModel(MiriDataModel):
                 strg = "phot_table must be a numpy record array or list of records."
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
+            
+        # Copy the table column units from the schema, if defined.
+        phot_table_units = self.set_table_units('phot_table')
 
         # If provided, define the pixel area metadata.
         if pixar_sr is not None:

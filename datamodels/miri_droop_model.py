@@ -38,6 +38,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 15 Jun 2017: meta.reffile schema level removed to match changes in the
              JWST build 7.1 data models release. meta.reffile.type also
              changed to meta.reftype. TYPE keyword replaced by DATAMODL.
+14 Nov 2018: Explicitly set table column units based on the tunit definitions
+             in the schema.
 
 @author: Steven Beard (UKATC)
 
@@ -124,9 +126,9 @@ class MiriDroopModel(MiriDataModel):
                 strg = "droop_table must be a numpy record array or list of records."
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
-#         
-#         # Copy the table column units, if defined.
-#         droop_units = self.set_table_units('droop_table')
+         
+        # Copy the table column units from the schema, if defined.
+        droop_units = self.set_table_units('droop_table')
         
     # TODO: Is this function needed?
     def __str__(self):

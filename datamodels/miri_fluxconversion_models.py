@@ -75,6 +75,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              MiriLrsFluxconversionModel will remain to support the existing
              LRS-only files. Corrected __all__.
 14 Nov 2018: Added PHOTMJSR and PHOTUJA2 keywords to the schema.
+             Explicitly set table column units based on the tunit definitions
+             in the schema.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -183,9 +185,9 @@ class MiriFluxconversionModel(MiriDataModel):
                 strg = "flux_table must be a numpy record array or list of records."
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
-# 
-#         # Copy the table column units from the schema, if defined.
-#         tableunits = self.set_table_units('flux_table')
+ 
+        # Copy the table column units from the schema, if defined.
+        tableunits = self.set_table_units('flux_table')
         
     # TODO: Is this function needed?
     def __str__(self):

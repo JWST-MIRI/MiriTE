@@ -35,6 +35,9 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 08 Oct 2018: Added some reconstruction functions.
 17 Oct 2018: The string 'ANY' is no longer recommended within CDP metadata.
              'N/A' should be used instead.
+14 Nov 2018: Explicitly set table column units based on the tunit definitions
+             in the schema. All units now defined in the schema and all
+             tables defined in the module test.
 
 @author: Steven Beard (UKATC)
 
@@ -207,10 +210,16 @@ class MiriMrsResolutionModel(MiriDataModel):
         if not self.meta.exposure.type:
             self.set_exposure_type()
         
-#         # Copy the table column units, if defined.
-#         resolving_power_units = self.set_table_units('resolving_power')
-#         psf_fwhm_alpha_units = self.set_table_units('psf_fwhm_alpha')
-#         psf_fwhm_beta_units = self.set_table_units('psf_fwhm_beta')
+        # Copy the table column units from the schema, if defined.
+        resolving_power_units = self.set_table_units('resolving_power')
+        psf_fwhm_alpha_units = self.set_table_units('psf_fwhm_alpha')
+        psf_fwhm_beta_units = self.set_table_units('psf_fwhm_beta')
+        resol_data_units = self.set_table_units('resol_data')
+        mlsf_data_units = self.set_table_units('mlsf_data')
+        phase1_data_units = self.set_table_units('phase1_data')
+        phase2_data_units = self.set_table_units('phase2_data')
+        phase3_data_units = self.set_table_units('phase3_data')
+        etalon_data_units = self.set_table_units('etalon_data')
         
     # TODO: Is this function needed?
     def __str__(self):
@@ -405,7 +414,10 @@ if __name__ == '__main__':
                    (NCOEFFS, phase3_coeffs)
                    ]
     
-
+    etalon_data = [(17.6, 17.7, 1.78, 1.79, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 18.7),
+                   (17.6, 17.7, 1.78, 1.79, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 18.7)
+                   ]
+    
     print("\nMRS spectral and spatial resolution model for MIRIFUSHORT:")
     with MiriMrsResolutionModel( psf_fwhm_alpha=psf_fwhm_alpha,
                                  psf_fwhm_beta=psf_fwhm_beta,
@@ -413,7 +425,8 @@ if __name__ == '__main__':
                                  mlsf_data=mlsf_data,
                                  phase1_data=phase1_data, \
                                  phase2_data=phase2_data,
-                                 phase3_data=phase3_data ) \
+                                 phase3_data=phase3_data,
+                                 etalon_data=etalon_data ) \
                                     as testspecres1:
         testspecres1.set_referencefile_metadata( author='Jeb Bailey',
                     pedigree='GROUND', useafter='DEFAULT',
@@ -443,7 +456,8 @@ if __name__ == '__main__':
                                  mlsf_data=mlsf_data,
                                  phase1_data=phase1_data, \
                                  phase2_data=phase2_data,
-                                 phase3_data=phase3_data ) \
+                                 phase3_data=phase3_data,
+                                 etalon_data=etalon_data ) \
                                     as testspecres2:
         testspecres2.set_referencefile_metadata( author='Jeb Bailey',
                     pedigree='GROUND', useafter='DEFAULT',

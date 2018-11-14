@@ -80,6 +80,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 10 Aug 2018: Updated MRS distortion models to reflect CDP-7 format.
 03 Sep 2018: Old CDP-6 variants of the distortion models included.
              Updated units for imager distortion model.
+14 Nov 2018: Explicitly set table column units based on the tunit definitions
+             in the schema.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -325,7 +327,6 @@ class MiriImagingDistortionModel(MiriDataModel):
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
         
-
         # Copy the units of the these arrays from the schema, if defined.
         aunits = self.set_data_units('amatrix')
         bunits = self.set_data_units('bmatrix')
@@ -336,8 +337,8 @@ class MiriImagingDistortionModel(MiriDataModel):
         tiunits = self.set_data_units('timatrix')
         miunits = self.set_data_units('mimatrix')
         
-#         # Copy the table column units, if defined.
-#         boresight_units = self.set_table_units('boresight_offsets')
+        # Copy the table column units from the schema, if defined.
+        boresight_units = self.set_table_units('boresight_offsets')
            
         if fitref is not None:
             self.meta.fit.reference = fitref
@@ -462,8 +463,8 @@ class MiriLrsD2WModel(MiriDataModel):
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
 
-#         # Copy the table column units, if defined.
-#         wavelength_units = self.set_table_units('wavelength_table')
+        # Copy the table column units from the schema, if defined.
+        wavelength_units = self.set_table_units('wavelength_table')
         
         # Define the exposure type (if not already contained in the data model)
         # NOTE: This will only define an exposure type when a valid detector
@@ -706,6 +707,20 @@ class MiriMrsDistortionModel12(MiriDataModel):
                 strg = "xanyan_albe must be a numpy record array or list of records."
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
+        
+        # Copy the table column units from the schema, if defined.
+        fov_ch1_units = self.set_table_units('fov_ch1')
+        fov_ch2_units = self.set_table_units('fov_ch2')
+        alpha_ch1_units = self.set_table_units('alpha_ch1')
+        alpha_ch2_units = self.set_table_units('alpha_ch2')
+        lambda_ch1_units = self.set_table_units('lambda_ch1')
+        lambda_ch2_units = self.set_table_units('lambda_ch2')
+        x_ch1_units = self.set_table_units('x_ch1')
+        x_ch2_units = self.set_table_units('x_ch2')
+        y_ch1_units = self.set_table_units('y_ch1')
+        y_ch2_units = self.set_table_units('y_ch2')
+        albe_to_xanyan_units = self.set_table_units('albe_to_xanyan')
+        xanyan_to_albe_units = self.set_table_units('xanyan_to_albe')
 
         # Define the exposure type (if not already contained in the data model)
         # NOTE: This will only define an exposure type when a valid detector
@@ -1014,6 +1029,20 @@ class MiriMrsDistortionModel34(MiriDataModel):
                 strg = "xanyan_albe must be a numpy record array or list of records."
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
+
+        # Copy the table column units from the schema, if defined.
+        fov_ch3_units = self.set_table_units('fov_ch3')
+        fov_ch4_units = self.set_table_units('fov_ch4')
+        alpha_ch3_units = self.set_table_units('alpha_ch3')
+        alpha_ch4_units = self.set_table_units('alpha_ch4')
+        lambda_ch3_units = self.set_table_units('lambda_ch3')
+        lambda_ch4_units = self.set_table_units('lambda_ch4')
+        x_ch3_units = self.set_table_units('x_ch3')
+        x_ch4_units = self.set_table_units('x_ch4')
+        y_ch3_units = self.set_table_units('y_ch3')
+        y_ch4_units = self.set_table_units('y_ch4')
+        albe_to_xanyan_units = self.set_table_units('albe_to_xanyan')
+        xanyan_to_albe_units = self.set_table_units('xanyan_to_albe')
 
         # Define the exposure type (if not already contained in the data model)
         # NOTE: This will only define an exposure type when a valid detector

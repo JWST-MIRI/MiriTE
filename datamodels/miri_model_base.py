@@ -167,6 +167,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 12 Nov 2018: Check for and warn the user about deprecated values.
              Only report deprecated values when attempting to write to or
              save the data model, not when reading it.
+14 Nov 2018: Added get_table_units and set_table_units functions.
+             Removed the setting of WCS metadata from the module tests.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -856,6 +858,9 @@ class MiriDataModel(DataModel):
         Convenience function to define telescope pointing metadata.
         Useful for setting up test data and converting data models.
         
+        NOTE: Only valid for data models which include the wcsinfo
+        schema.
+        
         :Parameters:
         
         ra_v1: number
@@ -882,6 +887,9 @@ class MiriDataModel(DataModel):
         """
         
         A trivial helper function which returns the pointing metadata.
+        
+        NOTE: Only valid for data models which include the wcsinfo
+        schema.
         
         :Parameters:
         
@@ -1346,6 +1354,9 @@ class MiriDataModel(DataModel):
         contains 4 axes. Warnings will be issued if a data model
         has not defined a sufficient number of axes.
         
+        NOTE: Only valid for data models which include the wcsinfo
+        schema.
+        
         :Parameters:
         
         wcsaxes: int
@@ -1489,6 +1500,9 @@ class MiriDataModel(DataModel):
         world coordinates metadata.
         Useful for setting up test data and converting data models.
         
+        NOTE: Only valid for data models which include the wcsinfo
+        schema.
+        
         :Parameters:
         
         s_region: string, optional
@@ -1523,6 +1537,9 @@ class MiriDataModel(DataModel):
         Convenience function to define the optional reference subset of the
         world coordinates metadata.
         Useful for setting up test data and converting data models.
+        
+        NOTE: Only valid for data models which include the wcsinfo
+        schema.
         
         :Parameters:
         
@@ -2742,7 +2759,7 @@ class MiriDataModel(DataModel):
         """
         # The data units should be defined in the metadata.
         units = None
-        if hasattr( self.meta, name):
+        if hasattr(self.meta, name):
             metaname = getattr(self.meta, name)
             if hasattr(metaname, 'units'):
                 # A data array with data units defined in meta.units
@@ -2770,6 +2787,52 @@ class MiriDataModel(DataModel):
             if name in unitlist:
                 units = unitlist[name]
         return units
+
+    def get_table_units(self, name):
+        """
+        
+        Return the units of the columns within a named data table
+        
+        :Parameters:
+        
+        name: str
+            The name of the data table
+        
+        :Returns:
+        
+        unitlist: list of str
+            A list of column units for the data table.
+        
+        """
+        # The data units should be defined in the metadata.
+        unitlist = []
+        if hasattr(self.meta, name):
+            metaname = getattr(self.meta, name)
+            if hasattr(metaname, 'units'):
+                # A data array with data units defined in meta.units
+                # Return a list containing a single string.
+                unitlist = [getattr(metaname, 'units')]
+            elif hasattr(metaname, 'tunit1'):
+                # A data table with column units defined in
+                # meta.tunit1, meta.tunit2, etc...
+                col = 1
+                unitname = 'tunit%s' % col
+                while (hasattr(metaname, unitname)):
+                    unitval = str(getattr(metaname, unitname))
+                    if unitval != "None":
+                        unitlist.append(unitval)
+                    else:
+                        unitlist.append('')
+                    col += 1
+                    unitname = 'tunit%s' % col
+        
+        # If no units are defined in the metadata, see if there are
+        # default units in the schema.
+        if not unitlist:
+            unitsfound = self.find_schema_components('units')
+            if name in unitsfound:
+                unitlist = [unitsfound[name]]
+        return unitlist
 
     def set_data_units(self, name, units=None):
         """
@@ -2857,81 +2920,83 @@ class MiriDataModel(DataModel):
                 raise AttributeError(strg)
         return units
 
-#     def set_table_units(self, name, units=None):
-#         """
-#          
-#         Define the column units of the named data table.
-#          
-#         :Parameters:
-#          
-#         name: str
-#             The name of the data table
-#         units: list of str (optional)
-#             The required table column units to be defined.
-#             If not specified (or None) the column units will be set
-#             to the default value defined in the schema. If there
-#             is no default, no unit will be defined.
-#             A warning will be issued if the data model already
-#             defines units that are different from those expected
-#             by the schema.
-#          
-#         :Returns:
-#          
-#         units: list of str
-#             The actual table column units as defined.
-#              
-#         :Raises:
-#          
-#         AttributeError:
-#             Raised if there are no table units defined in the schema
-#             or if the data item does not exist.
-#          
-#         """
-#         if units is not None and len(units) > 0:
-# #             print("+++Table column units for %s of %s provided explicitly" % (name,str(units)))
-#             # Table column units have been explicitly provided.
-#             # Set each column of the metadata to the defined units.
-#             if hasattr( self.meta, name):
-#                 metaname = getattr(self.meta, name)
-#             for col in range(0,len(units)):
-#                 # Convert null units into null strings
-#                 if units[col] is None:
-#                     units[col] = ''
-#                 unitname = 'tunit%s' % (col + 1)
-#                 if metaname and hasattr(metaname, unitname):
-#                     metaunits = getattr(metaname, unitname)
-# #                     if metaunits:
-# #                         print("+++Changing %s.%s from %s to %s" % \
-# #                             (name, unitname, str(metaunits), str(units[col])))
-# #                     else:
-# #                         print("+++Setting %s.%s to %s." % \
-# #                             (name, unitname, str(units[col])))
-#                     setattr(metaname, unitname, str(units[col]))
-#                 else:
-#                     strg = "\n***Table column unit %s.%s is not defined in the schema metadata" % (name,unitname)
-#                     warnings.warn(strg)
-#         else:
-#             # No units provided explicitly.
-#             # Leave the metadata as it is (but check that something
-#             # is defined).
-#             if hasattr( self.meta, name):
-#                 metaname = getattr(self.meta, name)
-#                 MAXCOLS = 24
-#                 defined = False
-#                 for col in range(0,MAXCOLS):
-#                     unitname = 'tunit%s' % (col + 1)
-#                     if metaname and hasattr(metaname, unitname):
-#                         defined = True
-# #                         metaunits = getattr(metaname, unitname)
-# #                         print("+++Leaving table column unit %s.%s set to %s." % \
-# #                                 (name, unitname, str(metaunits)))
-#                     else:
-#                         break
-#                 if not defined:
-#                     strg = "\n***No table units for table \'%s\' defined in metadata or in schema" % name
-#                     warnings.warn(strg)
-#         return units
-    
+    def set_table_units(self, name, units=None):
+        """
+          
+        Define the column units of the named data table.
+          
+        :Parameters:
+          
+        name: str
+            The name of the data table
+        units: list of str (optional)
+            The required table column units to be defined.
+            If not specified (or None) the column units will be set
+            to the default value defined in the schema. If there
+            is no default, no unit will be defined.
+            A warning will be issued if the data model already
+            defines units that are different from those expected
+            by the schema.
+          
+        :Returns:
+          
+        tableunits: list of str
+            The actual table column units as defined.
+              
+        :Raises:
+          
+        AttributeError:
+            Raised if there are no table units defined in the schema
+            or if the data item does not exist.
+          
+        """
+        tableunits = []
+        # Get the field (column) names contained in the table
+        fieldnames = self.get_field_names(name)
+        if fieldnames:
+            # The item is a data table. Get the associated data units
+            if units is None:
+                tableunits = self.get_table_units(name)
+            else:
+                tableunits = units
+            if tableunits:
+                # Obtain a copy of the table
+                mytable = getattr(self, name)
+                # If the table is blank its units can be set.
+                if mytable is not None and hasattr(mytable, 'columns'):
+                    overlap = min(len(fieldnames), len(tableunits))
+                    for ii in range(0,overlap):
+                        # Assume there is a 1:1 match between table column and units.
+                        # Warn if the units defined in the schema don't match the
+                        # units defined in the table.
+                        if tableunits[ii]:
+                            fromunits = mytable.columns[fieldnames[ii]].unit
+                            if fromunits is not None and fromunits and \
+                               fromunits != "None":
+                                if str(tableunits[ii]) != str(fromunits):
+                                    strg = "Table %s: " % name
+                                    strg += "Changing column \'%s\' " % fieldnames[ii]
+                                    strg += "units from \'%s\' to \'%s\'" % \
+                                        (str(fromunits), str(tableunits[ii]))
+                                    warnings.warn(strg)
+                            strg = "Table %s: " % name
+                            strg += "Changing column \'%s\' " % fieldnames[ii]
+                            strg += "units from \'%s\' to \'%s\'" % \
+                                (str(fromunits), str(tableunits[ii]))
+                            print(strg)
+                            mytable.columns[fieldnames[ii]].unit = tableunits[ii]
+                    # Write back the modified table
+                    setattr(self, name, mytable)
+                else:
+                    warnings.warn("Table \'%s\' is empty! No column units defined." % name)
+            else:
+                # Cannot define units because the schema doesn't
+                # define the appropriate metadata.
+                strg = "Cannot define units. Schema does not define "
+                strg += "any self.meta.%s.tunits attributes." % name
+                raise AttributeError(strg)
+        return tableunits
+                
     def get_data_stats(self, name):
         """
         
@@ -3301,15 +3366,17 @@ if __name__ == '__main__':
                                  visit_id='001', visit_number='001',
                                  visit_group='01', sequence_id='1',
                                  activity_id='01', exposure_number='00001')
-        testdata.set_pointing_metadata(ra_v1=12.20, dec_v1=-7.15, pa_v3=2.0)
+        # Basic data model does not include wcsinfo schema
+#         testdata.set_pointing_metadata(ra_v1=12.20, dec_v1=-7.15, pa_v3=2.0)
         testdata.set_target_metadata(ra=12.0, dec=-7.0)
         testdata.set_instrument_metadata(detector='MIRIMAGE', filt='F560W',
                                 channel='', ccc_pos='OPEN', 
                                 deck_temperature=10.0,
                                 detector_temperature=7.0)
-        testdata.set_wcs_metadata(wcsaxes=2, waverange_start=5.0,
-                                  waverange_end=25.0, ra_ref=12.10,
-                                  dec_ref=-7.03)
+        # Basic data model does not include wcsinfo schema
+#         testdata.set_wcs_metadata(wcsaxes=2, waverange_start=5.0,
+#                                   waverange_end=25.0, ra_ref=12.10,
+#                                   dec_ref=-7.03)
         testdata.set_exposure_metadata(readpatt='SLOW', nints=1, ngroups=3,
                                        pointing_sequence=1)
         testdata.set_exposure_type()

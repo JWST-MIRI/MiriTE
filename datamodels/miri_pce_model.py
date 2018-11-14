@@ -23,6 +23,8 @@ The STScI jwst.datamodels documentation.
              Do not set observation or target metadata. Neither are
              appropriate for a reference file.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+14 Nov 2018: Explicitly set table column units based on the tunit definitions
+             in the schema.
 
 @author: Steven Beard (UKATC)
 
@@ -194,8 +196,8 @@ class MiriPceModel(MiriDataModel):
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
 
-#         # Copy the table column units, if defined.
-#         pce_units = self.set_table_units('pce_table')
+        # Copy the table column units from the schema, if defined.
+        pce_units = self.set_table_units('pce_table')
                 
         # Cached arrays
         self._wavelength = None

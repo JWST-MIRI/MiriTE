@@ -17,6 +17,8 @@ which vary with a variable.
              from FITS files, not ASCII files. ASCII support withdrawn.
 15 Jun 2017: TYPE keyword replaced by DATAMODL.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+14 Nov 2018: Explicitly set table column units based on the tunit definitions
+             in the schema.
 
 @author: Steven Beard (UKATC)
 
@@ -153,6 +155,9 @@ class MiriMeasurement(MiriDataModel):
                 strg = "measurement_table must be a numpy record array or list of records."
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
+
+        # Copy the table column units from the schema, if defined.
+        measurement_units = self.set_table_units('measurement_table')
 
         # Cached arrays
         self._parameters = None
