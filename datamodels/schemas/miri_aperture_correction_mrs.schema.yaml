@@ -70,18 +70,22 @@ allOf:
       datatype:
       - name: wavelength
         datatype: float64
+        unit: micron
       - name: solution
         datatype: [ascii,16]
       - name: a_aperture
         datatype: float64
+        unit: arcsec
       - name: a_annulus_in
         datatype: float64
+        unit: arcsec
       - name: a_annulus_out
         datatype: float64
       - name: a_over_b
         datatype: float64
       - name: pos_angle
         datatype: float64
+        unit: deg
       - name: aper_corr
         datatype: float64
       - name: aper_corr_err

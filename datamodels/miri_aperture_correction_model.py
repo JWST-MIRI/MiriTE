@@ -93,7 +93,15 @@ class MiriMrsApertureCorrectionModel(MiriDataModel):
                 strg = "apercorr_table must be a numpy record array or list of records."
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
-#         
+            
+        # Define the table units (TEMPORARY FUDGE)
+        if self.apercorr_table is not None:
+            self.apercorr_table.columns['wavelength'].unit = 'micron'
+            self.apercorr_table.columns['a_annulus_in'].unit = 'arcsec'
+            self.apercorr_table.columns['a_annulus_out'].unit = 'arcsec'
+            self.apercorr_table.columns['pos_angle'].unit = 'deg'
+        
+
 #         # Copy the table column units, if defined.
 #         apercorr_units = self.set_table_units('apercorr_table')
 
@@ -124,7 +132,7 @@ if __name__ == '__main__':
     PLOTTING = False
     SAVE_FILES = False
 
-    apercorrdata = [( 5.0, 'nominal', 4.87,  7.76,  8.57, 1.0,  0.0, 42.0, 0.1),
+    apercorrdata = [(5.0, 'nominal', 4.87,  7.76,  8.57, 1.0,  0.0, 42.0, 0.1),
                    (10.0, 'nominal', 5.87,  8.76,  9.57, 1.0,  0.0, 32.0, 0.1),
                    (15.0, 'nominal', 6.87,  9.76, 10.57, 1.0,  0.0, 32.0, 0.1),
                    (15.0, 'nominal', 7.87, 10.76, 11.57, 0.7, 45.0, 12.0, 0.1)]
