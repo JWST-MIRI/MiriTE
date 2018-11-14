@@ -131,7 +131,6 @@ if __name__ == '__main__':
 
     print("\nAperture correction with factors derived from list of tuples:")
     with MiriMrsApertureCorrectionModel( apercorr_table=apercorrdata ) as testapercorr1:
-        print(testapercorr1)
         testapercorr1.set_instrument_metadata(detector='MIRIFUSHORT',
                                          channel='1', band='SHORT',
                                          ccc_pos='OPEN')
@@ -139,6 +138,7 @@ if __name__ == '__main__':
         testapercorr1.set_housekeeping_metadata('UK', author='MIRI team',
                                            version='1.0', useafter='2015-11-20',
                                            description='Test data')
+        print(testapercorr1)
         if PLOTTING:
             testapercorr1.plot(description="testapercorr1")
         if SAVE_FILES:

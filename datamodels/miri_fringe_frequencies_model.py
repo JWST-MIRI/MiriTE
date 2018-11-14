@@ -129,7 +129,6 @@ if __name__ == '__main__':
 
     print("\nFringe frequencies with factors derived from list of tuples:")
     with MiriMrsFringeFrequenciesModel( fringefreq_table=fringefreqdata ) as testfringefreq1:
-        print(testfringefreq1)
         testfringefreq1.set_instrument_metadata(detector='MIRIFUSHORT',
                                          ccc_pos='OPEN', channel='ANY',
                                          band='ANY')
@@ -137,6 +136,7 @@ if __name__ == '__main__':
         testfringefreq1.set_housekeeping_metadata('UK', author='MIRI team',
                                            version='1.0', useafter='2015-11-20',
                                            description='Test data')
+        print(testfringefreq1)
         if PLOTTING:
             testfringefreq1.plot(description="testfringefreq1")
         if SAVE_FILES:

@@ -165,6 +165,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 02 Nov 2018: Improved data display facilities. "info" and "summary" defined
              as aliases for get_title_and_metadata and stats functions.
 12 Nov 2018: Check for and warn the user about deprecated values.
+             Only report deprecated values when attempting to write to or
+             save the data model, not when reading it.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -478,7 +480,7 @@ class MiriDataModel(DataModel):
         created_strg = "Created from: %s" % self.__class__.__name__
         self.add_unique_history(created_strg)
         
-        self._report_deprecated_values()
+        #self._report_deprecated_values('__init__')
 
     def _reference_model(self):
         """
@@ -515,7 +517,7 @@ class MiriDataModel(DataModel):
         # being written.
         self._no_asdf_extension = True
 
-    def _report_deprecated_values(self):
+    def _report_deprecated_values(self, description=''):
         """
         
         A helper function which checks for data model items containing
@@ -534,7 +536,7 @@ class MiriDataModel(DataModel):
         INSTRUMENT_ATTRIBUTES = ('detector_settings', 'filter', 'channel', 'band')
         BAD_VALUE = 'ANY'
         nwarnings = 0
-        strg = "\n  "
+        strg = "%s\n  " % description
         if self.meta.filename:
             # Including the filename ensures there is a separate
             # warning for each file.
@@ -619,7 +621,7 @@ class MiriDataModel(DataModel):
         else:
             strg = "Metadata attributes missing from data model"
             raise AttributeError(strg)
-        self._report_deprecated_values()
+        self._report_deprecated_values('set_housekeeping_metadata')
 
     def set_referencefile_metadata(self, reftype=None, author=None,
                                    pedigree=None, useafter=None,
@@ -668,7 +670,7 @@ class MiriDataModel(DataModel):
         else:
             strg = "Reference file metadata attributes missing from data model"
             raise AttributeError(strg)
-        self._report_deprecated_values()
+        self._report_deprecated_values('set_referencefile_metadata')
 
     def add_referencefile_history(self, document=None, software=None,
                                    dataused=None, differences=None,
@@ -710,7 +712,7 @@ class MiriDataModel(DataModel):
                     self.add_history(str(hstrg))
             else:
                 self.add_history(str(history))
-        self._report_deprecated_values()
+        self._report_deprecated_values('add_referencefile_history')
                     
     def set_observation_metadata(self, dateobs=None, timeobs=None, obsid=None,
                                  observation_number=None, program_number=None,
@@ -801,7 +803,7 @@ class MiriDataModel(DataModel):
         else:
             strg = "Observation metadata attributes missing from data model"
             raise AttributeError(strg)
-        self._report_deprecated_values()
+        self._report_deprecated_values('set_observation_metadata')
 
     def set_target_metadata(self, ra, dec):
         """
@@ -825,7 +827,7 @@ class MiriDataModel(DataModel):
         else:
             strg = "Target metadata attributes missing from data model"
             raise AttributeError(strg)
-        self._report_deprecated_values()
+        self._report_deprecated_values('set_target_metadata')
 
     def get_target_metadata(self):
         """
@@ -874,7 +876,7 @@ class MiriDataModel(DataModel):
         else:
             strg = "Pointing metadata attributes missing from data model"
             raise AttributeError(strg)
-        self._report_deprecated_values()
+        self._report_deprecated_values('set_pointing_metadata')
 
     def get_pointing_metadata(self):
         """
@@ -971,7 +973,7 @@ class MiriDataModel(DataModel):
         else:
             strg = "Instrument metadata attributes missing from data model"
             raise AttributeError(strg)
-        self._report_deprecated_values()
+        self._report_deprecated_values('set_instrument_metadata')
 
     def get_instrument_detector(self):
         """
@@ -1155,7 +1157,7 @@ class MiriDataModel(DataModel):
         else:
             strg = "Exposure metadata attributes missing from data model"
             raise AttributeError(strg)
-        self._report_deprecated_values()
+        self._report_deprecated_values('set_exposure_metadata')
 
     def get_exposure_readout(self):
         """
@@ -1231,7 +1233,6 @@ class MiriDataModel(DataModel):
         else:
             strg = "Exposure metadata attributes missing from data model"
             raise AttributeError(strg)
-        self._report_deprecated_values()
 
     def get_exposure_type(self):
         """
@@ -1303,7 +1304,7 @@ class MiriDataModel(DataModel):
         else:
             strg = "Subarray metadata attributes missing from data model"
             raise AttributeError(strg)
-        self._report_deprecated_values()
+        self._report_deprecated_values('set_subarray_metadata')
 
     def get_subarray_metadata(self):
         """
@@ -1478,7 +1479,7 @@ class MiriDataModel(DataModel):
         else:
             strg = "World coordinates metadata attributes missing from data model"
             raise AttributeError(strg)
-        self._report_deprecated_values()
+        self._report_deprecated_values('set_wcs_metadata')
 
     def set_wcs_metadata_ranges(self, s_region=None, waverange_start=None,
                                 waverange_end=None, spectral_order=None):
@@ -1512,7 +1513,7 @@ class MiriDataModel(DataModel):
         else:
             strg = "World coordinates metadata attributes missing from data model"
             raise AttributeError(strg)
-        self._report_deprecated_values()
+        self._report_deprecated_values('set_wcs_metadata_ranges')
 
     def set_wcs_metadata_refs(self, v2_ref=None, v3_ref=None, vparity=None,
                               v3yangle=None, ra_ref=None, dec_ref=None,
@@ -1564,7 +1565,7 @@ class MiriDataModel(DataModel):
         else:
             strg = "World coordinates metadata attributes missing from data model"
             raise AttributeError(strg)
-        self._report_deprecated_values()
+        self._report_deprecated_values('set_wcs_metadata_refs')
             
     def copy_metadata(self, other, ignore=[]):
         """
@@ -3164,6 +3165,25 @@ class MiriDataModel(DataModel):
             strg += self.get_data_str(tablename, underline=True, underchar="-")
         return strg
 
+    def on_save(self, path=None):
+        """
+        
+        Use the "on_save" hook within the JWST data models to
+        check the metadata before saving a data mode to a file.
+
+        Parameters
+        ----------
+        path : str
+            The path to the file that we're about to save to.
+            
+        """
+        # Report if an attempt is made to save a data model with
+        # faulty metadata.
+        self._report_deprecated_values('on_save')
+            
+        # Switch to the hook defined in the base model.
+        super(MiriDataModel, self).on_save(path)
+
     def plot(self, description='', visitor=None, **kwargs):
         """
         
@@ -3265,6 +3285,7 @@ if __name__ == '__main__':
     # Create an empty MIRI data model and add some metadata.
     print("Empty MIRI data model")
     with MiriDataModel() as testdata:
+        print(testdata.info)
         # Dump the schema to a string
         dump_strg = testdata.dump_schema()
         # Check the string is valid. It can be printed out, but generates
