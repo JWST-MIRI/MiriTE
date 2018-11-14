@@ -350,7 +350,7 @@ if __name__ == '__main__':
     print("Testing the MiriMrsResolutionModel module.")
     
     PLOTTING = False
-    SAVE_FILES = True
+    SAVE_FILES = False
 
 # OLD RESOLVING POWER CODE
 #     # Sub-bands
@@ -445,7 +445,7 @@ if __name__ == '__main__':
         if PLOTTING:
             testspecres1.plot(description="testspecres1")
         if SAVE_FILES:
-            testspecres1.save("MIRI_FM_MIRIFUSHORT_12_RESOL_07.XX.00.fits",
+            testspecres1.save("test_MIRI_FM_MIRIFUSHORT_12_RESOL_07.XX.00.fits",
                               overwrite=True)
         del testspecres1
 
@@ -476,7 +476,7 @@ if __name__ == '__main__':
         if PLOTTING:
             testspecres2.plot(description="testspecres2")
         if SAVE_FILES:
-            testspecres2.save("MIRI_FM_MIRIFULONG_34_RESOL_07.XX.00.fits",
+            testspecres2.save("test_MIRI_FM_MIRIFULONG_34_RESOL_07.XX.00.fits",
                               overwrite=True)
         del testspecres2
         
