@@ -9,6 +9,7 @@ on the base MIRI data model.
 :Reference:
 
 The STScI jwst.datamodels documentation.
+https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 
 :History:
 

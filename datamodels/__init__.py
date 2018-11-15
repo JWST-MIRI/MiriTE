@@ -88,6 +88,21 @@ miri_pixel_saturation_model:
 
 miri_psf_models:
     JWST/MIRI point-spread-function data.
+    
+miri_readnoise_model.py
+    MIRI detector read noise measurement.
+    
+miri_reset_model.py
+    MIRI detector reset calibration.
+    
+miri_reset_switch_charge_decey_model.py
+    MIRI detector reset switch charge decay (RSCD) correction coefficients.
+    
+miri_spectral_spatial_resolution_model.py
+    MIRI fine spectral resolution calibration.
+    
+miri_straylight_model.py
+    MIRI MRS straylight mask.
 
 miri_telescope_emission_model:
     JWST/MIRI telescope emission data.
@@ -95,22 +110,22 @@ miri_telescope_emission_model:
 miri_transmission_correction_model:
     MIRI tranmission correction data.
 
-miri_wavelength_calibration_model:
+miri_wavelength_correction_model.py
     MIRI wavelength calibration coefficients
     
 sim:
     Contains all the simulator support data products, as listed below.
     
-miri_exposure_model:
+miri_exposure_model.py
     MIRI exposure data model.
     
-miri_illumination_model:
+miri_illumination_model.py
     MIRI detector illumination model
     
-filters:
+miri_filters.py
     Filter tools and detector quantum efficiency measurements.
     
-measured_variable
+miri_measurement.py
     Tools for managing variable measurements.
 
 Scripts
@@ -140,11 +155,8 @@ run_make_filters_fits.sh:
 
 Data
 ----
-data/filters/*.txt,*.fits:
-    MIRI filters data from fm_filters.xls on the FMTestData wiki page.
-
-data/examples/filter_example.py:
-    Demonstrate usage of the filters module
+data/example_filter.fits, example_measurements.fits:
+    Demonstrate usage of the filter and measurements module
 
 :History:
 13 Nov 2012: Created
@@ -158,6 +170,7 @@ data/examples/filter_example.py:
 06 Sep 2016: Renamed to miri.datamodels
 29 Jun 2017: Updated to use build 7.1 data models.
 05 Jan 2018: More version control information added. SVN info dropped.
+15 Nov 2018: Documentation update.
 
 """
 

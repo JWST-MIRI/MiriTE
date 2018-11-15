@@ -9,11 +9,10 @@ describing the illumination at a plane within the MIRI instrument.
 This module is intended to be used by a MIRI simulator for describing
 the illumination seen by the instrument.
 
-
 :Reference:
 
 The STScI jwst.datamodels documentation. See
-http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
+https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 
 :History:
 

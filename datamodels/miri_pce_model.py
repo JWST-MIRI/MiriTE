@@ -11,6 +11,7 @@ function of wavelength.
 :Reference:
 
 The STScI jwst.datamodels documentation.
+https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 
 :History:
 

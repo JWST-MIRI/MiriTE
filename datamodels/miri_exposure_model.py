@@ -15,11 +15,11 @@ exposure data.
 
 The STScI jwst.datamodels documentation:
 
-http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
+https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 
 and the documentation on JWST file formats:
 
-http://ssb.stsci.edu/doc/jwst/jwst/datamodels/fits_files.html#raw-level-1b-suffix-uncal
+https://jwst-docs.stsci.edu/display/JDAT/JWST+File+Names%2C+Formats%2C+and+Data+Structures
 
 :History:
 

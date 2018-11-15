@@ -8,7 +8,8 @@ and other devices whose transmission or efficiency varies with wavelength.
 
 :Reference:
 
-The STScI jwst.dataproduct documentation.
+The STScI jwst.datamodels documentation.
+https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 
 :History:
 

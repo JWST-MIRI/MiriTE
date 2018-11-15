@@ -9,7 +9,7 @@ aperture correction model.
 :Reference:
 
 The STScI jwst.datamodels documentation. See
-http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
+https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 
 :History:
 
