@@ -9,7 +9,7 @@ model.
 :Reference:
 
 The STScI jwst.datamodel library documentation. See
-http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
+https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 
 :History:
 
@@ -2984,8 +2984,10 @@ class MiriDataModel(DataModel):
                                 mytable.columns[fieldnames[ii]].unit = tableunits[ii]
                     # Write back the modified table
                     setattr(self, name, mytable)
-                else:
-                    warnings.warn("Table \'%s\' is empty! No column units defined." % name)
+# The following warning happens whenever an empty data model is created to be
+# filled in later.
+#                 else:
+#                     warnings.warn("Table \'%s\' is empty! No column units defined." % name)
             elif defaulted:
                 # Cannot define units because the schema doesn't
                 # define the appropriate metadata.
