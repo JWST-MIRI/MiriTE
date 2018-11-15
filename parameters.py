@@ -15,6 +15,7 @@ its capabilities and modes of operation. It exists to ensure the
              'N/A' should be used instead.
 12 Nov 2018: Added compulsory metadata for imager and MRS CDPs.
              Updated list of detector settings.
+15 Nov 2018: Added CDP_USEAFTER_DICT.
 
 @author: Steven Beard (UKATC)
 
@@ -182,6 +183,22 @@ CDP_SUBARRAY = [['SUBSTRT1', []], # Empty list means any value accepted.
                 ]
 # Keywords used in HISTORY records
 CDP_HISTORY = ['DOCUMENT', 'SOFTWARE', 'DATA USED', 'DIFFERENCES']
+
+# A list of common dates for the reference file USEAFTER keyword
+CDP_USEAFTER_DICT = {'DEFAULT'   : '2000-01-01T00:00:00',
+                     'FM'        : '2011-05-01T00:00:00',
+                     'CV1'       : '2013-09-26T05:00:00',
+                     'CV2'       : '2013-09-26T05:00:00',
+                     'CV3'       : '2013-09-26T05:00:00',
+                     'CV3_BURST' : '2015-08-01T00:00:00',
+                     'CDP1'      : '2013-03-01T00:00:00',
+                     'CDP2'      : '2013-11-01T00:00:00',
+                     'CDP3'      : '2014-11-01T00:00:00',
+                     'CDP4'      : '2015-06-15T00:00:00',
+                     'CDP5'      : '2015-12-18T00:00:00',
+                     'CDP6'      : '2016-06-30T00:00:00',
+                     'CDP7'      : '2018-12-01T00:00:00'
+                    }
 
 #
 # Dictionary of the relationship between known detector settings

@@ -159,7 +159,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 12 Jul 2018: Check the .data_filled attribute is not None before attempting
              to fill it. Clarified warning when too many WCS axes are given.
 18 Oct 2018: Added _reference_model() so that reference models can be flagged
-             not to save the ASDF FITS extension. Added USEAFTER_DICT.
+             not to save the ASDF FITS extension. Added CDP_USEAFTER_DICT.
              Changed the metadata setting functions so that 'N/A' is used as
              a default instead of 'ANY'.
 02 Nov 2018: Improved data display facilities. "info" and "summary" defined
@@ -182,12 +182,12 @@ import datetime
 # LOGGER = logging.getLogger("miri.datamodels") # Get a default parent logger
 import warnings
 import numpy as np
+#import numpy.ma as ma
 from astropy.extern import six
 from astropy.time import Time
 import asdf.util
 from asdf.tags.core import HistoryEntry
 from asdf.extension import AsdfExtension
-#import numpy.ma as ma
 
 # Import the STScI base data model and utilities
 import jwst.datamodels
@@ -198,26 +198,10 @@ from jwst.datamodels.model_base import DataModel
 # Import the MIRI data models and the data model plotter.
 import miri.datamodels
 from miri.datamodels.plotting import DataModelPlotVisitor
-from miri.parameters import SUBARRAY
+from miri.parameters import SUBARRAY, CDP_USEAFTER_DICT
 
 # List all classes and global functions here.
 __all__ = ['get_exp_type', 'MiriDataModel']
-
-# A list of common dates for the USEAFTER keyword
-USEAFTER_DICT = {'DEFAULT'   : '2000-01-01T00:00:00',
-                 'FM'        : '2011-05-01T00:00:00',
-                 'CV1'       : '2013-09-26T05:00:00',
-                 'CV2'       : '2013-09-26T05:00:00',
-                 'CV3'       : '2013-09-26T05:00:00',
-                 'CV3_BURST' : '2015-08-01T00:00:00',
-                 'CDP1'      : '2013-03-01T00:00:00',
-                 'CDP2'      : '2013-11-01T00:00:00',
-                 'CDP3'      : '2014-11-01T00:00:00',
-                 'CDP4'      : '2015-06-15T00:00:00',
-                 'CDP5'      : '2015-12-18T00:00:00',
-                 'CDP6'      : '2016-06-30T00:00:00',
-                 'CDP7'      : '2018-12-01T00:00:00'
-                 }
 
 #
 # Public global function.
@@ -659,9 +643,9 @@ class MiriDataModel(DataModel):
                 self.meta.pedigree = pedigree
             if author is not None:
                 self.meta.author = author
-            if useafter in list(USEAFTER_DICT.keys()):
+            if useafter in list(CDP_USEAFTER_DICT.keys()):
                 # A recognised USEAFTER keyword
-                self.meta.useafter = USEAFTER_DICT[useafter]
+                self.meta.useafter = CDP_USEAFTER_DICT[useafter]
             elif useafter == 'TODAY':
                 self.meta.useafter = str(datetime.date.today()) + \
                     'T00:00:00'
@@ -2934,9 +2918,9 @@ class MiriDataModel(DataModel):
             If not specified (or None) the column units will be set
             to the default value defined in the schema. If there
             is no default, no unit will be defined.
-            A warning will be issued if the data model already
-            defines units that are different from those expected
-            by the schema.
+            A warning will be issued if the data model already defines
+            column units that are different from those expected by the
+            schema.
           
         :Returns:
           
@@ -2957,8 +2941,10 @@ class MiriDataModel(DataModel):
             # The item is a data table. Get the associated data units
             if units is None:
                 tableunits = self.get_table_units(name)
+                defaulted = True # Default units obtained from schema
             else:
                 tableunits = units
+                defaulted = False #  Units explicitly provided
             if tableunits:
                 # Obtain a copy of the table
                 mytable = getattr(self, name)
@@ -2972,24 +2958,35 @@ class MiriDataModel(DataModel):
                         if tableunits[ii]:
                             fromunits = mytable.columns[fieldnames[ii]].unit
                             if fromunits is not None and fromunits and \
-                               fromunits != "None":
+                               fromunits != "None" and defaulted:
+                                # The data model units are already defined
+                                # and a default value is present in the schema.
+                                # Give a warning if the two values differ and
+                                # don't change anything.
                                 if str(tableunits[ii]) != str(fromunits):
-                                    strg = "Table %s: " % name
-                                    strg += "Changing column \'%s\' " % fieldnames[ii]
-                                    strg += "units from \'%s\' to \'%s\'" % \
-                                        (str(fromunits), str(tableunits[ii]))
-                                    warnings.warn(strg)
-#                             strg = "Table %s: " % name
-#                             strg += "Changing column \'%s\' " % fieldnames[ii]
-#                             strg += "units from \'%s\' to \'%s\'" % \
-#                                 (str(fromunits), str(tableunits[ii]))
-#                             print(strg)
-                            mytable.columns[fieldnames[ii]].unit = tableunits[ii]
+                                    strg = "Table \'%s\': " % name
+                                    strg += "Column \'%s\' units " % fieldnames[ii]
+                                    strg += "defined in the data  "
+                                    strg += "(%s) do not match the default units " % \
+                                        str(fromunits)
+                                    strg += "defined in the schema (%s)." % \
+                                        str(tableunits[ii])
+                                    warnings.warn(strg)    
+                            else:
+                                # Either the data model units are blank or
+                                # an explicit value has been provided. The unit
+                                # can be set to the value provided.
+                                strg = "Table %s: " % name
+                                strg += "Changing column \'%s\' " % fieldnames[ii]
+                                strg += "units from \'%s\' to \'%s\'" % \
+                                    (str(fromunits), str(tableunits[ii]))
+                                print(strg)
+                                mytable.columns[fieldnames[ii]].unit = tableunits[ii]
                     # Write back the modified table
                     setattr(self, name, mytable)
                 else:
                     warnings.warn("Table \'%s\' is empty! No column units defined." % name)
-            else:
+            elif defaulted:
                 # Cannot define units because the schema doesn't
                 # define the appropriate metadata.
                 strg = "Cannot define units. Schema does not define "
