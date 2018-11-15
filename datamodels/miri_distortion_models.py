@@ -81,7 +81,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 03 Sep 2018: Old CDP-6 variants of the distortion models included.
              Updated units for imager distortion model.
 14 Nov 2018: Explicitly set table column units based on the tunit definitions
-             in the schema.
+             in the schema. Removed redundant function.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -471,23 +471,6 @@ class MiriLrsD2WModel(MiriDataModel):
         # is defined in the metadata.
         if not self.meta.exposure.type:
             self.set_exposure_type()
-
-    # TODO: Is this function needed?
-    def __str__(self):
-        """
-        
-        Return the contents of the wavelength calibration object as a readable
-        string.
-        
-        """
-        # Start with the data object title and metadata
-        strg = self.get_title_and_metadata()
-
-        # Describe the wavelength calibration table
-        if self.wavelength_table is not None:
-            strg += self.get_data_str('wavelength_table', underline=True,
-                                      underchar="-")
-        return strg
 
 
 # TODO: Over-complicated data structure needs to be simplified.

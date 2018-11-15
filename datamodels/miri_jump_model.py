@@ -25,7 +25,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              changed to meta.reftype. TYPE keyword replaced by DATAMODL.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 14 Nov 2018: Explicitly set table column units based on the tunit definitions
-             in the schema.
+             in the schema. Removed redundant function.
 
 @author: Vincent Geers (DIAS)
 
@@ -114,23 +114,6 @@ class MiriJumpModel(MiriDataModel):
             
         # Copy the table column units from the schema, if defined.
         finejump_table_units = self.set_table_units('finejump_table')
-        
-    # TODO: Is this function needed?
-    def __str__(self):
-        """
-        
-        Return the contents of the jump object as a readable
-        string.
-        
-        """
-        # Start with the data object title and metadata
-        strg = self.get_title_and_metadata()
-
-        # Describe the fine jump table
-        strg += "\nColumn names: " + str(self.fieldnames) + "\n"
-        if self.finejump_table is not None:
-            strg += self.get_data_str('finejump_table', underline=True, underchar="-")
-        return strg
 
 
 #

@@ -22,6 +22,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              JWST build 7.1 data models release. meta.reffile.type also
              changed to meta.reftype. TYPE keyword replaced by DATAMODL.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+15 Nov 2018: Removed redundant function.
 
 @author: Steven Beard (UKATC)
 
@@ -126,24 +127,6 @@ class MiriResetSwitchChargeDecayModel(MiriDataModel):
         # NOTE: The JWST schema does not define any units.
 #         # Copy the table column units from the schema, if defined.
 #         rscd_units = self.set_table_units('rscd_table')
-        
-    # TODO: Is this function needed?
-    def __str__(self):
-        """
-        
-        Return the contents of the RSCD object as a readable
-        string.
-        
-        """
-        # Start with the data object title and metadata
-        strg = self.get_title_and_metadata()
-
-        # Describe the RSCD table
-        if self.rscd_table is not None:
-            strg += self.get_data_str('rscd_table', underline=True, underchar="-")
-        else:
-            strg += "No RSCD table!"
-        return strg
 
 
 class MiriResetSwitchChargeDecayModel_CDP6(MiriResetSwitchChargeDecayModel):

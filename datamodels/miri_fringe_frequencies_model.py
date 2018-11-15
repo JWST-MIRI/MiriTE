@@ -20,6 +20,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 14 Nov 2018: Replaced 'ANY' with 'N/A'. Explicitly set table column units
              based on the tunit definitions in the schema.
+15 Nov 2018: Removed redundant function.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -96,22 +97,6 @@ class MiriMrsFringeFrequenciesModel(MiriDataModel):
          
         # Copy the table column units from the schema, if defined.
         fringefreq_units = self.set_table_units('fringefreq_table')
-        
-    # TODO: Is this function needed?
-    def __str__(self):
-        """
-        
-        Return the contents of the fringe frequencies object
-        as a readable string.
-        
-        """
-        # Start with the data object title, metadata and history
-        strg = self.get_title_and_metadata()
-
-        # Describe the fringe frequencies table
-        if self.fringefreq_table is not None:
-            strg += self.get_data_str('fringefreq_table', underline=True, underchar="-")
-        return strg
 
 
 #

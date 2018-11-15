@@ -25,7 +25,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              changed to meta.reftype. TYPE keyword replaced by DATAMODL.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 14 Nov 2018: Explicitly set table column units based on the tunit definitions
-             in the schema.
+             in the schema. Removed redundant function.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -134,26 +134,6 @@ class MiriMrsWavelengthCorrectionModel(MiriDataModel):
         wavcorr_optical_units = self.set_table_units('wavcorr_optical')
         wavcorr_xslice_units = self.set_table_units('wavcorr_xslice')
         wavcorr_shift_units = self.set_table_units('wavcorr_shift')
-        
-    # TODO: Is this function needed?
-    def __str__(self):
-        """
-        
-        Return the contents of the wavelength correction object
-        as a readable string.
-        
-        """
-        # Start with the data object title and metadata
-        strg = self.get_title_and_metadata()
-
-        # Describe the wavelength correction tables
-        if self.wavcorr_optical is not None:
-            strg += self.get_data_str('wavcorr_optical', underline=True, underchar="-")
-        if self.wavcorr_xslice is not None:
-            strg += self.get_data_str('wavcorr_xslice', underline=True, underchar="-")
-        if self.wavcorr_shift is not None:
-            strg += self.get_data_str('wavcorr_shift', underline=True, underchar="-")
-        return strg
 
 
 #

@@ -24,7 +24,7 @@ The STScI jwst.datamodels documentation.
              appropriate for a reference file.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 14 Nov 2018: Explicitly set table column units based on the tunit definitions
-             in the schema.
+             in the schema. Removed redundant function.
 
 @author: Steven Beard (UKATC)
 
@@ -307,24 +307,6 @@ class MiriPceModel(MiriDataModel):
             filteredflux[areneg] = 0.0
 
         return filteredflux
-
-    # TODO: Is this function needed?
-    def __str__(self):
-        """
-        
-        Return the contents of the PCE efficiency object as a readable
-        string.
-        
-        """
-        # Start with the data object title and metadata
-        strg = self.get_title_and_metadata()
-
-        # Describe the PCE efficiency table
-        strg += "\nColumn names: " + str(self.fieldnames) + "\n"
-        if self.pce_table is not None:
-            strg += self.get_data_str('pce_table', underline=True,
-                                      underchar="-")
-        return strg
 
     def plot(self, plotaxis=None, xlabel='', ylabel='', description='',
              **kwargs):

@@ -30,6 +30,7 @@ The STScI jwst.dataproduct documentation.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 17 Oct 2018: The string 'ANY' is no longer recommended within CDP metadata.
              'N/A' should be used instead.
+15 Nov 2018: Removed redundant function.
 
 
 @author: Steven Beard (UKATC)
@@ -247,24 +248,6 @@ class MiriFilter(MiriDataModel):
         """
         strg = "Filter measurement for %s filter %s" % \
             (self.meta.instrument.filter_type, self.meta.instrument.filter)
-        return strg
-        
-    # TODO: Is this function needed?
-    def __str__(self):
-        """
-        
-        Return the contents of the filter transmission object as a readable
-        string.
-        
-        """
-        # Start with the data object title, metadata and history
-        strg = self.get_title_and_metadata()
-
-        # Describe the filter transmission table
-        strg += "\nColumn names: " + str(self.fieldnames) + "\n"
-        if self.filter_table is not None:
-            strg += self.get_data_str('filter_table', underline=True,
-                                      underchar="-")
         return strg
 
     def plot_new(self, description='', visitor=None, **kwargs):

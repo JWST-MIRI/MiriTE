@@ -76,7 +76,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              LRS-only files. Corrected __all__.
 14 Nov 2018: Added PHOTMJSR and PHOTUJA2 keywords to the schema.
              Explicitly set table column units based on the tunit definitions
-             in the schema.
+             in the schema. Removed redundant function. Removed redundant
+             function.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -188,22 +189,6 @@ class MiriFluxconversionModel(MiriDataModel):
  
         # Copy the table column units from the schema, if defined.
         tableunits = self.set_table_units('flux_table')
-        
-    # TODO: Is this function needed?
-    def __str__(self):
-        """
-        
-        Return the contents of the flux conversion object as a readable
-        string.
-        
-        """
-        # Start with the data object title, metadata and history
-        strg = self.get_title_and_metadata()
-
-        # Describe the flux conversion table
-        if self.flux_table is not None:
-            strg += self.get_data_str('flux_table', underline=True, underchar="-")
-        return strg
 
 
 class MiriImagingFluxconversionModel(MiriFluxconversionModel):

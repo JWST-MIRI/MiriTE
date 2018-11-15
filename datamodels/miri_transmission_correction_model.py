@@ -25,7 +25,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              changed to meta.reftype. TYPE keyword replaced by DATAMODL.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 14 Nov 2018: Explicitly set table column units based on the tunit definitions
-             in the schema.
+             in the schema. Removed redundant function.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -103,22 +103,6 @@ class MiriMrsTransmissionCorrectionModel(MiriDataModel):
          
         # Copy the table column units from the schema, if defined.
         tracorr_units = self.set_table_units('tracorr_table')
-        
-    # TODO: Is this function needed?
-    def __str__(self):
-        """
-        
-        Return the contents of the transmission correction object
-        as a readable string.
-        
-        """
-        # Start with the data object title and metadata
-        strg = self.get_title_and_metadata()
-
-        # Describe the transmission correction table
-        if self.tracorr_table is not None:
-            strg += self.get_data_str('tracorr_table', underline=True, underchar="-")
-        return strg
 
 
 #
