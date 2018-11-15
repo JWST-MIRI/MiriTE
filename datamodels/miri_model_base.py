@@ -2976,11 +2976,11 @@ class MiriDataModel(DataModel):
                                 # Either the data model units are blank or
                                 # an explicit value has been provided. The unit
                                 # can be set to the value provided.
-                                strg = "Table %s: " % name
-                                strg += "Changing column \'%s\' " % fieldnames[ii]
-                                strg += "units from \'%s\' to \'%s\'" % \
-                                    (str(fromunits), str(tableunits[ii]))
-                                print(strg)
+#                                 strg = "Table %s: " % name
+#                                 strg += "Changing column \'%s\' " % fieldnames[ii]
+#                                 strg += "units from \'%s\' to \'%s\'" % \
+#                                     (str(fromunits), str(tableunits[ii]))
+#                                 print(strg)
                                 mytable.columns[fieldnames[ii]].unit = tableunits[ii]
                     # Write back the modified table
                     setattr(self, name, mytable)
