@@ -75,6 +75,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/introduction.html#crds-reference-files
 09 Nov 2018: Added 'FRINGE_CALSOURCE' to the dictionary. Moved 'PSF-MONOCHROM',
              'RESET' and 'IPC' into the OBSOLETE section. Reordered the CDPs
              in the dictionary to reflect the order on the wiki.
+15 Nov 2018: Dictionary modified to include CDP-3 variant of the MRS
+             straylight model.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -129,7 +131,7 @@ from miri.datamodels.miri_psf_models import \
 from miri.datamodels.miri_readnoise_model import MiriReadnoiseModel
 from miri.datamodels.miri_reset_model import MiriResetModel
 from miri.datamodels.miri_straylight_model import \
-    MiriMrsStraylightModel
+    MiriMrsStraylightModel, MiriMrsStraylightModel_CDP3
 from miri.datamodels.miri_telescope_emission_model import \
     MiriTelescopeEmissionModel
 
@@ -222,11 +224,11 @@ CDP_DICT = { \
             'SKYFLAT' : MiriSkyFlatfieldModel,  \
             'FLAT-TA' : MiriTargetFlatfieldModel,  \
             'FRINGEFREQ' : MiriMrsFringeFrequenciesModel, \
+            # STRAYMASK corresponds to the new format CDP and STRAY to the old one.
             'STRAYMASK' : {'MIRIFUSHORT' : MiriMrsStraylightModel, \
                            'MIRIFULONG'  : MiriMrsStraylightModel }, \
-            # STRAY is an alias for STRAYMASK
-            'STRAY'   : {'MIRIFUSHORT' : MiriMrsStraylightModel, \
-                         'MIRIFULONG'  : MiriMrsStraylightModel }, \
+            'STRAY'   : {'MIRIFUSHORT' : MiriMrsStraylightModel_CDP3, \
+                         'MIRIFULONG'  : MiriMrsStraylightModel_CDP3 }, \
             'TRACORR' : MiriMrsTransmissionCorrectionModel, \
             'WAVCORR' : MiriMrsWavelengthCorrectionModel, \
             'RESOL'   : MiriMrsResolutionModel, \

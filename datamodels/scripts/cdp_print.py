@@ -142,7 +142,7 @@ if __name__ == "__main__":
     with miri.datamodels.open( init=inputfile, astype=datatype ) as datamodel:
         if hasattr(datamodel.meta, 'reftype'):
             datatype = datamodel.meta.reftype
-            strg = "The data model is of (post-CDP-3) type \'%s\'" % str(datatype)
+            strg = "The data model is of type \'%s\'" % str(datatype)
         elif hasattr(datamodel.meta, 'datatype'):
             datatype = datamodel.meta.datatype
             strg = "The data model is of (pre-CDP-3) type \'%s\'" % str(datatype)

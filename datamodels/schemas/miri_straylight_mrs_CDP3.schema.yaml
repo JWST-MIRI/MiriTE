@@ -1,0 +1,9 @@
+allOf:
+- $ref: miri_bad_pixel_mask.schema.yaml
+- type: object
+  title: MIRI Old Format MRS Straylight pixel mask
+  properties:
+    dq:
+      title: Straylight pixel mask
+      fits_hdu: DQ
+      datatype: uint32
