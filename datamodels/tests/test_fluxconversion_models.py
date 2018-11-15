@@ -28,6 +28,8 @@ in the datamodels.miri_fluxconversion_model module.
 03 Dec 2015: Added MiriPowerlawColourCorrectionModel.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 24 Oct 2017: Set the pixel size when testing MiriMrsFluxConversionModel
+15 Nov 2018: MRS schema switched to use JWST mirmrs_photom.schema.yaml.
+             3-D versions of the MRS data are no longer accepted.
 
 @author: Steven Beard (UKATC)
 
@@ -505,14 +507,12 @@ class TestMiriMrsFluxconversionModel(unittest.TestCase):
         
     def setUp(self):
         # Create a typical MRS flux conversion product.        
-        flux_plane = [(1.0, 1.1, 1.2),
+        self.flux = [(1.0, 1.1, 1.2),
                       (1.3, 1.4, 1.5),
                       (1.6, 1.7, 1.8)]
-        self.flux = [flux_plane, flux_plane, flux_plane]
-        err_plane = [(0.0, 0.01, 0.0),
+        self.err = [(0.0, 0.01, 0.0),
                      (0.02, 0.0, 0.03),
                      (0.01, 0.04, 0.0)]
-        self.err = [err_plane, err_plane, err_plane]
         self.dq =  [(1,0,0), (0,1,0), (1,0,1)]
         
         self.pixsiz = [(1.01, 1.02, 1.03),
