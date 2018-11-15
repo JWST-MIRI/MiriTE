@@ -16,7 +16,7 @@ The MRS flux conversion model, MiriMrsFluxconversionModel, is still in use.
 :Reference:
 
 The STScI jwst.datamodels documentation. See
-http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
+https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 
 :History:
 
@@ -78,6 +78,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
              Explicitly set table column units based on the tunit definitions
              in the schema. Removed redundant function. Removed redundant
              function.
+15 Nov 2018: MRS schema switched to use JWST mirmrs_photom.schema.yaml.
+             3-D versions of the MRS data are no longer accepted.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -538,14 +540,15 @@ if __name__ == '__main__':
             testflux3.save("test_lrs_flux_model1.fits", overwrite=True)
         del testflux3
 
-    print("\nMRS flux with RSRF defined in a data cube (old format):")
-    with MiriMrsFluxconversionModel( data=flux_mrs, err=err_mrs ) as testflux3:
-        print(testflux3)
-        if PLOTTING:
-            testflux3.plot(description="testflux3")
-        if SAVE_FILES:
-            testflux3.save("test_mrs_flux_model1.fits", overwrite=True)
-        del testflux3
+# OLD DATA NO LONGER SUPPORTED
+#     print("\nMRS flux with RSRF defined in a data cube (old format):")
+#     with MiriMrsFluxconversionModel( data=flux_mrs, err=err_mrs ) as testflux3:
+#         print(testflux3)
+#         if PLOTTING:
+#             testflux3.plot(description="testflux3")
+#         if SAVE_FILES:
+#             testflux3.save("test_mrs_flux_model1.fits", overwrite=True)
+#         del testflux3
 
     print("\nMRS flux with RSRF defined in a the detector plane (new format):")
     with MiriMrsFluxconversionModel( data=flux_plane, err=err_plane,

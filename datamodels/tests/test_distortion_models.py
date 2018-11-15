@@ -79,10 +79,13 @@ class TestMiriImagingDistortionModel(unittest.TestCase):
                [0.0,0.1,0.0],
                [0.1,0.0,0.0]
                ]
+        self.boresight_offsets = [('One', 0.1, 0.2),
+                                  ('Two', 0.2, 0.3)]
         self.dataproduct = MiriImagingDistortionModel( amatrix=self.bmatrix,
                                                 bmatrix=self.amatrix,
                                                 tmatrix=self.tmatrix,
-                                                mmatrix=self.mmatrix )
+                                                mmatrix=self.mmatrix,
+                                                boresight_offsets=self.boresight_offsets )
         # Add some example metadata.
         self.dataproduct.set_target_metadata(0.0, 0.0)
         self.dataproduct.set_instrument_metadata(detector='MIRIFUSHORT',
@@ -126,7 +129,8 @@ class TestMiriImagingDistortionModel(unittest.TestCase):
         dataproduct1 = MiriImagingDistortionModel( bmatrix=self.bmatrix,
                                             amatrix=self.amatrix,
                                             tmatrix=self.tmatrix,
-                                            mmatrix=self.mmatrix )
+                                            mmatrix=self.mmatrix,
+                                            boresight_offsets=self.boresight_offsets )
         self.assertTrue( np.allclose(dataproduct1.bmatrix, self.bmatrix) )
         self.assertTrue( np.allclose(dataproduct1.amatrix, self.amatrix) )
         self.assertTrue( np.allclose(dataproduct1.tmatrix, self.tmatrix) )

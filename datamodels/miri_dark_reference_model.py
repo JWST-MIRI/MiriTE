@@ -10,7 +10,7 @@ additional metadata.
 :Reference:
 
 The STScI jwst.datamodels documentation. See
-http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
+https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 
 :History:
 
@@ -57,6 +57,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/datamodels/index.html
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 06 Jul 2018: Merged schema with JWST software. DARK data is now only
              accepted with 4-D data, err and dq arrays.
+15 Nov 2018: Schema switched to use JWST darkMIRI.schema.yaml.
+             3-D DARK reference data are no longer accepted.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 

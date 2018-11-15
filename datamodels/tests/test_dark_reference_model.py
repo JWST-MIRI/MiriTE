@@ -36,6 +36,7 @@ in the datamodels.miri_dark_reference_model module.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 06 Jul 2018: Merged schema with JWST software. DARK data is now only
              accepted with 4-D data, err and dq arrays.
+15 Nov 2018: Schema switched to use JWST darkMIRI.schema.yaml.
 
 @author: Steven Beard (UKATC)
 
@@ -70,7 +71,7 @@ class TestMiriDarkReferenceModel(unittest.TestCase):
         acube = [a1,a1,a1]
         bcube = [b1,b1,b1]
         ccube = [c1,c1,c1]
-        self.ahyper = [acube,acube]#
+        self.ahyper = [acube,acube]
         self.bhyper = [bcube,bcube]
         self.chyper = [ccube,ccube]
         self.dataproduct = MiriDarkReferenceModel(data=self.ahyper,
@@ -115,19 +116,19 @@ class TestMiriDarkReferenceModel(unittest.TestCase):
         self.assertIsNotNone(pedigree)
 
     def test_creation(self):
-        # 3-D data, 3-D err and 2-D dq must be accepted
+        # Only 4-D data are accepted
         testproduct = MiriDarkReferenceModel(data=self.ahyper,
                                             err=self.bhyper,
                                             dq=self.chyper)
         descr = str(testproduct)
         del testproduct, descr
         
-        # 3-D data without err must be acceptable
+        # 4-D data without err must be acceptable
         testproduct = MiriDarkReferenceModel(data=self.ahyper, dq=self.chyper)
         descr = str(testproduct)
         del testproduct, descr
 
-        # 3-D data without err or dq be acceptable
+        # 4-D data without err or dq be acceptable
         testproduct = MiriDarkReferenceModel(data=self.ahyper)
         descr = str(testproduct)
         del testproduct, descr
