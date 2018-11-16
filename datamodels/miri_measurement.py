@@ -18,7 +18,7 @@ which vary with a variable.
 15 Jun 2017: TYPE keyword replaced by DATAMODL.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 14 Nov 2018: Explicitly set table column units based on the tunit definitions
-             in the schema.
+             in the schema. Changed 'ANY' to 'N/A' in test data.
 
 @author: Steven Beard (UKATC)
 
@@ -767,7 +767,7 @@ if __name__ == '__main__':
 #                                     unit=unit, vname=vname, vunit=vunit,
 #                                     interptype='LINEAR')
         meas1.set_instrument_metadata(detector=detector, modelnam='FM',
-                                filt='ANY', channel='ANY', band='ANY',
+                                filt='N/A', channel='N/A', band='N/A',
                                 ccc_pos='OPEN', deck_temperature=None,
                                 detector_temperature=6.7)
         print(meas1)
@@ -803,7 +803,7 @@ if __name__ == '__main__':
 #                                     unit=unit, vname=vname, vunit=vunit,
 #                                     interptype='LOGLIN')
         meas2.set_instrument_metadata(detector=detector, modelnam='FM',
-                                filt='ANY', channel='ANY', band='ANY',
+                                filt='N/A', channel='N/A', band='N/A',
                                 ccc_pos='OPEN', deck_temperature=None,
                                 detector_temperature=6.7)
         print(meas2)
