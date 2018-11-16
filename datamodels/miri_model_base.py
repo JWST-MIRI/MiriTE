@@ -2956,32 +2956,41 @@ class MiriDataModel(DataModel):
                         # Warn if the units defined in the schema don't match the
                         # units defined in the table.
                         if tableunits[ii]:
-                            fromunits = mytable.columns[fieldnames[ii]].unit
-                            if fromunits is not None and fromunits and \
-                               fromunits != "None" and defaulted:
-                                # The data model units are already defined
-                                # and a default value is present in the schema.
-                                # Give a warning if the two values differ and
-                                # don't change anything.
-                                if str(tableunits[ii]) != str(fromunits):
-                                    strg = "Table \'%s\': " % name
-                                    strg += "Column \'%s\' units " % fieldnames[ii]
-                                    strg += "defined in the data  "
-                                    strg += "(%s) do not match the default units " % \
-                                        str(fromunits)
-                                    strg += "defined in the schema (%s)." % \
-                                        str(tableunits[ii])
-                                    warnings.warn(strg)    
-                            else:
-                                # Either the data model units are blank or
-                                # an explicit value has been provided. The unit
-                                # can be set to the value provided.
-#                                 strg = "Table %s: " % name
-#                                 strg += "Changing column \'%s\' " % fieldnames[ii]
-#                                 strg += "units from \'%s\' to \'%s\'" % \
-#                                     (str(fromunits), str(tableunits[ii]))
-#                                 print(strg)
-                                mytable.columns[fieldnames[ii]].unit = tableunits[ii]
+                            try:
+                                fromunits = mytable.columns[fieldnames[ii]].unit
+                                if fromunits is not None and fromunits and \
+                                   fromunits != "None" and defaulted:
+                                    # The data model units are already defined
+                                    # and a default value is present in the schema.
+                                    # Give a warning if the two values differ and
+                                    # don't change anything.
+                                    if str(tableunits[ii]) != str(fromunits):
+                                        strg = "Table \'%s\': " % name
+                                        strg += "Column \'%s\' units " % fieldnames[ii]
+                                        strg += "defined in the data  "
+                                        strg += "(%s) do not match the default units " % \
+                                            str(fromunits)
+                                        strg += "defined in the schema (%s)." % \
+                                            str(tableunits[ii])
+                                        warnings.warn(strg)    
+                                else:
+                                    # Either the data model units are blank or
+                                    # an explicit value has been provided. The unit
+                                    # can be set to the value provided.
+#                                     strg = "Table %s: " % name
+#                                     strg += "Changing column \'%s\' " % fieldnames[ii]
+#                                     strg += "units from \'%s\' to \'%s\'" % \
+#                                         (str(fromunits), str(tableunits[ii]))
+#                                     print(strg)
+                                    mytable.columns[fieldnames[ii]].unit = tableunits[ii]
+                            except (KeyError, AttributeError):
+                                # An exception indicates either the column entry
+                                # or the 'unit' attribute were not found. There
+                                # is something strange about the data model table.
+                                strg = "Table \'%s\': " % name
+                                strg += "Column \'%s\' not found in data model. " % fieldnames[ii]
+                                strg += "Cannot check the column units."
+                                warnings.warn(strg)    
                     # Write back the modified table
                     setattr(self, name, mytable)
 # The following warning happens whenever an empty data model is created to be
