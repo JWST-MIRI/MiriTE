@@ -80,6 +80,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              function.
 15 Nov 2018: MRS schema switched to use JWST mirmrs_photom.schema.yaml.
              3-D versions of the MRS data are no longer accepted.
+16 Nov 2018: Use of the JWST mirmrs_photom.schema.yaml reverted! This schema
+             added a phot_table entry which is unnecessary and caused the
+             MRS CDPs to be rejected
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
