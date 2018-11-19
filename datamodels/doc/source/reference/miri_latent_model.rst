@@ -29,6 +29,6 @@ When stored as a FITS file, a LATENT CDP contains the following HDUs
 
 * Primary - metadata
 * LATENT1 - latent correction table 1
-* LATENT1 - latent correction table 2
-* LATENT1 - latent correction table 3
-* LATENT1 - latent correction table 4
+* LATENT2 - latent correction table 2
+* LATENT3 - latent correction table 3
+* LATENT4 - latent correction table 4

@@ -22,6 +22,11 @@ When stored as a FITS file, a spectral spatial resolution CDP contains the
 following HDUs
 
 * Primary - metadata
-* RESOLVING_POWER - resolving power table
-* PSF_FWHM_ALPHA - alpha spectral resolution table
-* PSF_FWHM_BETA - beta spectral resolution table
+* PSF_FWHM_ALPHA - Alpha spectral resolution table
+* PSF_FWHM_BETA - Beta spectral resolution table
+* RESOL_DATA - Resolving power table
+* MSLF_DATA - Parameters describing the MLSF profile
+* PHASE1_DATA - Samples for constructing the Phase1 spline
+* PHASE2_DATA - Coefficients for constructing the Phase2 polynomials
+* PHASE3_DATA - Coefficients for constructing the Phase3 polynomials
+* ETALON_DATA - Description of the etalon line fit

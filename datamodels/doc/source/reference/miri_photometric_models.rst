@@ -21,6 +21,9 @@ Objects
 .. autoclass:: MiriImagingPhotometricModel
    :members:
 
+.. autoclass:: MiriLrsPhotometricModel
+   :members:
+
 .. autoclass:: MiriPixelAreaModel
    :members:
 
@@ -34,3 +37,6 @@ When stored as a FITS file, a MIRI photometric model contains the following HDUs
 
 * Primary - metadata
 * PHOTOM - Photometric flux conversion table
+
+The MIRI pixel area model contains a data array describing the effective area
+of each detector pixel.

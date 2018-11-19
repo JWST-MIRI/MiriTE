@@ -31,5 +31,4 @@ Data formats
 When stored as a FITS file, a stray light CDP contains the following HDUs
 
 * Primary - metadata
-* DQ - stray light mask (rows x columns)
-* DQ_DEF - description of the contents of the stray light mask
+* MASK - stray light mask (rows x columns)
