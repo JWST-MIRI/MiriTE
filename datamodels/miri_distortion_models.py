@@ -117,7 +117,7 @@ class MiriImagingDistortionModel(MiriDataModel):
     parameters, below. Metadata items are available within a ".meta"
     attribute tree.
     
-    See http://ssb.stsci.edu/doc/jwst_dev/jwst.datamodels.doc/html/index.html.
+    See https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
     
     :Parameters:
     
@@ -402,11 +402,14 @@ class MiriLrsD2WModel(MiriDataModel):
     A generic data model for a MIRI LRS distortion and wavelength
     calibration table.
 
+    See MIRI-TR-10020-MPI for a detailed description of the content
+    of the data model.
+
     After a data model has been created, the wavelength table is available
     within the attribute .wavelength_table. Metadata items are available
     within a ".meta" attribute tree.
     
-    See http://ssb.stsci.edu/doc/jwst_dev/jwst.datamodels.doc/html/index.html.
+    See https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
    
     :Parameters:
     

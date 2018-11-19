@@ -42,6 +42,9 @@ class MiriMrsApertureCorrectionModel(MiriDataModel):
     
     A generic data model for a MIRI aperture correction table,
     based on the STScI base model, DataModel.
+
+    See MIRI-DS-00011-NLC for a detailed description of the content
+    of the data model.
     
     :Parameters:
     

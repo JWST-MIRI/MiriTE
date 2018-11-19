@@ -390,13 +390,15 @@ mrssrf_reference_flags = insert_value_column( mrssrf_reference_setup )
 class MiriMrsFluxconversionModel(MiriMeasuredModel):
     """
     
-    A data model for MIRI LRS mode flux conversion data, based on
-    MiriFluxconversionModel, but with the flux factors looked up
-    by wavelength.
+    A data model for MIRI MRS mode flux conversion data, based on
+    MiriMeasuredModel.
+
+    See MIRI-TN-00003-KUL and MIRI-TN-00004-KUL for a description of the
+    MRS spectrophotometric calibration.
     
     :Parameters:
     
-    The same as MiriMeasuredModel plus
+    The same as MiriMeasuredModel (data, err, dq) plus
     
     pixsiz: numpy array (optional)
         An array containing the pixel size data.

@@ -248,6 +248,9 @@ class MiriImagingPointSpreadFunctionModel(MiriPointSpreadFunctionModel):
     MiriPointSpreadFunctionModel, with the PSFs looked up
     by filter name.
     
+    See MIRI-TN-00076-ATC for a detailed description of the content
+    of the data model.
+    
     :Parameters:
     
     The same as MiriPointSpreadFunctionModel with the addition of

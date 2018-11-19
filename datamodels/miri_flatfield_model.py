@@ -282,7 +282,9 @@ class MiriFringeFlatfieldModel(MiriFlatfieldModel):
     A variation of MiriFlatfieldModel used to maintain FRINGE flats.
     The structure is identical to MiriFlatfieldModel, except the
     REFTYPE is defined as 'FRINGE'.
-    
+
+    See MIRI-RP-00510-NLC for information on fringing.
+
     :Parameters:
     
     init: shape tuple, file path, file object, pyfits.HDUList, numpy array
