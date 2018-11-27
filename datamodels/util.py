@@ -665,20 +665,25 @@ def verify_metadata(datamodel):
         try:
             value = datamodel.get_fits_keyword(name)
 #             print("%s = %s" % (name, str(value)))
+            # Check for a null value, empty string or white space.
             if value is not None:
-                if isinstance(test_values,(tuple,list)):
-                    # Multiple possible values
-                    if len(test_values) > 0:
-                        if value not in test_values:
+                if len(str(value).strip()) > 0:
+                    if isinstance(test_values,(tuple,list)):
+                        # Multiple possible values
+                        if len(test_values) > 0:
+                            if value not in test_values:
+                                failure_string += "  Value of \'%s\' is " % name
+                                failure_string += "%s instead of one of %s.\n" % \
+                                    (str(value),str(test_values))
+                    else:
+                        # Single possible value
+                        if value != test_values:
                             failure_string += "  Value of \'%s\' is " % name
-                            failure_string += "%s instead of one of %s.\n" % \
+                            failure_string += "%s instead of %s.\n" % \
                                 (str(value),str(test_values))
                 else:
-                    # Single possible value
-                    if value != test_values:
-                        failure_string += "  Value of \'%s\' is " % name
-                        failure_string += "%s instead of %s.\n" % \
-                            (str(value),str(test_values))
+                    failure_string += "  Compulsory metadata keyword "
+                    failure_string += "\'%s\' is blank.\n" % name
             else:
                 failure_string += "  Compulsory metadata keyword "
                 failure_string += "\'%s\' is not defined.\n" % name
