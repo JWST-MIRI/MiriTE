@@ -77,6 +77,8 @@ ray events.
              Added flags for finer control over which tests are run.
              Statistics function added. Rebin by averaging.
 31 Oct 2017: Reduced verbosity of cosmic ray event reporting.
+28 Nov 2018: Added the load_cosmic_ray_single function, which creates a
+             cosmic ray environment where events always have the same energy.
 
 @author: Steven Beard (UKATC)
 
@@ -416,6 +418,7 @@ class CosmicRayEnvironment(object):
     method: string
         The method of cosmic ray generation.
         
+        * SINGLE_ENERGY - Generate random cosmic rays of a single energy.
         * RANDOM - Generate random cosmic rays based on a probability
           distribution.
         * LIBRARY - Read cosmic ray descriptions from a prepared
@@ -425,6 +428,7 @@ class CosmicRayEnvironment(object):
         A vector of cosmic ray energies in MeV. This vector can be used
         in one of two ways, depending on the generation method:
         
+        * SINGLE_ENERGY - A list of identical cosmic ray energies
         * RANDOM - A list of likely cosmic ray energies
         * LIBRARY - A list of cosmic ray energies read from the library.
              
@@ -502,7 +506,7 @@ class CosmicRayEnvironment(object):
         self.method = method
         self.energies = np.asarray(energies)
         
-        if method == 'RANDOM':
+        if method == 'RANDOM' or method == 'SINGLE_ENERGY':
             if distribution is not None:
                 if len(distribution) == len(energies):
                     self.distribution = np.asarray(distribution)
@@ -1069,7 +1073,7 @@ class CosmicRayEnvironment(object):
         hit_column = int(np.random.uniform(0, columns))
         hit_coords = (hit_row, hit_column)
             
-        if self.method == 'RANDOM':
+        if self.method == 'RANDOM' or self.method == 'SINGLE_ENERGY':
             # Select a random event from the list of possible energies
             # weighted by the given incremental probability
             # distribution.
@@ -1105,6 +1109,69 @@ class CosmicRayEnvironment(object):
                                logger=self.logger)
         
         return cosmic_ray        
+
+
+def load_cosmic_ray_single(cosmic_ray_mode='SOLAR_MIN', energy=1.0e4, verbose=2,
+                           logger=LOGGER):
+    """
+    
+    Create a CosmicRayEnvironment object which generates cosmic ray events
+    at a single energy level only. This option is useful for software
+    testing and debugging but is not a realistic environment.
+    
+    :Parameters:
+    
+    cosmic_ray_mode: string, optional, default='SOLAR_MIN'
+        The cosmic ray flux to be simulated. Available modes are:
+        
+        * 'NONE' - No cosmic rays.
+        * 'SOLAR_MIN' - Solar minimum
+        * 'SOLAR_MAX' - Solar maximum
+        * 'SOLAR_FLARE' - Solar flare (worst case scenario)
+        
+    energy: float, optional, default=1.0e4
+        The cosmic ray energy in MeV. All cosmic ray events will have
+        this same energy. The normal range is 10.0 MeV to 1.0e7 MeV.
+    verbose: int, optional, default=2
+        Verbosity level. Activates print statements when non-zero.
+        
+        * 0 - no output at all except for error messages
+        * 1 - warnings and errors only
+        * 2 - normal output
+        * 3, 4, 5 - additional commentary
+        * 6, 7, 8 - extra debugging information
+
+    logger: Logger object (optional)
+        A Python logger to handle the I/O. This parameter can be used
+        by a caller to direct the output to a different logger, if
+        the default defined by this module is not suitable.
+     
+    :Returns:
+    
+    A new CosmicRayEnvironment object.
+    
+    """
+    if (verbose > 1) and (cosmic_ray_mode != 'NONE'):
+        logger.info( "Creating randomised cosmic ray environment for mode %s" % \
+            cosmic_ray_mode)
+    if (verbose > 1) and (cosmic_ray_mode != 'NONE'):
+        strg = "Creating a single energy cosmic ray environment "
+        strg += "for mode %s. All events have energy %g MeV." \
+            % (cosmic_ray_mode, energy)
+        logger.info(strg)
+
+    cr_flux = cosmic_ray_properties.get('CR_FLUX', cosmic_ray_mode) * \
+        cosmic_ray_properties['CR_FLUX_MULTIPLIER']
+        
+    energies = np.array([energy, energy, energy, energy]) * \
+                    cosmic_ray_properties['CR_ENERGY_MULTIPLIER']
+    distribution = np.array([0.25, 0.25, 0.25, 0.25])
+    
+    cr_env = CosmicRayEnvironment(cr_flux, 'SINGLE_ENERGY', energies=energies,
+                                  distribution=distribution,
+                                  images=None, nucleons=None,
+                                  verbose=verbose, logger=logger)
+    return cr_env
 
 
 def load_cosmic_ray_random(cosmic_ray_mode='SOLAR_MIN', verbose=2,

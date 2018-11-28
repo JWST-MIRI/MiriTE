@@ -85,6 +85,7 @@ https://jwst-docs.stsci.edu/display/JDAT/JWST+File+Names%2C+Formats%2C+and+Data+
 19 Feb 2018: Added the ability to make nonlinearity correction in situ
              (for simulation).
 27 Feb 2018: Much more efficient nonlinearity correction.
+28 Nov 2018: Corrected a mistake in the schema for simulated data.
 
 @author: Steven Beard (UKATC)
 

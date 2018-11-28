@@ -12,7 +12,7 @@ properties:
       cosmic_ray_mode:
         type: string
         title: Cosmic ray mode
-        enum: [SOLAR_MIN, SOLAR_MIN, SOLAR_MAX, SOLAR_FLARE, NONE]
+        enum: [RANDOM, SOLAR_MIN, SOLAR_MAX, SOLAR_FLARE, NONE]
         fits_keyword: CRMODE
       cosmic_ray_variant:
         type: string

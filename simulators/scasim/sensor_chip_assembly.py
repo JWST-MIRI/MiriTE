@@ -340,6 +340,7 @@ Calibration Data Products (CDPs).
 04 Jun 2018: Added hard_reset function.
 11 Jul 2018: Explicitly convert a subarray list to a tuple when using it to
              format a string for printing.
+28 Nov 2018: Added the ability to simulate cosmic rays of a single energy.
 
 @author: Steven Beard
 
@@ -376,7 +377,7 @@ from miri.datamodels.sim import MiriExposureModel, \
 
 # The following modules form part of the sca simulator.
 from miri.simulators.scasim.cosmic_ray import CosmicRayEnvironment, CosmicRay, \
-    load_cosmic_ray_library, load_cosmic_ray_random
+    load_cosmic_ray_library, load_cosmic_ray_random, load_cosmic_ray_single
 from miri.simulators.scasim.detector import DetectorArray, SIM_CDP_FTP_PATH, \
     NONLINEARITY_BY_TABLE
 
@@ -661,6 +662,19 @@ def _mjd_to_clock( mjd_days ):
     clock_seconds = (mjd_days - MJD_ZEROPOINT) * SECONDS_PER_DAY
     return clock_seconds
  
+def _is_number( strg ):
+    """
+    
+    Helper function which determines whether the given string parameter
+    contains a valid number. Returns True if the string is a number and
+    False otherwise.
+    
+    """
+    try:
+        isitanumber = float( strg )
+        return True
+    except (ValueError, TypeError):
+        return False
 
 # A metaclass which only allows one instance of a class to exist at a time.
 class Singleton(type):
@@ -810,6 +824,7 @@ class SensorChipAssembly(object):
             * 'SOLAR_MIN' - Solar minimum
             * 'SOLAR_MAX' - Solar maximum
             * 'SOLAR_FLARE' - Solar flare (worst case scenario)
+            * '<flux>+<energy>' - Single flux and energy mode
             
         fileformat: string, optional, default='STScI'
             The kind of file format to be written.
@@ -1080,23 +1095,33 @@ class SensorChipAssembly(object):
         Define the cosmic ray environment for the simulation.
         
         Cosmic ray simulations for the MIRI sensors are assumed to be
-        contained in files named CRs_SiAs_35_<mode>_<number>_<suffix>.fits
-        where
+        contained in files named CRs_SiAs_470_<mode>_<number>_<suffix>.fits
+        where::
         
         * <mode> is the cosmic ray mode.
         * <number> is a simulation run number (selected at random by
           this function).
+        * <suffix> is an optional suffix contain a variation of the library.
 
         :Parameters:
         
         cosmic_ray_mode: string, optional, default='SOLAR_MIN'
             The cosmic ray environment mode to be simulated. Available modes
-            are:
+            are::
         
             * 'NONE' - No cosmic rays.
             * 'SOLAR_MIN' - Solar minimum
             * 'SOLAR_MAX' - Solar maximum
             * 'SOLAR_FLARE' - Solar flare (worst case scenario)
+            
+            An optional suffix can be added to the cosmic ray mode
+            (separated by a '+') to select a particular variation of the
+            cosmic ray simulation library. For example, 'SOLAR_MIN+IPC'
+            selects the variant of the solar minimum library which includes
+            'IPC' charge crosstalk effects.
+            If the suffix contains a number, for example 'SOLAR_MIN+1.0e7',
+            the number restricts all cosmic ray events to a single
+            energy level. Useful for testing and debugging.
         
         """
         # Only set up a new cosmic ray environment when the mode has changed,
@@ -1106,6 +1131,10 @@ class SensorChipAssembly(object):
             if self._verbose > 1:
                 self.logger.info( self.cosmic_ray_str() + " (No change.)" )
             return
+
+        # Delete any previous cosmic ray environment
+        if self.cosmic_ray_env is not None:
+            del self.cosmic_ray_env
         
         # Set up the cosmic ray environment, based on the required cosmic
         # ray mode. Choose one of the 10 library files available for that
@@ -1120,45 +1149,55 @@ class SensorChipAssembly(object):
         else:
             suffix = ''
         if cr_mode != 'NONE':
-            filenum = int(np.random.uniform(0, 9))
-            try:
-                crname = cosmic_ray_properties.get('CR_LIBRARY_FILES', \
-                                                   cr_mode)
-                if crname is not None:
-                    if suffix:
-                        filename = '%s0%d_%s.fits' % (crname, filenum, suffix)
+            # If the suffix contains a number then a single energy mode
+            # has been requested.
+            if suffix and _is_number( suffix ):
+                # A single energy cosmic ray mode has been requested.
+               self.cosmic_ray_env = load_cosmic_ray_single(
+                                                    cosmic_ray_mode=cr_mode,
+                                                    energy=float(suffix),
+                                                    verbose=self._verbose,
+                                                    logger=self.toplogger)
+            else:
+                # Try and define the cosmic ray environment from a library file.
+                filenum = int(np.random.uniform(0, 9))
+                try:
+                    crname = cosmic_ray_properties.get('CR_LIBRARY_FILES', \
+                                                       cr_mode)
+                    if crname is not None:
+                        if suffix:
+                            filename = '%s0%d_%s.fits' % (crname, filenum, suffix)
+                        else:
+                            filename = '%s0%d.fits' % (crname, filenum)
                     else:
-                        filename = '%s0%d.fits' % (crname, filenum)
-                else:
-                    filename = None
-            except KeyError:
-                strg = "Unrecognised cosmic ray mode: %s" % cosmic_ray_mode
-                raise KeyError(strg)
-                        
-            # Delete any previous cosmic ray environment
-            if self.cosmic_ray_env is not None:
-                del self.cosmic_ray_env
-            try:
-                self.cosmic_ray_env = load_cosmic_ray_library(filename,
+                        filename = None
+                except KeyError:
+                    strg = "Unrecognised cosmic ray mode: %s" % cosmic_ray_mode
+                    raise KeyError(strg)
+                            
+                try:
+                    self.cosmic_ray_env = load_cosmic_ray_library(filename,
                                                     cosmic_ray_mode=cr_mode,
                                                     convolve_ipc=True,
                                                     verbose=self._verbose,
                                                     logger=self.toplogger)
-            except Exception:
-                # If the cosmic ray library file cannot be read, fall back
-                # to using a random distribution.
-                if filename is not None:
-                    strg = "***Cosmic ray library '%s' not readable." % \
-                        filename
-                else:
-                    strg = "***Cosmic ray library is not defined."
-                strg += " Falling back to RANDOM mode."
-                self.logger.warning(strg)
-                self.cosmic_ray_env = load_cosmic_ray_random(
+                except Exception:
+                    # If the cosmic ray library file cannot be read, fall back
+                    # to using a random distribution.
+                    if filename is not None:
+                        strg = "***Cosmic ray library '%s' not readable." % \
+                            filename
+                    else:
+                        strg = "***Cosmic ray library is not defined."
+                    strg += " Falling back to RANDOM mode."
+                    self.logger.warning(strg)
+                    self.cosmic_ray_env = load_cosmic_ray_random(
                                                     cosmic_ray_mode=cr_mode,
                                                     verbose=self._verbose,
                                                     logger=self.toplogger)
         else:
+            # Cosmic ray mode is NONE. This creates a dummy environemnt
+            # with zero flux.
             self.cosmic_ray_env = load_cosmic_ray_random(
                                                     cosmic_ray_mode=cr_mode,
                                                     verbose=self._verbose)
@@ -3330,6 +3369,7 @@ class SensorChipAssembly(object):
             * 'SOLAR_MIN' - Solar minimum
             * 'SOLAR_MAX' - Solar maximum
             * 'SOLAR_FLARE' - Solar flare (worst case scenario)
+            * '<flux>+<energy>' - Single flux and energy mode
 
             If this parameter is not explicitly given it will be obtained
             from the FITS header of the input file. Failing that, it will
@@ -3754,6 +3794,7 @@ class SensorChipAssembly(object):
             * 'SOLAR_MIN' - Solar minimum
             * 'SOLAR_MAX' - Solar maximum
             * 'SOLAR_FLARE' - Solar flare (worst case scenario)
+            * '<flux>+<energy>' - Single flux and energy mode
 
             If this parameter is not explicitly given it will be obtained
             from the FITS header of the input file. Failing that, it will
@@ -4314,6 +4355,7 @@ def simulate_sca(inputfile, outputfile, detectorid, scale=1.0, fringemap=None,
         * 'SOLAR_MIN' - Solar minimum
         * 'SOLAR_MAX' - Solar maximum
         * 'SOLAR_FLARE' - Solar flare (worst case scenario)
+        * '<flux>+<energy>' - Single flux and energy mode
 
         If this parameter is not explicitly given it will be obtained
         from the FITS header of the input file. Failing that, it will
@@ -4612,6 +4654,7 @@ def simulate_sca_list(inputfile, outputfile, detectorid, scale=1.0,
         * 'SOLAR_MIN' - Solar minimum
         * 'SOLAR_MAX' - Solar maximum
         * 'SOLAR_FLARE' - Solar flare (worst case scenario)
+        * '<flux>+<energy>' - Single flux and energy mode
 
         If this parameter is not explicitly given it will be obtained
         from the FITS header of the input file. Failing that, it will
@@ -4908,6 +4951,7 @@ def simulate_sca_pipeline(illumination_map, scale=1.0,
         * 'SOLAR_MIN' - Solar minimum
         * 'SOLAR_MAX' - Solar maximum
         * 'SOLAR_FLARE' - Solar flare (worst case scenario)
+        * '<flux>+<energy>' - Single flux and energy mode
 
         If this parameter is not explicitly given it will be obtained
         from the FITS header of the input file. Failing that, it will

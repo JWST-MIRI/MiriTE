@@ -62,6 +62,7 @@
 # 13 Jun 2017: Added cdp_ftp_path parameter.
 # 26 Oct 2017: Set cdp_ftp_path to default if not specified.
 # 14 Feb 2018: Added version number for nonlinearity CDP.
+# 26 Nov 2018: Added the ability to simulate cosmic rays of a single energy.
 # 
 # @author: Steven Beard (UKATC)
 
@@ -166,19 +167,24 @@ The following optional parameters may be provided by keyword:
         to the expected target temperature contained in the detector
         properties file.
     --crmode
-        The cosmic ray environment ('NONE', 'SOLAR_MIN', 'SOLAR_MAX'
-        or 'SOLAR_FLARE'). If not specified, the value will be taken
-        from the FITS header of the input file, or failing that the
-        default contained in the cosmic ray properties file
+        The cosmic ray environment ('NONE', 'SOLAR_MIN', 'SOLAR_MAX',
+        'SOLAR_FLARE' or '<flux>+<energy>'). If not specified, the value
+        will be taken from the FITS header of the input file, or failing
+        that the default contained in the cosmic ray properties file
         ('SOLAR_MIN') will be used.
         *NOTE: 'SOLAR_FLARE' simulations can take a long time because
         of the high number of cosmic ray events involved. Use very
         short exposures.*
         An optional suffix can be added to this parameter (separated
-        by a '+' to select a particular variation of the cosmic ray
+        by a '+') to select a particular variation of the cosmic ray
         simulation library. For example, 'SOLAR_MIN+IPC' selects the
         variant of the solar minimum library which includes 'IPC'
-        charge crosstalk effects. 
+        charge crosstalk effects.
+        If the suffix contains a number, for example 'SOLAR_MIN+1.0e7',
+        the number restricts all cosmic ray events to a particular
+        energy level. Useful for testing and debugging.
+       *NOTE: Be careful not to include an extra '+' into the string.
+        Use 'SOLAR_MIN+1.0e7' not 'SOLAR_MIN+1.0e+7'.*
     --format
         The file format required ('STSCI' or 'FITSWriter').
         In 'FITSWriter' format the data array is written to the primary
