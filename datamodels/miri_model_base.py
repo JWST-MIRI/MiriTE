@@ -169,6 +169,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              save the data model, not when reading it.
 14 Nov 2018: Added get_table_units and set_table_units functions.
              Removed the setting of WCS metadata from the module tests.
+17 Jan 2019: Changed set_exposure_type filter parameter to mirifilter.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -206,7 +207,7 @@ __all__ = ['get_exp_type', 'MiriDataModel']
 #
 # Public global function.
 #
-def get_exp_type(detector, filter, subarray='FULL', datatype='SCIENCE'):
+def get_exp_type(detector, mirifilter, subarray='FULL', datatype='SCIENCE'):
     """
     
     Helper function which derives an exposure type given a combination
@@ -219,7 +220,7 @@ def get_exp_type(detector, filter, subarray='FULL', datatype='SCIENCE'):
     
     detector: str
         Name of detector (MIRIMAGE, MIRIFUSHORT or MIRIFULONG)
-    filter: str
+    mirifilter: str
         Name of filter
     subarray: str, optional
         Name of subarray (defaults to 'FULL')
@@ -234,21 +235,21 @@ def get_exp_type(detector, filter, subarray='FULL', datatype='SCIENCE'):
     
     """
     assert isinstance(detector, str)
-    assert isinstance(filter, str)
+    assert isinstance(mirifilter, str)
     
     if 'MIRIFU' in detector:
-        if (filter and 'OPAQUE' in filter) or (datatype == 'DARK'):
+        if (mirifilter and 'OPAQUE' in mirifilter) or (datatype == 'DARK'):
             exp_type = 'MIR_DARK'
         elif datatype == 'FLAT':
             exp_type = 'MIR_FLAT-MRS'
         else:
             exp_type = 'MIR_MRS'
     elif 'IM' in detector:
-        if (filter and 'OPAQUE' in filter) or (datatype == 'DARK'):
+        if (mirifilter and 'OPAQUE' in mirifilter) or (datatype == 'DARK'):
             exp_type = 'MIR_DARK'
         elif datatype == 'FLAT':
             exp_type = 'MIR_FLAT-IMAGE'
-        elif filter and 'P750L' in filter:
+        elif mirifilter and 'P750L' in mirifilter:
             if 'SLITLESS' in subarray:
                 exp_type = 'MIR_LRS-SLITLESS'
             else:
@@ -1175,7 +1176,7 @@ class MiriDataModel(DataModel):
         else:
             return (None, None, None, None)
 
-    def set_exposure_type(self, detector=None, filter=None, subarray=None,
+    def set_exposure_type(self, detector=None, mirifilter=None, subarray=None,
                           datatype='SCIENCE'):
         """
     
@@ -1187,7 +1188,7 @@ class MiriDataModel(DataModel):
         detector: str, optional
             Name of detector (MIRIMAGE, MIRIFUSHORT or MIRIFULONG).
             If not specified, derived from the existing metadata.
-        filter: str, optional
+        mirifilter: str, optional
             Name of filter
             If not specified, derived from the existing metadata.
         subarray: str, optional
@@ -1202,18 +1203,18 @@ class MiriDataModel(DataModel):
             if hasattr(self.meta, 'instrument'):
                 if detector is None:
                     detector = self.meta.instrument.detector
-                if filter is None:
-                    filter = self.meta.instrument.filter
+                if mirifilter is None:
+                    mirifilter = self.meta.instrument.filter
             if hasattr(self.meta, 'subarray'):
                 if subarray is None:
                     subarray = self.meta.subarray.name   
             if not detector:
                 detector = 'UNKNOWN'
-            if not filter:
-                filter = 'UNKNOWN'
+            if not mirifilter:
+                mirifilter = 'UNKNOWN'
             if not subarray:
                 subarray = 'FULL'
-            exp_type = get_exp_type(detector, filter=filter, subarray=subarray,
+            exp_type = get_exp_type(detector, mirifilter=mirifilter, subarray=subarray,
                                     datatype=datatype)
             if exp_type:
                 self.meta.exposure.type = exp_type

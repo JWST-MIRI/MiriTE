@@ -2560,13 +2560,28 @@ class SensorChipAssembly(object):
         # Adjust the World Coordinates metadata contained in the INTENSITY
         # metadata, shifting the reference point to account for the
         # reference columns and subarray mode.
-        # The first two axes of the exposure data are pixels, and the
-        # rest are groups and integrations
-        naxes = 2                        
-        if self.exposure_data is not None:
-            naxes = len(self.exposure_data.shape)
-        intensity_metadata['WCSAXES'] = naxes 
-                   
+# REMOVED: Bug 434
+#         # The first two axes of the exposure data are pixels, and the
+#         # rest are groups and integrations.
+#         naxes = 2
+#         if self.exposure_data is not None:
+#             naxes = len(self.exposure_data.shape)
+#         intensity_metadata['WCSAXES'] = naxes 
+
+        # Bug 434: In JWST ramp data WCSAXES must be 2 for imager data
+        # an 3 for LRS or MRS data.
+        if 'IFU' in self.detectorid:
+            # MRS data
+            intensity_metadata['WCSAXES'] = 3
+        else:
+            mirifilter = self.illumination_map.get_fits_keyword('FILTER')
+            if mirifilter == 'P750L':
+                # LRS data
+                intensity_metadata['WCSAXES'] = 3
+            else:
+                # Imager data
+                intensity_metadata['WCSAXES'] = 2
+
         if 'CRPIX1' in self.metadata:
             crpix1 = intensity_metadata['CRPIX1']
         else:
@@ -2594,19 +2609,22 @@ class SensorChipAssembly(object):
             substrt2 = 1
         intensity_metadata['CRPIX2'] = crpix2 + 1 - substrt2
 
-        # Add the extra WCS metadata which describes ramp data
-        if naxes > 2:
-            intensity_metadata['CTYPE3'] = ''
-            intensity_metadata['CUNIT3'] = 'groups'
-            intensity_metadata['CRVAL3'] = 0.0
-            intensity_metadata['CRPIX3'] = 0.0
-            intensity_metadata['CDELT3'] = 1.0
-        if naxes > 3:
-            intensity_metadata['CTYPE4'] = ''
-            intensity_metadata['CUNIT4'] = 'integrations'
-            intensity_metadata['CRVAL4'] = 0.0
-            intensity_metadata['CRPIX4'] = 0.0
-            intensity_metadata['CDELT4'] = 1.0
+# REMOVED: Bugs 434 and 413
+# As a compromise between Bugs 434 and 413 do not add the extra axes
+# and do not label them either (groups,integrations) or (microns).
+#         # Add the extra WCS metadata which describes ramp data
+#         if naxes > 2:
+#             intensity_metadata['CTYPE3'] = ''
+#             intensity_metadata['CUNIT3'] = 'groups'
+#             intensity_metadata['CRVAL3'] = 0.0
+#             intensity_metadata['CRPIX3'] = 0.0
+#             intensity_metadata['CDELT3'] = 1.0
+#         if naxes > 3:
+#             intensity_metadata['CTYPE4'] = ''
+#             intensity_metadata['CUNIT4'] = 'integrations'
+#             intensity_metadata['CRVAL4'] = 0.0
+#             intensity_metadata['CRPIX4'] = 0.0
+#             intensity_metadata['CDELT4'] = 1.0
 
         # Copy the detector metadata to the primary metadata.         
         # NOTE: This function call should only happen AFTER
@@ -2942,8 +2960,9 @@ class SensorChipAssembly(object):
                 
                 # Define the exposure type (if not already given)
                 if not self.exposure_data.meta.exposure.type:
+                    mirifilter = self.illumination_map.get_fits_keyword('FILTER')
                     self.exposure_data.set_exposure_type(self.detectorid,
-                            filter=None, subarray=self.subarray_str)
+                            mirifilter=mirifilter, subarray=self.subarray_str)
             else:
                 self.exposure_data = ExposureData(
                                         data_shape[0], data_shape[1],
@@ -3161,7 +3180,8 @@ class SensorChipAssembly(object):
                 # Copy the metadata.
                 cube_model.copy_metadata(self.exposure_data)
                 # The new exposure data has only 3 WCS aces
-                cube_model.meta.wcsinfo.wcsaxes = 3
+# REMOVED: Bug 434
+#                 cube_model.meta.wcsinfo.wcsaxes = 3
                 # Write the cube data to the given output file.
                 cube_model.save(filename, overwrite=overwrite)
                 # Tidy up the temporary cube model.

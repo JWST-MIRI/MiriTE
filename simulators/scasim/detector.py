@@ -231,6 +231,7 @@ Calibration Data Products (CDPs).
              CDP data models are now opened within a Python context structure
              where possible.
 04 Jun 2018: Added hard_reset function.
+15 Jan 2019: Added explicit garbage collection (commented out for now).
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -245,6 +246,7 @@ LOGGER = logging.getLogger("miri.simulators") # Get a default parent logger
 
 import os
 import math
+# import gc # FIXME: Solve file open issue before using this.
 import numpy as np
 
 # Import the miri.tools plotting module.
@@ -1222,14 +1224,6 @@ class DetectorArray(object):
         # relevant window from the map. The gain map includes the
         # normal detector pixels (including the reference columns) but does
         # not include the reference rows added to the level 1 FITS data.        
-#         gain_model = get_cdp('GAIN', detector=detector,
-#                              ftp_path=cdp_ftp_path,
-#                              ftp_user=SIM_CDP_FTP_USER, 
-#                              ftp_passwd=SIM_CDP_FTP_PASSWD,
-#                              cdprelease=cdprelease,
-#                              cdpversion=cdpversion,
-#                              cdpsubversion=cdpsubversion,
-#                              logger=self.toplogger)
         with get_cdp('GAIN', detector=detector,
                              ftp_path=cdp_ftp_path,
                              ftp_user=SIM_CDP_FTP_USER, 
@@ -1279,6 +1273,7 @@ class DetectorArray(object):
             self.gain_map = gain_map
             self.mean_gain = mean_gain
             del gain_model
+        #gc.collect() # FIXME: Solve file open issue before using this.
 
 # # Original version which used a dark supplied with the SCASim release.
 #     def add_dark_map_fixed(self, filename, readpatt=None):
@@ -1584,6 +1579,7 @@ class DetectorArray(object):
                 del self.dark_map
             self.dark_map = dark_map
             del dark_model
+        #gc.collect() # FIXME: Solve file open issue before using this.
 
     def add_flat_map(self, detector, readpatt=None, subarray=None,
                      mirifilter=None, miriband=None,
@@ -1770,7 +1766,6 @@ class DetectorArray(object):
             new_map = flat_map[0:self.illuminated_shape[0],
                                0:self.detector_shape[1]]
             flat_map = new_map
-            
 
         # If there are any reference rows, extend the flat-field to
         # include the additional pixels in the reference rows, otherwise
@@ -1796,6 +1791,7 @@ class DetectorArray(object):
             del self.flat_map
         self.flat_map = flat_map
         del flat_model
+        #gc.collect() # FIXME: Solve file open issue before using this.
 
     def add_linearity_table(self, detector, mirifilter=None, miriband=None,
                      cdp_ftp_path=SIM_CDP_FTP_PATH, cdp_version=''):
@@ -1906,6 +1902,7 @@ class DetectorArray(object):
 #                                 self.linearity_table_right], title=tstrg)
 
         del linearity_model
+        #gc.collect() # FIXME: Solve file open issue before using this.
 
     def add_readnoise_map(self, detector, readpatt=None,
                           cdp_ftp_path=SIM_CDP_FTP_PATH, cdp_version=''):
@@ -2013,6 +2010,7 @@ class DetectorArray(object):
                 del self.readnoise_map
             self.readnoise_map = readnoise_map
             del readnoise_model
+        #gc.collect() # FIXME: Solve file open issue before using this.
         
     def get_subarray_shape(self, subarray=None):
         """
