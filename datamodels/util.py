@@ -71,6 +71,7 @@ processing the MIRI data models.
              FILTER, CHANNEL and BAND keywords.
 12 Nov 2018: Added compulsory metadata for imager and MRS CDPs. Reworked the
              metadata warning message so it doesn't appear twice in the output.
+29 Jan 2019: Check for a legacy DATAMODL keyword in verify_cdp_file.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -792,20 +793,43 @@ def verify_cdp_file(filename, datatype=None, overwrite=False, keepfile=False):
 
         # Warn about obsolete data tables (CDP-2 to CDP-3 only).
         if 'FIELD_DEF' in datatables or 'field_def' in datatables:
-            strg = "\n***Data object \'%s\' contains obsolete FIELD_DEF table." % \
+            strg = "Data object \'%s\' has failed the test." % \
                 (datamodel.__class__.__name__)
-            warnings.warn(strg) # Throw an exception?
+            strg += "\n  It contains an obsolete FIELD_DEF table."
+            raise TypeError(strg)
+        
         if 'GROUP_DEF' in datatables or 'group_def' in datatables:
-            strg = "***\nData object \'%s\' contains obsolete GROUP_DEF table." % \
+            strg = "Data object \'%s\' has failed the test." % \
                 (datamodel.__class__.__name__)
-            warnings.warn(strg) # Throw an exception?
+            strg += "\n  It contains an obsolete GROUP_DEF table."
+            raise TypeError(strg)
 
         # Update the data type
         if hasattr(datamodel.meta, 'reftype'):
             datatype = datamodel.meta.reftype
         elif hasattr(datamodel.meta, 'datatype'):
             datatype = datamodel.meta.datatype
-        
+            
+        # The data model type is not compulsory, but if it exists warn
+        # if it contains something unexpected.
+        if hasattr(datamodel.meta, 'model_type'):
+            model_type = str(datamodel.meta.model_type)
+            class_name = str(datamodel.__class__.__name__)
+            if not model_type:
+                strg = "\n***WARNING: Data object \'%s\' contains " % \
+                    class_name
+                strg += "an empty DATAMODL keyword in the metadata."
+                warnings.warn(strg)
+            else:
+                # Check for a legacy DATAMODL keyword, which use to contain
+                # the class name.
+                if model_type.strip().upper() == class_name.strip().upper():
+                    strg = "\n***WARNING: Data object \'%s\' contains " % \
+                        class_name
+                    strg += "a legacy DATAMODL=\'%s\' in the metadata." % \
+                        model_type
+                    warnings.warn(strg)
+                    
         # Test 2 - all data arrays and tables must be readable and not empty.
 #         print("Test 2")
         for dataarray in dataarrays:
