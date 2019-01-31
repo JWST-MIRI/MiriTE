@@ -135,12 +135,9 @@ from miri.datamodels.miri_straylight_model import \
 from miri.datamodels.miri_telescope_emission_model import \
     MiriTelescopeEmissionModel
 
-# Define a dictionary which distinguishes the different kinds of
-# models, which are distinguished by detector name and filter.
-
 # Define a dictionary giving the data type code for each of the above
 # CDP data models. Some of the models need to be distinguished by
-# detector and filter in addition to the type code.
+# detector and filter in addition to the data type.
 CDP_DICT = { \
             # -----------------------------------------------------------
             # Currently Supported Calibration Data Products

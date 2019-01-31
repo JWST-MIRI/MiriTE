@@ -45,6 +45,8 @@ in the datamodels.miri_psf_model module.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 27 Apr 2018: Temporarily comment out the TypeError test while converting
              to Python 3.
+30 Jan 2019: Test that the REFTYPE and DATAMODL metadata is not altered
+             when the data model is saved to a file.
 
 @author: Steven Beard (UKATC)
 
@@ -171,6 +173,8 @@ class TestMiriPointSpreadFunctionModel(unittest.TestCase):
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
             with MiriPointSpreadFunctionModel(self.testfile) as readback:
+                self.assertEqual(self.dataproduct.meta.reftype,
+                                 readback.meta.reftype)
                 assert_products_equal( self, self.dataproduct, readback,
                                        arrays=['data', 'err', 'dq'],
                                        tables='dq_def' )
@@ -291,6 +295,10 @@ class TestMiriImagingPointSpreadFunctionModel(unittest.TestCase):
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
             with MiriImagingPointSpreadFunctionModel(self.testfile) as readback:
+                self.assertEqual(self.dataproduct.meta.reftype,
+                                 readback.meta.reftype)
+                self.assertEqual(self.dataproduct.meta.model_type,
+                                 readback.meta.model_type)
                 assert_products_equal( self, self.dataproduct, readback,
                                        arrays=['data', 'err', 'dq'],
                                        tables=['dq_def', 'psf_lut'] )
@@ -313,8 +321,8 @@ class TestMiriImagingPointSpreadFunctionModel(unittest.TestCase):
                                 psftype='PSF-OOF')
             testproduct.save(self.testfile, overwrite=True)
             with MiriImagingPointSpreadFunctionModel(self.testfile) as readback:
-                self.assertEqual(testproduct.meta.model_type,
-                                 readback.meta.model_type)
+                self.assertEqual(testproduct.meta.reftype,
+                                 readback.meta.reftype)
                 assert_products_equal( self, testproduct, readback,
                                        arrays=['data', 'err', 'dq'],
                                        tables=['dq_def', 'psf_lut'] )
@@ -419,6 +427,10 @@ class TestMiriLrsPointSpreadFunctionModel(unittest.TestCase):
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
             with MiriLrsPointSpreadFunctionModel(self.testfile) as readback:
+                self.assertEqual(self.dataproduct.meta.reftype,
+                                 readback.meta.reftype)
+                self.assertEqual(self.dataproduct.meta.model_type,
+                                 readback.meta.model_type)
                 assert_products_equal( self, self.dataproduct, readback,
                                        arrays=['data', 'err', 'dq'],
                                        tables=['dq_def',] )
@@ -435,8 +447,8 @@ class TestMiriLrsPointSpreadFunctionModel(unittest.TestCase):
                                 err=b1, dq=c1, psftype='PSF-MONOCHROM')
             testproduct.save(self.testfile, overwrite=True)
             with MiriImagingPointSpreadFunctionModel(self.testfile) as readback:
-                self.assertEqual(testproduct.meta.model_type,
-                                 readback.meta.model_type)
+                self.assertEqual(testproduct.meta.reftype,
+                                 readback.meta.reftype)
                 assert_products_equal( self, testproduct, readback,
                                        arrays=['data', 'err', 'dq'],
                                        tables=['dq_def',] )
@@ -538,6 +550,10 @@ class TestMiriMrsPointSpreadFunctionModel(unittest.TestCase):
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
             with MiriMrsPointSpreadFunctionModel(self.testfile) as readback:
+                self.assertEqual(self.dataproduct.meta.reftype,
+                                 readback.meta.reftype)
+                self.assertEqual(self.dataproduct.meta.model_type,
+                                 readback.meta.model_type)
                 assert_products_equal( self, self.dataproduct, readback,
                                        arrays=['data', 'err', 'dq'],
                                        tables=['dq_def',] )

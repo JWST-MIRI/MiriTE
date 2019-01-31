@@ -76,6 +76,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 04 Oct 2018: Define exposure type.
 14 Nov 2018: Explicitly set table column units based on the tunit definitions
              in the schema.
+30 Jan 2019: self.meta.model_type now set to the name of the STScI data
+             model this model is designed to match (skipped if there isn't
+             a corresponding model defined in ancestry.py).
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -88,6 +91,7 @@ import numpy as np
 #import numpy.ma as ma
 
 # Import the MIRI measured data model.
+from miri.datamodels.ancestry import get_my_model_type
 from miri.datamodels.dqflags import insert_value_column
 from miri.datamodels.miri_measured_model import MiriMeasuredModel
 
@@ -179,8 +183,10 @@ class MiriPointSpreadFunctionModel(MiriMeasuredModel):
 
         # Data type is PSF.
         if not self.meta.reftype:
-            self.meta.model_type = 'PSF'
             self.meta.reftype = 'PSF'
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type
 
         # This is a reference data model.
         self._reference_model()
@@ -292,16 +298,18 @@ class MiriImagingPointSpreadFunctionModel(MiriPointSpreadFunctionModel):
         # Data type is imager PSF.
         if not psftype:
             if not self.meta.reftype:
-                self.meta.model_type = 'PSF (Imaging)'
                 self.meta.reftype = 'PSF'
         else:
-            self.meta.model_type = psftype
             psupper = psftype.upper()
             if 'OOF' in psupper:
                 self.meta.reftype = 'PSF-OOF'
             else:
                 self.meta.reftype = 'PSF'
-        
+
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type
+                    
         if psf_lut is not None:
             try:
                 self.psf_lut = psf_lut
@@ -364,15 +372,17 @@ class MiriLrsPointSpreadFunctionModel(MiriPointSpreadFunctionModel):
         # Data type is LRS PSF.
         if not psftype:
             if not self.meta.reftype:
-                self.meta.model_type = 'PSF (LRS)'
                 self.meta.reftype = 'PSF'
         else:
-            self.meta.model_type = psftype
             psupper = psftype.upper()
             if 'MONOCHROM' in psupper:
                 self.meta.reftype = 'PSF-MONOCHROM'
             else:
                 self.meta.reftype = 'PSF'
+
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type
 
     def __str__(self):
         """
@@ -414,8 +424,10 @@ class MiriMrsPointSpreadFunctionModel(MiriPointSpreadFunctionModel):
         super(MiriMrsPointSpreadFunctionModel, self).__init__(init=init,
                                                 **kwargs)
         # Data type is MRS PSF.
-        self.meta.model_type = 'PSF (MRS)'
         self.meta.reftype = 'PSF'
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type
 
     def __str__(self):
         """

@@ -32,7 +32,8 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 17 Oct 2018: The string 'ANY' is no longer recommended within CDP metadata.
              'N/A' should be used instead.
 15 Nov 2018: Removed redundant function.
-
+30 Jan 2019: self.meta.filetype used to contain the filter type instead
+             instead of self.meta.model_type.
 
 @author: Steven Beard (UKATC)
 
@@ -116,7 +117,7 @@ class MiriFilter(MiriDataModel):
         super(MiriFilter, self).__init__(init=init, **kwargs)
 
         # Data type is filter.
-        self.meta.model_type = 'FILTER'
+        self.meta.filetype = 'FILTER'
         
         # Define the filter name and type, if given
         if filter_name is not None:
@@ -509,7 +510,7 @@ class MiriQuantumEfficiency(MiriFilter):
                                                     filter_type='QE', **kwargs)
 
         # Data type is QE.
-        self.meta.model_type = 'QE'
+        self.meta.filetype = 'QE'
         
         # Define the detector name and detector temperature, if given
         if detector is not None:

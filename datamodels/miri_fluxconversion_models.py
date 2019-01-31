@@ -83,6 +83,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 16 Nov 2018: Use of the JWST mirmrs_photom.schema.yaml reverted! This schema
              added a phot_table entry which is unnecessary and caused the
              MRS CDPs to be rejected
+30 Jan 2019: self.meta.model_type now set to the name of the STScI data
+             model this model is designed to match (skipped if there isn't
+             a corresponding model defined in ancestry.py).
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -99,6 +102,7 @@ import numpy as np
 
 # Import the MIRI base data model and utilities.
 from jwst.datamodels.model_base import DataModel
+from miri.datamodels.ancestry import get_my_model_type
 from miri.datamodels.dqflags import insert_value_column
 from miri.datamodels.miri_model_base import MiriDataModel
 from miri.datamodels.miri_measured_model import MiriMeasuredModel
@@ -178,9 +182,11 @@ class MiriFluxconversionModel(MiriDataModel):
         super(MiriFluxconversionModel, self).__init__(init=init, **kwargs)
 
         # Data type is flux conversion.
-        self.meta.model_type = 'PHOTOM'
         self.meta.reftype = 'PHOTOM'
-        
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type        
+
         # This is a reference data model.
         self._reference_model()
 
@@ -229,10 +235,12 @@ class MiriImagingFluxconversionModel(MiriFluxconversionModel):
         if not MiriImagingFluxconversionModel.info_logged:
             LOGGER.info(self.__class__.__name__ + ": This class is valid for pre-CDP-4 data only")
             MiriImagingFluxconversionModel.info_logged = True
-        # Data type is imaging flux conversion.
-        self.meta.model_type = 'PHOTOM (OLD Imaging)'
-        self.meta.reftype = 'PHOTOM'
 
+        # Data type is imaging flux conversion.
+        self.meta.reftype = 'PHOTOM'
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type
 
 class MiriImagingColourCorrectionModel(MiriFluxconversionModel):
     """
@@ -261,9 +269,10 @@ class MiriImagingColourCorrectionModel(MiriFluxconversionModel):
                                                 flux_table=flux_table,
                                                 **kwargs)
         # Data type is colour correction.
-        self.meta.model_type = 'COLCORR (Black Body)'
         self.meta.reftype = 'COLCORR'
-
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type
 
 class MiriPowerlawColourCorrectionModel(MiriFluxconversionModel):
     """
@@ -292,9 +301,10 @@ class MiriPowerlawColourCorrectionModel(MiriFluxconversionModel):
                                                 flux_table=flux_table,
                                                 **kwargs)
         # Data type is colour correction.
-        self.meta.model_type = 'COLCORR (Power Law)'
         self.meta.reftype = 'COLCORRPL'
-
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type
 
 class MiriLrsFluxconversionModel(MiriFluxconversionModel):
     """
@@ -328,8 +338,10 @@ class MiriLrsFluxconversionModel(MiriFluxconversionModel):
                                                     **kwargs)
 
         # Data type is LRS flux conversion.
-        self.meta.model_type = 'PHOTOM (LRS)'
         self.meta.reftype = 'PHOTOM'
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type
 
     def plot_srf(self, description=''):
         """
@@ -434,9 +446,11 @@ class MiriMrsFluxconversionModel(MiriMeasuredModel):
                                                          **kwargs)
 
         # Data type is MRS flux conversion.
-        self.meta.model_type = 'PHOTOM (MRS)'
         self.meta.reftype = 'PHOTOM'
-        
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type        
+
         # This is a reference data model.
         self._reference_model()
         

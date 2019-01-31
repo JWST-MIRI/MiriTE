@@ -47,7 +47,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Oct 2018: Reimplemented the flatfield models so the different varieties
              are distinguished by inheritance rather than a constructor
              parameter. PIXELFLAT is no longer used.
-
+30 Jan 2019: self.meta.model_type now set to the name of the STScI data
+             model this model is designed to match (skipped if there isn't
+             a corresponding model defined in ancestry.py).
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
@@ -58,6 +60,7 @@ import numpy as np
 #import numpy.ma as ma
 
 # Import the MIRI measured data model.
+from miri.datamodels.ancestry import get_my_model_type
 from miri.datamodels.dqflags import insert_value_column
 from miri.datamodels.miri_measured_model import MiriMeasuredModel, HasDataErrAndDq
 
@@ -150,7 +153,6 @@ class MiriFlatfieldModel(MiriMeasuredModel):
         if not flattype:
             # Set to the default type, if not already defined
             if not self.meta.reftype:
-                self.meta.model_type = 'FLAT'
                 self.meta.reftype = 'FLAT'
         else:
             # Remember the existing reference type, if there is one
@@ -159,7 +161,6 @@ class MiriFlatfieldModel(MiriMeasuredModel):
             else:
                 existing_reftype = ''
 
-            self.meta.model_type = flattype
             ftupper = flattype.upper()
             if "FRINGE" in ftupper:
                 self.meta.reftype = "FRINGE"
@@ -182,6 +183,10 @@ class MiriFlatfieldModel(MiriMeasuredModel):
                     strg = "Flat-field type will be changed from \'%s\' " % existing_reftype
                     strg += "to \'%s\'." % str(self.meta.reftype)
                     warnings.warn(strg)
+
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type
         
         # This is a reference data model.
         self._reference_model()

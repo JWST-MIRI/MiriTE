@@ -35,6 +35,8 @@ in the datamodels.miri_distortion_model module.
              appropriate for a reference file.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 10 Aug 2018: Updated MRS distortion models to reflect CDP-7 format.
+30 Jan 2019: Test that the REFTYPE and DATAMODL metadata is not altered
+             when the data model is saved to a file.
 
 @author: Steven Beard (UKATC)
 
@@ -198,6 +200,10 @@ class TestMiriImagingDistortionModel(unittest.TestCase):
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
             with MiriImagingDistortionModel(self.testfile) as readback:
+                self.assertEqual(self.dataproduct.meta.reftype,
+                                 readback.meta.reftype)
+                self.assertEqual(self.dataproduct.meta.model_type,
+                                 readback.meta.model_type)
                 self.assertTrue( np.allclose(self.dataproduct.amatrix,
                                              readback.amatrix) )
                 self.assertTrue( np.allclose(self.dataproduct.bmatrix,
@@ -304,6 +310,10 @@ class TestMiriLrsD2WModel(unittest.TestCase):
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
             with MiriLrsD2WModel(self.testfile) as readback:
+                self.assertEqual(self.dataproduct.meta.reftype,
+                                 readback.meta.reftype)
+                self.assertEqual(self.dataproduct.meta.model_type,
+                                 readback.meta.model_type)
                 self.assertIsNotNone(readback.wavelength_table)
                 self.assertEqual( len(self.dataproduct.wavelength_table),
                                   len(readback.wavelength_table) )
@@ -468,6 +478,10 @@ class TestMiriMrsDistortionModel12(unittest.TestCase):
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
             with MiriMrsDistortionModel12(self.testfile) as readback:
+                self.assertEqual(self.dataproduct.meta.reftype,
+                                 readback.meta.reftype)
+                self.assertEqual(self.dataproduct.meta.model_type,
+                                 readback.meta.model_type)
                 self.assertTrue( np.allclose(self.dataproduct.slicenumber,
                                              readback.slicenumber) )
                 assert_products_equal( self, self.dataproduct, readback,
@@ -638,6 +652,10 @@ class TestMiriMrsDistortionModel34(unittest.TestCase):
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
             with MiriMrsDistortionModel34(self.testfile) as readback:
+                self.assertEqual(self.dataproduct.meta.reftype,
+                                 readback.meta.reftype)
+                self.assertEqual(self.dataproduct.meta.model_type,
+                                 readback.meta.model_type)
                 self.assertTrue( np.allclose(self.dataproduct.slicenumber,
                                              readback.slicenumber) )
                 assert_products_equal( self, self.dataproduct, readback,

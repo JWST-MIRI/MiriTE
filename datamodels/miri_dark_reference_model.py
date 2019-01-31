@@ -59,7 +59,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              accepted with 4-D data, err and dq arrays.
 15 Nov 2018: Schema switched to use JWST darkMIRI.schema.yaml.
              3-D DARK reference data are no longer accepted.
-
+30 Jan 2019: self.meta.model_type now set to the name of the STScI data
+             model this model is designed to match (skipped if there isn't
+             a corresponding model defined in ancestry.py).
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
@@ -71,6 +73,7 @@ import numpy as np
 #import numpy.linalg as LA
 
 # Import the MIRI ramp data model utilities.
+from miri.datamodels.ancestry import get_my_model_type
 from miri.datamodels.dqflags import insert_value_column
 from miri.datamodels.miri_measured_model import MiriMeasuredModel
 
@@ -169,11 +172,10 @@ class MiriDarkReferenceModel(MiriMeasuredModel):
                                                     **kwargs)
 
         # Data type is dark.
-        if averaged:
-            self.meta.model_type = 'DARK (averaged)'
-        else:
-            self.meta.model_type = 'DARK'
         self.meta.reftype = 'DARK'
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type
         self.averaged = averaged
         
         # This is a reference data model.

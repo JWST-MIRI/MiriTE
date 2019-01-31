@@ -40,6 +40,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              tables defined in the module test.
 19 Nov 2018: Documentation updated from Jeb's model. RESOLVING_POWER marked
              as obsolete (to be removed after CDP-7 release).
+30 Jan 2019: self.meta.model_type now set to the name of the STScI data
+             model this model is designed to match (skipped if there isn't
+             a corresponding model defined in ancestry.py).
 
 @author: Steven Beard (UKATC)
 
@@ -51,6 +54,7 @@ import numpy as np
 import scipy
 
 # Import the MIRI base data model and utilities.
+from miri.datamodels.ancestry import get_my_model_type
 from miri.datamodels.miri_model_base import MiriDataModel
 
 # List all classes and global functions here.
@@ -163,9 +167,11 @@ class MiriMrsResolutionModel(MiriDataModel):
         super(MiriMrsResolutionModel, self).__init__(init=init, **kwargs)
 
         # Data type is spectral resolution.
-        self.meta.model_type = 'RESOL'
         self.meta.reftype = 'RESOL'
-        
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type        
+
         # This is a reference data model.
         self._reference_model()
         

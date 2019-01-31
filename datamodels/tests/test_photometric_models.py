@@ -14,6 +14,8 @@ in the datamodels.miri_fluxconversion_model module.
              on subarray.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 17 Oct 2018: Added relresperror column to MiriPhotometricModel.
+30 Jan 2019: Test that the REFTYPE and DATAMODL metadata is not altered
+             when the data model is saved to a file.
 
 @author: Steven Beard (UKATC)
 
@@ -151,6 +153,10 @@ class TestMiriPhotometricModel(unittest.TestCase):
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
             with MiriPhotometricModel(self.testfile) as readback:
+                self.assertEqual(self.dataproduct.meta.reftype,
+                                 readback.meta.reftype)
+                self.assertEqual(self.dataproduct.meta.model_type,
+                                 readback.meta.model_type)
                 self.assertIsNotNone(readback.phot_table)
                 self.assertEqual( len(self.dataproduct.phot_table),
                                   len(readback.phot_table) )
@@ -338,6 +344,10 @@ class TestMiriPixelAreaModel(unittest.TestCase):
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
             with MiriPixelAreaModel(self.testfile) as readback:
+                self.assertEqual(self.dataproduct.meta.reftype,
+                                 readback.meta.reftype)
+                self.assertEqual(self.dataproduct.meta.model_type,
+                                 readback.meta.model_type)
                 assert_products_equal( self, self.dataproduct, readback,
                                        arrays=['data'] )
                 del readback

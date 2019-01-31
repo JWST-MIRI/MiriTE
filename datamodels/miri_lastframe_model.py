@@ -29,6 +29,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              JWST build 7.1 data models release. meta.reffile.type also
              changed to meta.reftype. TYPE keyword replaced by DATAMODL.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
+30 Jan 2019: self.meta.model_type now set to the name of the STScI data
+             model this model is designed to match (skipped if there isn't
+             a corresponding model defined in ancestry.py).
 
 @author: Vincent Geers (DIAS)
 
@@ -39,6 +42,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 import numpy as np
 
 # Import the MIRI image model.
+from miri.datamodels.ancestry import get_my_model_type
 from miri.datamodels.dqflags import insert_value_column
 from miri.datamodels.miri_measured_model import MiriMeasuredModel
 
@@ -111,9 +115,11 @@ class MiriLastFrameModel(MiriMeasuredModel):
                                                  dq_def=dq_def, **kwargs)
 
         # Data type is last frame.
-        self.meta.model_type = 'LASTFRAME'
         self.meta.reftype = 'LASTFRAME'
-        
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type        
+
         # This is a reference data model.
         self._reference_model()
 

@@ -69,6 +69,7 @@ import numpy as np
 #import numpy.ma as ma
 
 # Import the MIRI base data model and utilities.
+from miri.datamodels.ancestry import get_my_model_type
 from miri.datamodels.miri_model_base import MiriDataModel
 
 
@@ -144,9 +145,11 @@ class MiriIlluminationModel(MiriDataModel):
         super(MiriIlluminationModel, self).__init__(init=init, **kwargs)
 
         # Data type is illumination map.
-        self.meta.model_type = 'ILLUMINATION'
         self.meta.filetype = 'ILLUMINATION'
-
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type
+            
         if intensity is not None:
             self.intensity = intensity      
         # Replace NaNs or invalid values in the intensity array with zeros.

@@ -23,6 +23,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              changed to meta.reftype. TYPE keyword replaced by DATAMODL.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 15 Nov 2018: Removed redundant function.
+30 Jan 2019: self.meta.model_type now set to the name of the STScI data
+             model this model is designed to match (skipped if there isn't
+             a corresponding model defined in ancestry.py).
 
 @author: Steven Beard (UKATC)
 
@@ -34,6 +37,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 #import numpy as np
 
 # Import the MIRI base data model and utilities.
+from miri.datamodels.ancestry import get_my_model_type
 from miri.datamodels.miri_model_base import MiriDataModel
 
 # List all classes and global functions here.
@@ -101,9 +105,11 @@ class MiriResetSwitchChargeDecayModel(MiriDataModel):
         super(MiriResetSwitchChargeDecayModel, self).__init__(init=init, **kwargs)
 
         # Data type is RSCD.
-        self.meta.model_type = 'RSCD'
         self.meta.reftype = 'RSCD'
-        
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type        
+
         # This is a reference data model.
         self._reference_model()
         

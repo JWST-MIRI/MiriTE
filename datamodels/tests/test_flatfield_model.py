@@ -31,6 +31,8 @@ in the datamodels.miri_flatfield_model module.
              appropriate for a reference file.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 30 Oct 2018: Test all the new flat-field classes.
+30 Jan 2019: Test that the REFTYPE and DATAMODL metadata is not altered
+             when the data model is saved to a file.
 
 @author: Steven Beard (UKATC)
 
@@ -151,6 +153,8 @@ class TestMiriFlatfieldModel(unittest.TestCase):
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
             with MiriFlatfieldModel(self.testfile) as readback:
+                self.assertEqual(self.dataproduct.meta.reftype,
+                                 readback.meta.reftype)
                 self.assertEqual(self.dataproduct.meta.model_type,
                                  readback.meta.model_type)
                 assert_products_equal( self, self.dataproduct, readback,
@@ -284,6 +288,8 @@ class TestMiriSkyFlatfieldModel(unittest.TestCase):
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
             with MiriSkyFlatfieldModel(self.testfile) as readback:
+                self.assertEqual(self.dataproduct.meta.reftype,
+                                 readback.meta.reftype)
                 self.assertEqual(self.dataproduct.meta.model_type,
                                  readback.meta.model_type)
                 assert_products_equal( self, self.dataproduct, readback,
@@ -417,6 +423,8 @@ class TestMiriFringeFlatfieldModel(unittest.TestCase):
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
             with MiriFringeFlatfieldModel(self.testfile) as readback:
+                self.assertEqual(self.dataproduct.meta.reftype,
+                                 readback.meta.reftype)
                 self.assertEqual(self.dataproduct.meta.model_type,
                                  readback.meta.model_type)
                 assert_products_equal( self, self.dataproduct, readback,
@@ -550,6 +558,8 @@ class TestMiriTargetFlatfieldModel(unittest.TestCase):
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
             with MiriTargetFlatfieldModel(self.testfile) as readback:
+                self.assertEqual(self.dataproduct.meta.reftype,
+                                 readback.meta.reftype)
                 self.assertEqual(self.dataproduct.meta.model_type,
                                  readback.meta.model_type)
                 assert_products_equal( self, self.dataproduct, readback,

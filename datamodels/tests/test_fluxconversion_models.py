@@ -30,6 +30,8 @@ in the datamodels.miri_fluxconversion_model module.
 24 Oct 2017: Set the pixel size when testing MiriMrsFluxConversionModel
 15 Nov 2018: MRS schema switched to use JWST mirmrs_photom.schema.yaml.
              3-D versions of the MRS data are no longer accepted.
+30 Jan 2019: Test that the REFTYPE and DATAMODL metadata is not altered
+             when the data model is saved to a file.
 
 @author: Steven Beard (UKATC)
 
@@ -140,6 +142,10 @@ class TestMiriImagingFluxconversionModel(unittest.TestCase):
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
             with MiriImagingFluxconversionModel(self.testfile) as readback:
+                self.assertEqual(self.dataproduct.meta.reftype,
+                                 readback.meta.reftype)
+                self.assertEqual(self.dataproduct.meta.model_type,
+                                 readback.meta.model_type)
                 self.assertIsNotNone(readback.flux_table)
                 self.assertEqual( len(self.dataproduct.flux_table),
                                   len(readback.flux_table) )
@@ -252,6 +258,10 @@ class TestMiriImagingColourCorrectionModel(unittest.TestCase):
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
             with MiriImagingColourCorrectionModel(self.testfile) as readback:
+                self.assertEqual(self.dataproduct.meta.reftype,
+                                 readback.meta.reftype)
+                self.assertEqual(self.dataproduct.meta.model_type,
+                                 readback.meta.model_type)
                 self.assertIsNotNone(readback.flux_table)
                 self.assertEqual( len(self.dataproduct.flux_table),
                                   len(readback.flux_table) )
@@ -364,6 +374,10 @@ class TestMiriPowerlawColourCorrectionModel(unittest.TestCase):
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
             with MiriPowerlawColourCorrectionModel(self.testfile) as readback:
+                self.assertEqual(self.dataproduct.meta.reftype,
+                                 readback.meta.reftype)
+                self.assertEqual(self.dataproduct.meta.model_type,
+                                 readback.meta.model_type)
                 self.assertIsNotNone(readback.flux_table)
                 self.assertEqual( len(self.dataproduct.flux_table),
                                   len(readback.flux_table) )
@@ -476,6 +490,10 @@ class TestMiriLrsFluxconversionModel(unittest.TestCase):
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
             with MiriLrsFluxconversionModel(self.testfile) as readback:
+                self.assertEqual(self.dataproduct.meta.reftype,
+                                 readback.meta.reftype)
+                self.assertEqual(self.dataproduct.meta.model_type,
+                                 readback.meta.model_type)
                 self.assertIsNotNone(readback.flux_table)
                 self.assertEqual( len(self.dataproduct.flux_table),
                                   len(readback.flux_table) )
@@ -588,6 +606,10 @@ class TestMiriMrsFluxconversionModel(unittest.TestCase):
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
             with MiriMrsFluxconversionModel(self.testfile) as readback:
+                self.assertEqual(self.dataproduct.meta.reftype,
+                                 readback.meta.reftype)
+                self.assertEqual(self.dataproduct.meta.model_type,
+                                 readback.meta.model_type)
                 assert_products_equal( self, self.dataproduct, readback,
                                        arrays=['data', 'err', 'dq'],
                                        tables='dq_def' )

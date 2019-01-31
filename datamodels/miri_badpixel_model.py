@@ -75,7 +75,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 28 Jun 2018: Switch to using get_title_and_metadata() to display data model
              information.
-
+30 Jan 2019: self.meta.model_type now set to the name of the STScI data
+             model this model is designed to match (skipped if there isn't
+             a corresponding model defined in ancestry.py).
 @author: Steven Beard (UKATC), Michael Droettboom (STScI), Vincent Geers (UKATC)
 
 """
@@ -88,6 +90,7 @@ import numpy as np
 from miri.datamodels.dqflags import FlagsTable, insert_value_column, convert_dq
 
 # Import the MIRI base data model and utilities.
+from miri.datamodels.ancestry import get_my_model_type
 from miri.datamodels.miri_model_base import MiriDataModel
 from miri.datamodels.operations import HasMask
 
@@ -165,9 +168,11 @@ class MiriBadPixelMaskModel(MiriDataModel, HasMask):
         super(MiriBadPixelMaskModel, self).__init__(init=init, **kwargs)
 
         # Data type is bad pixel mask.
-        self.meta.model_type = 'MASK (Bad pixel mask)'
         self.meta.reftype = 'MASK'
-        
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type
+
         # This is a reference data model.
         self._reference_model()
 

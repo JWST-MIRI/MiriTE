@@ -107,6 +107,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 28 Jun 2018: Switch to using get_title_and_metadata() to display data model
              information. Removed superflous functions from MiriSimpleModel.
 06 Jul 2018: group and int_times objects added to ramp data schema.
+30 Jan 2019: self.meta.model_type now set to the name of the STScI data
+             model this model is designed to match (skipped if there isn't
+             a corresponding model defined in ancestry.py).
 
 @author: Steven Beard (UKATC)
 
@@ -122,6 +125,7 @@ from miri.datamodels.dqflags import master_flags, \
     pixeldq_flags, groupdq_flags, FlagsTable, insert_value_column, convert_dq
 
 # Import the MIRI base data model and utilities.
+from miri.datamodels.ancestry import get_my_model_type
 from miri.datamodels.miri_model_base import MiriDataModel
 from miri.datamodels.operations import HasData, HasDataErrAndDq, HasDataErrAndGroups
 
@@ -517,9 +521,11 @@ class MiriRampModel(MiriMeasuredModel, HasDataErrAndGroups):
                                             dq_def=None, rampdata=True,
                                             **kwargs)
         # Data type is MIRI ramp data (level 1b).
-        self.meta.model_type = 'Ramp (level 1b)'
         self.meta.filetype = 'Ramp (level 1b)'
-        
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type
+
         # Define the REFOUT and ZEROFRAME data arrays which are unique to
         # ramp data.
         if refout is not None:
@@ -913,8 +919,10 @@ class MiriSlopeModel(MiriMeasuredModel):
                                              err=err, dq_def=dq_def,
                                              **kwargs)
         # Data type is MIRI slope data.
-        self.meta.model_type = 'Slope (level 2)'
         self.meta.filetype = 'Slope (level 2)'
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type
         
         # If 3-D data is given, the 3rd dimension gives the number of
         # integrations.

@@ -34,6 +34,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 15 Nov 2018: New data model which uses the JWST schema, saturation.schema.yaml.
              Previous data model renamed to MiriMrsStraylightModel_CDP3.
+30 Jan 2019: self.meta.model_type now set to the name of the STScI data
+             model this model is designed to match (skipped if there isn't
+             a corresponding model defined in ancestry.py).
 
 @author: Vincent Geers (DIAS), Steven Beard (UKATC)
 
@@ -50,6 +53,7 @@ from miri.datamodels.dqflags import master_flags, \
 
 # Import the MIRI base data model and utilities.
 # from miri.datamodels.plotting import DataModelPlotVisitor
+from miri.datamodels.ancestry import get_my_model_type
 from miri.datamodels.dqflags import insert_value_column
 from miri.datamodels.miri_badpixel_model import MiriBadPixelMaskModel
 from miri.datamodels.miri_model_base import MiriDataModel
@@ -112,9 +116,11 @@ class MiriMrsStraylightModel(MiriDataModel, HasData):
         super(MiriMrsStraylightModel, self).__init__(init=init, **kwargs)
 
         # Data type is Straylight mask.
-        self.meta.model_type = 'STRAYMASK'
         self.meta.reftype = 'STRAYMASK'
-        
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type        
+
         # Set the instrument detector, if provided (backwards compatibility).
         if detector is not None:
             self.meta.instrument.detector = detector
@@ -201,7 +207,6 @@ class MiriMrsStraylightModel_CDP3(MiriBadPixelMaskModel):
                                                           **kwargs)
 
         # Data type is Straylight mask.
-        self.meta.model_type = 'STRAY'
         self.meta.reftype = 'STRAY'
         
         # This is a reference data model.

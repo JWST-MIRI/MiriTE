@@ -60,6 +60,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 18 May 2018: Use explicit rounding when converting floating point to integer
              in get_forwards_table and get_reverse_table.
 06 Jul 2018: Merged schema with JWST software.
+30 Jan 2019: self.meta.model_type now set to the name of the STScI data
+             model this model is designed to match (skipped if there isn't
+             a corresponding model defined in ancestry.py).
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -72,6 +75,7 @@ import numpy.ma as ma
 import sys
 
 # Import the MIRI measured data model.
+from miri.datamodels.ancestry import get_my_model_type
 from miri.datamodels.dqflags import insert_value_column
 from miri.datamodels.miri_measured_model import MiriMeasuredModel
 
@@ -162,9 +166,11 @@ class MiriLinearityModel(MiriMeasuredModel):
                                                  **kwargs)
         
         # Data type is non-linearity.
-        self.meta.model_type = 'LINEARITY'
         self.meta.reftype = 'LINEARITY'
-        
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type        
+
         # This is a reference data model.
         self._reference_model()
                     

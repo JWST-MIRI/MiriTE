@@ -38,6 +38,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 26 Oct 2018: Added get_srf() function.
 14 Nov 2018: Explicitly set table column units based on the tunit definitions
              in the schema.
+30 Jan 2019: self.meta.model_type now set to the name of the STScI data
+             model this model is designed to match (skipped if there isn't
+             a corresponding model defined in ancestry.py).
 
 @author: Steven Beard (UKATC)
 
@@ -49,6 +52,7 @@ import math
 import numpy as np
 
 # Import the MIRI base data model and utilities.
+from miri.datamodels.ancestry import get_my_model_type
 from miri.datamodels.miri_model_base import MiriDataModel
 from miri.datamodels.operations import HasData
 
@@ -132,10 +136,13 @@ class MiriPhotometricModel(MiriDataModel):
 
         """
         super(MiriPhotometricModel, self).__init__(init=init, **kwargs)
+
         # Data type is photometric flux conversion.
-        self.meta.model_type = 'PHOTOM'
         self.meta.reftype = 'PHOTOM'
-        
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type        
+
         # This is a reference data model.
         self._reference_model()
 
@@ -331,6 +338,7 @@ class MiriPhotometricModel_CDP5(MiriDataModel):
 
         """
         super(MiriPhotometricModel_CDP5, self).__init__(init=init, **kwargs)
+
         # Data type is photometric flux conversion.
         self.meta.model_type = 'PHOTOM'
         self.meta.reftype = 'PHOTOM'
@@ -558,9 +566,10 @@ class MiriImagingPhotometricModel(MiriPhotometricModel):
                                                           pixar_sr=pixar_sr,
                                                           pixar_a2=pixar_a2,
                                                           **kwargs)
-        self.meta.model_type = 'PHOTOM (Imaging)'
         #self.add_comment("WAVELENGTH and RELRESPONSE arrays are all zero for imager.")
-
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type
 
 class MiriLrsPhotometricModel(MiriPhotometricModel):
     """
@@ -658,9 +667,11 @@ class MiriLrsPhotometricModel(MiriPhotometricModel):
                                                       pixar_sr=pixar_sr,
                                                       pixar_a2=pixar_a2,
                                                       **kwargs)
-        self.meta.model_type = 'PHOTOM (LRS)'
         #self.add_comment("RELRESPONSE is absolute response so PHOTMJSR is 1.0.")
-
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type
+            
 class MiriPixelAreaModel(MiriDataModel, HasData):
     """
     
@@ -710,9 +721,10 @@ class MiriPixelAreaModel(MiriDataModel, HasData):
         super(MiriPixelAreaModel, self).__init__(init=init, **kwargs)
 
         # Data type is AREA.
-        self.meta.model_type = 'AREA (Pixel Area)'
         self.meta.reftype = 'AREA'
-        
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type        
         # This is a reference data model.
         self._reference_model()
 

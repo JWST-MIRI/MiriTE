@@ -82,7 +82,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              Updated units for imager distortion model.
 14 Nov 2018: Explicitly set table column units based on the tunit definitions
              in the schema. Removed redundant function.
-
+30 Jan 2019: self.meta.model_type now set to the name of the STScI data
+             model this model is designed to match (skipped if there isn't
+             a corresponding model defined in ancestry.py).
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
 """
@@ -94,6 +96,7 @@ import numpy as np
 #import numpy.ma as ma
 
 # Import the MIRI base data model and utilities.
+from miri.datamodels.ancestry import get_my_model_type
 from miri.datamodels.miri_model_base import MiriDataModel
 
 # The distortion model might be represented by one of these STScI models,
@@ -207,9 +210,11 @@ class MiriImagingDistortionModel(MiriDataModel):
         super(MiriImagingDistortionModel, self).__init__(init=init, **kwargs)
 
         # Data type is distortion map.
-        self.meta.model_type = 'DISTORTION (Imaging)'
         self.meta.reftype = 'DISTORTION'
-        
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type
+
         # This is a reference data model.
         self._reference_model()
 
@@ -452,9 +457,11 @@ class MiriLrsD2WModel(MiriDataModel):
         super(MiriLrsD2WModel, self).__init__(init=init, **kwargs)
 
         # Data type is wavelength calibration.
-        self.meta.model_type = 'DISTORTION (LRS)'
         self.meta.reftype = 'DISTORTION'
-        
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type        
+
         # This is a reference data model.
         self._reference_model()
 
@@ -588,9 +595,11 @@ class MiriMrsDistortionModel12(MiriDataModel):
         super(MiriMrsDistortionModel12, self).__init__(init=init, **kwargs)
 
         # Data type is MRS DISTORTION.
-        self.meta.model_type = 'DISTORTION (MRS)'
         self.meta.reftype = 'DISTORTION'
-        
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type        
+
         # This is a reference data model.
         self._reference_model()
 
@@ -910,9 +919,11 @@ class MiriMrsDistortionModel34(MiriDataModel):
         super(MiriMrsDistortionModel34, self).__init__(init=init, **kwargs)
 
         # Data type is MRS DISTORTION.
-        self.meta.model_type = 'DISTORTION (MRS)'
         self.meta.reftype = 'DISTORTION'
-        
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type:
+            self.meta.model_type = model_type        
+ 
         # This is a reference data model.
         self._reference_model()
 
