@@ -38,7 +38,7 @@ PARENT_DICT = {'MiriDataModel' : 'DataModel', \
                'MiriFringeFlatfieldModel' : 'FlatModel', \
                'MiriSkyFlatfieldModel' : 'FlatModel', \
                'MiriTargetFlatfieldModel' : 'FlatModel', \
-               'MiriMrsFluxconversionModel' : 'MiriImgPhotomModel', \
+               'MiriMrsFluxconversionModel' : 'MiriMrsPhotomModel', \
 #                'MiriMrsFringeFrequenciesModel' : 'FringeModel', \
                'MiriGainModel' : 'GainModel', \
                'MiriIPCModel' : 'IPCModel', \
