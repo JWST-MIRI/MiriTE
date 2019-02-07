@@ -63,6 +63,8 @@
 # 26 Oct 2017: Set cdp_ftp_path to default if not specified.
 # 14 Feb 2018: Added version number for nonlinearity CDP.
 # 26 Nov 2018: Added the ability to simulate cosmic rays of a single energy.
+# 07 Feb 2018: Added a --local parameter to specify that CDPs are obtained
+#              from local host only.
 # 
 # @author: Steven Beard (UKATC)
 
@@ -206,6 +208,12 @@ The following optional parameters may be provided by keyword:
         Scale factor to be applied to the intensity data (for debugging).
         If not specified, a scale of 1.0 will be used. This parameter
         can be used to make faulty input data usable.
+    --local
+        Specifying "--local" instructs SCASim to read CDP files only from
+        the local host. Files will not automatically be downloaded from the
+        CDP server, so the user must ensure all the necessary files are
+        already contained in the CDP_DIR directory. This option is useful
+        for testing SCASim with specific reference files
     --cdp_ftp_path
         A list of folders (or folders) on the SFTP host to be searched
         for CDP files, consisting of a list of folder names separated by
@@ -281,8 +289,8 @@ if __name__ == "__main__":
     usage += "\n\t[--detector] [--fringemap] [--rdmode] [--subarray] "
     usage += "[--inttime] [--ngroups]"
     usage += "\n\t[--nints] [--temperature] [--crmode] [--format] [--datashape]"
-    usage += "\n\t[--scale] [--cdp_ftp_path] [--cdprelease] [--previousfile]"
-    usage += "[--nopoisson] [--noreadnoise] [--norefpixels] [--nobadpixels]"
+    usage += "\n\t[--scale] [--local] [--cdp_ftp_path] [--cdprelease] [--previousfile]"
+    usage += "\n\t[--nopoisson] [--noreadnoise] [--norefpixels] [--nobadpixels]"
     usage += "\n\t[--nodark] [--noflat] [--nogain] [--nolinearity] "
     usage += "[--nodrifts] [--nolatency]"
     parser = optparse.OptionParser(usage)
@@ -330,6 +338,9 @@ if __name__ == "__main__":
     parser.add_option("", "--scale", dest="scale", type="float",
                      default=None, help="Intensity scale factor"
                      )
+    parser.add_option("-L", "--local", dest="local", action="store_true",
+                      help="Read CDPs from local host only"
+                     )
     parser.add_option("", "--cdp_ftp_path", dest="cdp_ftp_path", type="string",
                      default='', help="Search path for imported CDPs"
                      )
@@ -357,7 +368,7 @@ if __name__ == "__main__":
     parser.add_option("-o", "--overwrite", dest="overwrite", action="store_true",
                       help="Overwrite output file if it exists"
                      )
-
+    
     parser.add_option("-q", "--noqe", dest="noqe",
                       action="store_true", help="Turn off QE adjustment"
                      )
@@ -440,6 +451,10 @@ if __name__ == "__main__":
     scale = options.scale
     if scale is None:
         scale = 1.0
+    if options.local:
+        cdp_ftp_host = 'LOCAL'
+    else:
+        cdp_ftp_host = None
     cdp_ftp_path = options.cdp_ftp_path
     if not cdp_ftp_path:
         cdp_ftp_path = SIM_CDP_FTP_PATH
@@ -553,6 +568,7 @@ if __name__ == "__main__":
                      simulate_nonlinearity=simulate_nonlinearity,
                      simulate_drifts=simulate_drifts,
                      simulate_latency=simulate_latency,
+                     cdp_ftp_host=cdp_ftp_host,
                      cdp_ftp_path=cdp_ftp_path,
                      readnoise_version=cdprelease,
                      bad_pixels_version=cdprelease,
@@ -582,6 +598,7 @@ if __name__ == "__main__":
                      simulate_nonlinearity=simulate_nonlinearity,
                      simulate_drifts=simulate_drifts,
                      simulate_latency=simulate_latency,
+                     cdp_ftp_host=cdp_ftp_host,
                      cdp_ftp_path=cdp_ftp_path,
                      readnoise_version=cdprelease,
                      bad_pixels_version=cdprelease,

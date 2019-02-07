@@ -232,6 +232,7 @@ Calibration Data Products (CDPs).
              where possible.
 04 Jun 2018: Added hard_reset function.
 15 Jan 2019: Added explicit garbage collection (commented out for now).
+07 Feb 2019: Added cdp_ftp_host parameter.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -536,6 +537,11 @@ class DetectorArray(object):
     simulate_latency: boolean, optional, default=True
         A flag that may be used to switch off the simulation of
         detector latency and persistence effects.
+    cdp_ftp_host: str, optional, default=None
+        If specified, the address of the server hosting the CDP
+        repository. The string 'LOCAL' may be used to restrict searches
+        only to CDP files stored locally.
+        If not specified, the default CDP server at Leuven is used.
     cdp_ftp_path: str, optional, default=SIM_CDP_FTP_PATH
         If specified, a list of folders (or folders) on the SFTP host
         where the MIRI CDPs are held to be searched, consisting of a
@@ -591,7 +597,7 @@ class DetectorArray(object):
                  simulate_dark_current=True, simulate_flat_field=True,
                  simulate_gain=True, simulate_nonlinearity=True,
                  simulate_drifts=True, simulate_latency=True,
-                 cdp_ftp_path=SIM_CDP_FTP_PATH,
+                 cdp_ftp_host=None, cdp_ftp_path=SIM_CDP_FTP_PATH,
                  readnoise_version='', bad_pixels_version='',
                  dark_map_version='', flat_field_version='',
                  linearity_version='', gain_version='',
@@ -736,7 +742,7 @@ class DetectorArray(object):
         self.add_calibration_data(self._sca['DETECTOR'],
                             readpatt=readpatt, subarray=subarray,
                             mirifilter=mirifilter, miriband=miriband,
-                            cdp_ftp_path=cdp_ftp_path,
+                            cdp_ftp_host=cdp_ftp_host, cdp_ftp_path=cdp_ftp_path,
                             bad_pixels_version=bad_pixels_version,
                             dark_map_version=dark_map_version,
                             flat_field_version=flat_field_version,
@@ -878,7 +884,7 @@ class DetectorArray(object):
 
     def add_calibration_data(self, detector, readpatt=None, subarray=None,
                     mirifilter=None, miriband=None,
-                    cdp_ftp_path=SIM_CDP_FTP_PATH,
+                    cdp_ftp_host=None, cdp_ftp_path=SIM_CDP_FTP_PATH,
                     bad_pixels_version='', dark_map_version='',
                     flat_field_version='', linearity_version='',
                     readnoise_version='', gain_version=''):
@@ -907,6 +913,11 @@ class DetectorArray(object):
             The filter name with which to look up a flat-field
         miriband: string, optional
             The band name with which to look up a flat-field
+        cdp_ftp_host: str, optional, default=None
+            If specified, the address of the server hosting the CDP
+            repository. The string 'LOCAL' may be used to restrict searches
+            only to CDP files stored locally.
+            If not specified, the default CDP server at Leuven is used.
         cdp_ftp_path: str, optional, default=SIM_CDP_FTP_PATH
             If specified, a list of folders (or folders) on the SFTP host
             where the MIRI CDPs are held to be searched, consisting of a
@@ -931,6 +942,7 @@ class DetectorArray(object):
         self.bad_pixels = None
         if self.simulate_bad_pixels:
             self.add_bad_pixel_mask(self._sca['DETECTOR'],
+                                    cdp_ftp_host=cdp_ftp_host, 
                                     cdp_ftp_path=cdp_ftp_path,
                                     cdp_version=bad_pixels_version)
             # Distinguish the good and bad pixels by adding a different
@@ -951,7 +963,8 @@ class DetectorArray(object):
         # Obtain the amplifier gain for this detector.
         self.gain_map = None
         if self.simulate_gain:
-            self.add_gain_map(self._sca['DETECTOR'], cdp_ftp_path=cdp_ftp_path,
+            self.add_gain_map(self._sca['DETECTOR'], cdp_ftp_host=cdp_ftp_host,
+                              cdp_ftp_path=cdp_ftp_path,
                               cdp_version=gain_version)
         else:
             self.add_gain_map(None)
@@ -965,6 +978,7 @@ class DetectorArray(object):
             # the full 4-D dark is obtained.
             self.add_dark_map_cdp(self._sca['DETECTOR'], readpatt=readpatt,
                               subarray=subarray, averaged=AVERAGED_DARK,
+                              cdp_ftp_host=cdp_ftp_host,
                               cdp_ftp_path=cdp_ftp_path,
                               cdp_version=dark_map_version)
         else:
@@ -991,7 +1005,8 @@ class DetectorArray(object):
         if self.simulate_flat_field:
             self.add_flat_map(self._sca['DETECTOR'], readpatt=readpatt,
                               subarray=subarray, mirifilter=mirifilter,
-                              miriband=miriband, cdp_ftp_path=cdp_ftp_path,
+                              miriband=miriband, cdp_ftp_host=cdp_ftp_host,
+                              cdp_ftp_path=cdp_ftp_path,
                               cdp_version=flat_field_version)
         else:
             self.add_flat_map(None)
@@ -1001,7 +1016,8 @@ class DetectorArray(object):
         self.linearity_table_right = None
         if self.simulate_nonlinearity and NONLINEARITY_BY_TABLE:
             self.add_linearity_table(self._sca['DETECTOR'], mirifilter=mirifilter,
-                              miriband=miriband, cdp_ftp_path=cdp_ftp_path,
+                              miriband=miriband, cdp_ftp_host=cdp_ftp_host,
+                              cdp_ftp_path=cdp_ftp_path,
                               cdp_version=linearity_version)
         else:
             self.add_linearity_table(None)
@@ -1010,6 +1026,7 @@ class DetectorArray(object):
         self.readnoise_map = None
         if self.simulate_read_noise:
             self.add_readnoise_map(self._sca['DETECTOR'], readpatt=readpatt,
+                                   cdp_ftp_host=cdp_ftp_host,
                                    cdp_ftp_path=cdp_ftp_path,
                                    cdp_version=readnoise_version)
             # Start with the noise calibration factor contained in the
@@ -1077,8 +1094,8 @@ class DetectorArray(object):
             del self.readnoise_map
         self.readnoise_map = None
 
-    def add_bad_pixel_mask(self, detector, cdp_ftp_path=SIM_CDP_FTP_PATH,
-                           cdp_version=''):
+    def add_bad_pixel_mask(self, detector, cdp_ftp_host=None,
+                           cdp_ftp_path=SIM_CDP_FTP_PATH, cdp_version=''):
         """
         
         Add a bad pixel mask associated with the detector.
@@ -1087,6 +1104,11 @@ class DetectorArray(object):
         
         detector: string
             The detector name with which to look up the bad pixel mask.
+        cdp_ftp_host: str, optional, default=None
+            If specified, the address of the server hosting the CDP
+            repository. The string 'LOCAL' may be used to restrict searches
+            only to CDP files stored locally.
+            If not specified, the default CDP server at Leuven is used.
         cdp_ftp_path: str, optional, default=SIM_CDP_FTP_PATH
             If specified, a list of folders (or folders) on the SFTP host
             where the MIRI CDPs are held to be searched, consisting of a
@@ -1119,15 +1141,7 @@ class DetectorArray(object):
 
         # Read a MIRI bad pixel mask in standard STScI CDP format
         # and ensure the mask refers to the correct detector.
-#         bad_pixel_mask = get_cdp('MASK', detector=detector,
-#                                  ftp_path=cdp_ftp_path,
-#                                  ftp_user=SIM_CDP_FTP_USER, 
-#                                  ftp_passwd=SIM_CDP_FTP_PASSWD,
-#                                  cdprelease=cdprelease,
-#                                  cdpversion=cdpversion,
-#                                  cdpsubversion=cdpsubversion,
-#                                  logger=self.toplogger)
-        with get_cdp('MASK', detector=detector,
+        with get_cdp('MASK', detector=detector, ftp_host=cdp_ftp_host,
                                  ftp_path=cdp_ftp_path,
                                  ftp_user=SIM_CDP_FTP_USER, 
                                  ftp_passwd=SIM_CDP_FTP_PASSWD,
@@ -1188,8 +1202,8 @@ class DetectorArray(object):
                 mplt.plot_image(self.bad_pixels, title=tstrg)
             del bad_pixel_mask
 
-    def add_gain_map(self, detector, cdp_ftp_path=SIM_CDP_FTP_PATH,
-                     cdp_version=''):
+    def add_gain_map(self, detector, cdp_ftp_host=None,
+                     cdp_ftp_path=SIM_CDP_FTP_PATH, cdp_version=''):
         """
         
         Add a gain map associated with the detector.
@@ -1198,6 +1212,11 @@ class DetectorArray(object):
         
         detector: string
             The detector name with which to look up the gain map.
+        cdp_ftp_host: str, optional, default=None
+            If specified, the address of the server hosting the CDP
+            repository. The string 'LOCAL' may be used to restrict searches
+            only to CDP files stored locally.
+            If not specified, the default CDP server at Leuven is used.
         cdp_ftp_path: str, optional, default=SIM_CDP_FTP_PATH
             If specified, a list of folders (or folders) on the SFTP host
             where the MIRI CDPs are held to be searched, consisting of a
@@ -1224,7 +1243,7 @@ class DetectorArray(object):
         # relevant window from the map. The gain map includes the
         # normal detector pixels (including the reference columns) but does
         # not include the reference rows added to the level 1 FITS data.        
-        with get_cdp('GAIN', detector=detector,
+        with get_cdp('GAIN', detector=detector, ftp_host=cdp_ftp_host,
                              ftp_path=cdp_ftp_path,
                              ftp_user=SIM_CDP_FTP_USER, 
                              ftp_passwd=SIM_CDP_FTP_PASSWD,
@@ -1371,8 +1390,8 @@ class DetectorArray(object):
 
 # This version fetches a DARK CDP from the repository.
     def add_dark_map_cdp(self, detector, readpatt=None, subarray=None,
-                         averaged=False, cdp_ftp_path=SIM_CDP_FTP_PATH,
-                         cdp_version=''):
+                         averaged=False, cdp_ftp_host=None,
+                         cdp_ftp_path=SIM_CDP_FTP_PATH, cdp_version=''):
         """
          
         Add a dark current map associated with the detector.
@@ -1392,7 +1411,12 @@ class DetectorArray(object):
             The subarray with which to look up the dark CDP
         averaged: bool, optional
             If True, an averaged 3-D version of the DARK model is obtained,
-            otherwise the full 4-D model is obtained. 
+            otherwise the full 4-D model is obtained.
+        cdp_ftp_host: str, optional, default=None
+            If specified, the address of the server hosting the CDP
+            repository. The string 'LOCAL' may be used to restrict searches
+            only to CDP files stored locally.
+            If not specified, the default CDP server at Leuven is used.
         cdp_ftp_path: str, optional, default=SIM_CDP_FTP_PATH
             If specified, a list of folders (or folders) on the SFTP host
             where the MIRI CDPs are held to be searched, consisting of a
@@ -1416,14 +1440,15 @@ class DetectorArray(object):
          
         # Some of the DARK files do not have standard CDP file names, so we
         # need to access them directly using the CDP interface class
-        CDPInterface = MiriCDPInterface(ftp_path=cdp_ftp_path,
+        CDPInterface = MiriCDPInterface(ftp_host=cdp_ftp_host,
+                                        ftp_path=cdp_ftp_path,
                                         ftp_user=SIM_CDP_FTP_USER, 
                                         ftp_passwd=SIM_CDP_FTP_PASSWD,
                                         logger=self.toplogger)
              
         # Refresh the interface if any parameters are different from when the
         # class was first created (necessary when the class is a singleton).
-        CDPInterface.refresh(ftp_path=cdp_ftp_path,
+        CDPInterface.refresh(ftp_host=cdp_ftp_host, ftp_path=cdp_ftp_path,
                              ftp_user=SIM_CDP_FTP_USER, 
                              ftp_passwd=SIM_CDP_FTP_PASSWD)
          
@@ -1582,7 +1607,7 @@ class DetectorArray(object):
         #gc.collect() # FIXME: Solve file open issue before using this.
 
     def add_flat_map(self, detector, readpatt=None, subarray=None,
-                     mirifilter=None, miriband=None,
+                     mirifilter=None, miriband=None, cdp_ftp_host=None, 
                      cdp_ftp_path=SIM_CDP_FTP_PATH, cdp_version=''):
         """
         
@@ -1600,6 +1625,11 @@ class DetectorArray(object):
             The filter name with which to look up a pixel flat-field CDP.
         miriband: string, optional
             The band name with which to look up a flat-field
+        cdp_ftp_host: str, optional, default=None
+            If specified, the address of the server hosting the CDP
+            repository. The string 'LOCAL' may be used to restrict searches
+            only to CDP files stored locally.
+            If not specified, the default CDP server at Leuven is used.
         cdp_ftp_path: str, optional, default=SIM_CDP_FTP_PATH
             If specified, a list of folders (or folders) on the SFTP host
             where the MIRI CDPs are held to be searched, consisting of a
@@ -1670,6 +1700,7 @@ class DetectorArray(object):
                                         subarray=subarray,
                                         mirifilter=try_filter,
                                         band=try_band,
+                                        ftp_host=cdp_ftp_host, 
                                         ftp_path=cdp_ftp_path,
                                         ftp_user=SIM_CDP_FTP_USER, 
                                         ftp_passwd=SIM_CDP_FTP_PASSWD,
@@ -1794,7 +1825,8 @@ class DetectorArray(object):
         #gc.collect() # FIXME: Solve file open issue before using this.
 
     def add_linearity_table(self, detector, mirifilter=None, miriband=None,
-                     cdp_ftp_path=SIM_CDP_FTP_PATH, cdp_version=''):
+                     cdp_ftp_host=None, cdp_ftp_path=SIM_CDP_FTP_PATH,
+                     cdp_version=''):
         """
         
         Add a linearity correction associated with the detector.
@@ -1810,6 +1842,11 @@ class DetectorArray(object):
         miriband: string, optional
             The band name with which to look up the linearity
             correction CDP.
+        cdp_ftp_host: str, optional, default=None
+            If specified, the address of the server hosting the CDP
+            repository. The string 'LOCAL' may be used to restrict searches
+            only to CDP files stored locally.
+            If not specified, the default CDP server at Leuven is used.
         cdp_ftp_path: str, optional, default=SIM_CDP_FTP_PATH
             If specified, a list of folders (or folders) on the SFTP host
             where the MIRI CDPs are held to be searched, consisting of a
@@ -1837,7 +1874,7 @@ class DetectorArray(object):
         # Get the linearity correction.        
         linearity_model = get_cdp('LINEARITY', detector=detector,
                              mirifilter=mirifilter, band=miriband,
-                             ftp_path=cdp_ftp_path,
+                             ftp_host=cdp_ftp_host, ftp_path=cdp_ftp_path,
                              ftp_user=SIM_CDP_FTP_USER, 
                              ftp_passwd=SIM_CDP_FTP_PASSWD,
                              cdprelease=cdprelease,
@@ -1850,7 +1887,7 @@ class DetectorArray(object):
             # try and find a CDP matching any filter or band.
             linearity_model = get_cdp('LINEARITY', detector=detector,
                                  mirifilter=None, band=None,
-                                 ftp_path=cdp_ftp_path,
+                                 ftp_host=cdp_ftp_host, ftp_path=cdp_ftp_path,
                                  ftp_user=SIM_CDP_FTP_USER, 
                                  ftp_passwd=SIM_CDP_FTP_PASSWD,
                                  cdprelease=cdprelease,
@@ -1904,7 +1941,7 @@ class DetectorArray(object):
         del linearity_model
         #gc.collect() # FIXME: Solve file open issue before using this.
 
-    def add_readnoise_map(self, detector, readpatt=None,
+    def add_readnoise_map(self, detector, readpatt=None, cdp_ftp_host=None, 
                           cdp_ftp_path=SIM_CDP_FTP_PATH, cdp_version=''):
         """
         
@@ -1919,6 +1956,11 @@ class DetectorArray(object):
             The detector name with which to look up the readnoise map.
         readpatt: string, optional
             The readout mode with which to look up the readnoise map.
+        cdp_ftp_host: str, optional, default=None
+            If specified, the address of the server hosting the CDP
+            repository. The string 'LOCAL' may be used to restrict searches
+            only to CDP files stored locally.
+            If not specified, the default CDP server at Leuven is used.
         cdp_ftp_path: str, optional, default=SIM_CDP_FTP_PATH
             If specified, a list of folders (or folders) on the SFTP host
             where the MIRI CDPs are held to be searched, consisting of a
@@ -1944,18 +1986,8 @@ class DetectorArray(object):
         # relevant window from the map. The read noise map includes the
         # normal detector pixels (including the reference columns) but does
         # not include the reference rows added to the level 1 FITS data.
-#         readnoise_model = get_cdp('READNOISE', detector=detector,
-#                                   readpatt=readpatt,
-#                                   ftp_path=cdp_ftp_path,
-#                                   ftp_user=SIM_CDP_FTP_USER, 
-#                                   ftp_passwd=SIM_CDP_FTP_PASSWD,
-#                                   cdprelease=cdprelease,
-#                                   cdpversion=cdpversion,
-#                                   cdpsubversion=cdpsubversion,
-#                                   logger=self.toplogger)
-        with get_cdp('READNOISE', detector=detector,
-                                  readpatt=readpatt,
-                                  ftp_path=cdp_ftp_path,
+        with get_cdp('READNOISE', detector=detector, readpatt=readpatt,
+                                  ftp_host=cdp_ftp_host, ftp_path=cdp_ftp_path,
                                   ftp_user=SIM_CDP_FTP_USER, 
                                   ftp_passwd=SIM_CDP_FTP_PASSWD,
                                   cdprelease=cdprelease,

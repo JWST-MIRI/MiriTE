@@ -341,6 +341,7 @@ Calibration Data Products (CDPs).
 11 Jul 2018: Explicitly convert a subarray list to a tuple when using it to
              format a string for printing.
 28 Nov 2018: Added the ability to simulate cosmic rays of a single energy.
+07 Feb 2019: Added cdp_ftp_host parameter.
 
 @author: Steven Beard
 
@@ -414,7 +415,7 @@ def _report_sca_parameters(inputfile, outputfile, detectorid, readout_mode,
                            simulate_dark_current, simulate_flat_field,
                            simulate_gain, simulate_nonlinearity,
                            simulate_drifts, simulate_latency,
-                           cdp_ftp_path,
+                           cdp_ftp_host, cdp_ftp_path,
                            readnoise_version, bad_pixels_version,
                            flat_field_version, linearity_version, gain_version,
                            logger=LOGGER):
@@ -512,6 +513,9 @@ def _report_sca_parameters(inputfile, outputfile, detectorid, readout_mode,
         logger.debug( "NOTE: The following effects are switched off: %s" % \
             "\'" + "\', \'".join(switched_off) + "\'" )
 
+    if cdp_ftp_host:
+        logger.debug("CDP FTP host: " + \
+                     str(cdp_ftp_host))
     if cdp_ftp_path:
         logger.debug("CDP search path folder: " + \
                      str(cdp_ftp_path))
@@ -750,7 +754,7 @@ class SensorChipAssembly(object):
               simulate_flat_field=True, simulate_gain=True,
               simulate_nonlinearity=True,
               simulate_drifts=True, simulate_latency=True,
-              cdp_ftp_path=SIM_CDP_FTP_PATH,
+              cdp_ftp_host=None, cdp_ftp_path=SIM_CDP_FTP_PATH,
               readnoise_version='', bad_pixels_version='',
               flat_field_version='', linearity_version='', gain_version='',
               makeplot=False, verbose=2):
@@ -885,12 +889,18 @@ class SensorChipAssembly(object):
         simulate_latency: boolean, optional, default=True
             A flag that may be used to switch off the simulation of
             detector latency and persistence effects.
-        cdp_ftp_path: str, optional, default=None
+        cdp_ftp_host: str, optional, default=None
+            If specified, the address of the server hosting the CDP
+            repository. The string 'LOCAL' may be used to restrict searches
+            only to CDP files stored locally.
+            If not specified, the default CDP server at Leuven is used.
+        cdp_ftp_path: str, optional, default=CDPSIM
             If specified, a list of folders (or folders) on the SFTP host
             where the MIRI CDPs are held to be searched, consisting of a
             list of folder names separated by a ":" delimiter.
             Examples: 'CDP', 'CDPSIM', 'CDPSIM:CDP:CDPTMP'
-            If not specified, the default CDP repository at Leuven is used.
+            If not specified, the default simulator CDP repository at
+            Leuven is used.
         readnoise_version: string, optional, default=''
             A specific readnoise CDP version number of the form 'x.y.z'.
         bad_pixels_version: string, optional, default=''
@@ -1045,6 +1055,7 @@ class SensorChipAssembly(object):
                                   simulate_drifts=simulate_drifts,
                                   simulate_latency=simulate_latency)
 
+        self.cdp_ftp_host       = cdp_ftp_host
         self.cdp_ftp_path       = cdp_ftp_path
         self.readnoise_version  = readnoise_version
         self.bad_pixels_version = bad_pixels_version
@@ -1754,6 +1765,7 @@ class SensorChipAssembly(object):
                                 simulate_nonlinearity=self.simulate_nonlinearity,
                                 simulate_drifts=self.simulate_drifts,
                                 simulate_latency=self.simulate_latency,
+                                cdp_ftp_host=self.cdp_ftp_host, 
                                 cdp_ftp_path=self.cdp_ftp_path,
                                 readnoise_version=self.readnoise_version,
                                 bad_pixels_version=self.bad_pixels_version,
@@ -1785,6 +1797,7 @@ class SensorChipAssembly(object):
             self.detector.add_calibration_data(self.detectorid,
                     readpatt=readpatt, subarray=self.subarray_str,
                     mirifilter=mirifilter, miriband=miriband,
+                    cdp_ftp_host=self.cdp_ftp_host, 
                     cdp_ftp_path=self.cdp_ftp_path,
                     bad_pixels_version=self.bad_pixels_version,
                     flat_field_version=self.flat_field_version,
@@ -3277,7 +3290,8 @@ class SensorChipAssembly(object):
             simulate_bad_pixels=True, simulate_dark_current=True,
             simulate_flat_field=True, simulate_gain=True,
             simulate_nonlinearity=True, simulate_drifts=True,
-            simulate_latency=True, cdp_ftp_path=SIM_CDP_FTP_PATH,
+            simulate_latency=True,
+            cdp_ftp_host=None, cdp_ftp_path=SIM_CDP_FTP_PATH,
             readnoise_version='', bad_pixels_version='',
             flat_field_version='', linearity_version='', gain_version='',
             makeplot=False, seedvalue=None, verbose=2):
@@ -3468,6 +3482,11 @@ class SensorChipAssembly(object):
         simulate_latency: boolean, optional, default=True
             A flag that may be used to switch off the simulation of
             detector latency and persistence effects.
+        cdp_ftp_host: str, optional, default=None
+            If specified, the address of the server hosting the CDP
+            repository. The string 'LOCAL' may be used to restrict searches
+            only to CDP files stored locally.
+            If not specified, the default CDP server at Leuven is used.
         cdp_ftp_path: str, optional, default=None
             If specified, a list of folders (or folders) on the SFTP host
             where the MIRI CDPs are held to be searched, consisting of a
@@ -3537,7 +3556,7 @@ class SensorChipAssembly(object):
                                    simulate_dark_current, simulate_flat_field,
                                    simulate_gain, simulate_nonlinearity,
                                    simulate_drifts, simulate_latency,
-                                   cdp_ftp_path,
+                                   cdp_ftp_host, cdp_ftp_path,
                                    readnoise_version, bad_pixels_version,
                                    flat_field_version, linearity_version,
                                    gain_version,
@@ -3588,7 +3607,7 @@ class SensorChipAssembly(object):
               simulate_nonlinearity=simulate_nonlinearity,
               simulate_drifts=simulate_drifts,
               simulate_latency=simulate_latency,
-              cdp_ftp_path=cdp_ftp_path,
+              cdp_ftp_host=cdp_ftp_host, cdp_ftp_path=cdp_ftp_path,
               readnoise_version=readnoise_version,
               bad_pixels_version=bad_pixels_version,
               flat_field_version=flat_field_version, 
@@ -3675,7 +3694,7 @@ class SensorChipAssembly(object):
                       simulate_dark_current=True, simulate_flat_field=True,
                       simulate_gain=True, simulate_nonlinearity=True,
                       simulate_drifts=True, simulate_latency=True,
-                      cdp_ftp_path=SIM_CDP_FTP_PATH,
+                      cdp_ftp_host=None, cdp_ftp_path=SIM_CDP_FTP_PATH,
                       readnoise_version='', bad_pixels_version='',
                       flat_field_version='', linearity_version='',
                       gain_version='',
@@ -3870,6 +3889,11 @@ class SensorChipAssembly(object):
         simulate_latency: boolean, optional, default=True
             A flag that may be used to switch off the simulation of
             detector latency and persistence effects.
+        cdp_ftp_host: str, optional, default=None
+            If specified, the address of the server hosting the CDP
+            repository. The string 'LOCAL' may be used to restrict searches
+            only to CDP files stored locally.
+            If not specified, the default CDP server at Leuven is used.
         cdp_ftp_path: str, optional, default=None
             If specified, a list of folders (or folders) on the SFTP host
             where the MIRI CDPs are held to be searched, consisting of a
@@ -3949,7 +3973,7 @@ class SensorChipAssembly(object):
                                simulate_dark_current, simulate_flat_field,
                                simulate_gain, simulate_nonlinearity,
                                simulate_drifts, simulate_latency,
-                               cdp_ftp_path,
+                               cdp_ftp_host, cdp_ftp_path,
                                readnoise_version, bad_pixels_version,
                                flat_field_version, linearity_version,
                                gain_version,
@@ -4004,7 +4028,7 @@ class SensorChipAssembly(object):
             simulate_nonlinearity=simulate_nonlinearity,
             simulate_drifts=simulate_drifts,
             simulate_latency=simulate_latency,
-            cdp_ftp_path=cdp_ftp_path,
+            cdp_ftp_host=cdp_ftp_host, cdp_ftp_path=cdp_ftp_path,
             readnoise_version=readnoise_version,
             bad_pixels_version=bad_pixels_version,
             flat_field_version=flat_field_version, 
@@ -4265,7 +4289,7 @@ def simulate_sca(inputfile, outputfile, detectorid, scale=1.0, fringemap=None,
                  simulate_dark_current=True, simulate_flat_field=True,
                  simulate_gain=True, simulate_nonlinearity=True,
                  simulate_drifts=True, simulate_latency=True,
-                 cdp_ftp_path=SIM_CDP_FTP_PATH,
+                 cdp_ftp_host=None, cdp_ftp_path=SIM_CDP_FTP_PATH,
                  readnoise_version='', bad_pixels_version='',
                  flat_field_version='', linearity_version='', gain_version='',
                  makeplot=False, seedvalue=None, verbose=2, logger=LOGGER):
@@ -4451,6 +4475,11 @@ def simulate_sca(inputfile, outputfile, detectorid, scale=1.0, fringemap=None,
     simulate_latency: boolean, optional, default=True
         A flag that may be used to switch off the simulation of
         detector latency and persistence effects.
+    cdp_ftp_host: str, optional, default=None
+        If specified, the address of the server hosting the CDP
+        repository. The string 'LOCAL' may be used to restrict searches
+        only to CDP files stored locally.
+        If not specified, the default CDP server at Leuven is used.
     cdp_ftp_path: str, optional, default=None
         If specified, a list of folders (or folders) on the SFTP host
         where the MIRI CDPs are held to be searched, consisting of a
@@ -4539,7 +4568,7 @@ def simulate_sca(inputfile, outputfile, detectorid, scale=1.0, fringemap=None,
         simulate_nonlinearity=simulate_nonlinearity,
         simulate_drifts=simulate_drifts,
         simulate_latency=simulate_latency,
-        cdp_ftp_path=cdp_ftp_path,
+        cdp_ftp_host=cdp_ftp_path, cdp_ftp_path=cdp_ftp_path,
         readnoise_version=readnoise_version,
         bad_pixels_version=bad_pixels_version,
         flat_field_version=flat_field_version, 
@@ -4561,7 +4590,7 @@ def simulate_sca_list(inputfile, outputfile, detectorid, scale=1.0,
                       simulate_dark_current=True, simulate_flat_field=True,
                       simulate_gain=True, simulate_nonlinearity=True,
                       simulate_drifts=True, simulate_latency=True,
-                      cdp_ftp_path=SIM_CDP_FTP_PATH,
+                      cdp_ftp_host=None, cdp_ftp_path=SIM_CDP_FTP_PATH,
                       readnoise_version='', bad_pixels_version='',
                       flat_field_version='', linearity_version='',
                       gain_version='',
@@ -4750,6 +4779,11 @@ def simulate_sca_list(inputfile, outputfile, detectorid, scale=1.0,
     simulate_latency: boolean, optional, default=True
         A flag that may be used to switch off the simulation of
         detector latency and persistence effects.
+    cdp_ftp_host: str, optional, default=None
+        If specified, the address of the server hosting the CDP
+        repository. The string 'LOCAL' may be used to restrict searches
+        only to CDP files stored locally.
+        If not specified, the default CDP server at Leuven is used.
     cdp_ftp_path: str, optional, default=None
         If specified, a list of folders (or folders) on the SFTP host
         where the MIRI CDPs are held to be searched, consisting of a
@@ -4838,7 +4872,7 @@ def simulate_sca_list(inputfile, outputfile, detectorid, scale=1.0,
         simulate_nonlinearity=simulate_nonlinearity,
         simulate_drifts=simulate_drifts,
         simulate_latency=simulate_latency,
-        cdp_ftp_path=cdp_ftp_path,
+        cdp_ftp_host=cdp_ftp_host, cdp_ftp_path=cdp_ftp_path,
         readnoise_version=readnoise_version,
         bad_pixels_version=bad_pixels_version,
         flat_field_version=flat_field_version, 
@@ -4859,7 +4893,7 @@ def simulate_sca_pipeline(illumination_map, scale=1.0,
                           simulate_dark_current=True, simulate_flat_field=True,
                           simulate_gain=True, simulate_nonlinearity=True,
                           simulate_drifts=True, simulate_latency=True,
-                          cdp_ftp_path=SIM_CDP_FTP_PATH,
+                          cdp_ftp_host=None,  cdp_ftp_path=SIM_CDP_FTP_PATH,
                           readnoise_version='', bad_pixels_version='',
                           flat_field_version='', linearity_version='',
                           gain_version='',
@@ -5027,6 +5061,11 @@ def simulate_sca_pipeline(illumination_map, scale=1.0,
     simulate_latency: boolean, optional, default=True
         A flag that may be used to switch off the simulation of
         detector latency and persistence effects.
+    cdp_ftp_host: str, optional, default=None
+        If specified, the address of the server hosting the CDP
+        repository. The string 'LOCAL' may be used to restrict searches
+        only to CDP files stored locally.
+        If not specified, the default CDP server at Leuven is used.
     cdp_ftp_path: str, optional, default=None
         If specified, a list of folders (or folders) on the SFTP host
         where the MIRI CDPs are held to be searched, consisting of a
@@ -5120,7 +5159,7 @@ def simulate_sca_pipeline(illumination_map, scale=1.0,
         simulate_nonlinearity=simulate_nonlinearity,
         simulate_drifts=simulate_drifts,
         simulate_latency=simulate_latency,
-        cdp_ftp_path=cdp_ftp_path,
+        cdp_ftp_host=cdp_ftp_host, cdp_ftp_path=cdp_ftp_path,
         readnoise_version=readnoise_version,
         bad_pixels_version=bad_pixels_version,
         flat_field_version=flat_field_version, 
