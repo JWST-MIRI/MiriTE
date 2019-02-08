@@ -50,6 +50,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
+08 Feb 2019: Overwrite the PEDIGREE keyword regardless of whether it already
+             exists in the input file.
+             
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
@@ -193,11 +196,10 @@ class MiriFlatfieldModel(MiriMeasuredModel):
        
         # The default pedigree is 'DUMMY' for a sky flat and 'GROUND'
         # for everything else.
-        if not self.meta.pedigree:
-            if "SKY" in self.meta.reftype:
-                self.meta.pedigree = 'DUMMY'
-            else:
-                self.meta.pedigree = 'GROUND'
+        if "SKY" in self.meta.reftype:
+            self.meta.pedigree = 'DUMMY'
+        else:
+            self.meta.pedigree = 'GROUND'
 
         # Define the detector identifier, if specified.
         if detector is not None:
