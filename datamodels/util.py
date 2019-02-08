@@ -647,19 +647,19 @@ def verify_subarray_metadata(datamodel):
                  
                 if (expected_xstart != xstart) or (expected_ystart != ystart) or \
                    (expected_xsize != xsize) or (expected_ysize != ysize):
-                    failure_string = "Wrong subarray coordinates for %s:" % subname
+                    failure_string = "  Wrong subarray coordinates for %s:" % subname
                     failure_string += " Expected [%d, %d, %d, %d];" % \
                         (expected_xstart, expected_ystart,
                          expected_xsize, expected_ysize)
                     failure_string += " Actual [%d, %d, %d, %d]" % \
                         (xstart, ystart, xsize, ysize)
             else:
-                failure_string = "Invalid subarray name (%s)" % \
+                failure_string = "  Invalid subarray name (%s)" % \
                     str(datamodel.meta.subarray.name)
         else:
-            failure_string = "No subarray metadata!"
+            failure_string = "  No subarray metadata!"
     else:
-        failure_string = "No subarray metadata!"
+        failure_string = "  No subarray metadata!"
     return failure_string
     
 def verify_metadata(datamodel):
