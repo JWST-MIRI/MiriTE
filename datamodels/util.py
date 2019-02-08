@@ -637,22 +637,23 @@ def verify_subarray_metadata(datamodel):
             if datamodel.meta.subarray.name and \
                str(datamodel.meta.subarray.name) in list(SUBARRAY.keys()):
                 subname = str(datamodel.meta.subarray.name)
-                xstart = int(datamodel.meta.subarray.xstart)
-                ystart = int(datamodel.meta.subarray.ystart)
-                xsize = int(datamodel.meta.subarray.xsize)
-                ysize = int(datamodel.meta.subarray.ysize)
-
-                (expected_xstart, expected_ystart,
-                 expected_xsize, expected_ysize) = SUBARRAY[subname]
-                 
-                if (expected_xstart != xstart) or (expected_ystart != ystart) or \
-                   (expected_xsize != xsize) or (expected_ysize != ysize):
-                    failure_string = "  Wrong subarray coordinates for %s:" % subname
-                    failure_string += " Expected [%d, %d, %d, %d];" % \
-                        (expected_xstart, expected_ystart,
-                         expected_xsize, expected_ysize)
-                    failure_string += " Actual [%d, %d, %d, %d]" % \
-                        (xstart, ystart, xsize, ysize)
+                if subname != 'GENERIC':
+                    xstart = int(datamodel.meta.subarray.xstart)
+                    ystart = int(datamodel.meta.subarray.ystart)
+                    xsize = int(datamodel.meta.subarray.xsize)
+                    ysize = int(datamodel.meta.subarray.ysize)
+    
+                    (expected_xstart, expected_ystart,
+                     expected_xsize, expected_ysize) = SUBARRAY[subname]
+                     
+                    if (expected_xstart != xstart) or (expected_ystart != ystart) or \
+                       (expected_xsize != xsize) or (expected_ysize != ysize):
+                        failure_string = "  Wrong subarray coordinates for %s:" % subname
+                        failure_string += " Expected [%d, %d, %d, %d];" % \
+                            (expected_xstart, expected_ystart,
+                             expected_xsize, expected_ysize)
+                        failure_string += " Actual [%d, %d, %d, %d]" % \
+                            (xstart, ystart, xsize, ysize)
             else:
                 failure_string = "  Invalid subarray name (%s)" % \
                     str(datamodel.meta.subarray.name)
