@@ -72,6 +72,9 @@ processing the MIRI data models.
 12 Nov 2018: Added compulsory metadata for imager and MRS CDPs. Reworked the
              metadata warning message so it doesn't appear twice in the output.
 29 Jan 2019: Check for a legacy DATAMODL keyword in verify_cdp_file.
+08 Feb 2019: Added more CDP verification checks. Ensure all subarray coordinates
+             match the MIRI definitions. Ensure a SKYFLAT uses PEDIGREE=DUMMY.
+             Ensure that all data files use the correct dq_def field names.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -89,7 +92,7 @@ import astropy.io.fits as pyfits
 
 # Import the JWST data models and the CDP and SIM dictionaries
 import jwst.datamodels
-from miri.parameters import CDP_METADATA, CDP_METADATA_IMAGER, \
+from miri.parameters import SUBARRAY, CDP_METADATA, CDP_METADATA_IMAGER, \
     CDP_METADATA_MRS, CDP_SUBARRAY, CDP_HISTORY
 from miri.datamodels.miri_model_base import MiriDataModel
 from miri.datamodels.cdp import CDP_DICT
@@ -601,7 +604,64 @@ def add_subarray_metadata(datamodel, subname=''):
             datamodel.__class__.__name_
         raise TypeError(strg)
     return subarray_modified
- 
+
+def verify_subarray_metadata(datamodel):
+    """
+    
+    Verify that the subarray metadata contained in the given calibration
+    data model is self-consistent.
+    
+    The function assumes that a basic metadata check verifying the existence
+    of subarray metadata has already been made.
+    
+    :Parameters:
+    
+    datamodel: MiriDataModel
+        The calibration data model whose metadata is to be verified.
+        
+    :Returns:
+    
+    failure_string: str
+        A string indicating problems with the metadata.
+        If the metadata passes the test, an empty string is returned.
+    
+    """
+    failure_string = ''
+    
+    if hasattr(datamodel.meta, 'subarray'):
+        if hasattr(datamodel.meta.subarray, 'name') and \
+           hasattr(datamodel.meta.subarray, 'xstart') and \
+           hasattr(datamodel.meta.subarray, 'ystart') and \
+           hasattr(datamodel.meta.subarray, 'xsize') and \
+           hasattr(datamodel.meta.subarray, 'ysize'):
+            if datamodel.meta.subarray.name and \
+               str(datamodel.meta.subarray.name) in list(SUBARRAY.keys()):
+                subname = str(datamodel.meta.subarray.name)
+                xstart = int(datamodel.meta.subarray.xstart)
+                ystart = int(datamodel.meta.subarray.ystart)
+                xsize = int(datamodel.meta.subarray.xsize)
+                ysize = int(datamodel.meta.subarray.ysize)
+
+                (expected_xstart, expected_ystart,
+                 expected_xsize, expected_ysize) = SUBARRAY[subname]
+                 
+                if (expected_xstart != xstart) or (expected_ystart != ystart) or \
+                   (expected_xsize != xsize) or (expected_ysize != ysize):
+                    failure_string = "Wrong subarray coordinates for %s:" % subname
+                    failure_string += " Expected [%d, %d, %d, %d];" % \
+                        (expected_xstart, expected_ystart,
+                         expected_xsize, expected_ysize)
+                    failure_string += " Actual [%d, %d, %d, %d]" % \
+                        (xstart, ystart, xsize, ysize)
+            else:
+                failure_string = "Invalid subarray name (%s)" % \
+                    str(datamodel.meta.subarray.name)
+        else:
+            failure_string = "No subarray metadata!"
+    else:
+        failure_string = "No subarray metadata!"
+    return failure_string
+    
 def verify_metadata(datamodel):
     """
     
@@ -648,7 +708,7 @@ def verify_metadata(datamodel):
         
     # The FLAT, LINEARITY, PSF and DISTORTION data must contain both
     # imager and MRS keywords
-    if datamodel.meta.reftype == 'FLAT' or \
+    if 'FLAT' in datamodel.meta.reftype or \
        datamodel.meta.reftype == 'LINEARITY' or \
        datamodel.meta.reftype == 'PSF' or \
        datamodel.meta.reftype == 'DISTORTION':
@@ -710,7 +770,17 @@ def verify_metadata(datamodel):
             failure_string += strg
     else:
         failure_string += '  No HISTORY records found.'
-        
+
+    # Check for some exceptional cases.
+    # A SKYFLAT must, for the time being, have PEDIGREE defined as 'DUMMY'.
+    if datamodel.meta.reftype == 'SKYFLAT':
+        if hasattr(datamodel.meta, 'pedigree') and datamodel.meta.pedigree:
+            if datamodel.meta.pedigree != 'DUMMY':
+                failure_string = "SKYFLAT file contains PEDIGREE=%s." % \
+                    str(datamodel.meta.pedigree)
+                failure_string += " PEDIGREE=DUMMY expected."
+        else:
+            failure_string = "No PEDIGREE metadata found."
     return failure_string
 
 def verify_cdp_file(filename, datatype=None, overwrite=False, keepfile=False):
@@ -759,11 +829,16 @@ def verify_cdp_file(filename, datatype=None, overwrite=False, keepfile=False):
         metadata_failure = False
         metadata_strg = ''
         failure_string = verify_metadata(datamodel)
-        if failure_string:
+        subarray_string = verify_subarray_metadata(datamodel)
+        if failure_string or subarray_string:
             metadata_strg = "Data object \'%s\' has failed the test." % \
                 (datamodel.__class__.__name__)
-            metadata_strg += "\n  Incorrect metadata.\n"
-            metadata_strg += failure_string
+            metadata_strg += "\n  Incorrect metadata."
+            if failure_string:
+                metadata_strg += "\n" + failure_string
+            if subarray_string:
+                 metadata_strg += "\n" + subarray_string
+               
             # For now only set a flag, so the data content may also be checked.
             # The flag will trigger a warning or an exception later.
             metadata_failure = True
@@ -804,32 +879,57 @@ def verify_cdp_file(filename, datatype=None, overwrite=False, keepfile=False):
             strg += "\n  It contains an obsolete GROUP_DEF table."
             raise TypeError(strg)
 
+        # Check that the standard data tables contain the correct column titles.
+        if 'dq_def' in datatables:
+            fieldnames = datamodel.get_field_names('dq_def')
+            testnames = ['BIT', 'VALUE', 'NAME', 'DESCRIPTION']
+            names_ok = True
+            if len(fieldnames) <= len(testnames):
+                for ii in range(0, len(testnames)):
+                    if str(fieldnames[ii]).strip() != testnames[ii]:
+                        names_ok = False
+            if not names_ok:
+                strg = "Data object \'%s\' has failed the test." % \
+                    (datamodel.__class__.__name__)
+                strg = "Incorrect DQ_DEF column names!:" % subname
+                strg += " Expected %s;" % str(testnames)
+                strg += " Actual %s" % str(fieldnames)                
+                raise TypeError(strg)
+
         # Update the data type
         if hasattr(datamodel.meta, 'reftype'):
             datatype = datamodel.meta.reftype
         elif hasattr(datamodel.meta, 'datatype'):
             datatype = datamodel.meta.datatype
             
-        # The data model type is not compulsory, but if it exists warn
-        # if it contains something unexpected.
+        # Check the data model type. This keyword is compulsory.
         if hasattr(datamodel.meta, 'model_type'):
             model_type = str(datamodel.meta.model_type)
             class_name = str(datamodel.__class__.__name__)
             if not model_type:
-                strg = "\n***WARNING: Data object \'%s\' contains " % \
-                    class_name
-                strg += "an empty DATAMODL keyword in the metadata."
-                warnings.warn(strg)
+                if metadata_failure:
+                    warnings.warn(metadata_strg)   
+                strg = "Data object \'%s\' has failed the test." % \
+                    (datamodel.__class__.__name__)
+                strg += "\n  It contains an empty DATAMODL keyword."
+                raise TypeError(strg)
             else:
-                # Check for a legacy DATAMODL keyword, which use to contain
-                # the class name.
+                # If a data model has no STScI equivalent, the DATAMODL keyword
+                # is set to the MIRI class name.
                 if model_type.strip().upper() == class_name.strip().upper():
                     strg = "\n***WARNING: Data object \'%s\' contains " % \
                         class_name
-                    strg += "a legacy DATAMODL=\'%s\' in the metadata." % \
+                    strg += "a non-STScI DATAMODL=\'%s\' in the metadata." % \
                         model_type
                     warnings.warn(strg)
-                    
+        else:
+            if metadata_failure:
+                warnings.warn(metadata_strg)   
+            strg = "Data object \'%s\' has failed the test." % \
+                (datamodel.__class__.__name__)
+            strg += "\n  No data model type (DATAMODL) defined."
+            raise TypeError(strg)                
+    
         # Test 2 - all data arrays and tables must be readable and not empty.
 #         print("Test 2")
         for dataarray in dataarrays:
@@ -862,7 +962,7 @@ def verify_cdp_file(filename, datatype=None, overwrite=False, keepfile=False):
                     (datamodel.__class__.__name__)
                 strg += "\n  Data table %s is empty." % datatable
                 raise TypeError(strg)
-            
+                        
         # Check that the primary array of subarray data has the correct size.
         # The check is made when the subarray is not FULL and the primary
         # array exists and contains 2-D data.

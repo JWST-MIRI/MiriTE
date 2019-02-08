@@ -50,8 +50,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
-08 Feb 2019: Overwrite the PEDIGREE keyword regardless of whether it already
-             exists in the input file.
+08 Feb 2019: Update the PEDIGREE keyword if the flat type changes, regardless
+             of what has been read from the file.
+             
              
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -153,6 +154,7 @@ class MiriFlatfieldModel(MiriMeasuredModel):
 
         # Data type is flat-field.
         datatype = 'FLAT'
+        update_pedigree = False
         if not flattype:
             # Set to the default type, if not already defined
             if not self.meta.reftype:
@@ -183,6 +185,8 @@ class MiriFlatfieldModel(MiriMeasuredModel):
             # Warn if an existing reference type is being changed.
             if existing_reftype:
                 if self.meta.reftype != existing_reftype:
+                    # Update the PEDIGREE if the flat type has changed.
+                    update_pedigree = True
                     strg = "Flat-field type will be changed from \'%s\' " % existing_reftype
                     strg += "to \'%s\'." % str(self.meta.reftype)
                     warnings.warn(strg)
@@ -196,10 +200,11 @@ class MiriFlatfieldModel(MiriMeasuredModel):
        
         # The default pedigree is 'DUMMY' for a sky flat and 'GROUND'
         # for everything else.
-        if "SKY" in self.meta.reftype:
-            self.meta.pedigree = 'DUMMY'
-        else:
-            self.meta.pedigree = 'GROUND'
+        if not self.meta.pedigree or update_pedigree:
+            if "SKY" in self.meta.reftype:
+                self.meta.pedigree = 'DUMMY'
+            else:
+                self.meta.pedigree = 'GROUND'
 
         # Define the detector identifier, if specified.
         if detector is not None:
