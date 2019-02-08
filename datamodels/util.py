@@ -776,11 +776,11 @@ def verify_metadata(datamodel):
     if datamodel.meta.reftype == 'SKYFLAT':
         if hasattr(datamodel.meta, 'pedigree') and datamodel.meta.pedigree:
             if datamodel.meta.pedigree != 'DUMMY':
-                failure_string = "SKYFLAT file contains PEDIGREE=%s." % \
+                failure_string = "  SKYFLAT file contains PEDIGREE=%s." % \
                     str(datamodel.meta.pedigree)
                 failure_string += " PEDIGREE=DUMMY expected."
         else:
-            failure_string = "No PEDIGREE metadata found."
+            failure_string = "  No PEDIGREE metadata found."
     return failure_string
 
 def verify_cdp_file(filename, datatype=None, overwrite=False, keepfile=False):
