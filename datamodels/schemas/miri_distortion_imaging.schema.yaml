@@ -267,14 +267,14 @@ allOf:
       fits_hdu: F matrix
       default: 0
       ndim: 2
-      units: mm arcsec^-(i+j)
+      units: none
       datatype: float64
     ematrix:
       title: E matrix of distortion coefficients
       fits_hdu: E matrix
       default: 0
       ndim: 2
-      units: mm arcsec^-(i+j)
+      units: none
       datatype: float64
     dimatrix:
       title: Inverted D matrix of distortion coefficients
@@ -295,12 +295,12 @@ allOf:
       fits_hdu: FI matrix
       default: 0
       ndim: 2
-      units: arcsec mm^-(i+j)
+      units: none
       datatype: float64      
     eimatrix:
       title: Inverted E matrix of distortion coefficients
       fits_hdu: EI matrix
       default: 0
       ndim: 2
-      units: arcsec mm^-(i+j)
+      units: none
       datatype: float64
