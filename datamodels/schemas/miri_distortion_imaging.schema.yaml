@@ -54,6 +54,42 @@ allOf:
               title: Units of M coefficients
               fits_hdu: M matrix
               fits_keyword: BUNIT
+        dmatrix:
+          type: object
+          title: Information about the D matrix
+          properties:
+            units:
+              type: string
+              title: Units of D coefficients
+              fits_hdu: D matrix
+              fits_keyword: BUNIT
+        cmatrix:
+          type: object
+          title: Information about the C matrix
+          properties:
+            units:
+              type: string
+              title: Units of C coefficients
+              fits_hdu: C matrix
+              fits_keyword: BUNIT
+        fmatrix:
+          type: object
+          title: Information about the F matrix
+          properties:
+            units:
+              type: string
+              title: Units of F coefficients
+              fits_hdu: F matrix
+              fits_keyword: BUNIT
+        ematrix:
+          type: object
+          title: Information about the E matrix
+          properties:
+            units:
+              type: string
+              title: Units of E coefficients
+              fits_hdu: E matrix
+              fits_keyword: BUNIT
         bimatrix:
           type: object
           title: Information about the inverted B matrix
@@ -89,6 +125,42 @@ allOf:
               type: string
               title: Units of MI coefficients
               fits_hdu: MI matrix
+              fits_keyword: BUNIT
+        dimatrix:
+          type: object
+          title: Information about the DI matrix
+          properties:
+            units:
+              type: string
+              title: Units of DI coefficients
+              fits_hdu: DI matrix
+              fits_keyword: BUNIT
+        cimatrix:
+          type: object
+          title: Information about the CI matrix
+          properties:
+            units:
+              type: string
+              title: Units of CI coefficients
+              fits_hdu: CI matrix
+              fits_keyword: BUNIT
+        fimatrix:
+          type: object
+          title: Information about the FI matrix
+          properties:
+            units:
+              type: string
+              title: Units of FI coefficients
+              fits_hdu: FI matrix
+              fits_keyword: BUNIT
+        eimatrix:
+          type: object
+          title: Information about the EI matrix
+          properties:
+            units:
+              type: string
+              title: Units of EI coefficients
+              fits_hdu: EI matrix
               fits_keyword: BUNIT
         boresight_offsets:
           type: object
@@ -176,3 +248,59 @@ allOf:
         datatype: float64
       - name: ROW_OFFSET
         datatype: float64
+    dmatrix:
+      title: D matrix of distortion coefficients
+      fits_hdu: D matrix
+      default: 0
+      ndim: 2
+      units: mm arcsec^-(i+j)
+      datatype: float64
+    cmatrix:
+      title: A matrix of distortion coefficients
+      fits_hdu: C matrix
+      default: 0
+      ndim: 2
+      units: mm arcsec^-(i+j)
+      datatype: float64
+    fmatrix:
+      title: F matrix of distortion coefficients
+      fits_hdu: F matrix
+      default: 0
+      ndim: 2
+      units: mm arcsec^-(i+j)
+      datatype: float64
+    ematrix:
+      title: E matrix of distortion coefficients
+      fits_hdu: E matrix
+      default: 0
+      ndim: 2
+      units: mm arcsec^-(i+j)
+      datatype: float64
+    dimatrix:
+      title: Inverted D matrix of distortion coefficients
+      fits_hdu: DI matrix
+      default: 0
+      ndim: 2
+      units: arcsec mm^-(i+j)
+      datatype: float64
+    cimatrix:
+      title: Inverted C matrix of distortion coefficients
+      fits_hdu: CI matrix
+      default: 0
+      ndim: 2
+      units: arcsec mm^-(i+j)
+      datatype: float64
+    fimatrix:
+      title: Inverted F matrix of distortion coefficients
+      fits_hdu: FI matrix
+      default: 0
+      ndim: 2
+      units: arcsec mm^-(i+j)
+      datatype: float64      
+    eimatrix:
+      title: Inverted E matrix of distortion coefficients
+      fits_hdu: EI matrix
+      default: 0
+      ndim: 2
+      units: arcsec mm^-(i+j)
+      datatype: float64

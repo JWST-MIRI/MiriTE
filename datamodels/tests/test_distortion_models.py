@@ -87,6 +87,10 @@ class TestMiriImagingDistortionModel(unittest.TestCase):
                                                 bmatrix=self.amatrix,
                                                 tmatrix=self.tmatrix,
                                                 mmatrix=self.mmatrix,
+                                                dmatrix=self.bmatrix,
+                                                cmatrix=self.amatrix,
+                                                fmatrix=self.bmatrix,
+                                                ematrix=self.amatrix,
                                                 boresight_offsets=self.boresight_offsets )
         # Add some example metadata.
         self.dataproduct.set_target_metadata(0.0, 0.0)

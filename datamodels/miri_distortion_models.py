@@ -85,11 +85,11 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
+11 Feb 2019: Added missing C, D, E, F matrices to imager distortion model.             
+
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
 """
-# This module is now converted to Python 3.
-
 
 # import warnings
 import numpy as np
@@ -196,9 +196,11 @@ class MiriImagingDistortionModel(MiriDataModel):
     schema_url = "miri_distortion_imaging.schema.yaml"
     fieldnames = ('FILTER', 'COL_OFFSET', 'ROW_OFFSET')
     
-    def __init__(self, init=None, bmatrix=None, amatrix=None, 
-                 tmatrix=None, mmatrix=None, bimatrix=None, 
-                 aimatrix=None, timatrix=None, mimatrix=None, 
+    def __init__(self, init=None,
+                 bmatrix=None, amatrix=None, tmatrix=None, mmatrix=None,
+                 bimatrix=None, aimatrix=None, timatrix=None, mimatrix=None,
+                 dmatrix=None, cmatrix=None, fmatrix=None, ematrix=None,
+                 dimatrix=None, cimatrix=None, fimatrix=None, eimatrix=None,
                  fitref=None, fitmodel=None, boresight_offsets=None, **kwargs):
         """
         
@@ -272,6 +274,58 @@ class MiriImagingDistortionModel(MiriDataModel):
                 raise TypeError(strg)
             self.mmatrix = mmatrix
 
+        if dmatrix is not None:
+            dmatrix = np.asarray(dmatrix)
+            if dmatrix.ndim == 2:
+                if dmatrix.shape[0] != dmatrix.shape[1]:
+                    strg = "D Matrix should be square: "
+                    strg += "%dx%d matrix provided instead." % dmatrix.shape
+                    raise TypeError(strg)
+            else:
+                strg = "D matrix should be 2-D. %d-D array provided." % \
+                    dmatrix.ndim
+                raise TypeError(strg)
+            self.dmatrix = dmatrix
+
+        if cmatrix is not None:
+            cmatrix = np.asarray(cmatrix)
+            if cmatrix.ndim == 2:
+                if cmatrix.shape[0] != cmatrix.shape[1]:
+                    strg = "C Matrix should be square: "
+                    strg += "%dx%d matrix provided instead." % cmatrix.shape
+                    raise TypeError(strg)
+            else:
+                strg = "C matrix should be 2-D. %d-D array provided." % \
+                    cmatrix.ndim
+                raise TypeError(strg)
+            self.cmatrix = cmatrix
+
+        if fmatrix is not None:
+            fmatrix = np.asarray(fmatrix)
+            if fmatrix.ndim == 2:
+                if fmatrix.shape[0] != fmatrix.shape[1]:
+                    strg = "F Matrix should be square: "
+                    strg += "%dx%d matrix provided instead." % fmatrix.shape
+                    raise TypeError(strg)
+            else:
+                strg = "F matrix should be 2-D. %d-D array provided." % \
+                    fmatrix.ndim
+                raise TypeError(strg)
+            self.fmatrix = fmatrix     
+
+        if ematrix is not None:
+            ematrix = np.asarray(ematrix)
+            if ematrix.ndim == 2:
+                if ematrix.shape[0] != ematrix.shape[1]:
+                    strg = "E Matrix should be square: "
+                    strg += "%dx%d matrix provided instead." % ematrix.shape
+                    raise TypeError(strg)
+            else:
+                strg = "E matrix should be 2-D. %d-D array provided." % \
+                    ematrix.ndim
+                raise TypeError(strg)
+            self.ematrix = ematrix   
+       
         if bimatrix is not None:
             bimatrix = np.asarray(bimatrix)
             if bimatrix.ndim == 2:
@@ -324,6 +378,58 @@ class MiriImagingDistortionModel(MiriDataModel):
                 raise TypeError(strg)
             self.mimatrix = mimatrix
 
+        if dimatrix is not None:
+            dimatrix = np.asarray(dimatrix)
+            if dimatrix.ndim == 2:
+                if dimatrix.shape[0] != dimatrix.shape[1]:
+                    strg = "DI Matrix should be square: "
+                    strg += "%dx%d imatrix provided instead." % dimatrix.shape
+                    raise TypeError(strg)
+            else:
+                strg = "DI imatrix should be 2-D. %d-D array provided." % \
+                    dimatrix.ndim
+                raise TypeError(strg)
+            self.dimatrix = dimatrix
+
+        if cimatrix is not None:
+            cimatrix = np.asarray(cimatrix)
+            if cimatrix.ndim == 2:
+                if cimatrix.shape[0] != cimatrix.shape[1]:
+                    strg = "CI Matrix should be square: "
+                    strg += "%dx%d imatrix provided instead." % cimatrix.shape
+                    raise TypeError(strg)
+            else:
+                strg = "CI imatrix should be 2-D. %d-D array provided." % \
+                    cimatrix.ndim
+                raise TypeError(strg)
+            self.cimatrix = cimatrix
+
+        if fimatrix is not None:
+            fimatrix = np.asarray(fimatrix)
+            if fimatrix.ndim == 2:
+                if fimatrix.shape[0] != fimatrix.shape[1]:
+                    strg = "FI Matrix should be square: "
+                    strg += "%dx%d imatrix provided instead." % fimatrix.shape
+                    raise TypeError(strg)
+            else:
+                strg = "FI imatrix should be 2-D. %d-D array provided." % \
+                    fimatrix.ndim
+                raise TypeError(strg)
+            self.fimatrix = fimatrix     
+
+        if eimatrix is not None:
+            eimatrix = np.asarray(eimatrix)
+            if eimatrix.ndim == 2:
+                if eimatrix.shape[0] != eimatrix.shape[1]:
+                    strg = "EI Matrix should be square: "
+                    strg += "%dx%d imatrix provided instead." % eimatrix.shape
+                    raise TypeError(strg)
+            else:
+                strg = "EI imatrix should be 2-D. %d-D array provided." % \
+                    eimatrix.ndim
+                raise TypeError(strg)
+            self.eimatrix = eimatrix   
+
         if boresight_offsets is not None:
             try:
                 self.boresight_offsets = boresight_offsets
@@ -337,6 +443,10 @@ class MiriImagingDistortionModel(MiriDataModel):
         bunits = self.set_data_units('bmatrix')
         tunits = self.set_data_units('tmatrix')
         munits = self.set_data_units('mmatrix')
+        dunits = self.set_data_units('dmatrix')
+        cunits = self.set_data_units('cmatrix')
+        funits = self.set_data_units('fmatrix')
+        eunits = self.set_data_units('ematrix')
         biunits = self.set_data_units('bimatrix')
         aiunits = self.set_data_units('aimatrix')
         tiunits = self.set_data_units('timatrix')
@@ -388,11 +498,19 @@ class MiriImagingDistortionModel(MiriDataModel):
         strg += self.get_data_str('amatrix', underline=True, underchar="-")
         strg += self.get_data_str('tmatrix', underline=True, underchar="-")
         strg += self.get_data_str('mmatrix', underline=True, underchar="-")
+        strg += self.get_data_str('dmatrix', underline=True, underchar="-")
+        strg += self.get_data_str('cmatrix', underline=True, underchar="-")
+        strg += self.get_data_str('fmatrix', underline=True, underchar="-")
+        strg += self.get_data_str('ematrix', underline=True, underchar="-")
         strg += self.get_data_str('bimatrix', underline=True, underchar="-")
         strg += self.get_data_str('aimatrix', underline=True, underchar="-")
         strg += self.get_data_str('timatrix', underline=True, underchar="-")
         strg += self.get_data_str('mimatrix', underline=True, underchar="-")
-        
+        strg += self.get_data_str('dimatrix', underline=True, underchar="-")
+        strg += self.get_data_str('cimatrix', underline=True, underchar="-")
+        strg += self.get_data_str('fimatrix', underline=True, underchar="-")
+        strg += self.get_data_str('eimatrix', underline=True, underchar="-")        
+
         if self.boresight_offsets is not None:
             strg += self.get_data_str('boresight_offsets', underline=True, underchar="-")
         else:
@@ -1162,6 +1280,8 @@ if __name__ == '__main__':
                 ('Two', 0.2, 0.3)]
     with MiriImagingDistortionModel( bmatrix=bmatrix, amatrix=amatrix,
                               tmatrix=tmatrix, mmatrix=mmatrix,
+                              dmatrix=amatrix, cmatrix=bmatrix,
+                              fmatrix=amatrix, ematrix=bmatrix,
                               boresight_offsets=boffsets,
                               fitref='MIRI-TN-00070-ATC version 3',
                               fitmodel='Polynomial2D' ) as testdata1:
