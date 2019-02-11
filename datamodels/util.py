@@ -880,23 +880,6 @@ def verify_cdp_file(filename, datatype=None, overwrite=False, keepfile=False):
             strg += "\n  It contains an obsolete GROUP_DEF table."
             raise TypeError(strg)
 
-        # Check that the standard data tables contain the correct column titles.
-        if 'dq_def' in datatables:
-            fieldnames = datamodel.get_field_names('dq_def')
-            testnames = ['BIT', 'VALUE', 'NAME', 'DESCRIPTION']
-            names_ok = True
-            if len(fieldnames) <= len(testnames):
-                for ii in range(0, len(testnames)):
-                    if str(fieldnames[ii]).strip() != testnames[ii]:
-                        names_ok = False
-            if not names_ok:
-                strg = "Data object \'%s\' has failed the test." % \
-                    (datamodel.__class__.__name__)
-                strg = "Incorrect DQ_DEF column names!:" % subname
-                strg += " Expected %s;" % str(testnames)
-                strg += " Actual %s" % str(fieldnames)                
-                raise TypeError(strg)
-
         # Update the data type
         if hasattr(datamodel.meta, 'reftype'):
             datatype = datamodel.meta.reftype
@@ -1077,6 +1060,43 @@ def verify_fits_file(filename, cdp_checks=False):
             if cdp_checks:   
                 if 'REFTYPE' not in hdulist[0].header:
                     failure_strg +=  "No REFTYPE keyword in primary header. "
+                    
+                # Check whether that common data tables have correctly
+                # named columns.
+                if 'DQ_DEF' in hdulist:
+                    dq_def_header = hdulist['DQ_DEF'].header
+                    if 'TFIELDS' in dq_def_header:
+                        tfields = int(dq_def_header['TFIELDS'])
+                        if tfields == 4:
+                            fieldnames = []
+                            testnames = ['BIT', 'VALUE', 'NAME', 'DESCRIPTION']
+                            names_ok = True
+                            for index in range(0, tfields):
+                                index1 = index + 1
+                                ttypename = 'TTYPE%d' % index1
+                                ttype = dq_def_header[ttypename]
+                                fieldnames.append(ttype)
+                                if ttype.strip() != testnames[index].strip():
+                                    names_ok = False
+                            if not names_ok:
+                                strg = "FITS file \'%s\' has failed the test.\n" % \
+                                    filename
+                                strg += "  Incorrect DQ_DEF column names:"
+                                strg += " Expected %s;" % str(testnames)
+                                strg += " Actual %s" % str(fieldnames)                
+                                raise TypeError(strg)
+                        else:
+                            strg = "FITS file \'%s\' has failed the test.\n" % \
+                                    filename
+                            strg += "  DQ_DEF binary table is the wrong size"
+                            strg += "(expected 4 columns, got %d)." % tfields
+                            raise TypeError(strg) 
+                    else:
+                        strg = "FITS file \'%s\' has failed the test.\n" % \
+                                filename
+                        strg += "  DQ_DEF HDU is not a binary table!"              
+                        raise TypeError(strg)                    
+
         # NOTE: The following tidy up code now generates the astropy message:
         # WARNING:astropy:AstropyDeprecationWarning: Accessing an HDU after an HDUList is closed
         #hdulist.close()
