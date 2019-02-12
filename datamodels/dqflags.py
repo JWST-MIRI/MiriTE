@@ -142,8 +142,8 @@ for bit in range(0, MAXBITS-1):
 # This global variable contains the original data quality flag definitions
 # used by MIRI CDPs. NOW DEPRECATED. For details see
 # http://miri.ster.kuleuven.be/bin/view/Internal/DataQualityFlags
-#                  Bit  Name            Title
-#                  ---  ----            -----
+#                  Bit  Name            Description
+#                  ---  ----            -----------
 # reserved_flags = [(0,  'unusable',     'Unusable data'),
 #                   (1,  'non_science',  'Non science data'),
 #                   (2,  'low_qual',     'Data quality below threshold'),
@@ -155,8 +155,8 @@ for bit in range(0, MAXBITS-1):
 def insert_value_column(flagtable):
     """
     
-    Convert a 3-column table of the form (BIT,NAME,TITLE) into a
-    4-column table of the form ((BIT,VALUE,NAME,TITLE).
+    Convert a 3-column table of the form (BIT,NAME,DESCRIPTION) into a
+    4-column table of the form ((BIT,VALUE,NAME,DESCRIPTION).
     
     :Parameters:
     
@@ -728,8 +728,8 @@ class FlagsTable(object):
         read from a MIRI CDP.
         The table may have 3 or 4 columns.
         
-        * A 3 column table is assumed to contain (BIT,NAME,TITLE).
-        * A 4 column table is assumed to contain (BIT,VALUE,NAME,TITLE).
+        * A 3 column table is assumed to contain (BIT,NAME,DESCRIPTION).
+        * A 4 column table is assumed to contain (BIT,VALUE,NAME,DESCRIPTION).
         
     """    
     def __init__(self, flagtable):    
@@ -740,32 +740,32 @@ class FlagsTable(object):
             raise TypeError(strg)
             
         # Convert the flag table into 2 dictionaries: one to look
-        # up the flag values and a second to look up a flag title
+        # up the flag values and a second to look up a flag description
         self.keys = []
         self.flagvalues = {}
-        self.flagtitles = {}
+        self.flagdescr = {}
         if flagtable is None or len(flagtable) < 1:
             # The flag table may be defined empty and populated later.
             return
         
         if len(flagtable[0]) == 3:
-            # Flag table containing BIT, NAME, TITLE.
+            # Flag table containing BIT, NAME, DESCRIPTION.
             # Calculate the VALUE field.
             for record in flagtable:
                 self._check_value_range( record[0] )
                 keyw = record[1].strip() # Strip off padding at beginning and end
                 self.keys.append(keyw)
                 self.flagvalues[keyw] = record[0]
-                self.flagtitles[keyw] = record[2]
+                self.flagdescr[keyw] = record[2]
         elif len(flagtable[0]) == 4:
-            # Flag table containing BIT, VALUE, NAME, TITLE
+            # Flag table containing BIT, VALUE, NAME, DESCRIPTION
             # The VALUE field is ignored. It provides no additional information.
             for record in flagtable:
                 self._check_value_range( record[0] )
                 keyw = record[2].strip() # Strip off padding at beginning and end
                 self.keys.append(keyw)
                 self.flagvalues[keyw] = record[0]
-                self.flagtitles[keyw] = record[3]
+                self.flagdescr[keyw] = record[3]
         else:
             strg = "Flag table should contain 3 or 4 columns"
             strg += " (it actually contains %d)" % len(flagtable[0])
@@ -811,13 +811,13 @@ class FlagsTable(object):
         Return a string description of the flags table.
         
         """
-        strg =  'NAME                 BIT     VALUE      TITLE\n'
-        strg += '------------------   -----   ---------- --------------------\n'
+        strg =  'NAME                 BIT     VALUE      DESCRIPTION\n'
+        strg += '------------------   -----   ---------- -----------\n'
         for key in self.keys:
             bit = self.flagvalues[key]
             strg += "\'%-16s\' = 2**%2d = %10d (\'%s\')\n" % (key, bit,
                                                         bit_to_value[bit],
-                                                        self.flagtitles[key])
+                                                        self.flagdescr[key])
         return strg
     
     # The following methods allow a flag table to be used like
@@ -837,8 +837,8 @@ class FlagsTable(object):
             self._check_value_range( value )
             self.keys.append(keyword)
             self.flagvalues[keyword] = value
-            # Items set individually like this have an unknown title.
-            self.flagtitles[keyword] = ''
+            # Items set individually like this have an unknown description.
+            self.flagdescr[keyword] = ''
         else:
             strg = "Changing an existing entry in a flags table "
             strg += "is not allowed. Only new entries may be added."
@@ -907,7 +907,7 @@ class FlagsTable(object):
                     self._check_value_range( other.flagvalues[key] )
                     newobject.keys.append(key)
                     newobject.flagvalues[key] = other.flagvalues[key]
-                    newobject.flagtitles[key] = other.flagtitles[key]
+                    newobject.flagdescr[key] = other.flagdescr[key]
                 else:
                     strg = "\n***Duplicate key \'%s\' ignored" % key
                     warnings.warn(strg)
@@ -949,8 +949,8 @@ class FlagsTable(object):
             read from a MIRI CDP.
             The table may have 3 or 4 columns.
         
-            * A 3 column table is assumed to contain (BIT,NAME,TITLE).
-            * A 4 column table is assumed to contain (BIT,VALUE,NAME,TITLE).
+            * A 3 column table is assumed to contain (BIT,NAME,DESCRIPTION).
+            * A 4 column table is assumed to contain (BIT,VALUE,NAME,DESCRIPTION).
         
         """
         # The new table must be a record array or a numpy array.
@@ -959,26 +959,26 @@ class FlagsTable(object):
             raise TypeError(strg)
         
         if len(newtable[0]) == 3:
-            # Flag table containing BIT, NAME, TITLE.
+            # Flag table containing BIT, NAME, DESCRIPTION.
             # Calculate the VALUE field.
             for record in newtable:
                 if record[1] not in self.keys:
                     self._check_value_range( record[0] )
                     self.keys.append(record[1])
                     self.flagvalues[record[1]] = record[0]  
-                    self.flagtitles[record[1]] = record[2]
+                    self.flagdescr[record[1]] = record[2]
                 else:
                     strg = "\n***Duplicate key \'%s\' ignored" % record[1]
                     warnings.warn(strg)  
         elif len(newtable[0]) == 4:
-            # Flag table containing BIT, VALUE, NAME, TITLE
+            # Flag table containing BIT, VALUE, NAME, DESCRIPTION
             # The VALUE field is ignored, since it provides no extra information.
             for record in newtable:
                 if record[2] not in self.keys:
                     self._check_value_range( record[0] )
                     self.keys.append(record[2])
                     self.flagvalues[record[2]] = record[0]
-                    self.flagtitles[record[2]] = record[3]
+                    self.flagdescr[record[2]] = record[3]
                 else:
                     strg = "\n***Duplicate key \'%s\' ignored" % record[2]
                     warnings.warn(strg)  

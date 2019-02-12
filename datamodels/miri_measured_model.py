@@ -263,7 +263,7 @@ class MiriMeasuredModel(MiriDataModel, HasDataErrAndDq):
     
     """
     schema_url = "miri_measured.schema.yaml"
-    dq_def_names = ('BIT', 'VALUE', 'NAME', 'TITLE')
+    dq_def_names = ('BIT', 'VALUE', 'NAME', 'DESCRIPTION')
 
     # Set the default dq_def table to the JWST master flags
     # TODO: Can this default be defined in the schema?
