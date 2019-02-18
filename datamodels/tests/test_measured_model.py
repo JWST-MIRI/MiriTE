@@ -59,6 +59,7 @@ in the datamodels.miri_measured_model module.
              JWST pipeline version 0.7.8rc2
 27 Apr 2018: Corrected bug in get_history() length test.
 27 Jun 2018: Removed unused arrays.
+15 Feb 2018: Check that the DQ_DEF table has the correct fieldnames.
 
 @author: Steven Beard (UKATC)
 
@@ -151,6 +152,13 @@ class TestMiriMeasuredModel(unittest.TestCase):
         del self.tempfiles
         
     def test_creation(self):
+        # Check that the DQ_DEF field names in the class variable are the same
+        # as the ones declared in the schema.
+        dq_def_names = list(MiriMeasuredModel.dq_def_names)
+        schema_names = list(self.dataproduct.get_field_names('dq_def'))
+        self.assertEqual(dq_def_names, schema_names,
+                         "'dq_def_names' class variable does not match schema")
+
         # Test that the error and quality arrays are optional.
         a2 = [[10,20,30,40], [50,60,70,80], [90,100,110,120]]
         b2 = [[1,2,3,4],     [5,6,7,8],     [9,10,11,12]]

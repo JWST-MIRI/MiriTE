@@ -1031,9 +1031,9 @@ class MiriCDPFolder(object):
                 release_order.append( '_' + '0' + dig + '.' )
             # This list extends the test up to CDP-10 to CDP-19, just in case.
             # If the releases go further than this, just add to the ten_list.
-            ten_list = ['1']
             dig_list = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
             chr_list = ['A', 'B', 'C']
+            ten_list = ['1'] # Valid to CDP-19. ['1', '2', '3'] would be valid to CDP-39.
             for ten in ten_list:
                 for dig in dig_list:
                     for chr in chr_list:
