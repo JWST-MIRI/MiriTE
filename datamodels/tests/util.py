@@ -16,8 +16,6 @@ Module util - Utility module containing functions shared by all the unit tests.
          Ruyman Azzollini (DIAS)
 
 """
-# This module is now converted to Python 3.
-
 
 from astropy.extern import six
 

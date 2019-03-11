@@ -15,8 +15,6 @@ Simple tests of the data model utility functions in datamodels/util.py.
 @author: Steven Beard (UKATC)
 
 """
-# This module is now converted to Python 3.
-
 
 import os
 import unittest

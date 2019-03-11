@@ -75,6 +75,9 @@ processing the MIRI data models.
 08 Feb 2019: Added more CDP verification checks. Ensure all subarray coordinates
              match the MIRI definitions. Ensure a SKYFLAT uses PEDIGREE=DUMMY.
              Ensure that all data files use the correct dq_def field names.
+11 Mar 2019: Added yet more CDP verification checks. Every CDP file is now
+             analysed with fitsverify to ensure it meets FITS standards.
+             The USAFTER keyword must exist and contain both a date and a time.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -83,6 +86,7 @@ processing the MIRI data models.
 import os
 import copy
 import warnings
+import subprocess
 from astropy.extern import six
 
 import numpy as np
@@ -691,12 +695,25 @@ def verify_metadata(datamodel):
         failure_string = "  Data model object %s has no reference file type keyword (REFTYPE)." % \
             datamodel.__class__.__name__
         return failure_string
+    if not hasattr(datamodel.meta, 'useafter'):
+        failure_string = "  Data model object %s has no reference file type keyword (USEAFTER)." % \
+            datamodel.__class__.__name__
+        return failure_string
 
     if not datamodel.meta.reftype:
         failure_string += "  Empty reference file type keyword (REFTYPE).\n"
     elif datamodel.meta.reftype not in CDP_DICT:
         failure_string += "  Reference file type of \'%s\' is not recognised.\n" % \
             datamodel.meta.reftype
+            
+    # A reference file must contain a USEAFTER keyword containing a
+    # date and a time.
+
+    if not datamodel.meta.useafter:
+        failure_string += "  Empty reference file use after keyword (USEAFTER).\n"
+    elif 'T' not in str(datamodel.meta.useafter):
+        failure_string += "  USEAFTER string (%s) does " % datamodel.meta.useafter
+        failure_string += "not include a time component (e.g. T00:00:00).\n"    
     
     # Check for compulsory keywords and default values.
     # Check all the compulsory metadata. Add extra subarray keywords if
@@ -819,8 +836,12 @@ def verify_cdp_file(filename, datatype=None, overwrite=False, keepfile=False):
         file header.
     
     """
-    assert isinstance(filename, six.string_types)
+    assert isinstance(filename, str)
     outputfile = filename + "_copy.fits"
+    # Does the file exist?
+    if not os.path.isfile(filename):
+        strg = "verify_cdp_file: Specified file \'%s\' does not exist!" % filename
+        raise IOError(strg)
 
     # Read the data model either using a class derived from the data type
     # or using the class specified in the datatype parameter.
@@ -1018,7 +1039,7 @@ def verify_cdp_file(filename, datatype=None, overwrite=False, keepfile=False):
                               outputfile)
         return datatype
 
-def verify_fits_file(filename, cdp_checks=False):
+def verify_fits_file(filename, cdp_checks=False, fitsverify_checks=True):
     """
     
     Verify that a given FITS file looks vaguely like a MIRI/JWST
@@ -1034,6 +1055,8 @@ def verify_fits_file(filename, cdp_checks=False):
         The name of the FITS file containing the CDP.
     cdp_checks: bool
         Set True for additional CDP checks. Defaults to False.
+    fitsverify_checks: bool
+        Set True for an additional fitsverify check. Defaults to True.
         
     :Returns:
     
@@ -1041,7 +1064,28 @@ def verify_fits_file(filename, cdp_checks=False):
     
     """
     assert isinstance(filename, str)
+    # Does the file exist?
+    if not os.path.isfile(filename):
+        strg = "verify_fits_file: Specified file \'%s\' does not exist!" % filename
+        raise IOError(strg)
     
+    # First verify that the file obeys the rules of the FITS standard.
+    # This step is only executed if the host system recognises the
+    # "fitsverify" shell command.
+    if fitsverify_checks:
+        fitsverify_available = False
+        try:
+            if subprocess.call(["which", "fitsverify"]) == 0:
+                fitsverify_available = True
+        except:
+            pass
+        if fitsverify_available:
+            nerrors = subprocess.call(["fitsverify", "-q", filename])
+            if nerrors > 0:
+                strg = "FITS standard violation (%d errors)." % nerrors
+                strg += " Rerun \'fitsverify %s\' for details." % filename
+                raise TypeError(strg)
+
     failure_strg = ''
     with pyfits.open( filename ) as hdulist:
         if len(hdulist) < 1:
@@ -1079,22 +1123,16 @@ def verify_fits_file(filename, cdp_checks=False):
                                 if ttype.strip() != testnames[index].strip():
                                     names_ok = False
                             if not names_ok:
-                                strg = "FITS file \'%s\' has failed the test.\n" % \
-                                    filename
-                                strg += "  Incorrect DQ_DEF column names:"
+                                strg = "Incorrect DQ_DEF column names:"
                                 strg += " Expected %s;" % str(testnames)
                                 strg += " Actual %s" % str(fieldnames)                
                                 raise TypeError(strg)
                         else:
-                            strg = "FITS file \'%s\' has failed the test.\n" % \
-                                    filename
-                            strg += "  DQ_DEF binary table is the wrong size"
+                            strg = "DQ_DEF binary table is the wrong size "
                             strg += "(expected 4 columns, got %d)." % tfields
                             raise TypeError(strg) 
                     else:
-                        strg = "FITS file \'%s\' has failed the test.\n" % \
-                                filename
-                        strg += "  DQ_DEF HDU is not a binary table!"              
+                        strg = "DQ_DEF HDU is not a binary table!"              
                         raise TypeError(strg)                    
 
         # NOTE: The following tidy up code now generates the astropy message:

@@ -20,8 +20,6 @@ ONLY NEEDED AS LONG AS THE DATA MODEL/PYFITS FILE LOCKING PROBLEM REMAINS.
 @author: Steven Beard (UKATC)
 
 """
-# This module is now converted to Python 3.
-
 
 import os
 # import time

@@ -41,8 +41,6 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 @author: Vincent Geers (DIAS), Steven Beard (UKATC)
 
 """
-# This module is now converted to Python 3.
-
 
 #import warnings
 import numpy as np

@@ -46,7 +46,7 @@ PARENT_DICT = {'MiriDataModel' : 'DataModel', \
                'MiriLastFrameModel' : 'LastFrameModel', \
 #                'MiriLatentDecayModel' : '', \
                'MiriLinearityModel' : 'LinearityModel', \
-#                'MiriPceModel' : '', \
+#                'MiriPceModel' : 'PhotomModel', \
                'MiriImagingPhotometricModel' : 'MiriImgPhotomModel', \
                'MiriPixelAreaModel' : 'PixelAreaModel',
                'MiriPixelSaturationModel' : 'SaturationModel', \

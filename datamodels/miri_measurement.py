@@ -23,8 +23,6 @@ which vary with a variable.
 @author: Steven Beard (UKATC)
 
 """
-# This module is now converted to Python 3.
-
 
 #import sys
 import numpy as np

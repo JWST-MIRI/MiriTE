@@ -14,8 +14,6 @@ Simple tests of classes in "dqflags" module.
 @author: Ruyman Azzollini (DIAS), Steven Beard (UKATC)
 
 """
-# This module is now converted to Python 3.
-
 
 import unittest
 import numpy as np

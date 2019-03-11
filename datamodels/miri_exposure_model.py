@@ -90,8 +90,6 @@ https://jwst-docs.stsci.edu/display/JDAT/JWST+File+Names%2C+Formats%2C+and+Data+
 @author: Steven Beard (UKATC)
 
 """
-# This module is now converted to Python 3.
-
 
 # Python logging facility
 import logging

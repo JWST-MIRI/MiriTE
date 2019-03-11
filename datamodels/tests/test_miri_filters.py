@@ -13,8 +13,6 @@ Module test_miri_filters - unit tests for the MiriFilter classes.
 17 Oct 2018: 'N/A' used as a metadata wildcard instead of 'ANY'.
 
 """
-# This module is now converted to Python 3.
-
 
 import os
 import unittest

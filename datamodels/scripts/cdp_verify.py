@@ -93,7 +93,7 @@ if __name__ == "__main__":
     
     # Call the utility function which verifies a CDP file.
     try:
-        verify_fits_file(inputfile, cdp_checks=True)
+        verify_fits_file(inputfile, cdp_checks=True, fitsverify_checks=True)
         time.sleep(0.1) # Allow the file to close.
         datatype = verify_cdp_file( inputfile, datatype, overwrite=overwrite, 
                                     keepfile=keepfile )

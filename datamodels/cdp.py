@@ -179,6 +179,7 @@ CDP_DICT = { \
                          'ANY' : MiriPointSpreadFunctionModel }, \
             'PSF-OOF' : MiriImagingPointSpreadFunctionModel, \
             # TODO: Remove this cdprelease complexity after CDP-7 release
+            # TODO: The REFTYPE for spectroscopy distortion has changed to SPECWCS!
             'DISTORTION' : {'MIRIMAGE'    : {'P750L' : MiriLrsD2WModel, \
                                              'ANY'   : MiriImagingDistortionModel}, \
                             'MIRIFUSHORT' : {'ANY'   : {'6'   : MiriMrsDistortionModel12_CDP6, \

@@ -82,7 +82,7 @@ def verify_path(path, overwrite=False, pattern='*.fits', keepfile=False, nopass=
     for filename in filenames:
         bfilename = os.path.basename(filename)
         try:
-            verify_fits_file(filename, cdp_checks=True)
+            verify_fits_file(filename, cdp_checks=True, fitsverify_checks=True)
             time.sleep(0.1) # Allow the file to close.
             datatype = verify_cdp_file( filename, overwrite=overwrite, 
                                         keepfile=keepfile)

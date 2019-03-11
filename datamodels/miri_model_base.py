@@ -170,11 +170,12 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 14 Nov 2018: Added get_table_units and set_table_units functions.
              Removed the setting of WCS metadata from the module tests.
 17 Jan 2019: Changed set_exposure_type filter parameter to mirifilter.
+11 Mar 2019: Check that the USAFTER keyword contains a date and a string
+             (commented out).
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
-# This module is now converted to Python 3.
 
 import os
 import datetime
@@ -497,8 +498,16 @@ class MiriDataModel(DataModel):
             # A USEAFTER date must exist in a reference model. If not relevant,
             # set it to an impossibly early date.
             if hasattr(self.meta, 'useafter'):
-                if self.meta.useafter is None:
+                if self.meta.useafter is None or not self.meta.useafter:
                     self.meta.useafter = '2000-01-01T00:00:00'
+#                 else:
+#                     # Issue a warning if the date does not include the time.
+#                     # NOTE: This assumes the date format is already correct.
+#                     if 'T' not in str(self.meta.useafter):
+#                         strg = "USEAFTER string (%s) does " % self.meta.useafter
+#                         strg += "not include a time component (e.g. T00:00:00)"
+#                         warnings.warn(strg)
+                    
 
         # Define the attribute which prevents the ASDF extension from
         # being written.

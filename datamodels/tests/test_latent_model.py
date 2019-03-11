@@ -29,8 +29,6 @@ in the datamodels.miri_latent_model module.
 @author: Steven Beard (UKATC)
 
 """
-# This module is now converted to Python 3.
-
 
 import os
 import unittest

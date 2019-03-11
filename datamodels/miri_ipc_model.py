@@ -27,8 +27,6 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 @author: Vincent Geers (DIAS)
 
 """
-# This module is now converted to Python 3.
-
 
 import numpy as np
 

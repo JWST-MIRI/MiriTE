@@ -140,9 +140,7 @@ import sys, getpass
 import copy
 
 # Python utilities for accessing the sftp repository.
-# NOTE: Available for Python 2.7, 3.2, 3.3, 3.4
 import pysftp
-# NOTE: Available for Python 2.7, 3.4+
 from paramiko import SSHException
 
 # Python logging facility.
