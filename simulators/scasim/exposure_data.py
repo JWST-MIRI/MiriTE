@@ -106,8 +106,6 @@ It has been superceeded by the datamodels/miri_exposure_model.py
 @author: Steven Beard
 
 """
-# This module is now converted to Python 3.
-
 
 # Python logging facility
 import logging
