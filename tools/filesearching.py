@@ -35,14 +35,13 @@ The class hierarchy is::
              so the search result can be made predictable.
 26 Mar 2018: Changed 'nosuchfile' to a name even less likely to exist.
 17 May 2018: Python 3: Converted dictionary keys return into a list.
+:12 Mar 2019: Removed use of astropy.extern.six (since Python 2 no longer used).
 
 @author: Steven Beard (UKATC)
 
 """
-# This module is now converted to Python 3.
 
-
-from astropy.extern import six 
+#from astropy.extern import six 
 import sys, os, fnmatch
 
 # Python logging facility
@@ -618,7 +617,8 @@ class ParameterFileManager(object):
             fp = open(fname,"r")
             try:
                 code = fp.read()
-                six.exec_(code, self._kwdict)
+                #six.exec_(code, self._kwdict)
+                exec(code, self._kwdict)
             except Exception as e:
                 strg = "Error while creating ParameterFileManager object.\n"
                 strg += "  Failed to interpret %s as a Python file.\n" % fname

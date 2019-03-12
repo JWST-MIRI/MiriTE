@@ -56,8 +56,6 @@ distinguish between amplifiers and are applied to the whole detector.
 @author: Steven Beard (UKATC)
 
 """
-# This module is now converted to Python 3.
-
 
 from miri.simulators.find_simulator_file import find_simulator_file
 

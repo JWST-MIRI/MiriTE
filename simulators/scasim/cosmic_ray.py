@@ -83,8 +83,6 @@ ray events.
 @author: Steven Beard (UKATC)
 
 """
-# This module is now converted to Python 3.
-
 
 # Python logging facility
 import logging

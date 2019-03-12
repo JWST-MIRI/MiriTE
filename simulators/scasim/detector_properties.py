@@ -144,7 +144,6 @@ Sources:
 @author: Steven Beard (UKATC)
 
 """
-# This module is now converted to Python 3.
 
 # Import global properties
 from miri.parameters import READOUT_MODE

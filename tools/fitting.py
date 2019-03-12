@@ -29,9 +29,6 @@ LinFit - Class for linear fitting
 
 """
 
-# This module is now converted to Python 3.
-
-
 # Import standard python packages/modules
 # e.g. import os
 

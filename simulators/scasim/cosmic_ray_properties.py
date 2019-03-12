@@ -59,8 +59,6 @@ detector for cosmic ray hits, 2017?
 @author: Steven Beard (UKATC)
 
 """
-# This module is now converted to Python 3.
-
 
 import os
 import warnings

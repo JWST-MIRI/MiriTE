@@ -17,8 +17,6 @@ Module find_simulator_file - Contains function to search for simulator files.
 @author: Steven Beard (UKATC)
 
 """
-# This module is now converted to Python 3.
-
 
 import os
 

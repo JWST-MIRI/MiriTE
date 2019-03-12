@@ -237,8 +237,6 @@ Calibration Data Products (CDPs).
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
-# This module is now converted to Python 3.
-
 
 # Python logging facility
 import logging
