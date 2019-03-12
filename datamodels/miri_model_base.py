@@ -172,6 +172,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 17 Jan 2019: Changed set_exposure_type filter parameter to mirifilter.
 11 Mar 2019: Check that the USAFTER keyword contains a date and a string
              (commented out).
+12 Mar 2019: Removed use of astropy.extern.six (since Python 2 no longer used).
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -185,7 +186,6 @@ import datetime
 import warnings
 import numpy as np
 #import numpy.ma as ma
-from astropy.extern import six
 from astropy.time import Time
 import asdf.util
 from asdf.tags.core import HistoryEntry
@@ -1286,7 +1286,7 @@ class MiriDataModel(DataModel):
             # First define the fast and slow axes.
             self.meta.subarray.fastaxis = fastaxis
             self.meta.subarray.slowaxis = slowaxis
-            if isinstance(subarray, six.string_types):
+            if isinstance(subarray, str):
                 subarray = subarray.strip() # Strip off superflous white space
                 self.meta.subarray.name = subarray
                 subtuple = SUBARRAY[subarray]

@@ -78,6 +78,7 @@ processing the MIRI data models.
 11 Mar 2019: Added yet more CDP verification checks. Every CDP file is now
              analysed with fitsverify to ensure it meets FITS standards.
              The USAFTER keyword must exist and contain both a date and a time.
+12 Mar 2019: Removed use of astropy.extern.six (since Python 2 no longer used).
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -87,7 +88,6 @@ import os
 import copy
 import warnings
 import subprocess
-from astropy.extern import six
 
 import numpy as np
 from numpy.testing import assert_array_equal, assert_array_almost_equal
@@ -138,7 +138,7 @@ def read_fits_header( fitsobject, keyword, hduname='' ):
     try:
         if isinstance(fitsobject, bytes):
             fitsobject = fitsobject.decode('utf-8')
-        if isinstance(fitsobject, six.string_types) or hasattr(fitsobject, "read"):
+        if isinstance(fitsobject, str) or hasattr(fitsobject, "read"):
             hdulist = pyfits.open( fitsobject )
             file_open = True
         elif isinstance(fitsobject, pyfits.HDUList):
@@ -188,7 +188,7 @@ def get_data_class( kwlist, dictionary=CDP_DICT ):
     # Make sure kwlist is a list.
     if isinstance(kwlist, bytes):
         kwlist = kwlist.decode('utf-8')
-    if isinstance(kwlist, (six.string_types)):
+    if isinstance(kwlist, str):
         kwlist = [kwlist]
     if kwlist is None or len(kwlist) < 1:
         # No keywords at all.
@@ -284,7 +284,7 @@ def open( init=None, astype=None):
     if astype is None:
         datatype = ''
         mirimodel = None
-    elif isinstance(astype, six.string_types):
+    elif isinstance(astype, str):
         datatype = astype
         mirimodel = None
     elif isinstance(astype, bytes):
@@ -300,7 +300,7 @@ def open( init=None, astype=None):
         # If the initialiser is a FITS-type object, the data type may
         # be distinguished using the file header.
         try:
-            if isinstance(init, six.string_types) or hasattr(init, "read"):
+            if isinstance(init, str) or hasattr(init, "read"):
                 hdulist = pyfits.open(init)
             elif isinstance(init, bytes):
                 hdulist = pyfits.open(init.decode('utf-8'))
@@ -448,9 +448,9 @@ def assert_products_equal(a, b, arrays='data', tables=''):
     
     """
     # Make sure the attribute names are in list form.
-    if arrays and isinstance(arrays, six.string_types):
+    if arrays and isinstance(arrays, str):
         arrays = [arrays]
-    if tables and isinstance(tables, six.string_types):
+    if tables and isinstance(tables, str):
         tables = [tables]
         
     if arrays:
@@ -1238,8 +1238,8 @@ def convert_cdp_2to3(infile, outfile, datatype=None, settings=None,
         file header.
     
     """
-    assert isinstance(infile, six.string_types)
-    assert isinstance(outfile, six.string_types)
+    assert isinstance(infile, str)
+    assert isinstance(outfile, str)
     # Open the data model using the class derived from the data type.
     with open( init=infile, astype=datatype ) as datamodel:
          # Report the kind of model being processed

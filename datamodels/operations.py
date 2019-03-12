@@ -34,14 +34,13 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 04 May 2016: noerr option added to HasDataErrAndDq.
 12 Jul 2017: set_data_fill and set_err_fill options added to HasDataErrAndDq.
 27 Jun 2018: Added HasDataErrAndGroups class to be used with ramp data.
+12 Mar 2019: Removed use of astropy.extern.six (since Python 2 no longer used).
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
 
 import sys
-from astropy.extern import six
-
 import numpy as np
 import numpy.ma as ma
 
@@ -650,7 +649,7 @@ class HasDataErrAndDq(HasData):
         """
         # The data array must exist and must not be empty.
         if self._isvalid(data):
-            if isinstance(fill_descr, six.string_types):
+            if isinstance(fill_descr, str):
                 if fill_descr == 'min':
                     # Use the minimum unmasked value as the fill value
                     fill_value = data.min()

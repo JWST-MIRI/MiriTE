@@ -11,13 +11,12 @@ Module util - Utility module containing functions shared by all the unit tests.
              equal even if they have nans (Ruyman Azzollini, DIAS).
 29 Jun 2017: Explicitly test for identical NaN distributions using np.all()
              instead of using a subtraction.
+12 Mar 2019: Removed use of astropy.extern.six (since Python 2 no longer used).
 
 @author: Steven Beard (UKATC), Michael Droettboom (STScI),
          Ruyman Azzollini (DIAS)
 
 """
-
-from astropy.extern import six
 
 import numpy as np
 from numpy.testing import assert_array_equal
@@ -79,9 +78,9 @@ def assert_products_equal(testobj, a, b, arrays='data', tables=''):
     
     """
     # Make sure the attribute names are in list form.
-    if arrays and isinstance(arrays, six.string_types):
+    if arrays and isinstance(arrays, str):
         arrays = [arrays]
-    if tables and isinstance(tables, six.string_types):
+    if tables and isinstance(tables, str):
         tables = [tables]
         
     if arrays:

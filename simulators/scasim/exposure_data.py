@@ -101,6 +101,7 @@ It has been superceeded by the datamodels/miri_exposure_model.py
 11 Sep 2017: Ensure EXPSTART, EXPMID and EXPEND keywords are MJD.
 30 Apr 2018: Replaced xrange with range for Python 3.
 17 May 2018: Python 3: Converted dictionary keys return into a list.
+12 Mar 2019: Removed use of astropy.extern.six (since Python 2 no longer used).
 
 @author: Steven Beard
 
@@ -115,7 +116,6 @@ LOGGER = logging.getLogger("miri.exposure_data") # Get a default parent logger
 
 import numpy as np
 import scipy.stats
-from astropy.extern import six
 import astropy.io.fits as pyfits
 
 # Import the miri.tools plotting module.
@@ -370,7 +370,7 @@ class Metadata(object):
         
         """
         # A comment must be a string.
-        if isinstance(comment,six.string_types):
+        if isinstance(comment,str):
             return True
         else:
             return False
@@ -411,7 +411,7 @@ class Metadata(object):
         
         """
         # A keyword must be a string.
-        if isinstance(key,six.string_types):
+        if isinstance(key,str):
             # It cannot be white space or a null string or be longer
             # than the maximum length.
             if key.isspace() or (len(key) == 0) or (len(key) > maxlength):
@@ -1227,10 +1227,7 @@ class ExposureData(object):
         
         """
         # Convert unusual values into a string
-        if six.PY2:
-            usual_types = (str,float,int)
-        else:
-            usual_types = (str,float,int)
+        usual_types = (str,float,int)
         if not isinstance(value, usual_types):
             value = str(value)
         if hdu_name == 'DATA':

@@ -99,6 +99,7 @@ http://miri.ster.kuleuven.be/bin/view/Internal/DataQualityFlags
 17 Mar 2017: Corrected some documentation typos.
 14 Nov 2017: Added some new DQ flags.
 17 May 2018: Python 3: Converted dictionary keys return into a list.
+12 Mar 2019: Removed use of astropy.extern.six (since Python 2 no longer used).
 
 @author: Ruyman Azzollini (DIAS), Steven Beard (UKATC)
 
@@ -109,8 +110,6 @@ import copy
 
 import numpy as np
 import numpy.ma as ma
-
-from astropy.extern import six
 
 # import astropy.io.fits as pyfits 
 
@@ -1033,7 +1032,7 @@ class FlagsTable(object):
         bitmask = 0
         for flag in flags:
             # If the flag is a string, look up its value
-            if isinstance(flag, six.string_types):
+            if isinstance(flag, str):
                 flagbit = self[flag]
                 bitmask |= bit_to_value[flagbit]
             else:
