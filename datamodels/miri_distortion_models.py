@@ -85,7 +85,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
-11 Feb 2019: Added missing C, D, E, F matrices to imager distortion model.             
+11 Feb 2019: Added missing C, D, E, F matrices to imager distortion model.
+12 Mar 2019: Prepare to change the reference type for spectroscopy distortion
+             from 'DISTORTION' to 'SPECWCS'.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -576,6 +578,7 @@ class MiriLrsD2WModel(MiriDataModel):
 
         # Data type is wavelength calibration.
         self.meta.reftype = 'DISTORTION'
+#         self.meta.reftype = 'SPECWCS'
         model_type = get_my_model_type( self.__class__.__name__ )
         if model_type:
             self.meta.model_type = model_type        
@@ -714,6 +717,7 @@ class MiriMrsDistortionModel12(MiriDataModel):
 
         # Data type is MRS DISTORTION.
         self.meta.reftype = 'DISTORTION'
+#         self.meta.reftype = 'SPECWCS'
         model_type = get_my_model_type( self.__class__.__name__ )
         if model_type:
             self.meta.model_type = model_type        
@@ -1038,6 +1042,7 @@ class MiriMrsDistortionModel34(MiriDataModel):
 
         # Data type is MRS DISTORTION.
         self.meta.reftype = 'DISTORTION'
+#         self.meta.reftype = 'SPECWCS'
         model_type = get_my_model_type( self.__class__.__name__ )
         if model_type:
             self.meta.model_type = model_type        

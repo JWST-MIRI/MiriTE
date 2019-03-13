@@ -77,6 +77,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/introduction.html#crds-reference-files
              in the dictionary to reflect the order on the wiki.
 15 Nov 2018: Dictionary modified to include CDP-3 variant of the MRS
              straylight model.
+12 Mar 2019: Added 'SPECWCS' as an alias for 'DISTORTION'.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -179,7 +180,6 @@ CDP_DICT = { \
                          'ANY' : MiriPointSpreadFunctionModel }, \
             'PSF-OOF' : MiriImagingPointSpreadFunctionModel, \
             # TODO: Remove this cdprelease complexity after CDP-7 release
-            # TODO: The REFTYPE for spectroscopy distortion has changed to SPECWCS!
             'DISTORTION' : {'MIRIMAGE'    : {'P750L' : MiriLrsD2WModel, \
                                              'ANY'   : MiriImagingDistortionModel}, \
                             'MIRIFUSHORT' : {'ANY'   : {'6'   : MiriMrsDistortionModel12_CDP6, \
@@ -195,6 +195,13 @@ CDP_DICT = { \
 #                             'MIRIFUSHORT' : MiriMrsDistortionModel12, \
 #                             'MIRIFULONG'  : MiriMrsDistortionModel34, \
 #                             'ANY'         : MiriImagingDistortionModel }, \
+            # The REFTYPE for spectroscopy distortion has changed to SPECWCS
+            # so make this an alias for DISTORTION.
+            'SPECWCS' :    {'MIRIMAGE'  : {'P750L' : MiriLrsD2WModel, \
+                                           'ANY'   : MiriImagingDistortionModel}, \
+                            'MIRIFUSHORT' : MiriMrsDistortionModel12, \
+                            'MIRIFULONG'  : MiriMrsDistortionModel34, \
+                            'ANY'         : MiriImagingDistortionModel }, \
             'AREA' : MiriPixelAreaModel, \
             # TODO: Remove this cdprelease complexity after CDP-7 release
             'PHOTOM'  : {'MIRIMAGE'    : {'P750L' : {'5'   : MiriLrsFluxconversionModel, \
