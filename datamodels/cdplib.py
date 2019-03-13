@@ -127,12 +127,12 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/introduction.html#reference-
 30 Oct 2018: PIXELFLAT is no longer used as a reference type, but the strings
              'FLAT' and 'PIXELFLAT' can both be used to search for a pixel
              flat-field. Added missing SUBARRAYs to the module tests.
-12 Mar 2019: Removed use of astropy.extern.six (since Python 2 no longer used).
 
 Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
 
+from astropy.extern import six
 import os
 import re
 import time
@@ -1236,7 +1236,8 @@ class MiriCDPFolder(object):
 
 
 # Only one instance of this class is allowed to exist.
-class MiriCDPInterface(object, metaclass=Singleton):
+@six.add_metaclass(Singleton)
+class MiriCDPInterface(object):
     """
     
     A class which manages the interface between the MIRI pipeline or

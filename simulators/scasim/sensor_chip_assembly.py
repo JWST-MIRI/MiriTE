@@ -342,11 +342,13 @@ Calibration Data Products (CDPs).
              format a string for printing.
 28 Nov 2018: Added the ability to simulate cosmic rays of a single energy.
 07 Feb 2019: Added cdp_ftp_host parameter.
-12 Mar 2019: Removed use of astropy.extern.six (since Python 2 no longer used).
 
 @author: Steven Beard
 
 """
+# This module is now converted to Python 3.
+
+from astropy.extern import six
 
 # Python logging facility
 import logging
@@ -4178,7 +4180,8 @@ class SensorChipAssembly(object):
                                      tunit='seconds', show_ints=show_ints,
                                      description=description)
 
-class SensorChipAssembly1(SensorChipAssembly, metaclass=Singleton):
+@six.add_metaclass(Singleton)
+class SensorChipAssembly1(SensorChipAssembly):
     # Only one instance of this class is allowed to exist.
     """
 
@@ -4209,7 +4212,8 @@ class SensorChipAssembly1(SensorChipAssembly, metaclass=Singleton):
         super(SensorChipAssembly1, self).__init__(logger=logger)
 
 # Only one instance of this class is allowed to exist.
-class SensorChipAssembly2(SensorChipAssembly, metaclass=Singleton):
+@six.add_metaclass(Singleton)
+class SensorChipAssembly2(SensorChipAssembly):
     """
 
     Class Sensor Chip Assembly - Simulates the behaviour of the MIRI
@@ -4240,7 +4244,8 @@ class SensorChipAssembly2(SensorChipAssembly, metaclass=Singleton):
 
 
 # Only one instance of this class is allowed to exist.
-class SensorChipAssembly3(SensorChipAssembly, metaclass=Singleton):
+@six.add_metaclass(Singleton)
+class SensorChipAssembly3(SensorChipAssembly):
     """
 
     Class Sensor Chip Assembly - Simulates the behaviour of the MIRI
