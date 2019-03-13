@@ -127,6 +127,8 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/introduction.html#reference-
 30 Oct 2018: PIXELFLAT is no longer used as a reference type, but the strings
              'FLAT' and 'PIXELFLAT' can both be used to search for a pixel
              flat-field. Added missing SUBARRAYs to the module tests.
+13 Mar 2019: Test the SSH connection after opening it, to prevent a hidden
+             connection issue manifesting as an exception at a later time.
 
 Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -635,6 +637,10 @@ class MiriCDPFolder(object):
                 self.sftp.chdir(self.ftp_path)
             except (OSError, IOError, FileNotFoundError) as e:
                 strg = "%s: Failed to change directory to FTP folder \'%s\'\n" % (e.__class__.__name__, self.ftp_path)
+                strg += "  %s" % str(e)
+                raise IOError(strg)
+            except Exception as e:
+                strg = "%s: Fatal error while changing directory to FTP folder \'%s\'\n" % (e.__class__.__name__, self.ftp_path)
                 strg += "  %s" % str(e)
                 raise IOError(strg)
             ftp_list = self.sftp.listdir()
@@ -1350,18 +1356,19 @@ class MiriCDPInterface(object):
 
         self.sftp = None
         self.ftp_ok = False
+        self.cdp_folder_list = []
 
         # Set up the SFTP/CDP connection environment
         self._setup(ftp_host, ftp_path, ftp_user, ftp_passwd, timeout,
                     local_path, cdp_env_name, miri_env_name)     
 
         # Open the connection
-        self._open()        
+        self._open()
+        
         # Create a search list of FTP folders and initialise the list of
         # available CDPs within in each one. If the local cache is being
         # used, there is only one nominal FTP folder.
         failed_folder = False
-        self.cdp_folder_list = []
         if self.ftp_host != 'LOCAL' and self.ftp_ok:
             for ftpp in self.ftp_path.split(MiriCDPInterface.FTP_PATH_SEARCH):
                 try:
@@ -1601,6 +1608,10 @@ class MiriCDPInterface(object):
                                           username=self.ftp_user,
                                           password=self.ftp_passwd,
                                           cnopts=cnopts)
+            # Wait a short period, then test the connection is properly
+            # open by querying the current directory.
+            time.sleep(0.05)
+            testpwd = self.sftp.pwd
             # If you get this far without an exception, the SFTP connection
             # has been successful.
             self.ftp_ok = True
@@ -1626,6 +1637,10 @@ class MiriCDPInterface(object):
                                              username=self.ftp_user,
                                              password=self.ftp_passwd,
                                              cnopts=cnopts)
+                    # Wait a short period, then test the connection is properly
+                    # open by querying the current directory.
+                    time.sleep(0.05)
+                    testpwd = self.sftp.pwd
                     # If you get this far without an exception, the SFTP connection
                     # has been successful.
                     self.ftp_ok = True
