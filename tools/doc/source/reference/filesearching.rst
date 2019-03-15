@@ -7,11 +7,6 @@ Description
 ~~~~~~~~~~~
 This module contains general purpose functions for locating files.
 
-Objects
-~~~~~~~
-.. autoclass:: ParameterFileManager
-   :members:
-
 Functions
 ~~~~~~~~~
 .. autofunction:: add_to_searchpath

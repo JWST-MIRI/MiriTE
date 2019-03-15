@@ -86,15 +86,18 @@ def condense(spec, chunk, method = "Median", running = True):
     
     :Parameters:
     
-    spec: spectrum
+    spec: array 
+        spectrum
     
-    chunk: number of elements to average
+    chunk: int 
+        number of elements to average
     
-    method: string: method of smoothing /rebinning: Mean or Median or Min,
-    default: Median
+    method: string, optional (default = "Median") 
+        method of smoothing /rebinning: Mean or Median or Min
     
-    running: boolean: true if its a running averaging (smoothing) (default),
-    false if it is rebinning 
+    running: boolean, optional (default = True)
+        true if its a running averaging (smoothing) (default),
+        false if it is rebinning 
    
     :Returns:
     
@@ -164,24 +167,28 @@ def convGauss(x, n_points, sigma, mode = 'valid'):
     
     :Parameters:
     
-    x: spectrum
+    x: array 
+        spectrum
     
-    n_points: number of elements of Gaussian kernel
+    n_points: int
+        number of elements of Gaussian kernel
     
-    sigma: stdev, Sigma of Gaussian function
+    sigma: float
+        The stdev, sigma of Gaussian function
     
-    mode : {'full', 'valid', 'same'}, optional
-    'full':
-        This returns the convolution at each point of overlap, with an output
-        shape of (N+M-1,). At the end-points of the convolution, the signals
-        do not overlap completely, and boundary effects may be seen.
-    'same':
-        Mode same returns output of length max(M, N). Boundary effects are
-        still visible.
-    'valid': (default)
-        Mode valid returns output of length max(M, N) - min(M, N) + 1.
-        The convolution product is only given for points where the signals
-        overlap completely. Values outside the signal boundary have no effect.
+    mode: str, optional (default = "valid")
+        {'full', 'valid', 'same'}
+            * 'full':
+                This returns the convolution at each point of overlap, with an output
+                shape of (N+M-1,). At the end-points of the convolution, the signals
+                do not overlap completely, and boundary effects may be seen.
+            * 'same':
+                Mode same returns output of length max(M, N). Boundary effects are
+                still visible.
+            * 'valid': (default)
+                Mode valid returns output of length max(M, N) - min(M, N) + 1.
+                The convolution product is only given for points where the signals
+                overlap completely. Values outside the signal boundary have no effect.
     
     :Returns:
     
@@ -203,10 +210,12 @@ def lrs2D_spextract(data, xmin = 0, xmax = 1024, ymin =0, ymax = 1032, copy = Tr
     data: MiriMeasuredModel (or similar 2-D DataModel)
         The 2-D data product from which the 1-D spectrum will be extracted.
         
-    xmin, xmax: int, aperture x coordinates, optional, default=
+    xmin, xmax: int, optional (default=0, 1024)
+        aperture x coordinates,
         The aperture from which the spectrum is to be extracted
 
-    ymin, ymax: int, aperture y coordinates, optional, default=
+    ymin, ymax: int, optional (default=0, 1032) 
+        aperture y coordinates,
         The aperture from which the spectrum is to be extracted
 
     :Returns:
@@ -217,6 +226,7 @@ def lrs2D_spextract(data, xmin = 0, xmax = 1024, ymin =0, ymax = 1032, copy = Tr
     :Examples:
 
     imager_product = MiriMeasuredModel( filename )
+    
     lrs_product = lrs_2Dspectract( imager_product )
 
     """
@@ -268,11 +278,11 @@ def lrs_extract_spec(data):
         
     :Returns:
     
-    Spectrum1d dataproduct with
-    spec: 1d array 
-        The extracted spectrum.
-    err: 1d array
-        The propagated error 
+    Spectrum1d: dataproduct containing
+        * spec: 1d array 
+            The extracted spectrum.
+        * err: 1d array
+            The propagated error 
     
     """
    
@@ -329,11 +339,16 @@ def lrs_extract_spec_with_fit(data, minX = 0, leftY = 0, verbose = True,
         
     :Returns:
     
-    Spectrum1d dataproduct with
-    spec: 1d array 
-        The extracted spectrum.
-    err: 1d array
-        The propagated error 
+    Spectrum1d: dataproduct with
+        * spec: 1d array 
+            The extracted spectrum
+        * err: 1d array
+            The propagated error 
+
+    :Raises:
+    
+    TypeError
+        if wrong input type
     
     """
    
@@ -441,10 +456,10 @@ def get_psf_fit(data, minX = 0, leftY = 0, verbose = True, makeplot = False):
         
     :Returns:
     
-    x values per row
-    fit function (vs x) per row
-    all Gaussian fit parameters per row
-    all errors of Gaussian fit parameters per row
+    * x values per row
+    * fit function (vs x) per row
+    * all Gaussian fit parameters per row
+    * all errors of Gaussian fit parameters per row
     
     """
    
@@ -501,11 +516,11 @@ def optimalSpecExtraction(data):
         
     :Returns:
     
-    Spectrum1d dataproduct with
-    spec: 1d array 
-        The extracted spectrum.
-    err: 1d array
-        The propagated error 
+    Spectrum1d: dataproduct with
+        spec: 1d array 
+            The extracted spectrum.
+        err: 1d array
+            The propagated error 
     
     """
    
@@ -568,7 +583,8 @@ def subtractBackground(on, background):
  
     :Returns:
     
-    MiriMeasuredModel with the same dimensions
+    MiriMeasuredModel 
+        with the same dimensions
      
     """
     # Make sure the given data is a 2-D JWST data product.
@@ -621,9 +637,13 @@ def lrs_round(floatNumber):
     """
     rounding floats to integers in a way that python 2 did
     e.g. lrs_round(4.5) results in 5
+    
     :Parameters:
+    
     floatNumber: float to be rounded to integer
+    
     :Returns:
+    
     rounded number  
     """
     return floatNumber/abs(floatNumber) * math.floor(abs(floatNumber)+0.5)
@@ -636,9 +656,11 @@ def interpolWaveOnRows(pos, wave):
     
     :Parameters:
     
-    pos: float positions on the array
+    pos: array 
+        float positions on the array
     
-    wave: corresponding wavelengths
+    wave: array 
+        corresponding wavelengths
    
     :Returns:
     
@@ -660,15 +682,19 @@ def interpolLin(wave, spec, new_wave):
     
     :Parameters:
     
-    wave: original wavelengths
+    wave: array 
+        original wavelengths
     
-    spec: spectrum
+    spec: array 
+        spectrum
     
-    new_wave: corresponding new wavelengths
+    new_wave: array 
+        corresponding new wavelengths
    
     :Returns:
     
-    spectrum interpolated to new wavelengths
+    spectrum: array 
+        interpolated to new wavelengths
     
     """        
     inter = interpolate.interp1d(wave, spec, bounds_error = False)
@@ -681,15 +707,19 @@ def interpolSpline(wave, spec, new_wave):
     
     :Parameters:
     
-    wave: original wavelengths
+    wave: array 
+        original wavelengths
     
-    spec: spectrum
+    spec: array 
+        spectrum
     
-    new_wave: corresponding new wavelengths
+    new_wave: array 
+        corresponding new wavelengths
    
     :Returns:
     
-    spectrum interpolated to new wavelengths
+    spectrum: array 
+        interpolated to new wavelengths
     
     """        
     a,b,c = interpolate.splrep(wave, spec, k = 3)
@@ -704,11 +734,13 @@ def calcStraightLine(x0, y0, x1, y1):
     
     :Parameters:
     
-    x0, y0, x1, y1: 2 points in an x, y grid
+    x0, y0, x1, y1: float
+        2 points in an x, y grid
    
     :Returns:
     
-    m, b: the slope and the axis intercept of the calculated straight line
+    m, b: float 
+        the slope and the axis intercept of the calculated straight line
     
     """
     m = (y1 - y0) /(x1 - x0) 

@@ -25,7 +25,9 @@ directory
    :maxdepth: 1
 
    filesearching
+   fitting
    miriplot
+   spec_tools
 
 Unit tests corresponding to these modules may be found in the 
 miri/tools/tests directory.

@@ -5,16 +5,13 @@
 Module fitting - Contains general purpose fitting functions for
 MIRI data, including:
 
-gaussPlusPoly - Generate a Gaussian plus a polynomial
-
-gaussian - Generate a Gaussian
-
-nonLinFit - Nonlinear least squares fit using the Levenberg-Marquardt method
+* gaussPlusPoly - Generate a Gaussian plus a polynomial
+* gaussian - Generate a Gaussian
+* nonLinFit - Nonlinear least squares fit using the Levenberg-Marquardt method
       in the scipy.optimize.curve_fit method
       this should be possible with any function in the format of
-      ydata = f(xdata, *params)
-      
-LinFit - Class for linear fitting
+      ydata = f(xdata, *params)    
+* LinFit - Class for linear fitting
 
 :History:
 
@@ -40,14 +37,19 @@ from matplotlib import pyplot
 
 def gaussPlusPoly(x, *p):
     """
+    Function of a gaussian peak + a Polynomial 
     
-    A gaussian peak with:
-    Constant Background          : p[0]
-    Peak height above background : p[1]
-    Central value                : p[2]
-    Standard deviation           : p[3]
-    + a polynomial with coefficients p[4] + ....:
-    starting with the highest order but without constant offset parameter
+    :Parameters:
+    
+    x: array
+       position where the function is evaluated
+    
+    p: array 
+       * Constant Background          : p[0]
+       * Peak height above background : p[1]
+       * Central value                : p[2]
+       * Standard deviation           : p[3]
+       * plus a polynomial with coefficients p[4] + ....: starting with the highest order but without constant offset parameter
     
     """
     gp = (p[0]+p[len(p)-1], p[1], p[2], p[3])
@@ -63,12 +65,17 @@ def gaussPlusPoly(x, *p):
 
 def gaussian(x, *p):
     """
+    function of a gaussian peak
     
-    A gaussian peak with:
-    Constant Background          : p[0]
-    Peak height above background : p[1]
-    Central value                : p[2]
-    Standard deviation           : p[3]
+    :Parameters:
+    
+    x: array
+       position where the gaussian is evaluated
+    p: array
+       * Constant Background          : p[0]
+       * Peak height above background : p[1]
+       * Central value                : p[2]
+       * Standard deviation           : p[3]
     
     """
     return p[0]+p[1]*np.exp(-1*(x-p[2])**2/(2*p[3]**2))
@@ -77,58 +84,67 @@ def gaussian(x, *p):
 def nonLinFit(func, x_data, y_data, y_sigma=None, p_guess=None, plotting=False,
               verbose=True):     
     """
+    non linear fit function
     
-    func : callable
-    The model function, func(x, ...).  It must take the independent
-    variable as the first argument and the parameters to fit as
-    separate remaining arguments.
+    :Parameters:
     
-    xdata : An N-length sequence or an (k,N)-shaped array
-    for functions with k predictors.
-    The independent variable where the data is measured.
+    func: callable
+        The model function, func(x, ...).  It must take the independent
+        variable as the first argument and the parameters to fit as
+        separate remaining arguments.
     
-    ydata : N-length sequence
-    The dependent data --- nominally func(xdata, ...)
+    x_data: array 
+        An N-length sequence or an (k,N)-shaped array
+        for functions with k predictors. The independent variable where the data is measured.
     
-    p_guess : None, scalar, or M-length sequence
-    Initial guess for the parameters.  If None, then the initial
-    values will all be 1 (if the number of parameters for the 
-     function
-    can be determined using introspection, otherwise a 
-     ValueError
-    is raised).
+    y_data: array 
+        N-length sequence, the dependent data: nominally func(xdata, ...)
     
-    y_sigma : None or N-length sequence
-    If not None, it represents the standard-deviation of ydata.
-    This vector, if given, will be used as weights in the
-    least-squares problem. If None, they are set to unity.
-    plotting : Boolean default: False, to plot the results or not
+    p_guess: array, optional (default=None) 
+        None, scalar, or M-length sequence
+        Initial guess for the parameters.  If None, then the initial
+        values will all be 1 (if the number of parameters for the 
+        function can be determined using introspection, otherwise a 
+        ValueError is raised).
     
-    Returns
-    -------
-    fit : array 
-    the computed fit function
+    y_sigma: array, optional (default = None)
+        None or N-length sequence
+        If not None, it represents the standard-deviation of y_data.
+        This vector, if given, will be used as weights in the
+        least-squares problem. If None, they are set to unity.
+    
+    verbose: boolean, optional (default = True)
+        in verbose mode it prints out
+            * the optimal values for the parameters so that the sum of the 
+              squared error of ``func(xdata, *popt) - ydata`` is minimized
+              and their uncertainties
+            * the estimated covariance and correlation matrices
+              the diagonals provide the variance of the parameter estimate.
+            * Chi-Squared
+            * DOF: degree of freedom
+            * CDF: cumulative distribution function
+    
+    plotting: boolean, optional (default = False)
+        plotting results or not, it overplots:
+            * the guess function, 
+            * the measured values (inclusive error bars)
+            * the final fit 
+            * the residual with error bars   
+    
+    :Returns:
+    
+    fit: array 
+        the computed fit function
     
     popt: array
-    the optimal values for the parameters so that the sum of the 
-    squared error of ``func(xdata, *popt) - ydata`` is minimized
-    and their uncertainties
+        the optimal values for the parameters so that the sum of the 
+        squared error of ``func(xdata, *popt) - ydata`` is minimized
+        and their uncertainties
     
-    in verbose mode it prints out:
-    - the optimal values for the parameters so that the sum of the 
-      squared error of ``func(xdata, *popt) - ydata`` is minimized
-      and their uncertainties
-    - the estimated covariance and correlation matrices
-      the diagonals provide the variance of the parameter estimate.
-    - Chi-Squared
-    - DOF: degree of freedom
-    - CDF: cumulative distribution function
+    :Raises:
     
-    it overplots:
-    - the guess function, 
-    - the measured values (inclusive error bars)
-    - the final fit 
-    - the residual with error bars
+    TypeError
+        if the fit is bad
     """
     
     x_func = np.linspace(min(x_data),max(x_data))
@@ -261,36 +277,49 @@ def nonLinFit(func, x_data, y_data, y_sigma=None, p_guess=None, plotting=False,
 
 class LinFit():
     """
-    
-    fitter = LinFit(x, y)
-    
-    method fit: fitter.fit()
+    Linear Fit class does a
     linear least square fit of x, y arrays
-    y = a*x + b
-    returns the coefficients
-    coeff[0] = a
-    coeff[1] = b
-    coeff[2] = y_err
-    coeff[3] = a_err
-    coeff[4\ = b_err
+    ``y = a*x + b``
     
-    method fitter.calcLinFitError()
-    calculates the error on the whole fitted straight line
+    :Synopsis:
     
+      * fitter = LinFit(x, y)
+      * method fit: fitter.fit()
+      * method fitter.calcLinFitError():
+        calculates the error on the whole fitted straight line
+    
+    :Returns: 
+    
+    returns the coefficients array
+       * coeff[0] = a
+       * coeff[1] = b
+       * coeff[2] = y_err
+       * coeff[3] = a_err
+       * coeff[4] = b_err
     """
 
     def __init__(self, x_data, y_data):
+        """
+        constructor
+        
+        :Parameters:
+        
+        x_data: x coordinates array
+        y_data: corresponding y coordinates array
+        """
         self.x = x_data
         self.y = y_data
     
     def fit(self):
         """
-        
         linear least square fit of x, y arrays
-        y = a*x + b
+        ``y = a*x + b``
         
-        returns the coefficients(0(a),1(b), the overall error on y (2), and the
-        errors on the coefficients (3(a),4(b))
+        :Returns:
+        
+        coeff: array
+           returns the coefficients (0(a),1(b), the overall error on y (2), and the
+           errors on the coefficients (3(a),4(b))
         
         """
         x = self.x
@@ -315,10 +344,12 @@ class LinFit():
 
     def calcLinFitError(self, x_data):
         """
-        
         calculates the error depending on input x data and errors on linear coefficients
-        return: array of errors on y data with same length as input x data
         
+        :Returns:
+        
+        err: array
+            errors on y data with same length as input x data
         """
         coeffs = self.coeff
         y_max = (coeffs[0]+coeffs[3])*x_data + coeffs[1]-coeffs[4]
@@ -326,6 +357,9 @@ class LinFit():
         return np.abs(y_max - y_min)
 
     def straightLine(self, x_data):
+        """
+        calculates the straight line ``y = a*x + b`` at array x=x_data
+        """
         return self.coeff[0] * x_data + self.coeff[1]
         
            
