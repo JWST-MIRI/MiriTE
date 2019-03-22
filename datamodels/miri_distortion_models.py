@@ -86,7 +86,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
 11 Feb 2019: Added missing C, D, E, F matrices to imager distortion model.
-12 Mar 2019: Prepare to change the reference type for spectroscopy distortion
+22 Mar 2019: Changed the reference type for LRS distortion
              from 'DISTORTION' to 'SPECWCS'.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
@@ -216,7 +216,7 @@ class MiriImagingDistortionModel(MiriDataModel):
         # Data type is distortion map.
         self.meta.reftype = 'DISTORTION'
         model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type:
+        if model_type is not None:
             self.meta.model_type = model_type
 
         # This is a reference data model.
@@ -576,11 +576,11 @@ class MiriLrsD2WModel(MiriDataModel):
         """
         super(MiriLrsD2WModel, self).__init__(init=init, **kwargs)
 
-        # Data type is wavelength calibration.
-        self.meta.reftype = 'DISTORTION'
-#         self.meta.reftype = 'SPECWCS'
+        # Data type is wavelength calibration world coordinates.
+        #self.meta.reftype = 'DISTORTION'
+        self.meta.reftype = 'SPECWCS'
         model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type:
+        if model_type is not None:
             self.meta.model_type = model_type        
 
         # This is a reference data model.
@@ -719,7 +719,7 @@ class MiriMrsDistortionModel12(MiriDataModel):
         self.meta.reftype = 'DISTORTION'
 #         self.meta.reftype = 'SPECWCS'
         model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type:
+        if model_type is not None:
             self.meta.model_type = model_type        
 
         # This is a reference data model.
@@ -1044,7 +1044,7 @@ class MiriMrsDistortionModel34(MiriDataModel):
         self.meta.reftype = 'DISTORTION'
 #         self.meta.reftype = 'SPECWCS'
         model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type:
+        if model_type is not None:
             self.meta.model_type = model_type        
  
         # This is a reference data model.

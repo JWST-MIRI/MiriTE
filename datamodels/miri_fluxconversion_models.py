@@ -182,7 +182,7 @@ class MiriFluxconversionModel(MiriDataModel):
         # Data type is flux conversion.
         self.meta.reftype = 'PHOTOM'
         model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type:
+        if model_type is not None:
             self.meta.model_type = model_type        
 
         # This is a reference data model.
@@ -237,7 +237,7 @@ class MiriImagingFluxconversionModel(MiriFluxconversionModel):
         # Data type is imaging flux conversion.
         self.meta.reftype = 'PHOTOM'
         model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type:
+        if model_type is not None:
             self.meta.model_type = model_type
 
 class MiriImagingColourCorrectionModel(MiriFluxconversionModel):
@@ -301,7 +301,7 @@ class MiriPowerlawColourCorrectionModel(MiriFluxconversionModel):
         # Data type is colour correction.
         self.meta.reftype = 'COLCORRPL'
         model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type:
+        if model_type is not None:
             self.meta.model_type = model_type
 
 class MiriLrsFluxconversionModel(MiriFluxconversionModel):
@@ -338,7 +338,7 @@ class MiriLrsFluxconversionModel(MiriFluxconversionModel):
         # Data type is LRS flux conversion.
         self.meta.reftype = 'PHOTOM'
         model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type:
+        if model_type is not None:
             self.meta.model_type = model_type
 
     def plot_srf(self, description=''):
@@ -446,7 +446,7 @@ class MiriMrsFluxconversionModel(MiriMeasuredModel):
         # Data type is MRS flux conversion.
         self.meta.reftype = 'PHOTOM'
         model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type:
+        if model_type is not None:
             self.meta.model_type = model_type        
 
         # This is a reference data model.

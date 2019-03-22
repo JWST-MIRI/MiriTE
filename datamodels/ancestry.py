@@ -10,6 +10,8 @@ the DATAMODL metadata.
 :History:
 
 30 Jan 2019: Created
+22 Mar 2019: Return a blank string when a data model does not have an
+             STScI equivalent.
 
 
 @author: Steven Beard (UKATC)
@@ -70,13 +72,11 @@ def get_my_model_type( input_model_name ):
     Global function which compares a data model class with the above
     dictionary and returns the equivalent STScI model name
     
-    If the model name doesn't match, an empty string is returned
+    If the model name doesn't match, a blank string is returned
     
     """
-    output_model_name = ''
+    output_model_name = ' '
     if input_model_name:
         if input_model_name in list(PARENT_DICT.keys()):
             output_model_name = PARENT_DICT[input_model_name]
-#         else:
-#             output_model_name = "Unknown"
     return output_model_name

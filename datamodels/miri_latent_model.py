@@ -159,7 +159,7 @@ class MiriLatentDecayModel(MiriDataModel):
         # Data type is latent decay.
         self.meta.reftype = 'LATENT'
         model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type:
+        if model_type is not None:
             self.meta.model_type = model_type        
 
         # This is a reference data model.

@@ -89,7 +89,7 @@ class MiriMrsApertureCorrectionModel(MiriDataModel):
         # Data type is aperture correction.
         self.meta.reftype = 'APERCORR'
         model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type:
+        if model_type is not None:
             self.meta.model_type = model_type
         
         # This is a reference data model.
