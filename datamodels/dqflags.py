@@ -100,6 +100,7 @@ http://miri.ster.kuleuven.be/bin/view/Internal/DataQualityFlags
 14 Nov 2017: Added some new DQ flags.
 17 May 2018: Python 3: Converted dictionary keys return into a list.
 12 Mar 2019: Removed use of astropy.extern.six (since Python 2 no longer used).
+29 Apr 2019: Added REFERENCE_PIXEL to pixeldq_setup.
 
 @author: Ruyman Azzollini (DIAS), Steven Beard (UKATC)
 
@@ -122,7 +123,7 @@ import numpy.ma as ma
 MAXBITS = 32  # The maximum number of bits in a data quality flag
 
 bit_to_value = []
-for bit in range(0, MAXBITS-1):
+for bit in range(0, MAXBITS):
     bit_to_value.append( 2 ** bit )
 #
 # The above code makes creating the list more reliable against typos, but
@@ -232,8 +233,9 @@ pixeldq_setup = groupdq_setup + \
                                 'Open pixel (counts move to adj. pixels)'),
                  (27, 'ADJ_OPEN',         'Adjacent to open pixel'),
                  (28, 'UNRELIABLE_RESET', 'Sensitive to reset anomaly'),
-                 (29, 'MSA_FAILED_OPEN ', 'Pixel sees light from failed open shutter'),
-                 (30, 'OTHER_BAD_PIXEL ', 'A catch-all flag')]
+                 (29, 'MSA_FAILED_OPEN', 'Pixel sees light from failed open shutter'),
+                 (30, 'OTHER_BAD_PIXEL', 'A catch-all flag'),
+                 (31, 'REFERENCE PIXEL', 'Pixel is a reference pixel')]
 pixeldq_flags = insert_value_column( pixeldq_setup )
 
 # The master table is a combination of both of the above tables.
@@ -1288,37 +1290,38 @@ if __name__ == '__main__':
 # ----------------------------------------------------------------------------    
 
     # Try extending the flags table by adding new flags
-    bad_pixel_flags = [(29, 'choppy', 'Pixel is pretty choppy'),
-                       (30, 'noisy',  'Pixel is noisy')] #,
-    # There are three ways of making a bad pixel mask table:
-    # (1) Extend an existing table with new flags.
-    bad_pixel_table = FlagsTable( master_flags )
-    bad_pixel_table.extend( bad_pixel_flags )
-    print("\nThe first variation of the bad pixel flags table contains...")
-    print(bad_pixel_table)
-
-    # (2) Add the new flags to an existing table.
-    combined = reserved_table + bad_pixel_flags
-    print("The second variation of the bad pixel flags table contains...")
-    print(combined)
-    del combined
-    
-    # (3) Create two separate flag table objects then add them together.
-    bad_pixel_extras = FlagsTable( bad_pixel_flags )
-    combined = reserved_table + bad_pixel_extras
-    print("The third variation of the bad pixel flags table contains...")
-    print(combined)
-
-    # You can add a new flag as long as it is unique
-    #reserved_table['newflag'] = 2
-    reserved_table['newflag'] = 31
-    
-    # But you can't modify an existing one
-    #reserved_table['unusable'] = 23
-    
-    # And you can't create a new flag
-    # with a value that's already used    
-    # reserved_table['freakout'] = 5
+    # NOTE: The master_flags table is now full and cannot be extended
+#     bad_pixel_flags = [(30, 'choppy', 'Pixel is pretty choppy'),
+#                        (31, 'noisy',  'Pixel is noisy')] #,
+#     # There are three ways of making a bad pixel mask table:
+#     # (1) Extend an existing table with new flags.
+#     bad_pixel_table = FlagsTable( master_flags )
+#     bad_pixel_table.extend( bad_pixel_flags )
+#     print("\nThe first variation of the bad pixel flags table contains...")
+#     print(bad_pixel_table)
+# 
+#     # (2) Add the new flags to an existing table.
+#     combined = reserved_table + bad_pixel_flags
+#     print("The second variation of the bad pixel flags table contains...")
+#     print(combined)
+#     del combined
+#     
+#     # (3) Create two separate flag table objects then add them together.
+#     bad_pixel_extras = FlagsTable( bad_pixel_flags )
+#     combined = reserved_table + bad_pixel_extras
+#     print("The third variation of the bad pixel flags table contains...")
+#     print(combined)
+# 
+#     # You can add a new flag as long as it is unique
+#     #reserved_table['newflag'] = 2
+#     reserved_table['newflag'] = 31
+#     
+#     # But you can't modify an existing one
+#     #reserved_table['unusable'] = 23
+#     
+#     # And you can't create a new flag
+#     # with a value that's already used    
+#     # reserved_table['freakout'] = 5
 
 # ----------------------------------------------------------------------------    
 
