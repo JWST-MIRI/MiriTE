@@ -170,7 +170,8 @@ class TestMiriFlagsTable(unittest.TestCase):
         
     def test_getting_setting(self):
         # The table can be added to, as long as new flags are added
-        self.flagtable['newflag'] = 31
+        # NOTE: The standard table is now full, so this operation no longer works.
+        #self.flagtable['newflag'] = 31
         
         # Attempt to define an out of range value
         #self.flagtable['bigflag'] = 32
@@ -192,8 +193,8 @@ class TestMiriFlagsTable(unittest.TestCase):
         # Get the value of some existing items
         value = self.flagtable['DO_NOT_USE']
         self.assertEqual( value, 0 )
-        value = self.flagtable['newflag']
-        self.assertEqual( value, 31 )
+        #value = self.flagtable['newflag']
+        #self.assertEqual( value, 31 )
         
         # Get the value of a non-existent flag
         #value = self.flagtable['nosuchflag']
