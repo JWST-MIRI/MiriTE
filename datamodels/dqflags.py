@@ -101,8 +101,9 @@ http://miri.ster.kuleuven.be/bin/view/Internal/DataQualityFlags
 17 May 2018: Python 3: Converted dictionary keys return into a list.
 12 Mar 2019: Removed use of astropy.extern.six (since Python 2 no longer used).
 29 Apr 2019: Added REFERENCE_PIXEL to pixeldq_setup.
+14 May 2019: Added Christophe's masking functions.
 
-@author: Ruyman Azzollini (DIAS), Steven Beard (UKATC)
+@author: Ruyman Azzollini (DIAS), Steven Beard (UKATC), Christophe Cossou (CEA)
 
 """
 
@@ -274,6 +275,7 @@ flag_conversion_table = {'unusable' : 'DO_NOT_USE',
 # containing the name "flag" will set and test one flag at a time.
 # Functions containing the name "mask" work with several flags at once.
 #
+# (a) Functions provided by Ruyman
 
 def convert_dq( dq, old_table, new_table, conversion_map=flag_conversion_table):
     """
@@ -712,6 +714,124 @@ def combine_quality( dqarr1, dqarr2 ):
         # Neither array is defined - return None.
         newdq = None
     return newdq
+
+#
+# (b) Functions provided by Christophe
+#
+def change_mask( mask, include_in_mask ):
+    """
+
+    Change mask intended for a MaskedArray before actually creating the array.
+    A real mask is boolean, but in MIRI data you have integers that have a
+    complex structure. Each value is a combination of several status that you
+    might want You can subtract a combined status, like 928 for instance
+    (32, 128, 256, 512) and that will only affect pixels that have this
+    specific value. Or you can give a specific status (a power of 2).
+    If given that status, we will affect all concerned pixels, whether they
+    possess only that status or not.
+    
+    See also raise_mask, lower_mask (above)
+    
+    :Parameters:
+    
+    mask: numpy array
+        Array containing values. By default, 0 is correct and all others are not
+        
+    include_in_mask: list of int
+        A list of pixel status values you want to include, for example
+
+        - 1    : 2**0
+        - 2    : 2**1
+        - 4    : 2**2
+        - 8    : 2**3
+        - 16   : 2**4
+        - 32   : 2**5
+        - 64   : 2**6
+        - 128  : 2**7
+        - 256  : 2**8
+        - 512  : 2**9
+        - 1024 : 2**10
+        - 2048 : 2**11
+        
+        See pixeldq_setup for the definition of these values.
+    
+    :Returns:
+    
+        modified mask: numpy array
+    
+    """
+    out_mask = mask.astype(int)
+    for val in include_in_mask:
+        # Status can be combined and added.
+        # We just want to remove one specific status for all pixels
+
+        # If value is a power of 2, it's a unique status we want to
+        # subtract to all concerned pixels (that might contain other status)
+        if ((val & (val - 1)) == 0) and val > 0:
+            # Identify pixels that contain this specific status
+            status_pixel = np.bitwise_and(out_mask, val)
+            # Subtract this status to all concerned pixels (all other have 0)
+            out_mask -= status_pixel  
+        else:
+            out_mask[out_mask == val] = 0
+
+    return out_mask
+
+def combine_masks( masks ):
+    """
+    
+    Combine a list of masks into one array. We use what np.MaskedArray uses.
+    If 0, we keep the data, if not we mask it.
+    
+    Similar to combine_quality, except with a list of masks.
+
+    :Parameters:
+    
+    masks: list of numpy arrays
+        List of masks, all having the same shape. Values can be integers
+    
+    :Returns:
+    
+    combined_mask: numpy array
+        One combined mask where we keep data only if visible throughout
+        all the masks. Output mask will be boolean
+        
+    """
+    combined_mask = masks[0].copy()  # By default we keep everything
+
+    # If a pixel was previously masked, or is masked by the current image, we mask
+    for mask_tmp in masks[1:]:
+        combined_mask = np.logical_or(combined_mask, mask_tmp)
+
+    return combined_mask
+
+
+def decompose_mask_status( x ):
+    """
+    
+    Given a mask value, decompose what sub-status compose it
+    Example:
+    One pixel mask value is 928:
+    928 decompose into 32, 128, 256, 512
+
+    :Parameters:
+    
+    x: int
+        Mask value
+
+    :Returns:
+    
+    powers: list of int
+        List of powers of 2 making up the mask.
+
+    """
+    powers = []
+    i = 1
+    while i <= x:
+        if i & x:
+            powers.append(i)
+        i <<= 1
+    return powers
 
 #
 # (3) FlagsTable class

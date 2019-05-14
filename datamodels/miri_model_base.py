@@ -2040,9 +2040,9 @@ class MiriDataModel(DataModel):
         :Parameters:
         
         include_comments: bool, optional, default=False
-            Set True to include COMMENT and HISTORY records in the dictionary
+            Set True to include COMMENT records in the dictionary
         include_history: bool, optional, default=False
-            Set True to include COMMENT and HISTORY records in the dictionary
+            Set True to include HISTORY records in the dictionary
         include_builtin: bool, optional, default=False
             Set True to include builtin FITS keywords (such as NAXIS) in
             the dictionary.
@@ -2087,6 +2087,71 @@ class MiriDataModel(DataModel):
             comment = subschema.get('title')
             kw = '.'.join(path)
             results[kw] = (hdu, keyw, comment)
+
+        # Walk through the schema and apply the search function.
+        results = {}
+        mschema.walk_schema(self.schema, find_fits_elements, results)
+        return results
+
+    def get_fits_header(self, hdu_name='PRIMARY', include_comments=False,
+                        include_history=False, include_builtin=True):
+        """
+        
+        Locates all the metadata items associated with a FITS keyword
+        within a particular HDU and returns a dictionary which looks
+        like a FITS header structure.
+        
+        :Parameters:
+        
+        hdu_name: str, optional, default='PRIMARY'
+            The name of the FITS HDU the keyword is associated with.
+            If None, any HDU is matched, but the keyword must be
+            unique within the data structure.
+        include_comments: bool, optional, default=False
+            Set True to include COMMENT records in the dictionary
+        include_history: bool, optional, default=False
+            Set True to include HISTORY records in the dictionary
+        include_builtin: bool, optional, default=True
+            Set True to include builtin FITS keywords (such as NAXIS) in
+            the dictionary.
+        
+        :Returns:
+        
+        metadict = dictionary of {fitskw: value}
+            A header dictionary.
+        
+        :Requires:
+        
+        Makes use of the search facilities in jwst.datamodels.schema
+        
+        """
+        # Define a function to be applied at each level of the schema.
+        def find_fits_elements(subschema, path, combiner, ctx, recurse):
+            hdu = subschema.get('fits_hdu')
+            if not hdu:
+                # If there isn't a 'fits_hdu' declaration an item
+                # is assumed to be in the PRIMARY HDU.
+                hdu = 'PRIMARY'
+            if (hdu_name is not None) and (hdu != hdu_name):
+                return
+            keyw = subschema.get('fits_keyword')
+            # Reject a null path or a null or blank keyword
+            if not path:
+                return
+            if not keyw or keyw == 'BLANK':
+                return
+            # Only include comment, history and builtin keywords if requested.
+            if not include_comments and keyw == 'COMMENT':
+                return
+            if not include_history and keyw == 'HISTORY':
+                return
+            if not include_builtin and mfits._is_builtin_fits_keyword(keyw):
+                return
+            # Work around bug in mfits
+            if not include_builtin and (keyw == 'SIMPLE' or keyw == 'EXTEND'):
+                return
+            kw = '.'.join(path)
+            results[keyw] = self[kw]
 
         # Walk through the schema and apply the search function.
         results = {}
