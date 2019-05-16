@@ -173,6 +173,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 11 Mar 2019: Check that the USAFTER keyword contains a date and a string
              (commented out).
 12 Mar 2019: Removed use of astropy.extern.six (since Python 2 no longer used).
+16 May 2019: Added the get_fits_header_dict method.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -2037,6 +2038,12 @@ class MiriDataModel(DataModel):
         provides a similar function, but it returns a dictionary of
         metadata values only. This function is more FITS-specific.
         
+        WARNING: The dictionary returned by this function is meant to be
+        read-only. If you need to change the metadata contained in the
+        data model, use the syntax
+        
+            datamodel[schemakw] = newvalue
+        
         :Parameters:
         
         include_comments: bool, optional, default=False
@@ -2093,13 +2100,21 @@ class MiriDataModel(DataModel):
         mschema.walk_schema(self.schema, find_fits_elements, results)
         return results
 
-    def get_fits_header(self, hdu_name='PRIMARY', include_comments=False,
-                        include_history=False, include_builtin=True):
+    def get_fits_header_dict(self, hdu_name='PRIMARY', include_undefined=False,
+                             include_comments=False, include_history=False,
+                             include_builtin=True):
         """
         
         Locates all the metadata items associated with a FITS keyword
         within a particular HDU and returns a dictionary which looks
-        like a FITS header structure.
+        like a FITS header structure. Unlike the get_fits_keyword method,
+        who don't need to know in advance which keywords to query.
+        
+        WARNING: The dictionary returned by this function is meant to be
+        read-only. If you need to change any of the keywords listed in the
+        dictionary in the data model, use the method
+        
+            datamodel.set_fits_keyword( fitskw, newvalue )
         
         :Parameters:
         
@@ -2107,6 +2122,8 @@ class MiriDataModel(DataModel):
             The name of the FITS HDU the keyword is associated with.
             If None, any HDU is matched, but the keyword must be
             unique within the data structure.
+        include_undefined: bool, optional, default=False
+            Set True to include undefined keywords in the list
         include_comments: bool, optional, default=False
             Set True to include COMMENT records in the dictionary
         include_history: bool, optional, default=False
@@ -2151,6 +2168,8 @@ class MiriDataModel(DataModel):
             if not include_builtin and (keyw == 'SIMPLE' or keyw == 'EXTEND'):
                 return
             kw = '.'.join(path)
+            if not include_undefined and self[kw] is None:
+                return
             results[keyw] = self[kw]
 
         # Walk through the schema and apply the search function.
@@ -2439,6 +2458,8 @@ class MiriDataModel(DataModel):
   
         Return the value within the metadata associated with
         a FITS keyword. Only one value is returned.
+        
+        See also the get_fits_header_dict method.
      
         :Parameters:
         
