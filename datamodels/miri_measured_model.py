@@ -167,7 +167,7 @@ class MiriSimpleModel(MiriDataModel, HasData):
         See the jwst.datamodels documentation for the meaning of these keywords.
     
     """
-    schema_url = "miri_simple.schema.yaml"
+    schema_url = "miri_simple.schema"
     
     def __init__(self, init=None, data=None, **kwargs):
         """
@@ -261,7 +261,7 @@ class MiriMeasuredModel(MiriDataModel, HasDataErrAndDq):
         See the jwst.datamodels documentation for the meaning of these keywords.
     
     """
-    schema_url = "miri_measured.schema.yaml"
+    schema_url = "miri_measured.schema"
     dq_def_names = ('BIT', 'VALUE', 'NAME', 'DESCRIPTION')
 
     # Set the default dq_def table to the JWST master flags
@@ -507,7 +507,7 @@ class MiriRampModel(MiriMeasuredModel, HasDataErrAndGroups):
     """
     # Floating point data is assumed because the STScI RampModel also
     # declares floating point data.
-    schema_url = "miri_ramp_withmeta.schema.yaml"
+    schema_url = "miri_ramp_withmeta.schema"
 
     # DEPRECATED: The following flags will be removed in the future.
     _default_dq_def = pixeldq_flags
@@ -909,7 +909,7 @@ class MiriSlopeModel(MiriMeasuredModel):
         Must be broadcastable onto the data array.
     
     """
-    schema_url = "miri_slope.schema.yaml"
+    schema_url = "miri_slope.schema"
 
     def __init__(self, init=None, data=None, dq=None, err=None, dq_def=None,
                  zeropt=None, nreads=None, readsat=None, ngoodseg=None,

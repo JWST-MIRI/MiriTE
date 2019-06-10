@@ -80,7 +80,7 @@ class MiriJumpModel(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_jump.schema.yaml"
+    schema_url = "miri_jump.schema"
     fieldnames = ('METHOD', 'REJ_THRESH')
     
     def __init__(self, init=None, finejump_table=None, crthresh=None, **kwargs):

@@ -1,7 +1,7 @@
 allOf:
-- $ref: miri_core.schema.yaml
-- $ref: http://jwst.stsci.edu/schemas/referencefile.schema.yaml
-- $ref: http://jwst.stsci.edu/schemas/keyword_gainfact.schema.yaml
+- $ref: miri_core.schema
+- $ref: http://stsci.edu/schemas/jwst_datamodel/referencefile.schema
+- $ref: http://stsci.edu/schemas/jwst_datamodel/keyword_gainfact.schema
 - type: object
   title: MIRI nonlinearity measurement
   properties:
@@ -319,5 +319,5 @@ allOf:
       units: ''
       datatype: uint32
     dq_def:
-      $ref: http://jwst.stsci.edu/schemas/dq_def.schema.yaml
+      $ref: http://stsci.edu/schemas/jwst_datamodel/dq_def.schema
       

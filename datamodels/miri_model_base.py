@@ -174,6 +174,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              (commented out).
 12 Mar 2019: Removed use of astropy.extern.six (since Python 2 no longer used).
 16 May 2019: Added the get_fits_header_dict method.
+10 Jun 2019: Modified to meet new schema access method in JWST build 7.3.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -189,6 +190,7 @@ import numpy as np
 #import numpy.ma as ma
 from astropy.time import Time
 import asdf.util
+import asdf.constants
 from asdf.tags.core import HistoryEntry
 from asdf.extension import AsdfExtension
 
@@ -373,15 +375,26 @@ def _shape_to_string(shape, axes=None):
         strg = ' x '.join(str(s) for s in shape)
     return strg
 
+
 class MIRIExtension(AsdfExtension):
     """
     
     A class which defines an extension to the ASDF URI mapping
-    which recognises the URI 'http://miri.stsci.edu/schemas/'
+    which recognises the URI 'http://stsci.edu/schemas/miri_datamodel'
     as a reference to the schemas belonging to the miri.datamodels
     package.
     
     """
+
+    SCHEMA_PATH = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), 'schemas'))
+
+    METASCHEMA_PATH = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), 'metaschema'))
+
+    URL_PREFIX = asdf.constants.STSCI_SCHEMA_URI_BASE + 'miri_datamodel/'
+
+
     @property
     def types(self):
         return []
@@ -393,13 +406,11 @@ class MIRIExtension(AsdfExtension):
     @property
     def url_mapping(self):
         # Define the uri and directory containing the additional schemas
-        schema_uri_base = 'http://miri.stsci.edu/schemas/'
-        schema_path = os.path.abspath(os.path.join( \
-                            os.path.dirname(miri.datamodels.__file__),
-                            'schemas'))
-        return [(schema_uri_base,
-                 asdf.util.filepath_to_url(schema_path) +
-                 '/{url_suffix}')]
+        return [
+            (URL_PREFIX, util.filepath_to_url(SCHEMA_PATH) + '/{url_suffix}.yaml'),
+            ('http://stsci.edu/schemas/fits-schema/',
+                util.filepath_to_url(METASCHEMA_PATH) + '/{url_suffix}.yaml'),
+        ]
 
 
 class MiriDataModel(DataModel):
@@ -430,7 +441,7 @@ class MiriDataModel(DataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
     
     """
-    schema_url = "miri_core.schema.yaml"
+    schema_url = "miri_core.schema"
 
     def __init__(self, init=None, title='', extensions=None, **kwargs):
         """
@@ -558,7 +569,7 @@ class MiriDataModel(DataModel):
     #
     # Convenience functions for setting commonly associated blocks
     # of MIRI metadata. All these functions assume the metadata is
-    # as defined in the "miri_core.schema.yaml" file.
+    # as defined in the "miri_core.schema" file.
     #
     def set_housekeeping_metadata(self, origin, author=None, pedigree=None,
                                   version=None, date=None, useafter=None,

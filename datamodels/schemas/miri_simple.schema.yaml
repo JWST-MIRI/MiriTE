@@ -1,6 +1,6 @@
 allOf:
-- $ref: miri_core.schema.yaml
-- $ref: http://jwst.stsci.edu/schemas/wcsinfo.schema.yaml
+- $ref: miri_core.schema
+- $ref: http://stsci.edu/schemas/jwst_datamodel/wcsinfo.schema
 - type: object
   title: Basic MIRI data
   properties:

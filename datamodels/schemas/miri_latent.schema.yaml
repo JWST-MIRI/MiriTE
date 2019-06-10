@@ -1,5 +1,5 @@
 allOf:
-- $ref: miri_core.schema.yaml
+- $ref: miri_core.schema
 - type: object
   title: MIRI detector latent decay model
   properties:

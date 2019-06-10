@@ -2,8 +2,8 @@ allOf:
 - type: object
   properties:
     meta:
-      $ref: miri_metadata.schema.yaml
-- $ref: mirimg_photom.schema.yaml
+      $ref: miri_metadata.schema
+- $ref: mirimg_photom.schema
 - type: object
   title: MIRI photometric flux conversion model
   properties:

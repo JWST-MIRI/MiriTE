@@ -28,7 +28,7 @@ in the datamodels.miri_fluxconversion_model module.
 03 Dec 2015: Added MiriPowerlawColourCorrectionModel.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 24 Oct 2017: Set the pixel size when testing MiriMrsFluxConversionModel
-15 Nov 2018: MRS schema switched to use JWST mirmrs_photom.schema.yaml.
+15 Nov 2018: MRS schema switched to use JWST mirmrs_photom.schema.
              3-D versions of the MRS data are no longer accepted.
 30 Jan 2019: Test that the REFTYPE and DATAMODL metadata is not altered
              when the data model is saved to a file.

@@ -44,6 +44,7 @@ miri.simulators
 15 Jan 2018: MiriTools and MiriSimulators levels removed from package.
 21 Mar 2018: First public release to github (V7.0)
 21 Jun 2018: Python 3 release (V7.1)
+10 Jun 2019: Modified data model schemas for JWST build 7.3 (V7.3)
 
 @author: MIRI Software Team
 
@@ -51,5 +52,5 @@ miri.simulators
 __project__ = 'MIRI Tool and Environment Software'
 __author__ = 'MIRI Software Team'
 __maintainer__ = 'MIRI Software Team: mirisim@roe.ac.uk'
-__copyright__ = '2018, %s' % __author__
-__version__ = '7.1'
+__copyright__ = '2019, %s' % __author__
+__version__ = '7.3'

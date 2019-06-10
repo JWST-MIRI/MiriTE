@@ -1,6 +1,6 @@
 allOf:
-- $ref: miri_ramp_withmeta.schema.yaml
+- $ref: miri_ramp_withmeta.schema
 - type: object
   properties:
     meta:
-      $ref: miri_metadata_sim.schema.yaml
+      $ref: miri_metadata_sim.schema

@@ -16,7 +16,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 25 Sep 2014: Created from miri_lastframe_model.py
 30 Sep 2014: Superflous flags commented out.
 22 Oct 2014: MiriResetModel now based on the MiriMeasuredModel.
-07 Nov 2014: Modified to use miri_reset.schema.yaml, which defines
+07 Nov 2014: Modified to use miri_reset.schema, which defines
              the expected data and err units.
 20 Aug 2015: Duplicated parts of schema now reference STScI model.
 10 Dec 2015: TYPE and REFTYPE strings rationalised.
@@ -91,7 +91,7 @@ class MiriResetModel(MiriMeasuredModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
     
     """
-    schema_url = "miri_reset.schema.yaml"
+    schema_url = "miri_reset.schema"
     _default_dq_def = reset_reference_flags
 
     def __init__(self, init=None, data=None, dq=None, err=None,

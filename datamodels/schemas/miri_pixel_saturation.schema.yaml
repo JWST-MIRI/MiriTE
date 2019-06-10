@@ -2,12 +2,12 @@ allOf:
 - type: object
   properties:
     meta:
-      $ref: miri_metadata.schema.yaml
+      $ref: miri_metadata.schema
 - type: object
   properties:
     meta:
-      $ref: miri_metadata_dataerr.schema.yaml
-- $ref: http://jwst.stsci.edu/schemas/saturation.schema.yaml
+      $ref: miri_metadata_dataerr.schema
+- $ref: http://stsci.edu/schemas/jwst_datamodel/saturation.schema
 - type: object
   title: MIRI pixel saturation calibration data
   properties:

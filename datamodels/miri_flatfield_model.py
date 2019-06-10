@@ -133,7 +133,7 @@ class MiriFlatfieldModel(MiriMeasuredModel):
     
     """
     # All flat-field models use exactly the same schema.
-    schema_url = "miri_flatfield.schema.yaml"
+    schema_url = "miri_flatfield.schema"
     _default_dq_def = flat_reference_flags
 
     def __init__(self, init=None, data=None, dq=None, err=None,
@@ -266,7 +266,7 @@ class MiriSkyFlatfieldModel(MiriFlatfieldModel):
     
     """
     # All flat-field models use exactly the same schema.
-    schema_url = "miri_flatfield.schema.yaml"
+    schema_url = "miri_flatfield.schema"
     _default_dq_def = flat_reference_flags
 
     def __init__(self, init=None, data=None, dq=None, err=None,
@@ -335,7 +335,7 @@ class MiriFringeFlatfieldModel(MiriFlatfieldModel):
     
     """
     # All flat-field models use exactly the same schema.
-    schema_url = "miri_flatfield.schema.yaml"
+    schema_url = "miri_flatfield.schema"
     _default_dq_def = flat_reference_flags
 
     def __init__(self, init=None, data=None, dq=None, err=None,
@@ -402,7 +402,7 @@ class MiriTargetFlatfieldModel(MiriFlatfieldModel):
     
     """
     # All flat-field models use exactly the same schema.
-    schema_url = "miri_flatfield.schema.yaml"
+    schema_url = "miri_flatfield.schema"
     _default_dq_def = flat_reference_flags
 
     def __init__(self, init=None, data=None, dq=None, err=None,

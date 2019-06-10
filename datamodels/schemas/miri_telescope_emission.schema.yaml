@@ -1,5 +1,5 @@
 allOf:
-- $ref: miri_measured.schema.yaml
+- $ref: miri_measured.schema
 - type: object
   title: JWST/MIRI telescope emission model
   properties:

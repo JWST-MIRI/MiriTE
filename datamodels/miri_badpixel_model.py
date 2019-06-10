@@ -147,7 +147,7 @@ class MiriBadPixelMaskModel(MiriDataModel, HasMask):
         See the jwst.datamodels documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_bad_pixel_mask.schema.yaml"
+    schema_url = "miri_bad_pixel_mask.schema"
     dq_def_names = ('BIT', 'VALUE', 'NAME', 'DESCRIPTION')
     
     # Define a default value for the dq_def table.

@@ -162,7 +162,7 @@ class MiriPointSpreadFunctionModel(MiriMeasuredModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
     
     """
-    schema_url = "miri_psf.schema.yaml"
+    schema_url = "miri_psf.schema"
     _default_dq_def = psf_reference_flags
 
     def __init__(self, init=None, data=None, dq=None, err=None, dq_def=None,
@@ -276,7 +276,7 @@ class MiriImagingPointSpreadFunctionModel(MiriPointSpreadFunctionModel):
         The pixel size for which these PSF data are valid.
     
     """
-    schema_url = "miri_psf_imaging.schema.yaml"
+    schema_url = "miri_psf_imaging.schema"
     fieldnames = ('XFIELD', 'YFIELD', 'STACK', 'COL_FIELD', 'ROW_FIELD', \
                   'XAN_FIELD', 'YAN_FIELD')
 
@@ -354,7 +354,7 @@ class MiriLrsPointSpreadFunctionModel(MiriPointSpreadFunctionModel):
         If not given, the type defaults to the generic term 'PSF'.
     
     """
-    schema_url = "miri_psf_lrs.schema.yaml"
+    schema_url = "miri_psf_lrs.schema"
 
     def __init__(self, init=None, psftype=None, **kwargs):
         """
@@ -409,7 +409,7 @@ class MiriMrsPointSpreadFunctionModel(MiriPointSpreadFunctionModel):
     World coordinates?
     
     """
-    schema_url = "miri_psf_mrs.schema.yaml"
+    schema_url = "miri_psf_mrs.schema"
 
     def __init__(self, init=None, wavelength=None, **kwargs):
         """

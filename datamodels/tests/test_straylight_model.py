@@ -23,7 +23,7 @@ in the datamodels.miri_straylight_model module.
 15 Jun 2017: Do not set observation or target metadata. Neither are
              appropriate for a reference file.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
-15 Nov 2018: New data model which uses the JWST schema, saturation.schema.yaml.
+15 Nov 2018: New data model which uses the JWST schema, saturation.schema.
              Previous data model renamed to MiriMrsStraylightModel_CDP3.
 
 @author: Steven Beard (UKATC)

@@ -67,7 +67,7 @@ class MiriIPCModel(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
     
     """
-    schema_url = "miri_ipc.schema.yaml"
+    schema_url = "miri_ipc.schema"
 
     def __init__(self, init=None, data=None, **kwargs):
         """

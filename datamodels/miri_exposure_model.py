@@ -29,8 +29,8 @@ https://jwst-docs.stsci.edu/display/JDAT/JWST+File+Names%2C+Formats%2C+and+Data+
 10 Jun 2013: Resolved problem with rows and columns being declared in the
              wrong order. Use non-square test data. Remodelled in parallel
              with changes to the SCASim exposure data model.
-13 Jun 2013: Modified to use the miri.exposure.schema.yaml schema instead
-             of miri.ramp.schema.yaml
+13 Jun 2013: Modified to use the miri.exposure.schema schema instead
+             of miri.ramp.schema
 14 Aug 2013: Modified for new MIRI ramp model.
 07 Oct 2013: GROUP_DEF table added to MIRI ramp data.
 10 Dec 2013: Delimiter in MIRI schema names changed from "." to "_".
@@ -205,7 +205,7 @@ class MiriExposureModel(MiriRampModel):
     
     """
     # Exposure data has, by definition, the same structure as ramp data.
-    schema_url = "miri_exposure.schema.yaml"
+    schema_url = "miri_exposure.schema"
 
     def __init__(self, rows, columns, ngroups, nints, readpatt, refrows,
                  refcolumns, grpavg=1, intavg=1, nframes=1,

@@ -36,7 +36,7 @@ in the datamodels.miri_dark_reference_model module.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 06 Jul 2018: Merged schema with JWST software. DARK data is now only
              accepted with 4-D data, err and dq arrays.
-15 Nov 2018: Schema switched to use JWST darkMIRI.schema.yaml.
+15 Nov 2018: Schema switched to use JWST darkMIRI.schema.
 
 @author: Steven Beard (UKATC)
 

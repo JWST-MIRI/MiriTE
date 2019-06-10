@@ -57,7 +57,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 06 Jul 2018: Merged schema with JWST software. DARK data is now only
              accepted with 4-D data, err and dq arrays.
-15 Nov 2018: Schema switched to use JWST darkMIRI.schema.yaml.
+15 Nov 2018: Schema switched to use JWST darkMIRI.schema.
              3-D DARK reference data are no longer accepted.
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
@@ -151,7 +151,7 @@ class MiriDarkReferenceModel(MiriMeasuredModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
     
     """
-    schema_url = "miri_dark_reference.schema.yaml"
+    schema_url = "miri_dark_reference.schema"
     _default_dq_def = dark_reference_flags
 
     def __init__(self, init=None, data=None, dq=None, err=None,

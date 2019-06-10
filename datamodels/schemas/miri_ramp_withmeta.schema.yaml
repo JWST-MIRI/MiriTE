@@ -1,11 +1,11 @@
 allOf:
-- $ref: http://jwst.stsci.edu/schemas/core.schema.yaml
-- $ref: http://jwst.stsci.edu/schemas/photometry.schema.yaml
-- $ref: http://jwst.stsci.edu/schemas/wcsinfo.schema.yaml
+- $ref: http://stsci.edu/schemas/jwst_datamodel/core.schema
+- $ref: http://stsci.edu/schemas/jwst_datamodel/photometry.schema
+- $ref: http://stsci.edu/schemas/jwst_datamodel/wcsinfo.schema
 - type: object
   properties:
     meta:
-      $ref: miri_metadata.schema.yaml
+      $ref: miri_metadata.schema
 - type: object
   title: MIRI ramp data
   properties:
@@ -74,10 +74,10 @@ allOf:
       units: ''
       datatype: uint8
     group:
-      $ref: http://jwst.stsci.edu/schemas/group.schema.yaml
+      $ref: http://stsci.edu/schemas/jwst_datamodel/group.schema
     int_times:
-      $ref: http://jwst.stsci.edu/schemas/int_times.schema.yaml
+      $ref: http://stsci.edu/schemas/jwst_datamodel/int_times.schema
     pixeldq_def:
-      $ref: pixeldq_def.schema.yaml
+      $ref: pixeldq_def.schema
     groupdq_def:
-      $ref: groupdq_def.schema.yaml
+      $ref: groupdq_def.schema

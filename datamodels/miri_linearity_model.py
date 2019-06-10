@@ -146,7 +146,7 @@ class MiriLinearityModel(MiriMeasuredModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
     
     """
-    schema_url = "miri_linearity.schema.yaml"
+    schema_url = "miri_linearity.schema"
     _default_dq_def = linearity_reference_flags
 
     def __init__(self, init=None, coeffs=None, dq=None, err=None,

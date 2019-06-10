@@ -108,7 +108,7 @@ class MiriPixelSaturationModel(MiriMeasuredModel):
     
     """
     # There is no separate pixel saturation schema as yet.
-    schema_url = "miri_pixel_saturation.schema.yaml"
+    schema_url = "miri_pixel_saturation.schema"
     _default_dq_def = saturation_reference_flags
 
     def __init__(self, init=None, data=None, dq=None, err=None,

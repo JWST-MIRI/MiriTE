@@ -195,7 +195,7 @@ class MiriImagingDistortionModel(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
                 
     """
-    schema_url = "miri_distortion_imaging.schema.yaml"
+    schema_url = "miri_distortion_imaging.schema"
     fieldnames = ('FILTER', 'COL_OFFSET', 'ROW_OFFSET')
     
     def __init__(self, init=None,
@@ -562,7 +562,7 @@ class MiriLrsD2WModel(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_distortion_lrs.schema.yaml"
+    schema_url = "miri_distortion_lrs.schema"
     fieldnames = ('X_CENTER', 'Y_CENTER', 'WAVELENGTH', 'X0', 'Y0', 'X1', 'Y1', \
                   'X2', 'Y2', 'X3', 'Y3')
     
@@ -690,7 +690,7 @@ class MiriMrsDistortionModel12(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
             
     """
-    schema_url = "miri_distortion_mrs12.schema.yaml"
+    schema_url = "miri_distortion_mrs12.schema"
     fieldnames_fov = ('alpha_min', 'alpha_max')
     fieldnames_d2c = ['VAR1']
     for i in (0,1,2,3,4):
@@ -896,7 +896,7 @@ class MiriMrsDistortionModel12_CDP6(MiriMrsDistortionModel12):
     See the MiriMrsDistortionModel12 class for full documentation.
     
     """
-    schema_url = "miri_distortion_mrs12_CDP6.schema.yaml"
+    schema_url = "miri_distortion_mrs12_CDP6.schema"
     fieldnames_fov = ('alpha_min', 'alpha_max')
     fieldnames_d2c = ['VAR1']
     for i in (0,1,2,3,4):
@@ -1015,7 +1015,7 @@ class MiriMrsDistortionModel34(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
             
     """
-    schema_url = "miri_distortion_mrs34.schema.yaml"
+    schema_url = "miri_distortion_mrs34.schema"
     fieldnames_fov = ('alpha_min', 'alpha_max')
     fieldnames_d2c = ['VAR1']
     for i in (0,1,2,3,4):
@@ -1220,7 +1220,7 @@ class MiriMrsDistortionModel34_CDP6(MiriMrsDistortionModel34):
     See the MiriMrsDistortionModel34 class for full documentation.
     
     """
-    schema_url = "miri_distortion_mrs34_CDP6.schema.yaml"
+    schema_url = "miri_distortion_mrs34_CDP6.schema"
     fieldnames_fov = ('alpha_min', 'alpha_max')
     fieldnames_d2c = ['VAR1']
     for i in (0,1,2,3,4):

@@ -107,7 +107,7 @@ class MiriMeasurement(MiriDataModel):
         See the jwst_lib documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_measurement.schema.yaml"
+    schema_url = "miri_measurement.schema"
     fieldnames = ('VARIABLE', 'MEASUREMENT1', 'MEASUREMENT2', 'MEASUREMENT3',
                   'MEASUREMENT4', 'MEASUREMENT5')
     

@@ -1,5 +1,5 @@
 allOf:
-- $ref: miri_psf.schema.yaml
+- $ref: miri_psf.schema
 - type: object
   title: JWST/MIRI imaging point spread function
   properties:

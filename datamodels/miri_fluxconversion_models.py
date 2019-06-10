@@ -78,9 +78,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              Explicitly set table column units based on the tunit definitions
              in the schema. Removed redundant function. Removed redundant
              function.
-15 Nov 2018: MRS schema switched to use JWST mirmrs_photom.schema.yaml.
+15 Nov 2018: MRS schema switched to use JWST mirmrs_photom.schema.
              3-D versions of the MRS data are no longer accepted.
-16 Nov 2018: Use of the JWST mirmrs_photom.schema.yaml reverted! This schema
+16 Nov 2018: Use of the JWST mirmrs_photom.schema reverted! This schema
              added a phot_table entry which is unnecessary and caused the
              MRS CDPs to be rejected
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
@@ -119,7 +119,7 @@ __all__ = ['MiriFluxconversionModel', \
 #     A data model for a trivial flux table. Used for testing.
 #     
 #     """
-#     schema_url = "flux.schema.yaml"
+#     schema_url = "flux.schema"
 #     fieldnames = ('parameter', 'factor', 'uncertainty')
 # 
 #     def __init__(self, init=None, flux_table=None, **kwargs):
@@ -166,7 +166,7 @@ class MiriFluxconversionModel(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_fluxconversion.schema.yaml"
+    schema_url = "miri_fluxconversion.schema"
     fieldnames = ('PARAMETER', 'FACTOR', 'UNCERTAINTY')
     
     def __init__(self, init=None, flux_table=None, **kwargs):
@@ -214,7 +214,7 @@ class MiriImagingFluxconversionModel(MiriFluxconversionModel):
     Exactly the same as MiriFluxconversionModel.
     
     """
-    schema_url = "miri_fluxconversion_imaging.schema.yaml"
+    schema_url = "miri_fluxconversion_imaging.schema"
     fieldnames = ('FILTER', 'FACTOR', 'UNCERTAINTY')
     info_logged = False
 
@@ -252,7 +252,7 @@ class MiriImagingColourCorrectionModel(MiriFluxconversionModel):
     Exactly the same as MiriFluxconversionModel.
     
     """
-    schema_url = "miri_colourcorrection_imaging.schema.yaml"
+    schema_url = "miri_colourcorrection_imaging.schema"
     fieldnames = ('BBTEMP', 'FILTER', 'FACTOR', 'UNCERTAINTY')
 
     def __init__(self, init=None, flux_table=None, **kwargs):
@@ -284,7 +284,7 @@ class MiriPowerlawColourCorrectionModel(MiriFluxconversionModel):
     Exactly the same as MiriFluxconversionModel.
     
     """
-    schema_url = "miri_colourcorrection_powerlaw.schema.yaml"
+    schema_url = "miri_colourcorrection_powerlaw.schema"
     fieldnames = ('EXPONENT', 'FILTER', 'FACTOR', 'UNCERTAINTY')
 
     def __init__(self, init=None, flux_table=None, **kwargs):
@@ -320,7 +320,7 @@ class MiriLrsFluxconversionModel(MiriFluxconversionModel):
     Exactly the same as MiriFluxconversionModel.
     
     """
-    schema_url = "miri_fluxconversion_lrs.schema.yaml"
+    schema_url = "miri_fluxconversion_lrs.schema"
     fieldnames = ('WAVELENGTH', 'SRF', 'SRF_ERROR')
 
     def __init__(self, init=None, flux_table=None, **kwargs):
@@ -424,7 +424,7 @@ class MiriMrsFluxconversionModel(MiriMeasuredModel):
         The reference wavelength [in microns].
     
     """
-    schema_url = "miri_fluxconversion_mrs.schema.yaml"
+    schema_url = "miri_fluxconversion_mrs.schema"
     _default_dq_def = mrssrf_reference_flags
 
     def __init__(self, init=None, data=None, dq=None, err=None, dq_def=None,
