@@ -1,11 +1,11 @@
 allOf:
-- $ref: miri_core.schema
+- $ref: miri_core.schema.yaml
 - $ref: http://stsci.edu/schemas/jwst_datamodel/wcsinfo.schema
 - type: object
   title: MIRI data with error and quality arrays
   properties:
     meta:
-      $ref: miri_metadata_dataerr.schema
+      $ref: miri_metadata_dataerr.schema.yaml
     data:
       title: The science data
       fits_hdu: SCI

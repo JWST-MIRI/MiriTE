@@ -1,5 +1,5 @@
 allOf:
-- $ref: miri_illumination.schema
+- $ref: miri_illumination.schema.yaml
 - type: object
   title: MIRI illumination description for fringing model
   properties:

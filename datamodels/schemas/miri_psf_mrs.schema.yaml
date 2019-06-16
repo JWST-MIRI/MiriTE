@@ -1,5 +1,5 @@
 allOf:
-- $ref: miri_psf.schema
+- $ref: miri_psf.schema.yaml
 - type: object
   title: JWST/MIRI MRS point spread function
   properties:

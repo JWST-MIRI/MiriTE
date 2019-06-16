@@ -2,5 +2,5 @@ allOf:
 - type: object
   properties:
     meta:
-      $ref: miri_metadata.schema
+      $ref: miri_metadata.schema.yaml
 - $ref: http://stsci.edu/schemas/jwst_datamodel/rscd.schema

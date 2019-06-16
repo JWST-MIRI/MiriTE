@@ -1,5 +1,5 @@
 allOf:
-- $ref: miri_measured.schema
+- $ref: miri_measured.schema.yaml
 - type: object
   title: MIRI slope data
   properties:
