@@ -1,0 +1,29 @@
+allOf:
+- $ref: miri_core.schema.yaml
+- $ref: http://stsci.edu/schemas/jwst_datamodel/wcsinfo.schema
+- type: object
+  title: MIRI data with error and quality arrays
+  properties:
+    meta:
+      $ref: miri_metadata_dataerr.schema.yaml
+    data:
+      title: The science data
+      fits_hdu: SCI
+      default: 0.0
+      units: ''
+      axes: [hypercubes, cubes, planes, rows, columns]
+      datatype: float32
+    err:
+      title: Error array
+      fits_hdu: ERR
+      default: 0.0
+      units: ''
+      datatype: float32
+    dq:
+      title: Data quality array
+      fits_hdu: DQ
+      default: 0
+      units: ''
+      datatype: uint32
+    dq_def:
+      $ref: http://stsci.edu/schemas/jwst_datamodel/dq_def.schema
