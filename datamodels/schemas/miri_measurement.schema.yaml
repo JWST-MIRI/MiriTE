@@ -1,29 +1,85 @@
 allOf:
 - $ref: miri_core.schema.yaml
-- $ref: http://stsci.edu/schemas/jwst_datamodel/wcsinfo.schema
 - type: object
-  title: MIRI data with error and quality arrays
+  title: MIRI measurement model
   properties:
     meta:
-      $ref: miri_metadata_dataerr.schema.yaml
-    data:
-      title: The science data
-      fits_hdu: SCI
-      default: 0.0
-      units: ''
-      axes: [hypercubes, cubes, planes, rows, columns]
-      datatype: float32
-    err:
-      title: Error array
-      fits_hdu: ERR
-      default: 0.0
-      units: ''
-      datatype: float32
-    dq:
-      title: Data quality array
-      fits_hdu: DQ
-      default: 0
-      units: ''
-      datatype: uint32
-    dq_def:
-      $ref: http://stsci.edu/schemas/jwst_datamodel/dq_def.schema
+      type: object
+      properties:
+        measurement_table:
+          type: object
+          properties:
+            mcolumns:
+              type: number
+              title: Number of valid measurement columns
+              fits_hdu: MEASUREMENT
+              fits_keyword: MCOLUMNS
+            tunit1:
+              type: string
+              title: Units of column 1
+              fits_hdu: MEASUREMENT
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Units of column 2
+              fits_hdu: MEASUREMENT
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Units of column 3
+              fits_hdu: MEASUREMENT
+              fits_keyword: TUNIT3
+            tunit4:
+              type: string
+              title: Units of column 4
+              fits_hdu: MEASUREMENT
+              fits_keyword: TUNIT4
+            tunit5:
+              type: string
+              title: Units of column 5
+              fits_hdu: MEASUREMENT
+              fits_keyword: TUNIT5
+            tunit6:
+              type: string
+              title: Units of column 6
+              fits_hdu: MEASUREMENT
+              fits_keyword: TUNIT6
+        measurement:
+          type: object
+          properties:
+            name:
+              type: string
+              title: Name of measurement
+              fits_keyword: MEASNAME
+            unit:
+              type: string
+              title: Measurement unit
+              fits_keyword: MEASUNIT
+            variable:
+              type: string
+              title: Name of variable parameter
+              fits_keyword: MEASPARM
+            vunit:
+              type: string
+              title: Unit of variable parameter
+              fits_keyword: MEASPUNI
+            interp:
+              type: string
+              title: Measurement interpolation type
+              fits_keyword: MEASINTP
+    measurement_table:
+      title: Table of MIRI parameter measurements
+      fits_hdu: MEASUREMENT
+      datatype:
+      - name: VARIABLE
+        datatype: float64
+      - name: MEASUREMENT1
+        datatype: float64
+      - name: MEASUREMENT2
+        datatype: float64
+      - name: MEASUREMENT3
+        datatype: float64
+      - name: MEASUREMENT4
+        datatype: float64
+      - name: MEASUREMENT5
+        datatype: float64
