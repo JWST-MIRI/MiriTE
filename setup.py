@@ -76,8 +76,8 @@ def get_conda_prefix():
 
 
 # Test the command arguments given with this script.
-# Only unzip data files when building or installing, not when 
-# cleaning. If a "clean" is requested on its own, the previously 
+# Only unzip data files when building or installing, not when
+# cleaning. If a "clean" is requested on its own, the previously
 # unzipped files are deleted.
 if len(sys.argv[0]) > 0:
     argv = sys.argv
@@ -99,7 +99,7 @@ if verbose:
 # ------------------------------------------------------------------
 # Unzip the data files contained in the simulators data directories.
 #
-# The simulator detector data files are found relative to the 
+# The simulator detector data files are found relative to the
 # directory containing this Python script.
 (this_dir, this_file) = os.path.split(__file__)
 cr_data_path = os.path.join(this_dir, "simulators/data/cosmic_rays")
@@ -210,6 +210,9 @@ elif cleanflag:
                 except Exception:
                     pass
 
+
+entry_points = dict(asdf_extensions=['miri_datamodel = miri.datamodels.miri_extension:MIRIExtension'])
+
 # ------------------------------------------------------------------
 
 
@@ -289,7 +292,8 @@ setup(
              'simulators/scasim/scripts/plot_exposure_data.py',
              'simulators/scasim/scripts/scasim.py',
             ],
-    data_files=[('', ['LICENCE', 'README'])]
+    data_files=[('', ['LICENCE', 'README'])],
+    entry_points=entry_points,
 )
 
 if not cleanflag:

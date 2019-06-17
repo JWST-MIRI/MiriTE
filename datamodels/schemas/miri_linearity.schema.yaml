@@ -1,5 +1,5 @@
 allOf:
-- $ref: miri_core.schema
+- $ref: miri_core.schema.yaml
 - $ref: http://stsci.edu/schemas/jwst_datamodel/referencefile.schema
 - $ref: http://stsci.edu/schemas/jwst_datamodel/keyword_gainfact.schema
 - type: object

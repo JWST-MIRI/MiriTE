@@ -5,7 +5,7 @@ allOf:
 - type: object
   properties:
     meta:
-      $ref: miri_metadata.schema
+      $ref: miri_metadata.schema.yaml
 - type: object
   title: MIRI ramp data
   properties:
@@ -78,6 +78,6 @@ allOf:
     int_times:
       $ref: http://stsci.edu/schemas/jwst_datamodel/int_times.schema
     pixeldq_def:
-      $ref: pixeldq_def.schema
+      $ref: pixeldq_def.schema.yaml
     groupdq_def:
-      $ref: groupdq_def.schema
+      $ref: groupdq_def.schema.yaml

@@ -2,9 +2,7 @@ type: object
 title: Top Level MIRI Metadata
 properties:
   date:
-    anyOf:
-      - $ref: http://stsci.edu/schemas/asdf/time/time-1.0.0
-      - type: string
+    type: string
     title: Date this file was created (UTC)
     fits_keyword: DATE
   origin:
@@ -229,3 +227,5 @@ properties:
         type: integer
         title: Number of integrations averaged
         fits_keyword: INTAVG
+
+$schema: http://stsci.edu/schemas/fits-schema/fits-schema

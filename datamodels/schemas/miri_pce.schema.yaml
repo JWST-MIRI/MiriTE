@@ -1,5 +1,5 @@
 allOf:
-- $ref: miri_core.schema
+- $ref: miri_core.schema.yaml
 - type: object
   title: MIRI photon conversion efficiency model
   properties:
