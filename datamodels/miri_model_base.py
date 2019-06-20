@@ -175,6 +175,10 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 12 Mar 2019: Removed use of astropy.extern.six (since Python 2 no longer used).
 16 May 2019: Added the get_fits_header_dict method.
 10 Jun 2019: Modified to meet new schema access method in JWST build 7.3.
+17 Jun 2019: Merged with pull request "Miri schemas 1" from Nadia Dencheva.
+             Make MIRI schemas work with asdf and datamodels 0.13.4.
+17 Jun 2019: Modified list_data_arrays and list_data_tables functions to
+             skip schema entries of "str" type.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -199,6 +203,7 @@ from jwst.datamodels.model_base import DataModel
 
 # Import the MIRI data models and the data model plotter.
 import miri.datamodels
+from miri.datamodels.miri_extension import MIRIExtension, URL_PREFIX
 from miri.datamodels.plotting import DataModelPlotVisitor
 from miri.parameters import SUBARRAY, CDP_USEAFTER_DICT
 
@@ -372,7 +377,6 @@ def _shape_to_string(shape, axes=None):
         strg = ' x '.join(str(s) for s in shape)
     return strg
 
-from .miri_extension import MIRIExtension, URL_PREFIX
 
 class MiriDataModel(DataModel):
     """
@@ -1642,12 +1646,14 @@ class MiriDataModel(DataModel):
             # Data objects have a datatype and do not have a type
             type = subschema.get('type')
             subdtype = subschema.get('datatype')
+            #print("Found type=", type, "subdtype=", subdtype)
+            #print("subdtype is a", str(subdtype.__class__.__name__))
             if type is None and subdtype is not None:
-                if not isinstance(subdtype, (tuple,list)):
+                if not isinstance(subdtype, (str,tuple,list)):
                     # Ensure each entry is made only once.
                     pathstr = '.'.join(path)
                     if pathstr not in results:
-#                         print("Found data array at", pathstr)
+                        #print("Found data array at", pathstr)
                         results.append(pathstr)
 
         # Walk through the schema and apply the search function.
@@ -3500,8 +3506,10 @@ if __name__ == '__main__':
 
         # The following will be empty lists
         dataarrays = testdata.list_data_arrays()
+        print("dataarrays=", str(dataarrays))
         assert len(dataarrays) == 0
         datatables = testdata.list_data_tables()
+        print("datatables=", str(datatables))
         assert len(datatables) == 0
 
         print(testdata)
