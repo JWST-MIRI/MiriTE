@@ -78,6 +78,8 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
+20 Jun 2019: Stop setting the dq_def attribute.
+             
 @author: Steven Beard (UKATC), Michael Droettboom (STScI), Vincent Geers (UKATC)
 
 """
@@ -181,19 +183,20 @@ class MiriBadPixelMaskModel(MiriDataModel, HasMask):
         # Update the dq array if it has been specifically provided.
         HasMask.__init__(self, dq)
 
-        # Set the bit field definitions table, if provided.
-        if dq_def is not None:
-            try:
-                self.dq_def = dq_def
-            except (ValueError, TypeError) as e:
-                strg = "dq_def must be a numpy record array or list of records."
-                strg += "\n   %s" % str(e)
-                raise TypeError(strg)
-        elif self.dq_def is None or len(self.dq_def) < 1:
-            # No dq_def is provided.
-            # Explicitly create a DQ_DEF table with default values.
-            # TODO: Can the default be declared in the schema?
-            self.dq_def = self._default_dq_def
+# Stop setting dq_def
+#         # Set the bit field definitions table, if provided.
+#         if dq_def is not None:
+#             try:
+#                 self.dq_def = dq_def
+#             except (ValueError, TypeError) as e:
+#                 strg = "dq_def must be a numpy record array or list of records."
+#                 strg += "\n   %s" % str(e)
+#                 raise TypeError(strg)
+#         elif self.dq_def is None or len(self.dq_def) < 1:
+#             # No dq_def is provided.
+#             # Explicitly create a DQ_DEF table with default values.
+#             # TODO: Can the default be declared in the schema?
+#             self.dq_def = self._default_dq_def
 
     def get_primary_array_name(self):
         """
