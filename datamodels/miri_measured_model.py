@@ -309,11 +309,12 @@ class MiriMeasuredModel(MiriDataModel, HasDataErrAndDq):
                     strg = "dq_def must be a numpy record array or list of records."
                     strg += "\n   %s" % str(e)
                     raise TypeError(strg)
-            elif self.dq_def is None or len(self.dq_def) < 1:
-                # No dq_def is provided.
-                # Explicitly create a DQ_DEF table with default values.
-                # TODO: Can the default declared in the schema be used?
-                self.dq_def = self._default_dq_def
+            #elif self.dq_def is None or len(self.dq_def) < 1:
+            #    # No dq_def is provided.
+            #    # Explicitly create a DQ_DEF table with default values.
+            #    # TODO: Can the default declared in the schema be used?
+            #    print("No dq_def provided. Default NOT defined.")
+            #    #self.dq_def = self._default_dq_def
 
     def on_save(self, path):
         """
@@ -428,7 +429,9 @@ class MiriMeasuredModel(MiriDataModel, HasDataErrAndDq):
         if hasattr(self, 'dq_def') and self.dq_def is not None:
             # Convert the dq_def table into a FlagsTable object
             # and return it.
-            return FlagsTable( self.dq_def )
+            print("NOT converting self.dq_def to flags_table object.")
+            return None
+            #return FlagsTable( self.dq_def )
         else:
             return None
 
@@ -584,7 +587,8 @@ class MiriRampModel(MiriMeasuredModel, HasDataErrAndGroups):
                 # No pixeldq_def is provided.
                 # Explicitly create a PIXELDQ_DEF table with default values.
                 # TODO: Can the default declared in the schema be used?
-                self.pixeldq_def = self._default_dq_def
+                print("No pixeldq_def is provided. NOT setting a default value.")
+                #self.pixeldq_def = self._default_dq_def
     
             # Set the group bit field definitions table, if provided.
             if groupdq_def is not None:
@@ -598,7 +602,8 @@ class MiriRampModel(MiriMeasuredModel, HasDataErrAndGroups):
                 # No groupdq_def is provided.
                 # Explicitly create a GROUPDQ_DEF table with default values.
                 # TODO: Can the default declared in the schema be used?
-                self.groupdq_def = self._default_groupdq_def
+                print("No groupdq_def is provided. NOT setting a default value.")
+                #self.groupdq_def = self._default_groupdq_def
 
     def plot_ramp(self, rows, columns, stime=1.0, tunit='', averaged=False,
                   show_ints=False, description=''):
@@ -822,7 +827,9 @@ class MiriRampModel(MiriMeasuredModel, HasDataErrAndGroups):
         if hasattr(self, 'pixeldq_def') and self.pixeldq_def is not None:
             # Convert the pixeldq_def table into a FlagsTable object
             # and return it.
-            return FlagsTable( self.pixeldq_def )
+            print("NOT converting pixeldq_def into a flags_table.")
+            return None
+            #return FlagsTable( self.pixeldq_def )
         else:
             return None
 
@@ -837,7 +844,9 @@ class MiriRampModel(MiriMeasuredModel, HasDataErrAndGroups):
         if hasattr(self, 'groupdq_def') and self.groupdq_def is not None:
             # Convert the groupdq_def table into a FlagsTable object
             # and return it.
-            return FlagsTable( self.groupdq_def )
+            print("NOT converting groupdq_def into a flags_table.")
+            return None
+            #return FlagsTable( self.groupdq_def )
         else:
             return None
 
