@@ -111,6 +111,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
 20 Jun 2019: Stop setting dq_def. Removed deprecated code.
+             Corrected a bug in MiriImageModel.
 
 @author: Steven Beard (UKATC)
 
@@ -1000,7 +1001,10 @@ class MiriSlopeModel(MiriMeasuredModel):
         strg = super(MiriSlopeModel, self).__str__(extra_objects=False)
         
         # Add the extras
-        maxdq = self.dq.max()
+        if self.dq is not None and len(self.dq) > 0:
+            maxdq = self.dq.max()
+        else:
+            maxdq = 0
 
         strg += self.get_data_str('nreads', underline=True, underchar="-")
         strg += self.get_data_str('readsat', underline=True, underchar="-")
