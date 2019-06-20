@@ -110,7 +110,6 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
-20 Jun 2019: Stop setting the dq_def attribute.
 
 @author: Steven Beard (UKATC)
 
@@ -300,22 +299,21 @@ class MiriMeasuredModel(MiriDataModel, HasDataErrAndDq):
             if not errunits:
                 self.set_data_units('err', dataunits)
 
-# Stop setting dq_def
-#         # The ramp data model has its own way of defining data quality.
-#         if not self.rampdata:
-#             # Set the data quality bit field definitions table, if provided.
-#             if dq_def is not None:
-#                 try:
-#                     self.dq_def = dq_def
-#                 except (ValueError, TypeError) as e:
-#                     strg = "dq_def must be a numpy record array or list of records."
-#                     strg += "\n   %s" % str(e)
-#                     raise TypeError(strg)
-#             elif self.dq_def is None or len(self.dq_def) < 1:
-#                 # No dq_def is provided.
-#                 # Explicitly create a DQ_DEF table with default values.
-#                 # TODO: Can the default declared in the schema be used?
-#                 self.dq_def = self._default_dq_def
+        # The ramp data model has its own way of defining data quality.
+        if not self.rampdata:
+            # Set the data quality bit field definitions table, if provided.
+            if dq_def is not None:
+                try:
+                    self.dq_def = dq_def
+                except (ValueError, TypeError) as e:
+                    strg = "dq_def must be a numpy record array or list of records."
+                    strg += "\n   %s" % str(e)
+                    raise TypeError(strg)
+            elif self.dq_def is None or len(self.dq_def) < 1:
+                # No dq_def is provided.
+                # Explicitly create a DQ_DEF table with default values.
+                # TODO: Can the default declared in the schema be used?
+                self.dq_def = self._default_dq_def
 
     def on_save(self, path):
         """
@@ -572,36 +570,35 @@ class MiriRampModel(MiriMeasuredModel, HasDataErrAndGroups):
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
 
-# Stop setting dq_def
-#         # DEPRECATED: Set the data quality tables only for legacy data.
-#         if WRITE_RAMP_DQ_TABLES:
-#             # Set the pixel data quality bit field definitions table, if provided.
-#             if pixeldq_def is not None:
-#                 try:
-#                     self.pixeldq_def = pixeldq_def
-#                 except (ValueError, TypeError) as e:
-#                     strg = "pixeldq_def must be a numpy record array or list of records."
-#                     strg += "\n   %s" % str(e)
-#                     raise TypeError(strg)
-#             elif self.pixeldq_def is None or len(self.pixeldq_def) < 1:
-#                 # No pixeldq_def is provided.
-#                 # Explicitly create a PIXELDQ_DEF table with default values.
-#                 # TODO: Can the default declared in the schema be used?
-#                 self.pixeldq_def = self._default_dq_def
-#     
-#             # Set the group bit field definitions table, if provided.
-#             if groupdq_def is not None:
-#                 try:
-#                     self.groupdq_def = groupdq_def
-#                 except (ValueError, TypeError) as e:
-#                     strg = "groupdq_def must be a numpy record array or list of records."
-#                     strg += "\n   %s" % str(e)
-#                     raise TypeError(strg)
-#             elif self.groupdq_def is None or len(self.groupdq_def) < 1:
-#                 # No groupdq_def is provided.
-#                 # Explicitly create a GROUPDQ_DEF table with default values.
-#                 # TODO: Can the default declared in the schema be used?
-#                 self.groupdq_def = self._default_groupdq_def
+        # DEPRECATED: Set the data quality tables only for legacy data.
+        if WRITE_RAMP_DQ_TABLES:
+            # Set the pixel data quality bit field definitions table, if provided.
+            if pixeldq_def is not None:
+                try:
+                    self.pixeldq_def = pixeldq_def
+                except (ValueError, TypeError) as e:
+                    strg = "pixeldq_def must be a numpy record array or list of records."
+                    strg += "\n   %s" % str(e)
+                    raise TypeError(strg)
+            elif self.pixeldq_def is None or len(self.pixeldq_def) < 1:
+                # No pixeldq_def is provided.
+                # Explicitly create a PIXELDQ_DEF table with default values.
+                # TODO: Can the default declared in the schema be used?
+                self.pixeldq_def = self._default_dq_def
+    
+            # Set the group bit field definitions table, if provided.
+            if groupdq_def is not None:
+                try:
+                    self.groupdq_def = groupdq_def
+                except (ValueError, TypeError) as e:
+                    strg = "groupdq_def must be a numpy record array or list of records."
+                    strg += "\n   %s" % str(e)
+                    raise TypeError(strg)
+            elif self.groupdq_def is None or len(self.groupdq_def) < 1:
+                # No groupdq_def is provided.
+                # Explicitly create a GROUPDQ_DEF table with default values.
+                # TODO: Can the default declared in the schema be used?
+                self.groupdq_def = self._default_groupdq_def
 
     def plot_ramp(self, rows, columns, stime=1.0, tunit='', averaged=False,
                   show_ints=False, description=''):
@@ -806,50 +803,47 @@ class MiriRampModel(MiriMeasuredModel, HasDataErrAndGroups):
             strg += self.get_data_str('groupdq', underline=True, underchar="-")
         if hasattr(self, 'group'):
             strg += self.get_data_str('group', underline=True, underchar="-")
-
-# Remove deprecated code   
-#         # DEPRECATED: The following code exists only for legacy data.
-#         if hasattr(self, 'pixeldq_def'):
-#             if self.pixeldq_def is not None and len(self.pixeldq_def) > 0:
-#                 strg += "v LEGACY TABLE v"
-#                 strg += self.get_data_str('pixeldq_def', underline=True, underchar="-")
-#         if hasattr(self, 'groupdq_def'):
-#             if self.groupdq_def is not None and len(self.groupdq_def) > 0:
-#                 strg += "v LEGACY TABLE v"
-#                 strg += self.get_data_str('groupdq_def', underline=True, underchar="-")
+            
+        # DEPRECATED: The following code exists only for legacy data.
+        if hasattr(self, 'pixeldq_def'):
+            if self.pixeldq_def is not None and len(self.pixeldq_def) > 0:
+                strg += "v LEGACY TABLE v"
+                strg += self.get_data_str('pixeldq_def', underline=True, underchar="-")
+        if hasattr(self, 'groupdq_def'):
+            if self.groupdq_def is not None and len(self.groupdq_def) > 0:
+                strg += "v LEGACY TABLE v"
+                strg += self.get_data_str('groupdq_def', underline=True, underchar="-")
         return strg
 
-# Remove deprecated code   
-#     # DEPRECATED: "flags_table" is a FlagsTable object created on the fly
-#     # from the contents of the pixeldq_def table
-#     @property
-#     def flags_table(self):
-#         if hasattr(self, 'pixeldq_def') and self.pixeldq_def is not None:
-#             # Convert the pixeldq_def table into a FlagsTable object
-#             # and return it.
-#             return FlagsTable( self.pixeldq_def )
-#         else:
-#             return None
-# 
-#     @flags_table.setter
-#     def flags_table(self, data):
-#         raise AttributeError("The flags_table object is read-only")
+    # DEPRECATED: "flags_table" is a FlagsTable object created on the fly
+    # from the contents of the pixeldq_def table
+    @property
+    def flags_table(self):
+        if hasattr(self, 'pixeldq_def') and self.pixeldq_def is not None:
+            # Convert the pixeldq_def table into a FlagsTable object
+            # and return it.
+            return FlagsTable( self.pixeldq_def )
+        else:
+            return None
 
-# Remove deprecated code   
-#     # DEPRECATED: "groupdq_flags_table" is a FlagsTable object created on the fly
-#     # from the contents of the groupdq_def table
-#     @property
-#     def groupdq_flags_table(self):
-#         if hasattr(self, 'groupdq_def') and self.groupdq_def is not None:
-#             # Convert the groupdq_def table into a FlagsTable object
-#             # and return it.
-#             return FlagsTable( self.groupdq_def )
-#         else:
-#             return None
-# 
-#     @groupdq_flags_table.setter
-#     def groupdq_flags_table(self, data):
-#         raise AttributeError("The groupdq_flags_table object is read-only")
+    @flags_table.setter
+    def flags_table(self, data):
+        raise AttributeError("The flags_table object is read-only")
+
+    # DEPRECATED: "groupdq_flags_table" is a FlagsTable object created on the fly
+    # from the contents of the groupdq_def table
+    @property
+    def groupdq_flags_table(self):
+        if hasattr(self, 'groupdq_def') and self.groupdq_def is not None:
+            # Convert the groupdq_def table into a FlagsTable object
+            # and return it.
+            return FlagsTable( self.groupdq_def )
+        else:
+            return None
+
+    @groupdq_flags_table.setter
+    def groupdq_flags_table(self, data):
+        raise AttributeError("The groupdq_flags_table object is read-only")
 
     @property
     def dq(self):

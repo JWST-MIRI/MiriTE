@@ -102,7 +102,6 @@ http://miri.ster.kuleuven.be/bin/view/Internal/DataQualityFlags
 12 Mar 2019: Removed use of astropy.extern.six (since Python 2 no longer used).
 29 Apr 2019: Added REFERENCE_PIXEL to pixeldq_setup.
 14 May 2019: Added Christophe's masking functions.
-20 Jun 2019: Allow FlagsTable objects to be created from FITS_rec objects.
 
 @author: Ruyman Azzollini (DIAS), Steven Beard (UKATC), Christophe Cossou (CEA)
 
@@ -114,7 +113,7 @@ import copy
 import numpy as np
 import numpy.ma as ma
 
-from astropy.io.fits import FITS_rec
+# import astropy.io.fits as pyfits 
 
 # 1) Global constants
 #
@@ -855,8 +854,8 @@ class FlagsTable(object):
         
     """    
     def __init__(self, flagtable):    
-        # The flagtable must be a list, numpy record array, numpy array or FITS record.
-        if not isinstance(flagtable, (tuple,list,np.ndarray,np.recarray,FITS_rec)):
+        # The flagtable must be a record array or a numpy array.
+        if not isinstance(flagtable, (tuple,list,np.ndarray,np.recarray)):
             strg = "Flag table must be a tuple, list or numpy array"
             strg += " (%s given)" % flagtable.__class__.__name__
             raise TypeError(strg)
