@@ -819,7 +819,7 @@ class MiriRampModel(MiriMeasuredModel, HasDataErrAndGroups):
 #             if self.groupdq_def is not None and len(self.groupdq_def) > 0:
 #                 strg += "v LEGACY TABLE v"
 #                 strg += self.get_data_str('groupdq_def', underline=True, underchar="-")
-#         return strg
+        return strg
 
 # Removed deprecated code 
 #     # DEPRECATED: "flags_table" is a FlagsTable object created on the fly
@@ -834,25 +834,25 @@ class MiriRampModel(MiriMeasuredModel, HasDataErrAndGroups):
 #             #return FlagsTable( self.pixeldq_def )
 #         else:
 #             return None
+#
+#    @flags_table.setter
+#    def flags_table(self, data):
+#        raise AttributeError("The flags_table object is read-only")
 
-    @flags_table.setter
-    def flags_table(self, data):
-        raise AttributeError("The flags_table object is read-only")
-
-    # DEPRECATED: "groupdq_flags_table" is a FlagsTable object created on the fly
-    # from the contents of the groupdq_def table
-    @property
-    def groupdq_flags_table(self):
-        if hasattr(self, 'groupdq_def') and self.groupdq_def is not None:
-            # Convert the groupdq_def table into a FlagsTable object
-            # and return it.
-            return FlagsTable( self.groupdq_def )
-        else:
-            return None
-
-    @groupdq_flags_table.setter
-    def groupdq_flags_table(self, data):
-        raise AttributeError("The groupdq_flags_table object is read-only")
+#    # DEPRECATED: "groupdq_flags_table" is a FlagsTable object created on the fly
+#    # from the contents of the groupdq_def table
+#    @property
+#    def groupdq_flags_table(self):
+#        if hasattr(self, 'groupdq_def') and self.groupdq_def is not None:
+#            # Convert the groupdq_def table into a FlagsTable object
+#            # and return it.
+#            return FlagsTable( self.groupdq_def )
+#        else:
+#            return None
+#
+#    @groupdq_flags_table.setter
+#    def groupdq_flags_table(self, data):
+#        raise AttributeError("The groupdq_flags_table object is read-only")
 
     @property
     def dq(self):
