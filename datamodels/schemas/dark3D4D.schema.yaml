@@ -3,6 +3,7 @@ allOf:
 - $ref: http://stsci.edu/schemas/jwst_datamodel/core.schema
 - $ref: http://stsci.edu/schemas/jwst_datamodel/wcsinfo.schema
 - $ref: http://stsci.edu/schemas/jwst_datamodel/referencefile.schema
+- $ref: http://stsci.edu/schemas/jwst_datamodel/dq_def.schema
 - type: object
   properties:
     data:
@@ -20,6 +21,4 @@ allOf:
       fits_hdu: ERR
       default: 0.0
       datatype: float32
-    dq_def:
-      $ref: http://stsci.edu/schemas/jwst_datamodel/dq_def.schema
 $schema: http://stsci.edu/schemas/fits-schema/fits-schema
