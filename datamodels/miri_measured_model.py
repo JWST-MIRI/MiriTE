@@ -112,6 +112,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              a corresponding model defined in ancestry.py).
 20 Jun 2019: Stop setting dq_def. Removed deprecated code.
              Corrected a bug in MiriImageModel.
+28 Jun 2019: Start setting dq_def once again.
 
 @author: Steven Beard (UKATC)
 
@@ -301,22 +302,21 @@ class MiriMeasuredModel(MiriDataModel, HasDataErrAndDq):
             if not errunits:
                 self.set_data_units('err', dataunits)
 
-# Stop setting dq_def
-#         # The ramp data model has its own way of defining data quality.
-#         if not self.rampdata:
-#             # Set the data quality bit field definitions table, if provided.
-#             if dq_def is not None:
-#                 try:
-#                     self.dq_def = dq_def
-#                 except (ValueError, TypeError) as e:
-#                     strg = "dq_def must be a numpy record array or list of records."
-#                     strg += "\n   %s" % str(e)
-#                     raise TypeError(strg)
-#             elif self.dq_def is None or len(self.dq_def) < 1:
-#                 # No dq_def is provided.
-#                 # Explicitly create a DQ_DEF table with default values.
-#                 # TODO: Can the default declared in the schema be used?
-#                 self.dq_def = self._default_dq_def
+        # The ramp data model has its own way of defining data quality.
+        if not self.rampdata:
+            # Set the data quality bit field definitions table, if provided.
+            if dq_def is not None:
+                try:
+                    self.dq_def = dq_def
+                except (ValueError, TypeError) as e:
+                    strg = "dq_def must be a numpy record array or list of records."
+                    strg += "\n   %s" % str(e)
+                    raise TypeError(strg)
+            elif self.dq_def is None or len(self.dq_def) < 1:
+                # No dq_def is provided.
+                # Explicitly create a DQ_DEF table with default values.
+                # TODO: Can the default declared in the schema be used?
+                self.dq_def = self._default_dq_def
 
     def on_save(self, path):
         """
@@ -573,7 +573,7 @@ class MiriRampModel(MiriMeasuredModel, HasDataErrAndGroups):
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
 
-# Stop setting dq_def
+# Remove deprecated code
 #         # DEPRECATED: Set the data quality tables only for legacy data.
 #         if WRITE_RAMP_DQ_TABLES:
 #             # Set the pixel data quality bit field definitions table, if provided.
