@@ -2194,10 +2194,12 @@ class SensorChipAssembly(object):
             if self.subarray_input is None:
                 flux = self.illumination_map.get_illumination( usefilter=self.qe )
             else:
-                dshape = self.detector.illuminated_shape
-                location = (self.subarray_input[0], self.subarray_input[1])
                 dleft  = self._sca['LEFT_COLUMNS']
-                dright = self._sca['RIGHT_COLUMNS']                
+                dright = self._sca['RIGHT_COLUMNS']  
+                dshape = self.detector.illuminated_shape
+                # Bug 558: Subarray locations include the reference columns
+                location = (self.subarray_input[0], self.subarray_input[1]-dleft)      
+#                location = (self.subarray_input[0], self.subarray_input[1])      
                 flux = self.illumination_map.get_illumination_enlarged(
                             dshape, usefilter=self.qe, location=location,
                             leftcrop=dleft, rightcrop=dright)
@@ -2341,6 +2343,8 @@ class SensorChipAssembly(object):
             # >>>
             # >>> Integrate on the flux, read the detector and update the
             # >>> exposure data.
+            # TODO: Chop off the reference columns at the left edge of
+            # subarray data.
             # >>>
             self.detector.integrate(self.flux, time, intnum=intnum)
             total_samples = self.nframes * self.samplesum
@@ -2458,6 +2462,7 @@ class SensorChipAssembly(object):
         # If needed, create a new exposure data object.
         self._new_exposure_data()
 
+        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         # >>>
         # >>> Execute each integration in turn.
         # >>>
@@ -2468,6 +2473,7 @@ class SensorChipAssembly(object):
                 self.logger.info( "Simulating %d integration." % self.nints )
         for intnum in range(0, self.nints):
             self.integration(intnum, frame_time=frame_time)
+        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             
         # If the DARK calibration is not averaged, it is added here.
         if self.detector.simulate_dark_current and not self.detector.dark_averaged:
@@ -2606,8 +2612,11 @@ class SensorChipAssembly(object):
         if substrt1 > 1:
             # Reference columns not included in subarrays that do not
             # touch the left hand edge.
+            # Bug 558. Shift by the reference columns in all cases.
+#             intensity_metadata['CRPIX1'] = \
+#                         crpix1 + 1 - substrt1
             intensity_metadata['CRPIX1'] = \
-                        crpix1 + 1 - substrt1
+                        crpix1 + 1 - substrt1 + self.detector.left_columns
         else:
             intensity_metadata['CRPIX1'] = \
                         crpix1 + 1 - substrt1 + self.detector.left_columns
@@ -2906,6 +2915,8 @@ class SensorChipAssembly(object):
             # The exposure data model used depends on the choice of
             # output file format.
             if self.fileformat.upper() == 'STSCI':
+                # STScI JWST level 1b ramp data format.
+                
                 # Convert the bad pixel mask into a PIXELDQ array.
                 if self.detector.bad_pixels is not None and self.include_pixeldq:
                     new_dq = np.zeros_like( self.detector.bad_pixels )
@@ -2977,6 +2988,7 @@ class SensorChipAssembly(object):
                     self.exposure_data.set_exposure_type(self.detectorid,
                             mirifilter=mirifilter, subarray=self.subarray_str)
             else:
+                # Old DHAS FITSwriter data format.
                 self.exposure_data = ExposureData(
                                         data_shape[0], data_shape[1],
                                         self.ngroups, self.nints,

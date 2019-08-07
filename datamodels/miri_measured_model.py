@@ -522,8 +522,7 @@ class MiriRampModel(MiriMeasuredModel, HasDataErrAndGroups):
         # Data type is MIRI ramp data (level 1b).
         self.meta.filetype = 'Ramp (level 1b)'
         model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type is not None:
-            self.meta.model_type = model_type
+        self.meta.model_type = model_type
 
         # Define the REFOUT and ZEROFRAME data arrays which are unique to
         # ramp data.
@@ -920,8 +919,7 @@ class MiriSlopeModel(MiriMeasuredModel):
         # Data type is MIRI slope data.
         self.meta.filetype = 'Slope (level 2)'
         model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type is not None:
-            self.meta.model_type = model_type
+        self.meta.model_type = model_type
         
         # If 3-D data is given, the 3rd dimension gives the number of
         # integrations.

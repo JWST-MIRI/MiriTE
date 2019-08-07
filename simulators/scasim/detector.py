@@ -2058,6 +2058,13 @@ class DetectorArray(object):
             (firstrow, firstcol, subrows, subcolumns).
             *NOTE: Rows and columns are numbered from 1 when describing
             a subarray.*
+            
+        :Updated:
+        
+        self.refout_shape: tuple of 2 ints
+            (refout_rows, refout_columns)
+            Updated with the number of reference rows and columns
+            for the given subarray mode.
         
         :Returns:
         
@@ -2647,6 +2654,9 @@ class DetectorArray(object):
             # Map the photon flux onto the central illuminated columns of the
             # detector pixels. The left and right columns receive zero
             # illumination.
+            # TODO: Chop off the reference columns at the left edge of
+            # subarray data.     
+            #
             detector_flux = np.zeros(self.detector_shape, dtype=photon_flux.dtype)
             if self.top_rows > 0 and self.right_columns > 0:
                 detector_flux[self.bottom_rows:-self.top_rows,
