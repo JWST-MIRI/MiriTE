@@ -68,4 +68,9 @@ if __name__ == '__main__':
 
     for func in testfunctions:
         print("Running {}".format(func.__name__))
-        func()
+        try:
+            func()
+        except TypeError as e:
+            strg = "pytest.parametrize not supported.\n"
+            strg += "NOTE: This test depends on pytest utilities. Please launch with pytest."
+            raise Exception(strg) from e
