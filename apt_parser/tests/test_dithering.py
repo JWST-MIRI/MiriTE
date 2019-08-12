@@ -1,7 +1,7 @@
 import pytest
 
-from apt_parser.utils import assertDictEqual, read_test_xml, get_namespace
-from apt_parser.dithering import parse_dither
+from miri.apt_parser.utils import assertDictEqual, read_test_xml, get_namespace
+from miri.apt_parser.dithering import parse_dither
 
 testdata = [
     ("""    <mmrs:MrsDitherSpecification>

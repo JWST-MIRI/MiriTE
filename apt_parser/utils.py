@@ -3,7 +3,7 @@ import re
 import numpy as np
 
 import xml.etree.ElementTree as ET
-from apt_parser.constants import ns
+from .constants import ns
 
 LOG = logging.getLogger('parse_apt.utils')
 

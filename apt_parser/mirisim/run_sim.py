@@ -5,7 +5,7 @@ import os
 import time
 import logging
 
-LOG = logging.getLogger('parse_apt.mirisim.run_sim')
+LOG = logging.getLogger(__name__)
 
 # JWST imports
 from mirisim import MiriSimulation

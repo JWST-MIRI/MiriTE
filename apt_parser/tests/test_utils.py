@@ -1,5 +1,5 @@
 import pytest
-from apt_parser import utils
+from miri.apt_parser import utils
 
 def test_get_namespace():
     sample_xml = """    <mmrs:MrsDitherSpecification>

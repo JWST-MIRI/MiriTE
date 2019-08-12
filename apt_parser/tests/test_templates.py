@@ -1,5 +1,5 @@
-from apt_parser import templates
-from apt_parser.utils import assertListDictEqual, read_test_xml
+from miri.apt_parser import templates
+from miri.apt_parser.utils import assertListDictEqual, read_test_xml
 
 
 def test_MiriCoron():
