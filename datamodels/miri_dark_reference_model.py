@@ -172,8 +172,7 @@ class MiriDarkReferenceModel(MiriMeasuredModel):
         # Data type is dark.
         self.meta.reftype = 'DARK'
         model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type is not None:
-            self.meta.model_type = model_type
+        self.meta.model_type = model_type
         self.averaged = averaged
         
         # This is a reference data model.

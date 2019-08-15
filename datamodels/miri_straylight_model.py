@@ -116,8 +116,7 @@ class MiriMrsStraylightModel(MiriDataModel, HasData):
         # Data type is Straylight mask.
         self.meta.reftype = 'STRAYMASK'
         model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type is not None:
-            self.meta.model_type = model_type        
+        self.meta.model_type = model_type        
 
         # Set the instrument detector, if provided (backwards compatibility).
         if detector is not None:

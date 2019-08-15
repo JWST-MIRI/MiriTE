@@ -139,8 +139,7 @@ class MiriPhotometricModel(MiriDataModel):
         # Data type is photometric flux conversion.
         self.meta.reftype = 'PHOTOM'
         model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type is not None:
-            self.meta.model_type = model_type        
+        self.meta.model_type = model_type        
 
         # This is a reference data model.
         self._reference_model()
@@ -567,8 +566,7 @@ class MiriImagingPhotometricModel(MiriPhotometricModel):
                                                           **kwargs)
         #self.add_comment("WAVELENGTH and RELRESPONSE arrays are all zero for imager.")
         model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type is not None:
-            self.meta.model_type = model_type
+        self.meta.model_type = model_type
 
 class MiriLrsPhotometricModel(MiriPhotometricModel):
     """
@@ -668,8 +666,7 @@ class MiriLrsPhotometricModel(MiriPhotometricModel):
                                                       **kwargs)
         #self.add_comment("RELRESPONSE is absolute response so PHOTMJSR is 1.0.")
         model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type:
-            self.meta.model_type = model_type
+        self.meta.model_type = model_type
             
 class MiriPixelAreaModel(MiriDataModel, HasData):
     """
@@ -722,8 +719,7 @@ class MiriPixelAreaModel(MiriDataModel, HasData):
         # Data type is AREA.
         self.meta.reftype = 'AREA'
         model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type is not None:
-            self.meta.model_type = model_type        
+        self.meta.model_type = model_type        
         # This is a reference data model.
         self._reference_model()
 
