@@ -1,0 +1,37 @@
+allOf:
+- $ref: miri_core.schema.yaml
+- type: object
+  title: MIRI LRS aperture correction model
+  properties:
+    meta:
+      type: object
+      properties:
+        apercorr_table:
+          type: object
+          title: Information about the aperture correction table
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: micron
+              fits_hdu: APER_CORR
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: ''
+              fits_hdu: APER_CORR
+              fits_keyword: TUNIT2
+ 
+- type: object
+  properties:
+    apercorr_table:
+      title: Aperture correction table
+      fits_hdu: APER_CORR
+      datatype:
+      - name: wavelength
+        datatype: float32
+        unit: micron
+      - name: aper_corr
+        datatype: float32
+        shape: [40]
