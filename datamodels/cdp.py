@@ -91,7 +91,8 @@ from miri.datamodels.miri_dark_reference_model import \
 from miri.datamodels.miri_distortion_models import \
     MiriImagingDistortionModel, MiriLrsD2WModel, MiriMrsDistortionModel12, \
     MiriMrsDistortionModel34, MiriMrsDistortionModel12_CDP6, \
-    MiriMrsDistortionModel34_CDP6
+    MiriMrsDistortionModel34_CDP6, MiriMrsDistortionModel12_CDP8, \
+    MiriMrsDistortionModel34_CDP8
 from miri.datamodels.miri_droop_model import MiriDroopModel
 from miri.datamodels.miri_flatfield_model import \
     MiriFlatfieldModel, MiriSkyFlatfieldModel, MiriFringeFlatfieldModel, \
