@@ -108,7 +108,8 @@ from miri.datamodels.miri_model_base import MiriDataModel
 # List all classes and global functions here.
 __all__ = ['MiriImagingDistortionModel', 'MiriLrsD2WModel', \
            'MiriMrsDistortionModel12', 'MiriMrsDistortionModel34',
-           'MiriMrsDistortionModel12_CDP6', 'MiriMrsDistortionModel34_CDP6']
+           'MiriMrsDistortionModel12_CDP6', 'MiriMrsDistortionModel34_CDP6',
+           'MiriMrsDistortionModel12_CDP8', 'MiriMrsDistortionModel34_CDP8']
 
 
 class MiriImagingDistortionModel(MiriDataModel):
@@ -607,8 +608,8 @@ class MiriLrsD2WModel(MiriDataModel):
 class MiriMrsDistortionModel12(MiriDataModel):
     """
     
-    A data model for a MIRI MRS distortion model - CHANNEL 34 VARIANT,
-    based on the STScI base model, DataModel.
+    A data model for a MIRI MRS distortion model - CHANNEL 12 VARIANT,
+    based on the STScI base model, DataModel. Old CDP-7 version.
      
     :Parameters:
      
@@ -886,6 +887,288 @@ class MiriMrsDistortionModel12(MiriDataModel):
         strg += self.get_data_str('xanyan_to_albe', underline=True, underchar="-")
         return strg
 
+class MiriMrsDistortionModel12_CDP8(MiriDataModel):
+    """
+    
+    A data model for a MIRI MRS distortion model - CHANNEL 12 VARIANT,
+    based on the STScI base model, DataModel.
+     
+    :Parameters:
+     
+    init: shape tuple, file path, file object, pyfits.HDUList, numpy array
+        An optional initializer for the data model, which can have one
+        of the following forms:
+         
+        * None: A default data model with no shape. (If a data array is
+          provided in the lambda parameter, the shape is derived from
+          the array.)
+        * Shape tuple: Initialize with empty data of the given shape.
+        * File path: Initialize from the given file.
+        * Readable file object: Initialize from the given file object.
+        * pyfits.HDUList: Initialize from the given pyfits.HDUList.
+         
+    slicenumber: numpy array (optional)
+        An array containing the elements of the slice array, which
+        describes the mapping of pixel corners to slice number.
+        Must be 2-D.
+    fov_ch1: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (alpha_min:value, beta_min:value)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.        
+    fov_ch2: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (alpha_min:value, beta_min:value)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.        
+    alpha_ch1: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (...)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.        
+    lambda_ch1: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (...)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.        
+    alpha_ch2: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (...)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.        
+    lambda_ch2: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (...)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.        
+    x_ch1: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (...)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.        
+    y_ch1: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (...)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.        
+    x_ch2: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (...)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.        
+    y_ch2: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (...)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.        
+    albe_v2v3: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (...)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.        
+    v2v3_albe: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (...)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.
+    bzero1: float (optional)
+        Beta coordinate of the centre of slice 1 of channel 1
+    bdel1: float (optional)
+        Slice width (delta beta) for channel 1
+    bzero2: float (optional)
+        Beta coordinate of the centre of slice 1 of channel 2
+    bdel2: float (optional)
+        Slice width (delta beta) for channel 2
+    \*\*kwargs:
+        All other keyword arguments are passed to the DataModel initialiser.
+        See the jwst.datamodels documentation for the meaning of these keywords.
+            
+    """
+    schema_url = "miri_distortion_mrs12_CDP8.schema.yaml"
+    fieldnames_fov = ('alpha_min', 'alpha_max')
+    fieldnames_d2c = ['VAR1']
+    for i in (0,1,2,3,4):
+        for j in (0,1,2,3,4):
+            fieldnames_d2c.append('VAR2_%d_%d' % (i,j))
+    fieldnames_trans = ['Label']
+    for i in (0,1):
+        for j in (0,1):
+            fieldnames_trans.append('COEFF_%d_%d' % (i,j))
+    
+    def __init__(self, init=None, slicenumber=None, fov_ch1=None, fov_ch2=None,
+                 alpha_ch1=None, lambda_ch1=None, alpha_ch2=None, lambda_ch2=None,
+                 x_ch1=None, y_ch1=None, x_ch2=None, y_ch2=None,
+                 albe_v2v3=None, v2v3_albe=None, bzero1=None, bdel1=None,
+                 bzero2=None, bdel2=None, **kwargs):
+        """
+        
+        Initialises the MiriMrsDistortionModel12 class.
+        
+        Parameters: See class doc string.
+
+        """
+        super(MiriMrsDistortionModel12_CDP8, self).__init__(init=init, **kwargs)
+
+        # Data type is MRS DISTORTION.
+        self.meta.reftype = 'DISTORTION'
+#         self.meta.reftype = 'SPECWCS'
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type is not None:
+            self.meta.model_type = model_type        
+
+        # This is a reference data model.
+        self._reference_model()
+
+        if slicenumber is not None:
+            self.slicenumber = slicenumber
+ 
+        # Define the beta coordinates and slice widths, if given
+        if bzero1 is not None:
+            self.meta.instrument.bzero1 = bzero1
+        if bdel1 is not None:
+            self.meta.instrument.bdel1 = bdel1
+        if bzero2 is not None:
+            self.meta.instrument.bzero2 = bzero2
+        if bdel2 is not None:
+            self.meta.instrument.bdel2 = bdel2
+ 
+        if fov_ch1 is not None:
+            try:
+                self.fov_ch1 = fov_ch1
+            except (ValueError, TypeError) as e:
+                strg = "fov_ch1 must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+        if fov_ch2 is not None:
+            try:
+                self.fov_ch2 = fov_ch2
+            except (ValueError, TypeError) as e:
+                strg = "fov_ch2 must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+         
+        if alpha_ch1 is not None:
+            try:
+                self.alpha_ch1 = alpha_ch1
+            except (ValueError, TypeError) as e:
+                strg = "alpha_ch1 must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+        if lambda_ch1 is not None:
+            try:
+                self.lambda_ch1 = lambda_ch1
+            except (ValueError, TypeError) as e:
+                strg = "lambda_ch1 must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+        if alpha_ch2 is not None:
+            try:
+                self.alpha_ch2 = alpha_ch2
+            except (ValueError, TypeError) as e:
+                strg = "alpha_ch2 must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+        if lambda_ch2 is not None:
+            try:
+                self.lambda_ch2 = lambda_ch2
+            except (ValueError, TypeError) as e:
+                strg = "lambda_ch2 must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+          
+        if x_ch1 is not None:
+            try:
+                self.x_ch1 = x_ch1
+            except (ValueError, TypeError) as e:
+                strg = "x_ch1 must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+        if y_ch1 is not None:
+            try:
+                self.y_ch1 = y_ch1
+            except (ValueError, TypeError) as e:
+                strg = "y_ch1 must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+        if x_ch2 is not None:
+            try:
+                self.x_ch2 = x_ch2
+            except (ValueError, TypeError) as e:
+                strg = "x_ch2 must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+        if y_ch2 is not None:
+            try:
+                self.y_ch2 = y_ch2
+            except (ValueError, TypeError) as e:
+                strg = "y_ch2 must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+        if albe_v2v3 is not None:
+            try:
+                self.albe_to_v2v3 = albe_v2v3
+            except (ValueError, TypeError) as e:
+                strg = "albe_v2v3 must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+        if v2v3_albe is not None:
+            try:
+                self.v2v3_to_albe = v2v3_albe
+            except (ValueError, TypeError) as e:
+                strg = "v2v3_albe must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+        
+        # Copy the table column units from the schema, if defined.
+        fov_ch1_units = self.set_table_units('fov_ch1')
+        fov_ch2_units = self.set_table_units('fov_ch2')
+        alpha_ch1_units = self.set_table_units('alpha_ch1')
+        alpha_ch2_units = self.set_table_units('alpha_ch2')
+        lambda_ch1_units = self.set_table_units('lambda_ch1')
+        lambda_ch2_units = self.set_table_units('lambda_ch2')
+        x_ch1_units = self.set_table_units('x_ch1')
+        x_ch2_units = self.set_table_units('x_ch2')
+        y_ch1_units = self.set_table_units('y_ch1')
+        y_ch2_units = self.set_table_units('y_ch2')
+        albe_to_v2v3_units = self.set_table_units('albe_to_v2v3')
+        v2v3_to_albe_units = self.set_table_units('v2v3_to_albe')
+
+        # Define the exposure type (if not already contained in the data model)
+        # NOTE: This will only define an exposure type when a valid detector
+        # is defined in the metadata.
+        if not self.meta.exposure.type:
+            self.set_exposure_type()
+
+    def get_primary_array_name(self):
+        """
+        
+        Returns the name "primary" array for this model, which controls
+        the size of other arrays that are implicitly created.
+        For this data structure, the primary array's name is "slicenumber"
+        and not "data".
+        
+        """
+        return 'slicenumber'
+
+    def __str__(self):
+        """
+        
+        Return the contents of the D2C map object as a readable
+        string.
+        
+        """
+        # Start with the data object title, metadata and history
+        strg = self.get_title(underline=True, underchar="=") + "\n"
+        strg += self.get_meta_str(underline=True, underchar='-')
+        strg += self.get_history_str()
+            
+        strg += self.get_data_str('slicenumber', underline=True, underchar="-")
+
+        strg += self.get_data_str('fov_ch1', underline=True, underchar="-")
+        strg += self.get_data_str('fov_ch2', underline=True, underchar="-")
+ 
+        strg += self.get_data_str('alpha_ch1', underline=True, underchar="-")
+        strg += self.get_data_str('lambda_ch1', underline=True, underchar="-")
+        strg += self.get_data_str('alpha_ch2', underline=True, underchar="-")
+        strg += self.get_data_str('lambda_ch2', underline=True, underchar="-")
+  
+        strg += self.get_data_str('x_ch1', underline=True, underchar="-")
+        strg += self.get_data_str('y_ch1', underline=True, underchar="-")
+        strg += self.get_data_str('x_ch2', underline=True, underchar="-")
+        strg += self.get_data_str('y_ch2', underline=True, underchar="-")
+ 
+        strg += self.get_data_str('albe_to_xanyan', underline=True, underchar="-")
+        strg += self.get_data_str('xanyan_to_albe', underline=True, underchar="-")
+        return strg
+
 class MiriMrsDistortionModel12_CDP6(MiriMrsDistortionModel12):
     """
     
@@ -933,7 +1216,7 @@ class MiriMrsDistortionModel34(MiriDataModel):
     """
     
     A data model for a MIRI MRS distortion model - CHANNEL 34 VARIANT,
-    based on the STScI base model, DataModel.
+    based on the STScI base model, DataModel. Old CDP-7 version.
      
     :Parameters:
      
@@ -1209,6 +1492,285 @@ class MiriMrsDistortionModel34(MiriDataModel):
         strg += self.get_data_str('xanyan_to_albe', underline=True, underchar="-")
         return strg
 
+class MiriMrsDistortionModel34_CDP8(MiriDataModel):
+    """
+    
+    A data model for a MIRI MRS distortion model - CHANNEL 34 VARIANT,
+    based on the STScI base model, DataModel.
+     
+    :Parameters:
+     
+    init: shape tuple, file path, file object, pyfits.HDUList, numpy array
+        An optional initializer for the data model, which can have one
+        of the following forms:
+         
+        * None: A default data model with no shape. (If a data array is
+          provided in the lambda parameter, the shape is derived from
+          the array.)
+        * Shape tuple: Initialize with empty data of the given shape.
+        * File path: Initialize from the given file.
+        * Readable file object: Initialize from the given file object.
+        * pyfits.HDUList: Initialize from the given pyfits.HDUList.
+         
+    slicenumber: numpy array (optional)
+        An array containing the elements of the slice array, which
+        describes the mapping of pixel corners to slice number.
+        Must be 2-D.
+    fov_ch3: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (alpha_min:value, beta_min:value)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.        
+    fov_ch4: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (alpha_min:value, beta_min:value)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.        
+    alpha_ch3: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (...)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.        
+    lambda_ch3: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (...)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.        
+    alpha_ch4: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (...)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.        
+    lambda_ch4: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (...)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.        
+    x_ch3: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (...)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.        
+    y_ch3: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (...)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.        
+    x_ch4: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (...)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.        
+    y_ch4: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (...)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.        
+    albe_v2v3: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (...)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.        
+    v2v3_albe: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing (...)
+        Or: A numpy record array containing the same information as above.
+        If not specified, no table will be defined.
+    bzero3: float (optional)
+        Beta coordinate of the centre of slice 1 of channel 3
+    bdel3: float (optional)
+        Slice width (delta beta) for channel 3
+    bzero4: float (optional)
+        Beta coordinate of the centre of slice 1 of channel 4
+    bdel4: float (optional)
+        Slice width (delta beta) for channel 4
+    \*\*kwargs:
+        All other keyword arguments are passed to the DataModel initialiser.
+        See the jwst.datamodels documentation for the meaning of these keywords.
+            
+    """
+    schema_url = "miri_distortion_mrs34_CDP8.schema.yaml"
+    fieldnames_fov = ('alpha_min', 'alpha_max')
+    fieldnames_d2c = ['VAR1']
+    for i in (0,1,2,3,4):
+        for j in (0,1,2,3,4):
+            fieldnames_d2c.append('VAR2_%d_%d' % (i,j))
+    fieldnames_trans = ['Label']
+    for i in (0,1):
+        for j in (0,1):
+            fieldnames_trans.append('COEFF_%d_%d' % (i,j))
+    
+    def __init__(self, init=None, slicenumber=None, fov_ch3=None, fov_ch4=None,
+                 alpha_ch3=None, lambda_ch3=None, alpha_ch4=None, lambda_ch4=None,
+                 x_ch3=None, y_ch3=None, x_ch4=None, y_ch4=None,
+                 albe_v2v3=None, v2v3_albe=None, bzero3=None, bdel3=None,
+                 bzero4=None, bdel4=None, **kwargs):
+        """
+        
+        Initialises the MiriMrsDistortionModel34 class.
+        
+        Parameters: See class doc string.
+
+        """
+        super(MiriMrsDistortionModel34_CDP8, self).__init__(init=init, **kwargs)
+
+        # Data type is MRS DISTORTION.
+        self.meta.reftype = 'DISTORTION'
+#         self.meta.reftype = 'SPECWCS'
+        model_type = get_my_model_type( self.__class__.__name__ )
+        if model_type is not None:
+            self.meta.model_type = model_type        
+ 
+        # This is a reference data model.
+        self._reference_model()
+
+        if slicenumber is not None:
+            self.slicenumber = slicenumber
+ 
+        # Define the beta coordinates and slice widths, if given
+        if bzero3 is not None:
+            self.meta.instrument.bzero3 = bzero3
+        if bdel3 is not None:
+            self.meta.instrument.bdel3 = bdel3
+        if bzero4 is not None:
+            self.meta.instrument.bzero4 = bzero4
+        if bdel4 is not None:
+            self.meta.instrument.bdel4 = bdel4
+ 
+        if fov_ch3 is not None:
+            try:
+                self.fov_ch3 = fov_ch3
+            except (ValueError, TypeError) as e:
+                strg = "fov_ch3 must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+        if fov_ch4 is not None:
+            try:
+                self.fov_ch4 = fov_ch4
+            except (ValueError, TypeError) as e:
+                strg = "fov_ch4 must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+         
+        if alpha_ch3 is not None:
+            try:
+                self.alpha_ch3 = alpha_ch3
+            except (ValueError, TypeError) as e:
+                strg = "alpha_ch3 must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+        if lambda_ch3 is not None:
+            try:
+                self.lambda_ch3 = lambda_ch3
+            except (ValueError, TypeError) as e:
+                strg = "lambda_ch3 must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+        if alpha_ch4 is not None:
+            try:
+                self.alpha_ch4 = alpha_ch4
+            except (ValueError, TypeError) as e:
+                strg = "alpha_ch4 must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+        if lambda_ch4 is not None:
+            try:
+                self.lambda_ch4 = lambda_ch4
+            except (ValueError, TypeError) as e:
+                strg = "lambda_ch4 must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+          
+        if x_ch3 is not None:
+            try:
+                self.x_ch3 = x_ch3
+            except (ValueError, TypeError) as e:
+                strg = "x_ch3 must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+        if y_ch3 is not None:
+            try:
+                self.y_ch3 = y_ch3
+            except (ValueError, TypeError) as e:
+                strg = "y_ch3 must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+        if x_ch4 is not None:
+            try:
+                self.x_ch4 = x_ch4
+            except (ValueError, TypeError) as e:
+                strg = "x_ch4 must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+        if y_ch4 is not None:
+            try:
+                self.y_ch4 = y_ch4
+            except (ValueError, TypeError) as e:
+                strg = "y_ch4 must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+        if albe_v2v3 is not None:
+            try:
+                self.albe_to_v2v3 = albe_v2v3
+            except (ValueError, TypeError) as e:
+                strg = "albe_v2v3 must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+        if v2v3_albe is not None:
+            try:
+                self.v2v3_to_albe = v2v3_albe
+            except (ValueError, TypeError) as e:
+                strg = "v2v3_albe must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+
+        # Copy the table column units from the schema, if defined.
+        fov_ch3_units = self.set_table_units('fov_ch3')
+        fov_ch4_units = self.set_table_units('fov_ch4')
+        alpha_ch3_units = self.set_table_units('alpha_ch3')
+        alpha_ch4_units = self.set_table_units('alpha_ch4')
+        lambda_ch3_units = self.set_table_units('lambda_ch3')
+        lambda_ch4_units = self.set_table_units('lambda_ch4')
+        x_ch3_units = self.set_table_units('x_ch3')
+        x_ch4_units = self.set_table_units('x_ch4')
+        y_ch3_units = self.set_table_units('y_ch3')
+        y_ch4_units = self.set_table_units('y_ch4')
+        albe_to_v2v3_units = self.set_table_units('albe_to_v2v3')
+        v2v3_to_albe_units = self.set_table_units('v2v3_to_albe')
+
+        # Define the exposure type (if not already contained in the data model)
+        # NOTE: This will only define an exposure type when a valid detector
+        # is defined in the metadata.
+        if not self.meta.exposure.type:
+            self.set_exposure_type()
+
+    def get_primary_array_name(self):
+        """
+        
+        Returns the name "primary" array for this model, which controls
+        the size of other arrays that are implicitly created.
+        For this data structure, the primary array's name is "slicenumber"
+        and not "data".
+        
+        """
+        return 'slicenumber'
+
+    def __str__(self):
+        """
+        
+        Return the contents of the D2C map object as a readable
+        string.
+        
+        """
+        # Start with the data object title, metadata and history
+        strg = self.get_title_and_metadata()
+            
+        strg += self.get_data_str('slicenumber', underline=True, underchar="-")
+
+        strg += self.get_data_str('fov_ch3', underline=True, underchar="-")
+        strg += self.get_data_str('fov_ch4', underline=True, underchar="-")
+ 
+        strg += self.get_data_str('alpha_ch3', underline=True, underchar="-")
+        strg += self.get_data_str('lambda_ch3', underline=True, underchar="-")
+        strg += self.get_data_str('alpha_ch4', underline=True, underchar="-")
+        strg += self.get_data_str('lambda_ch4', underline=True, underchar="-")
+  
+        strg += self.get_data_str('x_ch3', underline=True, underchar="-")
+        strg += self.get_data_str('y_ch3', underline=True, underchar="-")
+        strg += self.get_data_str('x_ch4', underline=True, underchar="-")
+        strg += self.get_data_str('y_ch4', underline=True, underchar="-")
+ 
+        strg += self.get_data_str('albe_to_v2v3', underline=True, underchar="-")
+        strg += self.get_data_str('v2v3_to_albe', underline=True, underchar="-")
+        return strg
 
 class MiriMrsDistortionModel34_CDP6(MiriMrsDistortionModel34):
     """
@@ -1344,13 +1906,13 @@ if __name__ == '__main__':
     transform = [('T_CH3C,V2', 0.11, 0.21, 0.31, 0.41, 0.51, 0.61, 0.71, 0.81, 0.91),
                  ('T_CH3C,V3', 0.12, 0.22, 0.32, 0.42, 0.52, 0.62, 0.72, 0.82, 0.92)]
      
-    with MiriMrsDistortionModel12( slicenumber=slicenumber3,
+    with MiriMrsDistortionModel12_CDP8( slicenumber=slicenumber3,
                                  fov_ch1=fovdata, fov_ch2=fovdata,
                                  alpha_ch1=d2cdata, lambda_ch1=d2cdata,
                                  alpha_ch2=d2cdata, lambda_ch2=d2cdata,
                                  x_ch1=c2ddata, y_ch1=c2ddata,
                                  x_ch2=c2ddata, y_ch2=c2ddata,
-                                 albe_xanyan=transform, xanyan_albe=transform,
+                                 albe_v2v3=transform, v2v3_albe=transform,
                                  bzero1=-1.772, bdel1=0.177,
                                  bzero2=-2.238, bdel2=0.280
                                  ) as testdata1:
@@ -1366,13 +1928,13 @@ if __name__ == '__main__':
 #             print(newmodel)
         del testdata1
 
-    with MiriMrsDistortionModel34( slicenumber=slicenumber3,
+    with MiriMrsDistortionModel34_CDP8( slicenumber=slicenumber3,
                                  fov_ch3=fovdata, fov_ch4=fovdata,
                                  alpha_ch3=d2cdata, lambda_ch3=d2cdata,
                                  alpha_ch4=d2cdata, lambda_ch4=d2cdata,
                                  x_ch3=c2ddata, y_ch3=c2ddata,
                                  x_ch4=c2ddata, y_ch4=c2ddata,
-                                 albe_xanyan=transform, xanyan_albe=transform,
+                                 albe_v2v3=transform, v2v3_albe=transform,
                                  bzero3=-1.772, bdel3=0.177,
                                  bzero4=-2.238, bdel4=0.280
                                  ) as testdata2:

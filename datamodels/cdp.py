@@ -184,9 +184,13 @@ CDP_DICT = { \
                                              'ANY'   : MiriImagingDistortionModel}, \
                             'MIRIFUSHORT' : {'ANY'   : {'6'   : MiriMrsDistortionModel12_CDP6, \
                                                         '7'   : MiriMrsDistortionModel12, \
+                                                        '8'   : MiriMrsDistortionModel12_CDP8, \
+                                                        '8B'  : MiriMrsDistortionModel12_CDP8, \
                                                         'ANY' : MiriMrsDistortionModel12}}, \
                             'MIRIFULONG'  : {'ANY'   : {'6'   : MiriMrsDistortionModel34_CDP6, \
                                                         '7'   : MiriMrsDistortionModel34, \
+                                                        '8'   : MiriMrsDistortionModel34_CDP8, \
+                                                        '8B'  : MiriMrsDistortionModel34_CDP8, \
                                                         'ANY' : MiriMrsDistortionModel34}}, \
                             'ANY'         : MiriImagingDistortionModel }, \
 # Previous code without the extra level for CDP version
