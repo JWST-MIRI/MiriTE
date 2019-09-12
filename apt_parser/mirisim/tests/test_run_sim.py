@@ -1,8 +1,12 @@
+import nose
 import pytest
 
-sim = pytest.importorskip("apt_parser.mirisim")
-from apt_parser.mirisim import run
-import mirisim.config_parser as cp
+try:
+    from apt_parser.mirisim import run
+    import mirisim.config_parser as cp
+except ImportError:
+    raise nose.SkipTest("MIRISim not available")
+
 import os
 import shutil
 

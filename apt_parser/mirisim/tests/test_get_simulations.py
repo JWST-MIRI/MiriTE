@@ -1,7 +1,11 @@
+import nose
 import pytest
 
-sim = pytest.importorskip("apt_parser.mirisim")
-import apt_parser.mirisim.constants as c
+try:
+    import apt_parser.imsim as sim
+    import apt_parser.mirisim.constants as c
+except ImportError:
+    raise nose.SkipTest("MIRISim not available")
 
 from apt_parser.utils import assertDictEqual
 
