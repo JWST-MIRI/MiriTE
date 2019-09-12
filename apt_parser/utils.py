@@ -106,7 +106,7 @@ def compare_dict(input_dict, dict_ref, msg=None, prefix=None):
 
     return (isEqual, msg)
 
-def read_test_xml(txt):
+def read_fake_xml(txt):
     """
     Read an XML string, adding the generic namespace for the JWST APT in it and any other parts needed
 

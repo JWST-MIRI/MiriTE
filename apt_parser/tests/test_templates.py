@@ -1,5 +1,5 @@
 from miri.apt_parser import templates
-from miri.apt_parser.utils import assertListDictEqual, read_test_xml
+from miri.apt_parser.utils import assertListDictEqual, read_fake_xml
 
 
 def test_MiriCoron():
@@ -33,7 +33,7 @@ def test_MiriCoron():
         <mc:PsfJustification>false</mc:PsfJustification>
     </mc:MiriCoron>"""
 
-    tree = read_test_xml(sample_xml)
+    tree = read_fake_xml(sample_xml)
 
     metadata = {'obs_id': '1', 'filename': 'apt/1406.aptx', 'instrument': 'MIRI'}
 
@@ -68,7 +68,7 @@ def test_MiriCpc():
         </mcpc:Filters>
     </mcpc:MiriCpc>"""
 
-    tree = read_test_xml(sample_xml)
+    tree = read_fake_xml(sample_xml)
 
     metadata = {'obs_id': '1', 'filename': 'apt/1045.aptx', 'instrument': 'MIRI'}
 
@@ -104,7 +104,7 @@ def test_MiriDark():
         </md:Filters>
     </md:MiriDark>"""
 
-    tree = read_test_xml(sample_xml)
+    tree = read_fake_xml(sample_xml)
 
     metadata = {'obs_id': '1', 'filename': 'apt/1046.aptx', 'instrument': 'MIRI'}
 
@@ -153,7 +153,7 @@ def test_MiriExternalFlat():
         </mef:ExposureList>
     </mef:MiriExternalFlat>"""
 
-    tree = read_test_xml(sample_xml)
+    tree = read_fake_xml(sample_xml)
 
     metadata = {'obs_id': '9', 'filename': 'apt/1027.aptx', 'instrument': 'MIRI'}
 
@@ -217,7 +217,7 @@ def test_MiriImaging():
         </mi:Filters>
     </mi:MiriImaging>"""
 
-    tree = read_test_xml(sample_xml)
+    tree = read_fake_xml(sample_xml)
 
     metadata = {'obs_id': '1', 'filename': 'apt/1052.aptx', 'instrument': 'MIRI'}
 
@@ -264,7 +264,7 @@ def test_MiriLRS():
         <mlrs:SpatialStepOffset>0.11</mlrs:SpatialStepOffset>
     </mlrs:MiriLRS>"""
 
-    tree = read_test_xml(sample_xml)
+    tree = read_fake_xml(sample_xml)
 
     metadata = {'obs_id': '1', 'filename': 'apt/1042.aptx', 'instrument': 'MIRI'}
 
@@ -343,7 +343,7 @@ def test_MiriMRS():
         </mmrs:ExposureList>
     </mmrs:MiriMRS>"""
 
-    tree = read_test_xml(sample_xml)
+    tree = read_fake_xml(sample_xml)
 
     metadata = {'obs_id': '1', 'filename': 'apt/1031.aptx', 'instrument': 'MIRI'}
 
@@ -438,7 +438,7 @@ def test_MiriMRS_parallel():
         </mmrs:ExposureList>
     </mmrs:MiriMRS>"""
 
-    tree = read_test_xml(sample_xml)
+    tree = read_fake_xml(sample_xml)
 
     metadata = {'obs_id': '1', 'filename': 'apt/1024.aptx', 'instrument': 'MIRI'}
 
@@ -557,7 +557,7 @@ def test_MiriMRSCrossGratingEngineering():
         <mmrscge:LampUse>OFF ONLY</mmrscge:LampUse>
     </mmrscge:MiriMRSCrossGratingEngineering>"""
 
-    tree = read_test_xml(sample_xml)
+    tree = read_fake_xml(sample_xml)
 
     metadata = {'obs_id': '2', 'filename': 'apt/1050.aptx', 'instrument': 'MIRI'}
 

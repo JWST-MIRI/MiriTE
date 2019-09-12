@@ -1,6 +1,6 @@
-import pytest
+from parameterized import parameterized
 
-from miri.apt_parser.utils import assertDictEqual, read_test_xml, get_namespace
+from miri.apt_parser.utils import read_fake_xml, get_namespace
 from miri.apt_parser.dithering import parse_dither
 
 testdata = [
@@ -38,8 +38,7 @@ testdata = [
 ]
 
 
-
-@pytest.mark.parametrize("sample_xml,expected", testdata)
+@parameterized(testdata)
 def test_dithering(sample_xml, expected):
     """
     Test of dithering
@@ -50,27 +49,8 @@ def test_dithering(sample_xml, expected):
 
     namespace = get_namespace(sample_xml)
 
-    tree = read_test_xml(sample_xml)
+    tree = read_fake_xml(sample_xml)
 
     nb_dither = parse_dither(tree, namespace)
 
     assert nb_dither == expected, "Wrong number of dithering points, expected {}".format(expected)
-
-
-if __name__ == '__main__':
-    import sys
-    import inspect
-
-    # List all functions starting with test_ to launch them automatically
-    testfunctions = [obj for name, obj in inspect.getmembers(sys.modules[__name__])
-                     if (inspect.isfunction(obj) and
-                         name.startswith('test_'))]
-
-    for func in testfunctions:
-        print("Running {}".format(func.__name__))
-        try:
-            func()
-        except TypeError as e:
-            strg = "pytest.parametrize not supported.\n"
-            strg += "NOTE: This test depends on pytest utilities. Please launch with pytest."
-            raise Exception(strg) from e
