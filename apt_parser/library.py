@@ -191,9 +191,9 @@ def get_prediction(sim):
     integration_key = "{}integrations".format(key_prefix)
     frame_key = "{}frames".format(key_prefix)
 
-    ram = 0.04 * sim[integration_key] * sim[frame_key] + 4.8
-    # time = 11 * sim["integrations"] * sim["frames"] + 2200.
-    time = (11. * sim[integration_key] * sim[frame_key] + 40.)/ 3600.  # In hours
+    # Values extracted from my benchmark, done with Pipeline 7.3 (July 2019)
+    ram = 0.05 * sim[integration_key] * sim[frame_key] + 1.7
+    time = (8.75 * sim[integration_key] * sim[frame_key] + 50.)/ 3600.  # In hours
 
     # Correct for detector size (compared to FULL ARRAY)
     corr_factor = c.SUBARRAY_PIX[sim["subarray"]] / (1032. * 1024.)
