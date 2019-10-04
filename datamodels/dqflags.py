@@ -194,6 +194,35 @@ def insert_value_column(flagtable):
         strg += " (it actually contains %d)" % len(flagtable[0])
         raise TypeError(strg)
 
+def convert_to_recarray(flagtable):
+    """
+    
+    Convert a 4-column table of the form (BIT,VALUE,NAME,DESCRIPTION)
+    into a numpy record array with column types (int32,int32,str,str)
+    
+    :Parameters:
+    
+    flagtable: tuple containing record array
+        A data structure containing a data quality flag table.
+        
+    :Returns:
+    
+    newflagtable: record array
+        The same structure converted to a numpy record array.
+            
+    """
+    assert isinstance(flagtable, (tuple,list))
+    assert isinstance(flagtable[0], (tuple,list))
+    assert (len(flagtable[0]) == 4)
+
+    newflagtable = np.array( flagtable,
+                             dtype=([('BIT', '<i4'),
+                                     ('VALUE', '<u4'),
+                                     ('NAME','<U40'),
+                                     ('DESCRIPTION','<U80')])
+                            )
+    return newflagtable
+
 # This global variable contains the master set of JWST pipeline flags
 # used for the PIXELDQ and DQ arrays. The first 8 bits are also used
 # for the GROUPDQ array.For details see
