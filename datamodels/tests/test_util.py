@@ -93,10 +93,9 @@ class TestFileIO(unittest.TestCase):
        
     def tearDown(self):
         # Tidy up. Remove the temporary FITS files.
-        #for (filename, datamodel) in self.models_to_test:
-        #    if os.path.isfile(filename) and not KEEPFILES:
-        #        os.remove(filename)
-        pass
+        for (filename, datamodel) in self.models_to_test:
+            if os.path.isfile(filename) and not KEEPFILES:
+                os.remove(filename)
 
     def test_open_from_filename(self):
         # Check that each data model can be opened successfully

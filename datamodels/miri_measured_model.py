@@ -987,7 +987,7 @@ if __name__ == '__main__':
     print("Testing the MiriMeasuredModel module.")
 
     PLOTTING = False
-    SAVE_FILES = True
+    SAVE_FILES = False
 
     data3x3 = np.array([[1.,2.,3.],[4.,5.,6.],[7.,8.,9.]])
     err3x3 = np.array([[1.,1.,1.],[2.,2.,2.],[1.,1.,1.]])
