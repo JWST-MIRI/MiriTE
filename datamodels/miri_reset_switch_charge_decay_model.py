@@ -26,6 +26,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
+04 Oct 2019: Updated to match build 7.3 data model.
 
 @author: Steven Beard (UKATC)
 
@@ -87,7 +88,7 @@ class MiriResetSwitchChargeDecayModel(MiriDataModel):
         
     """
     schema_url = "miri_reset_switch_charge_decay.schema"
-    fieldnames = ('subarray', 'readpatt', 'rowtype', 'tau', 'ascale', 'pow',
+    fieldnames = ('subarray', 'readpatt', 'rows', 'tau', 'ascale', 'pow',
                   'illum_zp', 'illum_slope', 'illum2', 'param3',
                   'crossopt', 'sat_zp', 'sat_slope', 'sat_2', 'sat_mzp',
                   'sat_rowterm', 'sat_scale')

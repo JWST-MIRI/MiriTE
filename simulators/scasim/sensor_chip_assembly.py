@@ -342,13 +342,11 @@ Calibration Data Products (CDPs).
              format a string for printing.
 28 Nov 2018: Added the ability to simulate cosmic rays of a single energy.
 07 Feb 2019: Added cdp_ftp_host parameter.
+04 Oct 2019: Removed use of astropy.extern.six (since Python 2 no longer used)
 
 @author: Steven Beard
 
 """
-# This module is now converted to Python 3.
-
-from astropy.extern import six
 
 # Python logging facility
 import logging
@@ -2956,12 +2954,13 @@ class SensorChipAssembly(object):
                     self.exposure_data.copy_metadata(self.illumination_map,
                                                      ignore=['units', 'type'])
                 # Define the correct data units
+                # NOTE: refout no longer has associated metadata
                 if self.simulate_gain:
                     self.exposure_data.meta.data.units = 'DN'
-                    self.exposure_data.meta.refout.units = 'DN'
+                    #self.exposure_data.meta.refout.units = 'DN'
                 else:
                     self.exposure_data.meta.data.units = 'electrons'
-                    self.exposure_data.meta.refout.units = 'electrons'
+                    #self.exposure_data.meta.refout.units = 'electrons'
 # UNNECESSARY. ALREADY DEFINED IN CONSTRUCTOR AND COPIED TO METADATA IN EXPOSURE()
 #                 # Ensure the exposure parameters are included in the metadata
 #                 self.exposure_data.meta.exposure.nints = self.nints
@@ -4180,8 +4179,7 @@ class SensorChipAssembly(object):
                                      tunit='seconds', show_ints=show_ints,
                                      description=description)
 
-@six.add_metaclass(Singleton)
-class SensorChipAssembly1(SensorChipAssembly):
+class SensorChipAssembly1(SensorChipAssembly, metaclass=Singleton):
     # Only one instance of this class is allowed to exist.
     """
 
@@ -4212,8 +4210,7 @@ class SensorChipAssembly1(SensorChipAssembly):
         super(SensorChipAssembly1, self).__init__(logger=logger)
 
 # Only one instance of this class is allowed to exist.
-@six.add_metaclass(Singleton)
-class SensorChipAssembly2(SensorChipAssembly):
+class SensorChipAssembly2(SensorChipAssembly, metaclass=Singleton):
     """
 
     Class Sensor Chip Assembly - Simulates the behaviour of the MIRI
@@ -4244,8 +4241,7 @@ class SensorChipAssembly2(SensorChipAssembly):
 
 
 # Only one instance of this class is allowed to exist.
-@six.add_metaclass(Singleton)
-class SensorChipAssembly3(SensorChipAssembly):
+class SensorChipAssembly3(SensorChipAssembly, metaclass=Singleton):
     """
 
     Class Sensor Chip Assembly - Simulates the behaviour of the MIRI

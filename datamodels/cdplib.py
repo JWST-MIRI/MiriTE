@@ -129,12 +129,12 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/introduction.html#reference-
              flat-field. Added missing SUBARRAYs to the module tests.
 13 Mar 2019: Test the SSH connection after opening it, to prevent a hidden
              connection issue manifesting as an exception at a later time.
+04 Oct 2019: Removed use of astropy.extern.six (since Python 2 no longer used)
 
 Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
 
-from astropy.extern import six
 import os
 import re
 import time
@@ -1242,8 +1242,7 @@ class MiriCDPFolder(object):
 
 
 # Only one instance of this class is allowed to exist.
-@six.add_metaclass(Singleton)
-class MiriCDPInterface(object):
+class MiriCDPInterface(object, metaclass=Singleton):
     """
     
     A class which manages the interface between the MIRI pipeline or

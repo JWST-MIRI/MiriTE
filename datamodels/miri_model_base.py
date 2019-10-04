@@ -179,6 +179,8 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              Make MIRI schemas work with asdf and datamodels 0.13.4.
 17 Jun 2019: Modified list_data_arrays and list_data_tables functions to
              skip schema entries of "str" type.
+04 Oct 2019: MIR_DARK exposure type has changed to MIR_DARKALL, MIR_DARKIMG
+             and MIR_DARKMRS.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -245,14 +247,14 @@ def get_exp_type(detector, mirifilter, subarray='FULL', datatype='SCIENCE'):
 
     if 'MIRIFU' in detector:
         if (mirifilter and 'OPAQUE' in mirifilter) or (datatype == 'DARK'):
-            exp_type = 'MIR_DARK'
+            exp_type = 'MIR_DARKMRS'
         elif datatype == 'FLAT':
             exp_type = 'MIR_FLAT-MRS'
         else:
             exp_type = 'MIR_MRS'
     elif 'IM' in detector:
         if (mirifilter and 'OPAQUE' in mirifilter) or (datatype == 'DARK'):
-            exp_type = 'MIR_DARK'
+            exp_type = 'MIR_DARKIMG'
         elif datatype == 'FLAT':
             exp_type = 'MIR_FLAT-IMAGE'
         elif mirifilter and 'P750L' in mirifilter:
@@ -277,7 +279,7 @@ def get_exp_type(detector, mirifilter, subarray='FULL', datatype='SCIENCE'):
         else:
             exp_type = 'MIR_IMAGE'
     elif datatype == 'DARK':
-        exp_type = 'MIR_DARK'
+        exp_type = 'MIR_DARKALL'
     else:
         # Exposure type cannot be derived
         exp_type = ''

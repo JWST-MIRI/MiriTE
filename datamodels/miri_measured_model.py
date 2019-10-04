@@ -113,6 +113,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 20 Jun 2019: Stop setting dq_def. Removed deprecated code.
              Corrected a bug in MiriImageModel.
 28 Jun 2019: Start setting dq_def once again.
+04 Oct 2019: References to pixeldq_def and groupdq_def removed completely.
 
 @author: Steven Beard (UKATC)
 
@@ -124,7 +125,7 @@ import numpy.ma as ma
 
 # Import the MIRI reserved data quality flags and flags table class
 from miri.datamodels.dqflags import master_flags, \
-    pixeldq_flags, groupdq_flags, FlagsTable, insert_value_column, convert_dq
+    pixeldq_flags, groupdq_flags, FlagsTable, insert_value_column
 
 # Import the MIRI base data model and utilities.
 from miri.datamodels.ancestry import get_my_model_type
@@ -134,11 +135,6 @@ from miri.datamodels.operations import HasData, HasDataErrAndDq, HasDataErrAndGr
 # List all classes and global functions here.
 __all__ = ['MiriSimpleModel', 'MiriMeasuredModel', 'MiriRampModel',
            'MiriSlopeModel']
-
-# This flag controls the backwards compatibility of the MiriRampModel.
-# Ramp data written by the Python 3 software will no longer contain the
-# PIXELDQ_DEF and GROUPDQ_DEF extensions.
-WRITE_RAMP_DQ_TABLES = False
 
 
 class MiriSimpleModel(MiriDataModel, HasData):
@@ -490,35 +486,15 @@ class MiriRampModel(MiriMeasuredModel, HasDataErrAndGroups):
         ('pixeldq', 'groupdq' or 'both') should be used to mask the data arrays
         during arithmetic operations. The default is 'both', or whichever
         of the two arrays is not None if only one array is available.
-    pixeldq_def: list of tuples or numpy record array (optional)
-        DEPRECATED: This table will be removed from future ramp data.
-        Either: A list of tuples containing (value:int, name:str, title:str),
-        giving the meaning of values stored in the pixeldq array. For
-        example: [(0, 'bad','Bad data'), (1, 'dead', 'Dead Pixel'),
-        (2, 'hot', 'Hot Pixel')];
-        Or: A numpy record array containing the same information as above.
-        If not specified, it will default to the MIRI reserved flags.
-    groupdq_def: list of tuples or numpy record array (optional)
-        DEPRECATED: This table will be removed from future ramp data.
-        Either: A list of tuples containing (value:int, name:str, title:str),
-        giving the meaning of values stored in the groupdq array. For
-        example: [(0, 'bad','Bad group'), (1, 'saturated', 'Saturated group')]
-        Or: A numpy record array containing the same information as above.
-        If not specified, it will default to the default MIRI ramp group
-        flags.
     
     """
     # Floating point data is assumed because the STScI RampModel also
     # declares floating point data.
     schema_url = "miri_ramp_withmeta.schema"
 
-    # DEPRECATED: The following flags will be removed in the future.
-    _default_dq_def = pixeldq_flags
-    _default_groupdq_def = groupdq_flags
-
     def __init__(self, init=None, data=None, pixeldq=None, groupdq=None,
                  group=None, maskwith=None, err=None, refout=None, zeroframe=None,
-                 dq_def=None, pixeldq_def=None, groupdq_def=None, **kwargs):
+                 dq_def=None, **kwargs):
         super(MiriRampModel, self).__init__(init=init, data=data, dq=None,
                                             dq_def=None, rampdata=True,
                                             **kwargs)
@@ -572,39 +548,6 @@ class MiriRampModel(MiriMeasuredModel, HasDataErrAndGroups):
                 strg = "group must be a numpy record array or list of records."
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
-
-# Remove deprecated code
-#         # DEPRECATED: Set the data quality tables only for legacy data.
-#         if WRITE_RAMP_DQ_TABLES:
-#             # Set the pixel data quality bit field definitions table, if provided.
-#             if pixeldq_def is not None:
-#                 try:
-#                     self.pixeldq_def = pixeldq_def
-#                 except (ValueError, TypeError) as e:
-#                     strg = "pixeldq_def must be a numpy record array or list of records."
-#                     strg += "\n   %s" % str(e)
-#                     raise TypeError(strg)
-#             elif self.pixeldq_def is None or len(self.pixeldq_def) < 1:
-#                 # No pixeldq_def is provided.
-#                 # Explicitly create a PIXELDQ_DEF table with default values.
-#                 # TODO: Can the default declared in the schema be used?
-#                 print("No pixeldq_def is provided. NOT setting a default value.")
-#                 #self.pixeldq_def = self._default_dq_def
-#     
-#             # Set the group bit field definitions table, if provided.
-#             if groupdq_def is not None:
-#                 try:
-#                     self.groupdq_def = groupdq_def
-#                 except (ValueError, TypeError) as e:
-#                     strg = "groupdq_def must be a numpy record array or list of records."
-#                     strg += "\n   %s" % str(e)
-#                     raise TypeError(strg)
-#             elif self.groupdq_def is None or len(self.groupdq_def) < 1:
-#                 # No groupdq_def is provided.
-#                 # Explicitly create a GROUPDQ_DEF table with default values.
-#                 # TODO: Can the default declared in the schema be used?
-#                 print("No groupdq_def is provided. NOT setting a default value.")
-#                 #self.groupdq_def = self._default_groupdq_def
 
     def plot_ramp(self, rows, columns, stime=1.0, tunit='', averaged=False,
                   show_ints=False, description=''):
@@ -810,50 +753,7 @@ class MiriRampModel(MiriMeasuredModel, HasDataErrAndGroups):
         if hasattr(self, 'group'):
             strg += self.get_data_str('group', underline=True, underchar="-")
            
-# Removed deprecated code 
-#         # DEPRECATED: The following code exists only for legacy data.
-#         if hasattr(self, 'pixeldq_def'):
-#             if self.pixeldq_def is not None and len(self.pixeldq_def) > 0:
-#                 strg += "v LEGACY TABLE v"
-#                 strg += self.get_data_str('pixeldq_def', underline=True, underchar="-")
-#         if hasattr(self, 'groupdq_def'):
-#             if self.groupdq_def is not None and len(self.groupdq_def) > 0:
-#                 strg += "v LEGACY TABLE v"
-#                 strg += self.get_data_str('groupdq_def', underline=True, underchar="-")
         return strg
-
-# Removed deprecated code 
-#     # DEPRECATED: "flags_table" is a FlagsTable object created on the fly
-#     # from the contents of the pixeldq_def table
-#     @property
-#     def flags_table(self):
-#         if hasattr(self, 'pixeldq_def') and self.pixeldq_def is not None:
-#             # Convert the pixeldq_def table into a FlagsTable object
-#             # and return it.
-#             print("NOT converting pixeldq_def into a flags_table.")
-#             return None
-#             #return FlagsTable( self.pixeldq_def )
-#         else:
-#             return None
-#
-#    @flags_table.setter
-#    def flags_table(self, data):
-#        raise AttributeError("The flags_table object is read-only")
-
-#    # DEPRECATED: "groupdq_flags_table" is a FlagsTable object created on the fly
-#    # from the contents of the groupdq_def table
-#    @property
-#    def groupdq_flags_table(self):
-#        if hasattr(self, 'groupdq_def') and self.groupdq_def is not None:
-#            # Convert the groupdq_def table into a FlagsTable object
-#            # and return it.
-#            return FlagsTable( self.groupdq_def )
-#        else:
-#            return None
-#
-#    @groupdq_flags_table.setter
-#    def groupdq_flags_table(self, data):
-#        raise AttributeError("The groupdq_flags_table object is read-only")
 
     @property
     def dq(self):
@@ -1087,7 +987,7 @@ if __name__ == '__main__':
     print("Testing the MiriMeasuredModel module.")
 
     PLOTTING = False
-    SAVE_FILES = False
+    SAVE_FILES = True
 
     data3x3 = np.array([[1.,2.,3.],[4.,5.,6.],[7.,8.,9.]])
     err3x3 = np.array([[1.,1.,1.],[2.,2.,2.],[1.,1.,1.]])
@@ -1200,7 +1100,7 @@ if __name__ == '__main__':
     ramp3x3x2x2 = np.array([[data3x3,1.2*data3x3],[1.4*data3x3,1.6*data3x3]])
     refout = np.ones_like(ramp3x3x2x2)
     with MiriRampModel(data=ramp3x3x2x2, refout=refout,
-                       pixeldq=dq3x3, pixeldq_def=dqdef) \
+                       pixeldq=dq3x3 ) \
             as testdata3:
         print(testdata3)
         print(testdata3.stats())
@@ -1230,7 +1130,7 @@ if __name__ == '__main__':
 
     print("\nRamp data with data + refout + pixeldq + groupdq:")
     with MiriRampModel(data=ramp3x3x2x2, refout=refout, pixeldq=dq3x3,
-                       groupdq=dq3x3x2x2, pixeldq_def=dqdef, groupdq_def=grpdef) \
+                       groupdq=dq3x3x2x2 ) \
             as testdata3b:
         print(testdata3b)
         print(testdata3b.stats())

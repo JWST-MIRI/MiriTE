@@ -7,4 +7,4 @@ allOf:
   properties:
     meta:
       $ref: miri_metadata_dataerr.schema.yaml
-- $ref: http://stsci.edu/schemas/jwst_datamodel/ramp.schema
+- $ref: http://stsci.edu/schemas/jwst_datamodel/miri_ramp.schema

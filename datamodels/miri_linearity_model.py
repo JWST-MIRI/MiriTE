@@ -63,6 +63,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
+04 Oct 2019: Added missing primary array name.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -178,6 +179,15 @@ class MiriLinearityModel(MiriMeasuredModel):
             self.meta.fit.model = fitmodel
         if order is not None:
             self.meta.fit.order = order
+
+    def get_primary_array_name(self):
+        """
+
+        Returns the name "primary" array for this model.
+
+        """
+        return 'data'
+
 
     def __str__(self):
         """
