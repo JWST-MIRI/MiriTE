@@ -64,7 +64,8 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
 04 Oct 2019: Added missing primary array name.
-
+07 Oct 2019: Updated linearity_reference_flags to include only standard flag
+             names.
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
@@ -83,11 +84,11 @@ __all__ = ['linearity_reference_flags', 'MiriLinearityModel']
 
 # The new JWST linearity reference flags
 linearity_reference_setup = \
-            [(0, 'DO_NOT_USE',  'Bad pixel. Do not use.'),
-             (1, 'NONLINEAR',   'Pixel highly non-linear'),
-             (2, 'NO_LIN_CORR', 'Linearity correction not available'),
-             (3, 'CDP_BAD_SOLUTION', 'Bad solution'),
-             (4, 'CDP_PARTIAL_DATA', 'Data derived from incomplete input')]
+            [(0, 'DO_NOT_USE',      'Bad pixel. Do not use.'),
+             (1, 'NONLINEAR',       'Pixel highly non-linear'),
+             (2, 'NO_LIN_CORR',     'Linearity correction not available'),
+             (3, 'OTHER_BAD_PIXEL', 'Bad solution'),                       # Was CDP_BAD_SOLUTION
+             (4, 'DROPOUT',         'Data derived from incomplete input')] # Was CDP_PARTIAL_DATA 
 linearity_reference_flags = insert_value_column( linearity_reference_setup )
 
 

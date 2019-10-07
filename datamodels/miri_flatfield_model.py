@@ -52,7 +52,8 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              a corresponding model defined in ancestry.py).
 08 Feb 2019: Update the PEDIGREE keyword if the flat type changes, regardless
              of what has been read from the file.
-             
+07 Oct 2019: Updated flat_reference_flags to include only standard flag
+             names.
              
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -74,14 +75,14 @@ __all__ = ['flat_reference_flags', 'MiriFlatfieldModel',
 
 # The new JWST flat-field reference flags
 flat_reference_setup = \
-            [(0, 'DO_NOT_USE',          'Bad pixel. Do not use.'),
-             (1, 'NON_SCIENCE',         'Pixel not on science portion of detector'),
-             (2, 'UNRELIABLE_FLAT',     'Flat variance large'),
-             (3, 'CDP_PARTIAL_DATA',    'Data derived from incomplete input'),
-             (4, 'CDP_LOW_QUAL',        'Data of low quality'),
-             (5, 'CDP_UNRELIABLE_ERROR','Data without reliable error estimate'),
-             (6, 'NO_FLAT_FIELD',       'No flat-field data available'),
-             (7, 'DIFF_PATTERN',        'Diffraction pattern')]
+            [(0, 'DO_NOT_USE',       'Bad pixel. Do not use.'),
+             (1, 'NON_SCIENCE',      'Pixel not on science portion of detector'),
+             (2, 'UNRELIABLE_FLAT',  'Flat variance large'),
+             (3, 'DROPOUT',          'Data derived from incomplete input'), # Was CDP_PARTIAL_DATA 
+             (4, 'UNRELIABLE_SLOPE', 'Data of low quality'),                # Was CDP_LOW_QUAL
+             (5, 'UNRELIABLE_ERROR', 'Data without reliable error estimate'),
+             (6, 'NO_FLAT_FIELD',    'No flat-field data available'),
+             (7, 'OTHER_BAD_PIXEL',  'Diffraction pattern')]                # Was DIFF_PATTERN
 flat_reference_flags = insert_value_column( flat_reference_setup )
 
 

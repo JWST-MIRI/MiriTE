@@ -68,6 +68,8 @@ the DQ data array. The module contains three different kinds of object:
 
 http://miri.ster.kuleuven.be/bin/view/Internal/DataQualityFlags
 
+https://jwst-pipeline.readthedocs.io/en/stable/jwst/references_general/references_general.html#data-quality-flags
+
 :History:
 
 25 Sep 2013: Created
@@ -103,7 +105,7 @@ http://miri.ster.kuleuven.be/bin/view/Internal/DataQualityFlags
 29 Apr 2019: Added REFERENCE_PIXEL to pixeldq_setup.
 14 May 2019: Added Christophe's masking functions.
 20 Jun 2019: Allow a FlagsTable to be created from a FITS_rec object.
-04 Oct 2019: Added convert_to_recarray
+04 Oct 2019: Added convert_to_recarray. Added reference to STScI flag names.
 
 @author: Ruyman Azzollini (DIAS), Steven Beard (UKATC), Christophe Cossou (CEA)
 
