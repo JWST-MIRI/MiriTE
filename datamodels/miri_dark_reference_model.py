@@ -62,6 +62,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
+
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
