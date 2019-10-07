@@ -314,6 +314,20 @@ class MiriMeasuredModel(MiriDataModel, HasDataErrAndDq):
                 # TODO: Can the default declared in the schema be used?
                 self.dq_def = self._default_dq_def
 
+            # FIXME: A work-around for a bug in the build 7.3 jwst data models.
+            # Recognise and fix a dq_def table whose BIT or VALUE fields have been corrupted
+            if self.dq_def is not None and len(self.dq_def) > 0:
+                new_dq_def = []
+                for (bit, value, name, description) in self.dq_def:
+                    if bit < 0:
+                       bit += 2**31  # Correct sign bit error
+                    if bit > 31:
+                       bit = 31
+                    value = 2 ** bit # Correct sign bit error
+                    new_dq_row = (bit, value, name, description)
+                    new_dq_def.append( new_dq_row )
+                self.dq_def = new_dq_def
+
     def on_save(self, path):
         """
         
