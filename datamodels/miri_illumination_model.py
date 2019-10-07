@@ -130,7 +130,7 @@ class MiriIlluminationModel(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_illumination.schema.yaml"
+    schema_url = "miri_illumination.schema"
     
     def __init__(self, init=None, intensity=None, wavelength=None, **kwargs):
         """
@@ -653,7 +653,7 @@ class MiriIlluminationFringingModel(MiriIlluminationModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_illumination_full.schema.yaml"
+    schema_url = "miri_illumination_full.schema"
     
     def __init__(self, init=None, intensity=None, wavelength=None,
                  direction=None, **kwargs):

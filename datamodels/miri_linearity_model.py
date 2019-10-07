@@ -63,6 +63,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
+04 Oct 2019: Added missing primary array name.
+07 Oct 2019: Updated linearity_reference_flags to include only standard flag
+             names. Removed '.yaml' suffix from schema references.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -82,11 +85,11 @@ __all__ = ['linearity_reference_flags', 'MiriLinearityModel']
 
 # The new JWST linearity reference flags
 linearity_reference_setup = \
-            [(0, 'DO_NOT_USE',  'Bad pixel. Do not use.'),
-             (1, 'NONLINEAR',   'Pixel highly non-linear'),
-             (2, 'NO_LIN_CORR', 'Linearity correction not available'),
-             (3, 'CDP_BAD_SOLUTION', 'Bad solution'),
-             (4, 'CDP_PARTIAL_DATA', 'Data derived from incomplete input')]
+            [(0, 'DO_NOT_USE',      'Bad pixel. Do not use.'),
+             (1, 'NONLINEAR',       'Pixel highly non-linear'),
+             (2, 'NO_LIN_CORR',     'Linearity correction not available'),
+             (3, 'OTHER_BAD_PIXEL', 'Bad solution'),                       # Was CDP_BAD_SOLUTION
+             (4, 'DROPOUT',         'Data derived from incomplete input')] # Was CDP_PARTIAL_DATA 
 linearity_reference_flags = insert_value_column( linearity_reference_setup )
 
 
@@ -146,7 +149,7 @@ class MiriLinearityModel(MiriMeasuredModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
     
     """
-    schema_url = "miri_linearity.schema.yaml"
+    schema_url = "miri_linearity.schema"
     _default_dq_def = linearity_reference_flags
 
     def __init__(self, init=None, coeffs=None, dq=None, err=None,
@@ -177,6 +180,15 @@ class MiriLinearityModel(MiriMeasuredModel):
             self.meta.fit.model = fitmodel
         if order is not None:
             self.meta.fit.order = order
+
+    def get_primary_array_name(self):
+        """
+
+        Returns the name "primary" array for this model.
+
+        """
+        return 'data'
+
 
     def __str__(self):
         """

@@ -1,7 +1,9 @@
 allOf:
-- $ref: http://jwst.stsci.edu/schemas/core.schema.yaml
+- $ref: http://stsci.edu/schemas/jwst_datamodel/core.schema
 - type: object
   properties:
     meta:
       $ref: miri_metadata.schema.yaml
-- $ref: http://jwst.stsci.edu/schemas/referencefile.schema.yaml
+- $ref: http://stsci.edu/schemas/jwst_datamodel/referencefile.schema
+
+$schema: http://stsci.edu/schemas/fits-schema/fits-schema

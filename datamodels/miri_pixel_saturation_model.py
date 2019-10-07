@@ -53,7 +53,6 @@ __all__ = ['saturation_reference_flags', 'MiriPixelSaturationModel']
 saturation_reference_setup = \
             [(0, 'DO_NOT_USE',   'Bad pixel. Do not use.'),
              (1, 'NO_SAT_CHECK', 'Saturation check not available')]
-#              (2, 'CDP_PARTIAL_DATA', 'Data derived from incomplete input')]
 saturation_reference_flags = insert_value_column( saturation_reference_setup )
 
 
@@ -108,7 +107,7 @@ class MiriPixelSaturationModel(MiriMeasuredModel):
     
     """
     # There is no separate pixel saturation schema as yet.
-    schema_url = "miri_pixel_saturation.schema.yaml"
+    schema_url = "miri_pixel_saturation.schema"
     _default_dq_def = saturation_reference_flags
 
     def __init__(self, init=None, data=None, dq=None, err=None,

@@ -3,4 +3,4 @@ allOf:
   properties:
     meta:
       $ref: miri_metadata.schema.yaml
-- $ref: http://jwst.stsci.edu/schemas/ipc.schema.yaml
+- $ref: http://stsci.edu/schemas/jwst_datamodel/ipc.schema

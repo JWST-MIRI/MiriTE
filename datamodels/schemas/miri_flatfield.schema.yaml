@@ -7,4 +7,4 @@ allOf:
   properties:
     meta:
       $ref: miri_metadata_dataerr.schema.yaml
-- $ref: http://jwst.stsci.edu/schemas/flat.schema.yaml
+- $ref: http://stsci.edu/schemas/jwst_datamodel/flat.schema

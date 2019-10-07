@@ -68,6 +68,8 @@ the DQ data array. The module contains three different kinds of object:
 
 http://miri.ster.kuleuven.be/bin/view/Internal/DataQualityFlags
 
+https://jwst-pipeline.readthedocs.io/en/stable/jwst/references_general/references_general.html#data-quality-flags
+
 :History:
 
 25 Sep 2013: Created
@@ -102,6 +104,8 @@ http://miri.ster.kuleuven.be/bin/view/Internal/DataQualityFlags
 12 Mar 2019: Removed use of astropy.extern.six (since Python 2 no longer used).
 29 Apr 2019: Added REFERENCE_PIXEL to pixeldq_setup.
 14 May 2019: Added Christophe's masking functions.
+20 Jun 2019: Allow a FlagsTable to be created from a FITS_rec object.
+04 Oct 2019: Added convert_to_recarray. Added reference to STScI flag names.
 
 @author: Ruyman Azzollini (DIAS), Steven Beard (UKATC), Christophe Cossou (CEA)
 
@@ -113,7 +117,7 @@ import copy
 import numpy as np
 import numpy.ma as ma
 
-# import astropy.io.fits as pyfits 
+from astropy.io.fits import FITS_rec
 
 # 1) Global constants
 #
@@ -192,6 +196,35 @@ def insert_value_column(flagtable):
         strg = "Flag table should contain 3 or 4 columns"
         strg += " (it actually contains %d)" % len(flagtable[0])
         raise TypeError(strg)
+
+def convert_to_recarray(flagtable):
+    """
+    
+    Convert a 4-column table of the form (BIT,VALUE,NAME,DESCRIPTION)
+    into a numpy record array with column types (int32,int32,str,str)
+    
+    :Parameters:
+    
+    flagtable: tuple containing record array
+        A data structure containing a data quality flag table.
+        
+    :Returns:
+    
+    newflagtable: record array
+        The same structure converted to a numpy record array.
+            
+    """
+    assert isinstance(flagtable, (tuple,list))
+    assert isinstance(flagtable[0], (tuple,list))
+    assert (len(flagtable[0]) == 4)
+
+    newflagtable = np.array( flagtable,
+                             dtype=([('BIT', '<i4'),
+                                     ('VALUE', '<u4'),
+                                     ('NAME','<U40'),
+                                     ('DESCRIPTION','<U80')])
+                            )
+    return newflagtable
 
 # This global variable contains the master set of JWST pipeline flags
 # used for the PIXELDQ and DQ arrays. The first 8 bits are also used
@@ -854,9 +887,9 @@ class FlagsTable(object):
         
     """    
     def __init__(self, flagtable):    
-        # The flagtable must be a record array or a numpy array.
-        if not isinstance(flagtable, (tuple,list,np.ndarray,np.recarray)):
-            strg = "Flag table must be a tuple, list or numpy array"
+        # The flagtable must be a list, a numpy array, a record array or a FITS record.
+        if not isinstance(flagtable, (tuple,list,np.ndarray,np.recarray,FITS_rec)):
+            strg = "Flag table must be a tuple, list, numpy array or FITS record"
             strg += " (%s given)" % flagtable.__class__.__name__
             raise TypeError(strg)
             
@@ -1013,7 +1046,7 @@ class FlagsTable(object):
         result = this + other
         
         """
-        if isinstance(other, (tuple,list,np.ndarray,np.recarray)):
+        if isinstance(other, (tuple,list,np.ndarray,np.recarray,FITS_rec)):
             # A new object is being created with an extended table.
             # Make a duplicate of the present object and extend it
             # using the new table.
@@ -1075,7 +1108,7 @@ class FlagsTable(object):
         
         """
         # The new table must be a record array or a numpy array.
-        if not isinstance(newtable, (tuple,list,np.array,np.recarray)):
+        if not isinstance(newtable, (tuple,list,np.array,np.recarray,FITS_rec)):
             strg = "New table must be a tuple, list or numpy array"
             raise TypeError(strg)
         

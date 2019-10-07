@@ -836,6 +836,7 @@ def verify_cdp_file(filename, datatype=None, overwrite=False, keepfile=False):
         file header.
     
     """
+#    print("Verifying", filename)
     assert isinstance(filename, str)
     outputfile = filename + "_copy.fits"
     # Does the file exist?
@@ -847,6 +848,8 @@ def verify_cdp_file(filename, datatype=None, overwrite=False, keepfile=False):
     # or using the class specified in the datatype parameter.
     # Test 1 - the CDP must be readable.
     with open( init=filename, astype=datatype ) as datamodel:
+#        print("Opened data model.")
+#        print(datamodel)
         # Verify the metadata
         metadata_failure = False
         metadata_strg = ''
@@ -868,8 +871,8 @@ def verify_cdp_file(filename, datatype=None, overwrite=False, keepfile=False):
         if isinstance(datamodel, MiriDataModel):
             dataarrays = datamodel.list_data_arrays()
             datatables = datamodel.list_data_tables()
-#             print("List of data arrays:", dataarrays)
-#             print("List of data tables:", datatables)
+#            print("List of data arrays:", dataarrays)
+#            print("List of data tables:", datatables)
         else:
             if metadata_failure:
                 warnings.warn(metadata_strg)   
@@ -936,7 +939,7 @@ def verify_cdp_file(filename, datatype=None, overwrite=False, keepfile=False):
             raise TypeError(strg)                
     
         # Test 2 - all data arrays and tables must be readable and not empty.
-#         print("Test 2")
+#        print("Test 2")
         for dataarray in dataarrays:
             isempty = False
             if datamodel[dataarray] is None:
@@ -1000,7 +1003,7 @@ def verify_cdp_file(filename, datatype=None, overwrite=False, keepfile=False):
             raise TypeError(metadata_strg)
 
         # Test 3 - It must be possible to save the product to a new file
-#         print("Test 3")
+#        print("Test 3")
         try:
             datamodel.save( outputfile, overwrite=overwrite )
         except Exception as e:
@@ -1020,9 +1023,9 @@ def verify_cdp_file(filename, datatype=None, overwrite=False, keepfile=False):
             raise TypeError(strg)
         
         # Test 4 - The input and copied data products must be equal
-#         print("Test 4")
+#        print("Test 4 - Read back", outputfile)
         with open( init=outputfile, astype=datatype ) as newmodel:
-             
+#            print(newmodel)
             assert_products_equal(datamodel, newmodel, arrays=dataarrays,
                                   tables=datatables)
             del newmodel

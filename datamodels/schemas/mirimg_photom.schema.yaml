@@ -1,7 +1,7 @@
 title: MIRI imager photometric flux conversion data model
 allOf:
-- $ref: http://jwst.stsci.edu/schemas/photom.schema.yaml
-- $ref: http://jwst.stsci.edu/schemas/keyword_pixelarea.schema.yaml
+- $ref: http://stsci.edu/schemas/jwst_datamodel/photom.schema
+- $ref: http://stsci.edu/schemas/jwst_datamodel/keyword_pixelarea.schema
 - type: object
   properties:
     phot_table:

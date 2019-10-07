@@ -91,7 +91,7 @@ class MiriDroopModel(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_droop.schema.yaml"
+    schema_url = "miri_droop.schema"
     fieldnames = ('COUPLING_CONSTANT', 'UNCERTAINTY')
     
     def __init__(self, init=None, droop_table=None, detector=None, **kwargs):

@@ -47,9 +47,10 @@ Data
 06 Sep 2016: Changed to miri.tools
 19 Jun 2017: Updated to use build 7.1 data models (V7.0)
 05 Jan 2018: More version control information added. SVN info dropped.
+10 Jun 2019: JWST build 7.3 release (v7.3)
 
 """
 __project__ = 'MIRI Tools Software'
 __author__ = 'MIRI Software Team'
 __maintainer__ = 'MIRI Software Team: mirisim@roe.ac.uk'
-__copyright__ = '2018, %s' % __author__
+__copyright__ = '2019, %s' % __author__

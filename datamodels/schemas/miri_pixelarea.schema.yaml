@@ -3,4 +3,4 @@ allOf:
   properties:
     meta:
       $ref: miri_metadata.schema.yaml
-- $ref: http://jwst.stsci.edu/schemas/pixelarea.schema.yaml
+- $ref: http://stsci.edu/schemas/jwst_datamodel/pixelarea.schema

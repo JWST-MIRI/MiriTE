@@ -152,7 +152,7 @@ class MiriPceModel(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_pce.schema.yaml"
+    schema_url = "miri_pce.schema"
     fieldnames = ('WAVELENGTH', 'EFFICIENCY', 'CONVERSION')
     
     def __init__(self, init=None, pce_table=None, component=None,

@@ -1,6 +1,7 @@
 allOf:
 - $ref: miri_core.schema.yaml
-- $ref: http://jwst.stsci.edu/schemas/wcsinfo.schema.yaml
+- $ref: http://stsci.edu/schemas/jwst_datamodel/wcsinfo.schema
+- $ref: http://stsci.edu/schemas/jwst_datamodel/dq_def.schema
 - type: object
   title: MIRI data with error and quality arrays
   properties:
@@ -25,5 +26,3 @@ allOf:
       default: 0
       units: ''
       datatype: uint32
-    dq_def:
-      $ref: http://jwst.stsci.edu/schemas/dq_def.schema.yaml

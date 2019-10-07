@@ -88,6 +88,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 11 Feb 2019: Added missing C, D, E, F matrices to imager distortion model.
 22 Mar 2019: Changed the reference type for LRS distortion
              from 'DISTORTION' to 'SPECWCS'.
+12 Sep 2019: Added CDP8 version of MRS distortion models
+             while keeping CDP7 versions the default.
+07 Oct 2019: Removed '.yaml' suffix from schema references.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -196,7 +199,7 @@ class MiriImagingDistortionModel(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
                 
     """
-    schema_url = "miri_distortion_imaging.schema.yaml"
+    schema_url = "miri_distortion_imaging.schema"
     fieldnames = ('FILTER', 'COL_OFFSET', 'ROW_OFFSET')
     
     def __init__(self, init=None,
@@ -562,7 +565,7 @@ class MiriLrsD2WModel(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_distortion_lrs.schema.yaml"
+    schema_url = "miri_distortion_lrs.schema"
     fieldnames = ('X_CENTER', 'Y_CENTER', 'WAVELENGTH', 'X0', 'Y0', 'X1', 'Y1', \
                   'X2', 'Y2', 'X3', 'Y3')
     
@@ -608,7 +611,7 @@ class MiriLrsD2WModel(MiriDataModel):
 class MiriMrsDistortionModel12(MiriDataModel):
     """
     
-    A data model for a MIRI MRS distortion model - CHANNEL 12 VARIANT,
+    A data model for a MIRI MRS distortion model - CHANNEL 34 VARIANT,
     based on the STScI base model, DataModel. Old CDP-7 version.
      
     :Parameters:
@@ -690,7 +693,7 @@ class MiriMrsDistortionModel12(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
             
     """
-    schema_url = "miri_distortion_mrs12.schema.yaml"
+    schema_url = "miri_distortion_mrs12.schema"
     fieldnames_fov = ('alpha_min', 'alpha_max')
     fieldnames_d2c = ['VAR1']
     for i in (0,1,2,3,4):
@@ -972,7 +975,7 @@ class MiriMrsDistortionModel12_CDP8(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
             
     """
-    schema_url = "miri_distortion_mrs12_CDP8.schema.yaml"
+    schema_url = "miri_distortion_mrs12_CDP8.schema"
     fieldnames_fov = ('alpha_min', 'alpha_max')
     fieldnames_d2c = ['VAR1']
     for i in (0,1,2,3,4):
@@ -1178,7 +1181,7 @@ class MiriMrsDistortionModel12_CDP6(MiriMrsDistortionModel12):
     See the MiriMrsDistortionModel12 class for full documentation.
     
     """
-    schema_url = "miri_distortion_mrs12_CDP6.schema.yaml"
+    schema_url = "miri_distortion_mrs12_CDP6.schema"
     fieldnames_fov = ('alpha_min', 'alpha_max')
     fieldnames_d2c = ['VAR1']
     for i in (0,1,2,3,4):
@@ -1297,7 +1300,7 @@ class MiriMrsDistortionModel34(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
             
     """
-    schema_url = "miri_distortion_mrs34.schema.yaml"
+    schema_url = "miri_distortion_mrs34.schema"
     fieldnames_fov = ('alpha_min', 'alpha_max')
     fieldnames_d2c = ['VAR1']
     for i in (0,1,2,3,4):
@@ -1577,7 +1580,7 @@ class MiriMrsDistortionModel34_CDP8(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
             
     """
-    schema_url = "miri_distortion_mrs34_CDP8.schema.yaml"
+    schema_url = "miri_distortion_mrs34_CDP8.schema"
     fieldnames_fov = ('alpha_min', 'alpha_max')
     fieldnames_d2c = ['VAR1']
     for i in (0,1,2,3,4):

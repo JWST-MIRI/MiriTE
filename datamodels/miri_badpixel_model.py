@@ -78,6 +78,10 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
+20 Jun 2019: Stop setting dq_def.
+28 Jun 2019: Start setting dq_def once again.
+07 Oct 2019: Removed '.yaml' suffix from schema references.
+
 @author: Steven Beard (UKATC), Michael Droettboom (STScI), Vincent Geers (UKATC)
 
 """
@@ -147,7 +151,7 @@ class MiriBadPixelMaskModel(MiriDataModel, HasMask):
         See the jwst.datamodels documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_bad_pixel_mask.schema.yaml"
+    schema_url = "miri_bad_pixel_mask.schema"
     dq_def_names = ('BIT', 'VALUE', 'NAME', 'DESCRIPTION')
     
     # Define a default value for the dq_def table.

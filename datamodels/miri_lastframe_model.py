@@ -21,7 +21,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              used to convert between 3 column and 4 column flag tables.
              TYPE and REFTYPE are no longer identical.
 30 Sep 2014: Superflous flags commented out.
-07 Nov 2014: Modified to use miri_lastframe.schema.yaml, which defines
+07 Nov 2014: Modified to use miri_lastframe.schema, which defines
              the expected data and err units.
 20 Aug 2015: Duplicated parts of schema now reference STScI model.
 10 Dec 2015: TYPE and REFTYPE strings rationalised.
@@ -96,7 +96,7 @@ class MiriLastFrameModel(MiriMeasuredModel):
     
     """
     # TODO: Could the lastframe and reset models share the same schema?
-    schema_url = "miri_lastframe.schema.yaml"
+    schema_url = "miri_lastframe.schema"
     _default_dq_def = lastframe_reference_flags
 
     def __init__(self, init=None, data=None, dq=None, err=None,

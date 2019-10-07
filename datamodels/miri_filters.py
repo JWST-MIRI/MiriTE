@@ -100,7 +100,7 @@ class MiriFilter(MiriDataModel):
         See the jwst_lib documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_filter.schema.yaml"
+    schema_url = "miri_filter.schema"
     fieldnames = ('WAVELENGTH', 'TRANSMISSION')
     
     def __init__(self, init=None, filter_table=None, filter_name=None,

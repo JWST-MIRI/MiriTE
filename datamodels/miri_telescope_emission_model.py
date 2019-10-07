@@ -115,7 +115,7 @@ class MiriTelescopeEmissionModel(MiriMeasuredModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
     
     """
-    schema_url = "miri_telescope_emission.schema.yaml"
+    schema_url = "miri_telescope_emission.schema"
     _default_dq_def = telem_reference_flags
 
     def __init__(self, init=None, data=None, dq=None, err=None, dq_def=None,

@@ -1,8 +1,9 @@
 title: MIRI Dark current data model - 3D or 4D
 allOf:
-- $ref: http://jwst.stsci.edu/schemas/core.schema.yaml
-- $ref: http://jwst.stsci.edu/schemas/wcsinfo.schema.yaml
-- $ref: http://jwst.stsci.edu/schemas/referencefile.schema.yaml
+- $ref: http://stsci.edu/schemas/jwst_datamodel/core.schema
+- $ref: http://stsci.edu/schemas/jwst_datamodel/wcsinfo.schema
+- $ref: http://stsci.edu/schemas/jwst_datamodel/referencefile.schema
+- $ref: http://stsci.edu/schemas/jwst_datamodel/dq_def.schema
 - type: object
   properties:
     data:
@@ -20,6 +21,4 @@ allOf:
       fits_hdu: ERR
       default: 0.0
       datatype: float32
-    dq_def:
-      $ref: http://jwst.stsci.edu/schemas/dq_def.schema.yaml
 $schema: http://stsci.edu/schemas/fits-schema/fits-schema

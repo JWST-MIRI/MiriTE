@@ -3,5 +3,5 @@ allOf:
   properties:
     meta:
       $ref: miri_metadata.schema.yaml
-- $ref: http://jwst.stsci.edu/schemas/straylight.schema.yaml
+- $ref: http://stsci.edu/schemas/jwst_datamodel/straylight.schema
       

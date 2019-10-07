@@ -3,7 +3,7 @@ allOf:
   properties:
     meta:
       $ref: miri_metadata.schema.yaml
-- $ref: http://jwst.stsci.edu/schemas/mirimg_photom.schema.yaml
+- $ref: http://stsci.edu/schemas/jwst_datamodel/mirimg_photom.schema
 - type: object
   title: MIRI photometric flux conversion model
   properties:

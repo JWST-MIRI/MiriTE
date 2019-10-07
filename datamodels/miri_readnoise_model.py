@@ -77,7 +77,7 @@ class MiriReadnoiseModel(MiriDataModel, HasData):
         See the jwst.datamodels documentation for the meaning of these keywords.
     
     """
-    schema_url = "miri_readnoise.schema.yaml"
+    schema_url = "miri_readnoise.schema"
 
     def __init__(self, init=None, data=None, **kwargs):
         """

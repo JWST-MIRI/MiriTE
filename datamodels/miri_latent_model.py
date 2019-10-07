@@ -143,7 +143,7 @@ class MiriLatentDecayModel(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_latent.schema.yaml"
+    schema_url = "miri_latent.schema"
     fieldnames = ('TYPE', 'T_OFFSET', 'DECAY_PEAK', 'DECAY_FREQ', 'TAU')
    
     def __init__(self, init=None, latent_tables=None, **kwargs):
