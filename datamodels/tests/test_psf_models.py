@@ -286,7 +286,7 @@ class TestMiriImagingPointSpreadFunctionModel(unittest.TestCase):
         assert_products_equal( self, self.dataproduct, datacopy,
                                arrays=['data', 'err', 'dq'],
         # FIXME: removed dq_def until data corruption bug fixed.
-#                               tables=['dq_def', 'psf_lut'] )
+        #                      tables=['dq_def', 'psf_lut'] )
                                tables=['psf_lut'] )
         del datacopy
         
@@ -422,7 +422,7 @@ class TestMiriLrsPointSpreadFunctionModel(unittest.TestCase):
         datacopy = self.dataproduct.copy()
         self.assertIsNotNone(datacopy)
         assert_products_equal( self, self.dataproduct, datacopy,
-                               arrays=['data', 'err', 'dq'],
+                               arrays=['data', 'err', 'dq'])
         # FIXME: removed dq_def until data corruption bug fixed.
         #                       tables=['dq_def'] )
         del datacopy
@@ -443,7 +443,7 @@ class TestMiriLrsPointSpreadFunctionModel(unittest.TestCase):
                 assert_products_equal( self, self.dataproduct, readback,
                                        arrays=['data', 'err', 'dq'])
                 # FIXME: removed dq_def until data corruption bug fixed.
-                #                       tables=['dq_def',] )
+                #                       tables=['dq_def'] )
                 del readback
 
             # Check that other variations of the data product can be
