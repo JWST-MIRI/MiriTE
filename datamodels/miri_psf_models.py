@@ -79,7 +79,8 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
-
+07 Oct 2019: Updated flat_reference_flags to include only standard flag
+             names.
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
 """
@@ -98,8 +99,8 @@ __all__ = ['MiriPointSpreadFunctionModel', 'MiriImagingPointSpreadFunctionModel'
            'MiriLrsPointSpreadFunctionModel', 'MiriMrsPointSpreadFunctionModel']
 
 psf_reference_setup = \
-            [(0, 'DO_NOT_USE',         'Bad pixel. Do not use.'),
-             (1, 'CDP_LOW_QUAL',       'Data of low quality'),
+            [(0, 'DO_NOT_USE',           'Bad pixel. Do not use.'),
+             (1, 'UNRELIABLE_SLOPE',     'Data of low quality'),  # Was CDP_LOW_QUAL
              (2, 'CDP_UNRELIABLE_ERROR', 'Data without reliable error estimate')]
 psf_reference_flags = insert_value_column( psf_reference_setup )
 
