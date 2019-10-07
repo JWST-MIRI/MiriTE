@@ -133,7 +133,7 @@ class TestFileIO(unittest.TestCase):
     def test_verify_cdp_file(self):
         # Check that the CDP verification function passes the simple
         # files created by this test.
-        print("test_verify_cdp_file disabled due to bug!")
+        print("test_verify_cdp_file disabled due to dq_def corruption bug (589)!")
         # FIXME: Track down the source of the dq_def corruption bug
         #for (filename, datamodel) in self.cdp_models_to_test:
         #    util.verify_cdp_file(filename, overwrite=True)
