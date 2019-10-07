@@ -23,6 +23,8 @@ Setup file for installing the MiriTE software
 08 Oct 2018: Added convert_mrs_resolution script.
 11 Oct 2018: Added append_lrs_photom script.
 12 Oct 2018: Added cdp_remove_junk script.
+07 Oct 2019: Require Python 3.6. Corrected bug in the checking of
+             conda_prefix.
 
 @author: MIRI Software Team
 
@@ -225,7 +227,7 @@ setup(
     author_email="mirisim@roe.ac.uk",
     license="See LICENCE file",
     platforms=["Linux", "Mac OS X"],
-    python_requires='>=3.5',
+    python_requires='>=3.6',
     packages=['miri',
               'miri.tools', 'miri.tools.tests',
               'miri.datamodels', 'miri.datamodels.tests',
@@ -297,7 +299,7 @@ setup(
 )
 
 if not cleanflag:
-    if not ('miri' in conda_prefix) and not ('MIRI' in conda_prefix):
+    if not ('/envs' in conda_prefix):
         print("\n*** WARNING: MIRI software installed into the root environment! ***")
         print("If you didn't want to do this, remove the above package from site-packages, execute")
         print("\n\tsource activate <name-of-miricle-environment>")
