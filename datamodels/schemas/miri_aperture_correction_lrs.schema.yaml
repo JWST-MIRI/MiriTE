@@ -6,7 +6,7 @@ allOf:
     meta:
       type: object
       properties:
-        apercorr_table:
+        apcorr_table:
           type: object
           title: Information about the aperture correction table
           properties:
@@ -14,24 +14,34 @@ allOf:
               type: string
               title: Column 1 units
               default: micron
-              fits_hdu: APER_CORR
+              fits_hdu: APCORR
               fits_keyword: TUNIT1
             tunit2:
               type: string
               title: Column 2 units
-              default: ''
-              fits_hdu: APER_CORR
+              default: pixels
+              fits_hdu: APCORR
               fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: ''
+              fits_hdu: APCORR
+              fits_keyword: TUNIT3
  
 - type: object
   properties:
-    apercorr_table:
+    apcorr_table:
       title: Aperture correction table
-      fits_hdu: APER_CORR
+      fits_hdu: APCORR
       datatype:
       - name: wavelength
         datatype: float32
         unit: micron
-      - name: aper_corr
+      - name: width
+        datatype: uint8
+        shape: [40]
+        unit: pixels
+      - name: apcorr
         datatype: float32
         shape: [40]

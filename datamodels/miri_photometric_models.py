@@ -668,6 +668,95 @@ class MiriLrsPhotometricModel(MiriPhotometricModel):
         model_type = get_my_model_type( self.__class__.__name__ )
         self.meta.model_type = model_type
             
+class MiriLrsNewPhotometricModel(MiriDataModel):
+    """
+    
+    A data model for MIRI LRS mode photometric flux conversion data.
+    Flux factors are looked up by filter name and subarray.
+    
+    
+    :Parameters:
+    
+    init: shape tuple, file path, file object, pyfits.HDUList, numpy array
+        An optional initializer for the data model, which can have one
+        of the following forms:
+        
+        * None: A default data model with no shape. (If a data array is
+          provided in the phot_table parameter, the shape is derived from
+          the array.)
+        * Shape tuple: Initialize with empty data of the given shape.
+        * File path: Initialize from the given file.
+        * Readable file object: Initialize from the given file object.
+        * pyfits.HDUList: Initialize from the given pyfits.HDUList.
+    phot_table. list of tuples or numpy record array (optional)
+        A list of tuples, or a numpy record array, where each record
+        contains the following information:
+        
+        * FILTER: A string containing a filter name. Compulsory.
+        * SUBARRAY: A string containing a subarray name.
+        * MEAN_PIXAR_A2: mean pixel area in arcsec^2
+        * MEAN_PIXAR_SR: mean pixel area in steradian 
+        * PHOTMJSR: A conversion factor for the given subarray
+          at 7 micron, converting from DN/s to MJy/sr.
+        * UNCERTAINTY: error of PHOTMJSR at 7 micron (unit Mjy/sr).
+        * NELM: An integer (range 0 to 500) giving the number of elements
+          in the wavelength and relresponse arrays to be used. If NELM=0,
+          the wavelength and response arrays are ignored.
+        * WAVELENGTH: An array of 500 floats containing wavelengths in microns.
+          Unused parts of the array are padded with zero.
+        * RELRESPONSE: An array of 500 floats containing the relative
+          response of the instrument at each wavelength. To be multiplicated with PHOTMJSR.
+          Unused parts of the array are padded with zero.
+        * RELRESPERROR: An array of 500 floats containing the relative
+          response error of the instrument at each wavelength. To be multiplicated with UNCERTAINTY.
+          Unused parts of the array are padded with zero.  
+
+        A phot_table must either be defined in the initializer or in
+        this parameter. A blank table is not allowed.
+    
+    """
+    # Both models use exactly the same schema.
+    schema_url = "miri_photom_lrs.schema.yaml"
+    fieldnames = ('filter', 'subarray', 'mean_pixar_ar2','mean_pixar_sr', 'photmjsr', 'uncertainty', 'nelem',
+                  'wavelength', 'relresponse', 'relresperror')
+    def __init__(self, init=None, phot_table=None, **kwargs):
+        """
+        
+        Initialises the MiriPhotometricModel class.
+        
+        Parameters: See class doc string.
+
+        """
+        super(MiriLrsNewPhotometricModel, self).__init__(init=init, **kwargs)
+
+        # Data type is photometric flux conversion.
+        self.meta.reftype = 'PHOTOM'
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+        # This is a reference data model.
+        self._reference_model()
+
+        if phot_table is not None:
+            try:
+                #phot_table = np.recarray(phot_table)
+                self.phot_table = phot_table
+            except (ValueError, TypeError) as e:
+                strg = "phot_table must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+            
+        # Copy the table column units from the schema, if defined.
+        phot_table_units = self.set_table_units('phot_table')
+
+        # Define the exposure type (if not already contained in the data model)
+        # NOTE: This will only define an exposure type when a valid detector
+        # is defined in the metadata.
+        if not self.meta.exposure.type:
+            self.set_exposure_type()
+
+
+
 class MiriPixelAreaModel(MiriDataModel, HasData):
     """
     
@@ -892,6 +981,35 @@ if __name__ == '__main__':
         if SAVE_FILES:
             testphot3.save("test_lrs_photom_model3.fits", overwrite=True)
         del testphot3
+    
+    
+    
+    phot_lrs = [('P750L',  'FULL',          0.121, 0.001, 1.0,  0.0,  nelm, wavelength, relresponse, relresperror),
+                ('P750L',  'SLITLESSPRISM', 0.121, 0.001, 0.9,  0.0,  nelm, wavelength, relresponse, relresperror)
+               ]
+
+    print("\nLRS PHOTOM with defined wavelength and relresponse arrays:")
+    with MiriLrsNewPhotometricModel( phot_table=phot_lrs) as testphot4:
+        testphot4.set_instrument_metadata(detector='MIRIMAGE',
+                                          ccc_pos='OPEN', filt='P750L',
+                                          deck_temperature=11.0,
+                                          detector_temperature=6.0)
+        testphot4.set_exposure_metadata(readpatt='FAST',
+                                        nints=1, ngroups=1,
+                                        frame_time=1.0,
+                                        integration_time=10.0,
+                                        group_time=10.0,
+                                        reset_time=0, frame_resets=3)
+        testphot4.set_housekeeping_metadata('UK', author='MIRI team',
+                                           version='1.0', date='TODAY',
+                                           useafter='TODAY',
+                                           description='Test data')
+        print(testphot4)
+        if PLOTTING:
+            testphot4.plot(description="testphot4")
+        if SAVE_FILES:
+            testphot4.save("test_lrs_photom_model4.fits", overwrite=True)
+        del testphot4
 
     print("Pixel area model:")
     

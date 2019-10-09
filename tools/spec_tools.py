@@ -374,6 +374,8 @@ def lrs_extract_spec_with_fit(data, minX = 0, leftY = 0, verbose = True,
         si = sig[i,:]
         simax = np.max(si)
         stdevSi = np.std(si)
+        if simax <= 0 or stdevSi == 0:
+            continue
         if simax < 0.03 and simax/stdevSi < 1.:
             continue
         maxind = np.where(si == simax)[0][0]
@@ -486,6 +488,9 @@ def get_psf_fit(data, minX = 0, leftY = 0, verbose = True, makeplot = False):
         si = sig[i,:]
         simax = np.max(si)
         stdevSi = np.std(si)
+        if simax <= 0 or stdevSi == 0:
+            print("signal is below or equal zero in row ", i)
+            continue
         if simax/stdevSi < 1. or simax < np.mean(sigErr):
             print("signal too low in row ", i)
             continue

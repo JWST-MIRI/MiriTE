@@ -199,7 +199,7 @@ class MiriLrsApertureCorrectionModel(MiriDataModel):
         * Readable file object: Initialize from the given file object.
         * pyfits.HDUList: Initialize from the given pyfits.HDUList.
         
-    apercorr_table: list of tuples or numpy record array (optional)
+    apcorr_table: list of tuples or numpy record array (optional)
         Either: A list of tuples containing columns in the aperture
         correction table;
         Or: A numpy record array containing the same information as above.
@@ -211,9 +211,9 @@ class MiriLrsApertureCorrectionModel(MiriDataModel):
         
     """
     schema_url = "miri_aperture_correction_lrs.schema.yaml"
-    fieldnames = ('wavelength', 'aper_corr')
+    fieldnames = ('wavelength', 'width', 'apcorr')
     
-    def __init__(self, init=None, apercorr_table=None, **kwargs):
+    def __init__(self, init=None, apcorr_table=None, **kwargs):
         """
         
         Initialises the MiriLrsApertureCorrectionModel class.
@@ -224,23 +224,23 @@ class MiriLrsApertureCorrectionModel(MiriDataModel):
         super(MiriLrsApertureCorrectionModel, self).__init__(init=init, **kwargs)
 
         # Data type is aperture correction.
-        self.meta.reftype = 'APERCORR'
+        self.meta.reftype = 'APCORR'
         model_type = get_my_model_type( self.__class__.__name__ )
         self.meta.model_type = model_type
         
         # This is a reference data model.
         self._reference_model()
         
-        if apercorr_table is not None:
+        if apcorr_table is not None:
             try:
-                self.apercorr_table = apercorr_table
+                self.apcorr_table = apcorr_table
             except (ValueError, TypeError) as e:
-                strg = "apercorr_table must be a numpy record array or list of records."
+                strg = "apcorr_table must be a numpy record array or list of records."
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
             
         # Copy the table column units from the schema, if defined.
-        apercorr_units = self.set_table_units('apercorr_table')
+        apcorr_units = self.set_table_units('apcorr_table')
         
 class MiriLrsPositionCorrectionModel(MiriDataModel):
     """
@@ -386,26 +386,28 @@ if __name__ == '__main__':
         del poscorr_table
         del testposcorr_lrs
    
-    apercorr = np.zeros([40])
-    apercorr = np.linspace(0.5,1,num = 40) 
+    apcorr = np.zeros([40])
+    apcorr = np.linspace(0.5,1,num = 40) 
+    width = np.arange(40) + 1
     
-    apercorr_table=[]
-    apercorr_table.append((wave[0], apercorr.tolist()))
-    apercorr_table.append((wave[1], apercorr.tolist()))
-    apercorr_table.append((wave[2], apercorr.tolist()))
+    apcorr_table=[]
+    apcorr_table.append((wave[0], width.tolist(), apcorr.tolist()))
+    apcorr_table.append((wave[1], width.tolist(), apcorr.tolist()))
+    apcorr_table.append((wave[2], width.tolist(), apcorr.tolist()))
+    print(apcorr_table)
     
-    with MiriLrsApertureCorrectionModel( apercorr_table=apercorr_table) as testapercorr_lrs:
-        testapercorr_lrs.set_instrument_metadata(detector='MIRIMAGE', filt='P750L')
-        testapercorr_lrs.set_subarray_metadata('FULL')
-        testapercorr_lrs.set_housekeeping_metadata('MPIA', author='Juergen Schreiber',
+    with MiriLrsApertureCorrectionModel( apcorr_table=apcorr_table) as testapcorr_lrs:
+        testapcorr_lrs.set_instrument_metadata(detector='MIRIMAGE', filt='P750L')
+        testapcorr_lrs.set_subarray_metadata('FULL')
+        testapcorr_lrs.set_housekeeping_metadata('MPIA', author='Juergen Schreiber',
                                            version='1.0', useafter='2019-07-19',
                                            description='Test data')
-        print(testapercorr_lrs)
+        print(testapcorr_lrs)
         if PLOTTING:
-            testapercorr_lrs.plot(description="testapercorr_lrs")
+            testapcorr_lrs.plot(description="testapcorr_lrs")
         if SAVE_FILES:
-            testapercorr_lrs.save("test_apercorr_model_lrs.fits", overwrite=True)
-        del apercorr_table
-        del testapercorr_lrs
+            testapcorr_lrs.save("test_apcorr_model_lrs.fits", overwrite=True)
+        del apcorr_table
+        del testapcorr_lrs
     
     print("Test finished.")
