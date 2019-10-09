@@ -41,7 +41,6 @@ The class hierarchy is::
 
 """
 
-#from astropy.extern import six 
 import sys, os, fnmatch
 
 # Python logging facility
@@ -617,7 +616,6 @@ class ParameterFileManager(object):
             fp = open(fname,"r")
             try:
                 code = fp.read()
-                #six.exec_(code, self._kwdict)
                 exec(code, self._kwdict)
             except Exception as e:
                 strg = "Error while creating ParameterFileManager object.\n"

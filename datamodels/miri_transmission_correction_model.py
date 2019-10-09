@@ -74,7 +74,7 @@ class MiriMrsTransmissionCorrectionModel(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_transmission_correction_mrs.schema.yaml"
+    schema_url = "miri_transmission_correction_mrs.schema"
     fieldnames = ('CHANNEL', 'WAVE_MIN', 'WAVE_MAX', 'T_WMIN_CENTRE',
                   'T_WMIN_EDGE', 'T_WMAX_CENTRE', 'T_WMAX_EDGE')
     

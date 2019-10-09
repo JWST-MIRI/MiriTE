@@ -3,7 +3,7 @@
 
 """
 
-The base model for MIRI data. An extension to the standard STScI data 
+The base model for MIRI data. An extension to the standard STScI data
 model.
 
 :Reference:
@@ -86,7 +86,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              each file.
 11 Sep 2015: Moved the "plot" method here, to reduce the number of
              duplications of this same method. It will fail gracefully
-             if given an unplottable data model 
+             if given an unplottable data model
 07 Oct 2015: Made exception catching Python 3 compatible.
 22 Oct 2015: Missing metadata attributes will now raise an AttributeError
              exception.
@@ -110,8 +110,8 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              to self.meta.date. Renamed 'dtype' to 'datatype in query functions.
              Search for data entries by looking for type=None rather than
              type='data'.
-06 Apr 2016: Change for compatibility with ASDF version of jwst.datamodels: 
-             the "add_history" method now wraps the string in an 
+06 Apr 2016: Change for compatibility with ASDF version of jwst.datamodels:
+             the "add_history" method now wraps the string in an
              asdf.tags.core.HistoryEntry object, including a timestamp, before
              adding this HistoryEntry to the list.
 09 May 2016: Moved get_exposure_type and get_exp_type to here from
@@ -174,6 +174,14 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              (commented out).
 12 Mar 2019: Removed use of astropy.extern.six (since Python 2 no longer used).
 16 May 2019: Added the get_fits_header_dict method.
+10 Jun 2019: Modified to meet new schema access method in JWST build 7.3.
+17 Jun 2019: Merged with pull request "Miri schemas 1" from Nadia Dencheva.
+             Make MIRI schemas work with asdf and datamodels 0.13.4.
+17 Jun 2019: Modified list_data_arrays and list_data_tables functions to
+             skip schema entries of "str" type.
+04 Oct 2019: MIR_DARK exposure type has changed to MIR_DARKALL, MIR_DARKIMG
+             and MIR_DARKMRS.
+07 Oct 2019: Removed '.yaml' suffix from schema references.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -182,24 +190,23 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 import os
 import datetime
 # import logging
-# logging.basicConfig(level=logging.INFO) # Default level is informational output 
+# logging.basicConfig(level=logging.INFO) # Default level is informational output
 # LOGGER = logging.getLogger("miri.datamodels") # Get a default parent logger
 import warnings
 import numpy as np
 #import numpy.ma as ma
 from astropy.time import Time
-import asdf.util
 from asdf.tags.core import HistoryEntry
-from asdf.extension import AsdfExtension
-
+from  asdf import AsdfFile
+from asdf import schema as asdf_schema
 # Import the STScI base data model and utilities
-import jwst.datamodels
 import jwst.datamodels.fits_support as mfits
 import jwst.datamodels.schema as mschema
 from jwst.datamodels.model_base import DataModel
 
 # Import the MIRI data models and the data model plotter.
 import miri.datamodels
+from miri.datamodels.miri_extension import MIRIExtension, URL_PREFIX
 from miri.datamodels.plotting import DataModelPlotVisitor
 from miri.parameters import SUBARRAY, CDP_USEAFTER_DICT
 
@@ -211,15 +218,15 @@ __all__ = ['get_exp_type', 'MiriDataModel']
 #
 def get_exp_type(detector, mirifilter, subarray='FULL', datatype='SCIENCE'):
     """
-    
+
     Helper function which derives an exposure type given a combination
     of detector name, filter, subarray and data type
-    
+
     NOTE: This function needs to know the data type to return the
     correct exposure type for MIRI calibration data.
-    
+
     :Parameters:
-    
+
     detector: str
         Name of detector (MIRIMAGE, MIRIFUSHORT or MIRIFULONG)
     mirifilter: str
@@ -229,26 +236,26 @@ def get_exp_type(detector, mirifilter, subarray='FULL', datatype='SCIENCE'):
     datatype: str, optional
         Known data type (SCIENCE, DARK, FLAT or TARGET)
         Defaults to SCIENCE.
-        
+
     :Returns:
-    
+
     exp_type: str
         The exposure type string (EXP_TYPE)
-    
+
     """
     assert isinstance(detector, str)
     assert isinstance(mirifilter, str)
-    
+
     if 'MIRIFU' in detector:
         if (mirifilter and 'OPAQUE' in mirifilter) or (datatype == 'DARK'):
-            exp_type = 'MIR_DARK'
+            exp_type = 'MIR_DARKMRS'
         elif datatype == 'FLAT':
             exp_type = 'MIR_FLAT-MRS'
         else:
             exp_type = 'MIR_MRS'
     elif 'IM' in detector:
         if (mirifilter and 'OPAQUE' in mirifilter) or (datatype == 'DARK'):
-            exp_type = 'MIR_DARK'
+            exp_type = 'MIR_DARKIMG'
         elif datatype == 'FLAT':
             exp_type = 'MIR_FLAT-IMAGE'
         elif mirifilter and 'P750L' in mirifilter:
@@ -273,7 +280,7 @@ def get_exp_type(detector, mirifilter, subarray='FULL', datatype='SCIENCE'):
         else:
             exp_type = 'MIR_IMAGE'
     elif datatype == 'DARK':
-        exp_type = 'MIR_DARK'
+        exp_type = 'MIR_DARKALL'
     else:
         # Exposure type cannot be derived
         exp_type = ''
@@ -284,10 +291,10 @@ def get_exp_type(detector, mirifilter, subarray='FULL', datatype='SCIENCE'):
 #
 def _truncate_string_left(strg, maxlen):
     """
-        
+
     Helper function which truncates the left hand side of a string
     to the given length and adds a continuation characters, "...".
-        
+
     """
     if len(strg) > maxlen:
         lhs = maxlen - 4
@@ -297,10 +304,10 @@ def _truncate_string_left(strg, maxlen):
 
 def _truncate_string_right(strg, maxlen):
     """
-        
+
     Helper function which truncates the right hand side of a string
     to the given length and adds a continuation characters, "...".
-        
+
     """
     if len(strg) > maxlen:
         rhs = maxlen - 4
@@ -310,10 +317,10 @@ def _truncate_string_right(strg, maxlen):
 
 def _truncate_filename(filename, maxlen):
     """
-    
+
     Helper function which truncates a filename if it is longer than
     the given maximum length.
-    
+
     """
     if len(filename) > maxlen:
         filebits = os.path.split(filename)
@@ -323,19 +330,19 @@ def _truncate_filename(filename, maxlen):
 
 def _shape_to_string(shape, axes=None):
     """
-    
+
     Return an annotated string describing the given data shape.
-    
+
     For example, if shape=(3,4) and axes=('columns', 'rows')
     the string "3 rows x 4 columns" will be returned. If axes
     is not given, the string "3 x 4" will be returned.
-    
+
     If shape=(2,3,4) and axes=('hypercubes','cubes','rows','columns')
     the string "2 cubes x 3 rows x 4 columns" will be returned. The
     axes array is truncated on the left to match.
-        
+
     :Attributes:
-        
+
     shape: tuple of ints
         The shape to be described.
     axes: tuple of str, optional
@@ -344,17 +351,17 @@ def _shape_to_string(shape, axes=None):
         on the left.
         If the axes list is not given, or is too short, the shape will
         be described without labels.
-            
+
     :Returns:
-        
+
     description: str
         A human readable description of the given shape.
         For example, "3 cubes x 4 rows x 6 columns".
-    
+
     """
     if axes is not None:
         if len(shape) == 1:
-            strg = "%d %s" % (int(shape[0]), axes[-1])  
+            strg = "%d %s" % (int(shape[0]), axes[-1])
         elif len(axes) >= len(shape):
             strg = ''
             iishift = len(axes) - len(shape)
@@ -373,48 +380,20 @@ def _shape_to_string(shape, axes=None):
         strg = ' x '.join(str(s) for s in shape)
     return strg
 
-class MIRIExtension(AsdfExtension):
-    """
-    
-    A class which defines an extension to the ASDF URI mapping
-    which recognises the URI 'http://miri.stsci.edu/schemas/'
-    as a reference to the schemas belonging to the miri.datamodels
-    package.
-    
-    """
-    @property
-    def types(self):
-        return []
-
-    @property
-    def tag_mapping(self):
-        return []
-
-    @property
-    def url_mapping(self):
-        # Define the uri and directory containing the additional schemas
-        schema_uri_base = 'http://miri.stsci.edu/schemas/'
-        schema_path = os.path.abspath(os.path.join( \
-                            os.path.dirname(miri.datamodels.__file__),
-                            'schemas'))
-        return [(schema_uri_base,
-                 asdf.util.filepath_to_url(schema_path) +
-                 '/{url_suffix}')]
-
 
 class MiriDataModel(DataModel):
     """
-    
+
     A base data model for MIRI data, with MIRI-specific utilities and
     add-ons, based on the STScI base model, DataModel. The MiriDataModel
     also includes MIRI-specific additions to the metadata.
-    
+
     :Parameters:
-    
+
     init: shape tuple, file path, file object, pyfits.HDUList, numpy array
         An optional initializer for the data model, which can have one
         of the following forms:
-        
+
         * None: A default data model with no shape. (If a data array is
           provided later, the shape is derived from the data array.)
         * Shape tuple: Initialize with empty data of the given shape.
@@ -428,15 +407,15 @@ class MiriDataModel(DataModel):
     \*\*kwargs:
         All other keyword arguments are passed to the DataModel initialiser.
         See the jwst.datamodels documentation for the meaning of these keywords.
-    
+
     """
-    schema_url = "miri_core.schema.yaml"
+    schema_url = "miri_core.schema"
 
     def __init__(self, init=None, title='', extensions=None, **kwargs):
         """
-        
+
         Initialises the MiriDataModel class.
-        
+
         Parameters: See class doc string.
 
         """
@@ -447,12 +426,15 @@ class MiriDataModel(DataModel):
         # When a data model is copied, extensions will contain the current
         # list of extensions, in which case the list needs to be passed
         # unchanged to the parent class.
-        if extensions is None:
-#            extensions = [MIRIExtension(), JWSTExtension()]
-           extensions = [MIRIExtension()]
 
+        schema_path = os.path.join(URL_PREFIX, self.schema_url)
+        asdf_file = AsdfFile()
+        schema = asdf_schema.load_schema(schema_path,
+                                         resolver=asdf_file.resolver,
+                                         resolve_references=True)
+        self._schema = mschema.merge_property_trees(schema)
         # Initialise the underlying STScI data model.
-        super(MiriDataModel, self).__init__(init=init, extensions=extensions,
+        super(MiriDataModel, self).__init__(init=init, schema=self.schema,
                                             **kwargs)
 
         # Initialise the observation date if not already defined.
@@ -460,37 +442,37 @@ class MiriDataModel(DataModel):
             if hasattr(self.meta, 'observation') and hasattr(self.meta, 'date'):
                 if self.meta.date and not self.meta.observation.date:
                     self.meta.observation.date = self.meta.date
-        
+
         # Initialise the metadata cache used by the schema search functions.
         self._metadata_cache = {}
-        
+
         # Set the data product subtitle and history, if provided.
         self._subtitle = title
         created_strg = "Created from: %s" % self.__class__.__name__
         self.add_unique_history(created_strg)
-        
+
         #self._report_deprecated_values('__init__')
 
     def _reference_model(self):
         """
-        
+
         A helper function which declares the current data model as a reference
         data model. It defines default values for the PEDIGREE and USEAFTER
         fields and requests that no ASDF extensions be written when the
         data model is saved to a FITS file.
-        
+
         :Parameters:
-        
+
         None
-    
-        """         
+
+        """
         if hasattr(self, 'meta'):
             # The telescope must be JWST and the instrument must me MIRI
             if hasattr(self.meta, 'telescope'):
                 self.meta.telescope = 'JWST'
             if hasattr(self.meta, 'instrument'):
                 self.meta.instrument.name = 'MIRI'
-            
+
             # The default pedigree is 'GROUND' if not specified.
             if hasattr(self.meta, 'pedigree'):
                 if self.meta.pedigree is None:
@@ -508,7 +490,7 @@ class MiriDataModel(DataModel):
 #                         strg = "USEAFTER string (%s) does " % self.meta.useafter
 #                         strg += "not include a time component (e.g. T00:00:00)"
 #                         warnings.warn(strg)
-                    
+
 
         # Define the attribute which prevents the ASDF extension from
         # being written.
@@ -516,17 +498,17 @@ class MiriDataModel(DataModel):
 
     def _report_deprecated_values(self, description=''):
         """
-        
+
         A helper function which checks for data model items containing
         deprecated values. The function can be used during a transition
         period where the data model needs to accept the value in historical
         data but new data must no longer use it. The user is warned when
         the deprecated value is detected.
-        
+
         :Parameters:
-        
+
         None
-    
+
         """
         # TODO: If this test gets any more complicated it could be controlled
         # using a dictionary.
@@ -558,23 +540,23 @@ class MiriDataModel(DataModel):
     #
     # Convenience functions for setting commonly associated blocks
     # of MIRI metadata. All these functions assume the metadata is
-    # as defined in the "miri_core.schema.yaml" file.
+    # as defined in the "miri_core.schema" file.
     #
     def set_housekeeping_metadata(self, origin, author=None, pedigree=None,
                                   version=None, date=None, useafter=None,
                                   description=None):
         """
-        
+
         Convenience function to define housekeeping metadata.
-        
+
         Useful for setting up test data and converting data models.
 
         NOTE: The author, pedigree, useafter and descroption parameters are
         only valid for data models which define the reference file metadata
         in their data model.
-                
+
         :Parameters:
-        
+
         origin: str
             Organisation responsible for creating the file.
         author: str, optional
@@ -594,7 +576,7 @@ class MiriDataModel(DataModel):
             YY-MM-DD is today's date.
         description: str, optional
             Description of reference file.
-            
+
         """
         if hasattr(self, 'meta'):
             missing = ''
@@ -608,7 +590,7 @@ class MiriDataModel(DataModel):
                     'T00:00:00'
             elif date is not None:
                 self.meta.date = date
-                    
+
             if pedigree is not None or author is not None or \
                useafter is not None or description is not None:
                 self.set_referencefile_metadata(reftype=None, author=author,
@@ -624,12 +606,12 @@ class MiriDataModel(DataModel):
                                    pedigree=None, useafter=None,
                                    description=None):
         """
-        
+
         Convenience function to define reference file metadata.
-        
+
         NOTE: This function is only valid for data models which define
         the reference file metadata in their data model.
-        
+
         :Parameters:
 
         reftype: str, optional
@@ -645,7 +627,7 @@ class MiriDataModel(DataModel):
             YY-MM-DD is today's date.
         description: str, optional
             Description of reference file.
-            
+
         """
         if hasattr(self, 'meta'):
             if reftype is not None:
@@ -673,10 +655,10 @@ class MiriDataModel(DataModel):
                                    dataused=None, differences=None,
                                    history=None):
         """
-        
+
         Convenience function to add required HISTORY strings to
         reference file metadata.
-        
+
         :Parameters:
 
         document: str, optional
@@ -689,7 +671,7 @@ class MiriDataModel(DataModel):
             DIFFERENCES string describing differences.
         history: list of str, optional
             Optional list of additional history strings.
-            
+
         """
         if document is not None:
             document_strg = 'DOCUMENT: ' + str(document)
@@ -710,7 +692,7 @@ class MiriDataModel(DataModel):
             else:
                 self.add_history(str(history))
         self._report_deprecated_values('add_referencefile_history')
-                    
+
     def set_observation_metadata(self, dateobs=None, timeobs=None, obsid=None,
                                  observation_number=None, program_number=None,
                                  visit_id=None, visit_number=None,
@@ -719,14 +701,14 @@ class MiriDataModel(DataModel):
                                  bkgdtarg=None, template=None,
                                  observation_label=None):
         """
-        
+
         Convenience function to define observation and association metadata.
         By default it sets the observation date to the current date and time
         and leaves the other fields empty.
         Useful for setting up test data and converting data models.
-        
+
         :Parameters:
-        
+
         dateobs: date object, optional
             Observation date, formatted into a Python date object or string.
             If not given the current date will be used.
@@ -757,7 +739,7 @@ class MiriDataModel(DataModel):
             Observation template used
         observation_label: str, optional
             Proposer label for the observation
-            
+
         """
         from datetime import datetime
         if hasattr(self, 'meta') and hasattr(self.meta, 'observation'):
@@ -804,17 +786,17 @@ class MiriDataModel(DataModel):
 
     def set_target_metadata(self, ra, dec):
         """
-        
+
         Convenience function to define target metadata.
         Useful for setting up test data and converting data models.
-        
+
         :Parameters:
-        
+
         ra: number
             Target Right Ascension.
         dec: number
             Target declination.
-        
+
         """
         if hasattr(self, 'meta') and hasattr(self.meta, 'target'):
             if ra is not None:
@@ -828,19 +810,19 @@ class MiriDataModel(DataModel):
 
     def get_target_metadata(self):
         """
-        
+
         A trivial helper function which returns the target metadata.
-        
+
         :Parameters:
-        
+
         None
-        
+
         :Returns:
-        
+
         (ra, dec):
             Target Right Ascension and Declination.
             (None, None) if not defined.
-        
+
         """
         if hasattr(self, 'meta') and hasattr(self.meta, 'target'):
             return (self.meta.target.ra, self.meta.target.dec)
@@ -849,22 +831,22 @@ class MiriDataModel(DataModel):
 
     def set_pointing_metadata(self, ra_v1, dec_v1, pa_v3):
         """
-        
+
         Convenience function to define telescope pointing metadata.
         Useful for setting up test data and converting data models.
-        
+
         NOTE: Only valid for data models which include the wcsinfo
         schema.
-        
+
         :Parameters:
-        
+
         ra_v1: number
             Telescope pointing V1 axis Right Ascension.
         dec_v1: number
             Telescope pointing V1 axis declination.
         pa_v3: number
             Telescope pointing V3 axis position angle.
-        
+
         """
         if hasattr(self, 'meta') and hasattr(self.meta, 'pointing'):
             if ra_v1 is not None:
@@ -872,7 +854,7 @@ class MiriDataModel(DataModel):
             if dec_v1 is not None:
                 self.meta.pointing.dec_v1 = dec_v1
             if pa_v3 is not None:
-                self.meta.pointing.pa_v3 = pa_v3                
+                self.meta.pointing.pa_v3 = pa_v3
         else:
             strg = "Pointing metadata attributes missing from data model"
             raise AttributeError(strg)
@@ -880,23 +862,23 @@ class MiriDataModel(DataModel):
 
     def get_pointing_metadata(self):
         """
-        
+
         A trivial helper function which returns the pointing metadata.
-        
+
         NOTE: Only valid for data models which include the wcsinfo
         schema.
-        
+
         :Parameters:
-        
+
         None
-        
+
         :Returns:
-        
+
         (ra_v1, dec_v1, pa_v3):
             Telescope pointing V1 axis Right Ascension and Declination
             and Telescope pointing V3 axis position angle.
             (None, None, None) if not defined.
-        
+
         """
         if hasattr(self, 'meta') and hasattr(self.meta, 'pointing'):
             return (self.meta.pointing.ra_v1, self.meta.pointing.dec_v1,
@@ -906,29 +888,29 @@ class MiriDataModel(DataModel):
 
     def set_telescope(self):
         """
-        
+
         A convenience function to ensure the telescope metadata is set
         correctly. The telescope should always be 'JWST'.
-        
+
         :Parameters:
-        
+
         None
-        
+
         """
         if hasattr(self, 'meta') and hasattr(self.meta, 'telescope'):
             self.meta.telescope = 'JWST'
 
     def set_instrument_metadata(self, detector, modelnam='FM', detsetng='N/A',
                                 filt='', channel='', band='', coronagraph='',
-                                deck_temperature=None, ccc_pos='OPEN', 
+                                deck_temperature=None, ccc_pos='OPEN',
                                 detector_temperature=None):
         """
-        
+
         Convenience function to define instrument metadata.
         Useful for setting up test data and converting data models.
-        
+
         :Parameters:
-        
+
         detector: str
             Name of detector.
         modelnam: str
@@ -949,7 +931,7 @@ class MiriDataModel(DataModel):
             MIRI deck temperature in K.
         detector_temperature: number, optional
             MIRI detector temperature in K.
-        
+
         """
         if hasattr(self, 'meta') and hasattr(self.meta, 'instrument'):
             self.meta.instrument.name = 'MIRI'
@@ -980,20 +962,20 @@ class MiriDataModel(DataModel):
 
     def get_instrument_detector(self):
         """
-        
+
         A trivial helper function which returns the instrument detector name,
         model and settings.
-        
+
         :Parameters:
-        
+
         None
-        
+
         :Returns:
-        
+
         (detector, modelnam, detsetng):
             Instrument detector name, model and settings.
             (None, None, None) if not defined.
-        
+
         """
         if hasattr(self, 'meta') and hasattr(self.meta, 'instrument'):
             return (self.meta.instrument.detector, self.meta.instrument.model,
@@ -1003,20 +985,20 @@ class MiriDataModel(DataModel):
 
     def get_instrument_filter(self):
         """
-        
+
         A trivial helper function which returns the instrument filter name.
         Only valid for MIRI imager data. None will be returned for MRS
         data.
-        
+
         :Parameters:
-        
+
         None
-        
+
         :Returns:
-        
+
         filt: str
             Name of instrument filter. None if not defined.
-        
+
         """
         if hasattr(self, 'meta') and hasattr(self.meta, 'instrument'):
             if hasattr(self.meta.instrument, 'filter'):
@@ -1028,21 +1010,21 @@ class MiriDataModel(DataModel):
 
     def get_instrument_channel_band(self):
         """
-        
+
         A trivial helper function which returns the instrument channel
         and band. Only valid for MIRI MRS data. None will be returned
         for imager data.
-        
+
         :Parameters:
-        
+
         None
-        
+
         :Returns:
-        
+
         (channel, band)
             Name of instrument channel and band.
             (None, None) if not defined.
-        
+
         """
         if hasattr(self, 'meta') and hasattr(self.meta, 'instrument'):
             if hasattr(self.meta.instrument, 'channel') and hasattr(self.meta.instrument, 'band'):
@@ -1060,12 +1042,12 @@ class MiriDataModel(DataModel):
                               end_time=None, pointing_sequence=None, count=None,
                               prime_parallel=None):
         """
-        
+
         Convenience function to define exposure metadata.
         Useful for setting up test data and converting data models.
-        
+
         :Parameters:
-        
+
         readpatt: str
             Name of detector readout pattern.
         nints: int (optional)
@@ -1109,7 +1091,7 @@ class MiriDataModel(DataModel):
             Running count of exposures in visit
         prime_parallel: str, optional
             Prime or parallel exposure
-        
+
         """
         import time
         if hasattr(self, 'meta') and hasattr(self.meta, 'exposure'):
@@ -1156,7 +1138,7 @@ class MiriDataModel(DataModel):
                 self.meta.exposure.count = int(count)
             if prime_parallel is not None:
                 self.meta.exposure.prime_parallel = int(prime_parallel)
-                
+
         else:
             strg = "Exposure metadata attributes missing from data model"
             raise AttributeError(strg)
@@ -1164,21 +1146,21 @@ class MiriDataModel(DataModel):
 
     def get_exposure_readout(self):
         """
-        
+
         A trivial helper function which returns the exposure readout
         metadata.
-        
+
         :Parameters:
-        
+
         None
-        
+
         :Returns:
-        
+
         (readpatt, nints, ngroups, nframes):
             Detector readout pattern and the number of integrations,
             groups and frames.
-            (None, None, None, None) if not defined.  
-        
+            (None, None, None, None) if not defined.
+
         """
         if hasattr(self, 'meta') and hasattr(self.meta, 'exposure'):
             return (self.meta.exposure.readpatt, self.meta.exposure.nints,
@@ -1189,12 +1171,12 @@ class MiriDataModel(DataModel):
     def set_exposure_type(self, detector=None, mirifilter=None, subarray=None,
                           datatype='SCIENCE'):
         """
-    
+
         Convenience function which derives an exposure type given a
         combination of detector name, filter, subarray and data type
-    
+
         :Parameters:
-    
+
         detector: str, optional
             Name of detector (MIRIMAGE, MIRIFUSHORT or MIRIFULONG).
             If not specified, derived from the existing metadata.
@@ -1207,7 +1189,7 @@ class MiriDataModel(DataModel):
         datatype: str, optional
             Known data type (SCIENCE, DARK, FLAT or TARGET)
             Defaults to SCIENCE.
-            
+
         """
         if hasattr(self, 'meta') and hasattr(self.meta, 'exposure'):
             if hasattr(self.meta, 'instrument'):
@@ -1217,7 +1199,7 @@ class MiriDataModel(DataModel):
                     mirifilter = self.meta.instrument.filter
             if hasattr(self.meta, 'subarray'):
                 if subarray is None:
-                    subarray = self.meta.subarray.name   
+                    subarray = self.meta.subarray.name
             if not detector:
                 detector = 'UNKNOWN'
             if not mirifilter:
@@ -1239,18 +1221,18 @@ class MiriDataModel(DataModel):
 
     def get_exposure_type(self):
         """
-        
+
         A trivial helper function which returns the exposure type.
-        
+
         :Parameters:
-        
+
         None
-        
+
         :Returns:
-        
+
         type: str
             Exposure type. None if not defined.
-        
+
         """
         if hasattr(self, 'meta') and hasattr(self.meta, 'exposure'):
             if hasattr(self.meta.exposure, 'type'):
@@ -1262,17 +1244,17 @@ class MiriDataModel(DataModel):
 
     def set_subarray_metadata(self, subarray, fastaxis=1, slowaxis=2):
         """
-        
+
         Convenience function to define subarray metadata.
         Useful for setting up test data and converting data models.
-        
+
         :Parameters:
-        
+
         subarray: str or tuple
             If a string: The name of a known subarray mode
             If a tuple: The (xstart, ystart, xsize, ysize) of a
             user-defined subarray mode, where:
-            
+
             * xstart is the starting pixel in the X direction.
             * ystart is the starting pixel in the Y direction.
             * xsize is the number of pixels in the X direction (columns).
@@ -1281,7 +1263,7 @@ class MiriDataModel(DataModel):
             Axis number for fast readout. Default 1
         slowaxis: int (optional)
             Axis number for slow readout. Default 2.
-        
+
         """
         if hasattr(self, 'meta') and hasattr(self.meta, 'subarray'):
             # First define the fast and slow axes.
@@ -1295,7 +1277,7 @@ class MiriDataModel(DataModel):
                     self.meta.subarray.xstart = subtuple[0]
                     self.meta.subarray.ystart = subtuple[1]
                     self.meta.subarray.xsize = subtuple[2]
-                    self.meta.subarray.ysize = subtuple[3]   
+                    self.meta.subarray.ysize = subtuple[3]
             elif isinstance(subarray, (list,tuple)):
                 self.meta.subarray.name = "GENERIC"
                 self.meta.subarray.xstart = subarray[0]
@@ -1311,19 +1293,19 @@ class MiriDataModel(DataModel):
 
     def get_subarray_metadata(self):
         """
-        
+
         A trivial helper function which returns the subarray metadata.
-        
+
         :Parameters:
-        
+
         None
-        
+
         :Returns:
-        
+
         (name, xstart, ystart, xsize, ysize)
             Name of subarray mode, X and Y starting pixel and X and Y size.
             (None, None, None, None, None) if not defined.
-        
+
         """
         if hasattr(self, 'meta') and hasattr(self.meta, 'subarray'):
             return (self.meta.subarray.name,
@@ -1340,20 +1322,20 @@ class MiriDataModel(DataModel):
                          vparity=None, v3yangle=None,
                          ra_ref=None, dec_ref=None, roll_ref=None):
         """
-        
+
         Convenience function to define world coordinates metadata.
         Useful for setting up test data and converting data models.
-        
+
         NOTE: Data models may define different numbers of WCS axes.
         For example, the core data model defines 3 axes, but ramp data
         contains 4 axes. Warnings will be issued if a data model
         has not defined a sufficient number of axes.
-        
+
         NOTE: Only valid for data models which include the wcsinfo
         schema.
-        
+
         :Parameters:
-        
+
         wcsaxes: int
             Maximum number of WCS axes. Defaults to 3. Maximum 4.
         crpix: list of int
@@ -1395,7 +1377,7 @@ class MiriDataModel(DataModel):
         roll_ref, float, optional.
             Telescope roll angle of V3 measured from North over East
             at the ref. point (deg). Defaults to None.
-       
+
         """
         if hasattr(self, 'meta') and hasattr(self.meta, 'wcsinfo'):
             # Set the number of WCS to the supplied value, to 3, or to
@@ -1422,7 +1404,7 @@ class MiriDataModel(DataModel):
                 naxes = len(cdelt)
 
             self.meta.wcsinfo.wcsaxes = naxes
-            if naxes > 0:  
+            if naxes > 0:
                 for axis in range(0, naxes):
                     wcsmetadata = self.meta.wcsinfo
                     axis1 = axis + 1
@@ -1461,7 +1443,7 @@ class MiriDataModel(DataModel):
                         strg = "%s.%s does not exist! Too many WCS axes for data model." % \
                             (wcsmetadata, cdelt_name)
                         warnings.warn(strg)
-            
+
                 if pc is not None and len(pc) > 0:
                     minaxes = min( naxes, len(pc) )
                     if len(pc[0]) > 1:
@@ -1490,16 +1472,16 @@ class MiriDataModel(DataModel):
     def set_wcs_metadata_ranges(self, s_region=None, waverange_start=None,
                                 waverange_end=None, spectral_order=None):
         """
-        
+
         Convenience function to define the optional range subset of the
         world coordinates metadata.
         Useful for setting up test data and converting data models.
-        
+
         NOTE: Only valid for data models which include the wcsinfo
         schema.
-        
+
         :Parameters:
-        
+
         s_region: string, optional
             Spatial extent of the observation. Defaults to None.
         waverange_start: float, optional
@@ -1508,9 +1490,9 @@ class MiriDataModel(DataModel):
             Upper bound of default wavelength range. Defaults to None.
         spectral_order: int, optional
             Default spectral order. Defaults to None.
-       
+
         """
-        if hasattr(self, 'meta') and hasattr(self.meta, 'wcsinfo'):                
+        if hasattr(self, 'meta') and hasattr(self.meta, 'wcsinfo'):
             if s_region is not None:
                 self.meta.wcsinfo.s_region = s_region
             if waverange_start is not None:
@@ -1528,16 +1510,16 @@ class MiriDataModel(DataModel):
                               v3yangle=None, ra_ref=None, dec_ref=None,
                               roll_ref=None):
         """
-        
+
         Convenience function to define the optional reference subset of the
         world coordinates metadata.
         Useful for setting up test data and converting data models.
-        
+
         NOTE: Only valid for data models which include the wcsinfo
         schema.
-        
+
         :Parameters:
-        
+
         v2_ref: float, optional
             Telescope v2 coordinate of the reference point (arcmin).
             Defaults to None.
@@ -1557,7 +1539,7 @@ class MiriDataModel(DataModel):
         roll_ref, float, optional.
             Telescope roll angle of V3 measured from North over East
             at the ref. point (deg). Defaults to None.
-       
+
         """
         if hasattr(self, 'meta') and hasattr(self.meta, 'wcsinfo'):
             if v2_ref is not None:
@@ -1573,37 +1555,37 @@ class MiriDataModel(DataModel):
             if dec_ref is not None:
                 self.meta.wcsinfo.dec_ref = dec_ref
             if roll_ref is not None:
-                self.meta.wcsinfo.roll_ref = roll_ref       
+                self.meta.wcsinfo.roll_ref = roll_ref
         else:
             strg = "World coordinates metadata attributes missing from data model"
             raise AttributeError(strg)
         self._report_deprecated_values('set_wcs_metadata_refs')
-            
+
     def copy_metadata(self, other, ignore=[]):
         """
-        
+
         Copies metadata from another data model. MIRI metadata is copied
-        from the other data model object to this data model.  
+        from the other data model object to this data model.
         Useful when copying MIRI data products.
-        
+
         NOTE: This method will only copy the metadata defined in the
         schemas for both the current and "other" data models. Other
         metadata will be ignored (and a warning issued). Use the 'ignore'
         parameter to specify keywords that are know to be missing or
         irrelevant.
-        
+
         :Parameters:
-        
+
         other: MiriDataModel
             The data model whose metadata is to be copied to this one.
         ignore: list of strings, optional
             If a metadata keyword contains any of these strings it is
             not copied.
-        
+
         """
         assert isinstance(other, MiriDataModel)
         if hasattr(other, 'meta'):
-            
+
             # Copy all metadata apart from keyword matches specified
             # in the ignore list.
             fitskwdict = other.fits_metadata_dict()
@@ -1645,34 +1627,36 @@ class MiriDataModel(DataModel):
     #
     def list_data_arrays(self):
         """
-        
+
         Return a list of data arrays contained in the product.
-        
+
         :Parameters:
-        
+
         None
-        
+
         :Returns:
-        
+
         arraylist: tuple of str
             A list the names of the data arrays found.
-        
+
         :Requires:
-        
+
         Makes use of the search facilities in jwst.datamodels.schema
-        
+
         """
         # Define a function to be applied at each level of the schema.
         def find_data_arrays(subschema, path, combiner, ctx, recurse):
             # Data objects have a datatype and do not have a type
             type = subschema.get('type')
             subdtype = subschema.get('datatype')
+            #print("Found type=", type, "subdtype=", subdtype)
+            #print("subdtype is a", str(subdtype.__class__.__name__))
             if type is None and subdtype is not None:
-                if not isinstance(subdtype, (tuple,list)):
+                if not isinstance(subdtype, (str,tuple,list)):
                     # Ensure each entry is made only once.
                     pathstr = '.'.join(path)
                     if pathstr not in results:
-#                         print("Found data array at", pathstr)
+                        #print("Found data array at", pathstr)
                         results.append(pathstr)
 
         # Walk through the schema and apply the search function.
@@ -1682,22 +1666,22 @@ class MiriDataModel(DataModel):
 
     def list_data_tables(self):
         """
-        
+
         Return a list of data tables contained in the product.
-        
+
         :Parameters:
-        
+
         None
-        
+
         :Returns:
-        
+
         tablelist: tuple of str
             A list of the names of the data tables found.
-        
+
         :Requires:
-        
+
         Makes use of the search facilities in jwst.datamodels.schema
-        
+
         """
         # Define a function to be applied at each level of the schema.
         def find_data_tables(subschema, path, combiner, ctx, recurse):
@@ -1720,31 +1704,31 @@ class MiriDataModel(DataModel):
 
     def has_dataarray(self, name, matchfits=True):
         """
-        
+
         Return True if this data product contains the named data array
         within its schema. The function can also search for a match
         against the FITS HDU names.
-        
+
         :Parameters:
-        
+
         name: str
             Name of data array (e.g. 'data', 'err' or 'dq').
         matchfits: bool, optional
             If True (the default) also attempt to match the given
             name to the FITS HDU names.
-            
+
         :Returns:
-        
+
         True or False
-        
+
         """
         # Obtain a list of known data arrays
         list_of_arrays = self.list_data_arrays()
-        
+
         # Check for a match in the list of data arrays
         if name in list_of_arrays:
             return True
-        
+
         # If there isn't a match in the data array names, try looking
         # for a match in the FITS HDU name.
         if matchfits:
@@ -1752,62 +1736,62 @@ class MiriDataModel(DataModel):
                 hduname = self.dataname_to_hduname(dataname)
                 if name == hduname:
                     return True
-            
+
         # Match not found
         return False
 
     def has_datatable(self, name, matchfits=True):
         """
-        
+
         Return True if this data product contains the named data table
         within its schema. The function can also search for a match
         against the FITS HDU names.
-        
+
         :Parameters:
-        
+
         name: str
             Name of data table (e.g. 'data', 'err' or 'dq').
         matchfits: bool, optional
             If True (the default) also attempt to match the given
             name to the FITS HDU names.
-            
+
         :Returns:
-        
+
         True or False
-        
+
         """
         # Obtain a list of known data arrays
         list_of_tables = self.list_data_tables()
-        
+
         # Check for a match in the list of data arrays
         if name in list_of_tables:
             return True
-        
+
         # If there isn't a match in the data array names, try looking
         # for a match in the FITS HDU name.
         for tablename in list_of_tables:
             hduname = self.dataname_to_hduname(tablename)
             if name == hduname:
                 return True
-            
+
         # Match not found
         return False
 
     def maskable(self):
         """
-        
+
         Returns True if the data model contains a valid data quality
         array with at least one non-zero value, meaning the array can
         be used to mask other arrays.
-        
+
         Note: This function doesn't check the data quality array is
         broadcastable onto other arrays, only that it exists and
         contains valid data.
 
         :Returns:
-        
+
         True or False
-        
+
         """
         result = False
         # There must be a data quality array (dq).
@@ -1827,20 +1811,20 @@ class MiriDataModel(DataModel):
 
     def get_field_names(self, name):
         """
-        
+
         Get the field names associated with the named data table.
 
         :Parameters:
-        
+
         name: str
             The name of the data table.
-            
+
         :Returns:
-        
+
         field_names: list of str
             A list of column names found in the table. An empty list
             is returned if the data element is not a table.
-        
+
         """
         field_names = []
         dtypes = self.find_schema_components('datatype')
@@ -1871,15 +1855,15 @@ class MiriDataModel(DataModel):
 
     def add_comment(self, comment):
         """
-        
+
         Add a comment to the metadata associated with the data product.
         Obsolete function. Exists for backwards compatibility.
-        
+
         :Parameters:
-        
+
         comment: str
             A string containing a comment.
-                        
+
         """
         # The FITS comment function no longer works.
         # Add the comment as a history item instead.
@@ -1888,26 +1872,26 @@ class MiriDataModel(DataModel):
 
     def get_comments_str(self):
         """
-        
+
         Return a structured string containing the comments
         associated with the data product.
         Obsolete function. Exists for backwards compatibility.
-        
+
         """
         # For now, just return the FITS comments.
         return self.get_fits_comments_str()
 
     def add_history(self, history):
         """
-        
+
         Add a history record to the metadata associated with the
         data product.
-        
+
         :Parameters:
-        
+
         history: str
             A string containing a history record.
-                        
+
         """
         # The data model can store history records in a list-like object or
         # a dictionary, depending on which version of the JWST
@@ -1916,8 +1900,8 @@ class MiriDataModel(DataModel):
             try:
                 if hasattr(self.history, 'append'):
                     self.history.append( history )
-                elif isinstance(self.history, dict):  
-                    # Wrap history string in an ASDF HistoryEntry object 
+                elif isinstance(self.history, dict):
+                    # Wrap history string in an ASDF HistoryEntry object
                     # and tag it with the current time.
                     history_item = HistoryEntry({'description': history,
                     'time': Time(datetime.datetime.now())})
@@ -1934,16 +1918,16 @@ class MiriDataModel(DataModel):
 
     def add_unique_history(self, history):
         """
-        
+
         Add a history record to the metadata associated with the
         data product, but only if the same string doesn't already
         exist.
-        
+
         :Parameters:
-        
+
         history: str
             A string containing a history record.
-                        
+
         """
         history_list = self.get_history()
         if history_list:
@@ -1953,13 +1937,13 @@ class MiriDataModel(DataModel):
         else:
             # This is the first history entry.
             self.add_history(history)
-            
+
     def get_history(self):
         """
-        
+
         Return the history list as a list of strings.
         Exists for backwards compatibility.
-                
+
         """
         # The data model can store history records in a list-like object or
         # a dictionary, depending on which version of the JWST
@@ -1985,13 +1969,13 @@ class MiriDataModel(DataModel):
                 # Unrecognised type. Return no history.
                 pass
         return history_list
-        
+
     def get_history_str(self):
         """
-        
+
         Return a structured string containing the history records
         associated with the data product.
-        
+
         """
         strg = ''
         history_list = self.get_history()
@@ -2024,11 +2008,11 @@ class MiriDataModel(DataModel):
     def fits_metadata_dict(self, include_comments=False, include_history=False,
                            include_builtin=False):
         """
-        
+
         Locates all the metadata items associated with a FITS keyword
         and returns a dictionary which identifies the HDU name, FITS
         keyword name and comment associated with each item.
-        
+
         The dictionary can be used to translate each metadata tree element
         into its associated FITS HDU, keyword and comment (the opposite
         of the find_fits_keyword convenience function provided with the
@@ -2037,15 +2021,15 @@ class MiriDataModel(DataModel):
         NOTE: The to_flat_dict function included in the STScI data model
         provides a similar function, but it returns a dictionary of
         metadata values only. This function is more FITS-specific.
-        
+
         WARNING: The dictionary returned by this function is meant to be
         read-only. If you need to change the metadata contained in the
         data model, use the syntax
-        
+
             datamodel[schemakw] = newvalue
-        
+
         :Parameters:
-        
+
         include_comments: bool, optional, default=False
             Set True to include COMMENT records in the dictionary
         include_history: bool, optional, default=False
@@ -2053,20 +2037,20 @@ class MiriDataModel(DataModel):
         include_builtin: bool, optional, default=False
             Set True to include builtin FITS keywords (such as NAXIS) in
             the dictionary.
-        
+
         :Returns:
-        
+
         metadict = dictionary of {schemakw: (hduname, fitskw, fitscomment)}
             A dictionary whose keywords correspond to dot-separated
             metadata tree entries, such as `meta.observation.date`.
             Each element in the dictionary is a tuple of 3 strings,
             containing the HDU name, the FITS keyword and the title
             (or FITS comment string) for the metadata element.
-        
+
         :Requires:
-        
+
         Makes use of the search facilities in jwst.datamodels.schema
-        
+
         """
         # Define a function to be applied at each level of the schema.
         def find_fits_elements(subschema, path, combiner, ctx, recurse):
@@ -2104,20 +2088,20 @@ class MiriDataModel(DataModel):
                              include_comments=False, include_history=False,
                              include_builtin=True):
         """
-        
+
         Locates all the metadata items associated with a FITS keyword
         within a particular HDU and returns a dictionary which looks
         like a FITS header structure. Unlike the get_fits_keyword method,
         who don't need to know in advance which keywords to query.
-        
+
         WARNING: The dictionary returned by this function is meant to be
         read-only. If you need to change any of the keywords listed in the
         dictionary in the data model, use the method
-        
+
             datamodel.set_fits_keyword( fitskw, newvalue )
-        
+
         :Parameters:
-        
+
         hdu_name: str, optional, default='PRIMARY'
             The name of the FITS HDU the keyword is associated with.
             If None, any HDU is matched, but the keyword must be
@@ -2131,16 +2115,16 @@ class MiriDataModel(DataModel):
         include_builtin: bool, optional, default=True
             Set True to include builtin FITS keywords (such as NAXIS) in
             the dictionary.
-        
+
         :Returns:
-        
+
         metadict = dictionary of {fitskw: value}
             A header dictionary.
-        
+
         :Requires:
-        
+
         Makes use of the search facilities in jwst.datamodels.schema
-        
+
         """
         # Define a function to be applied at each level of the schema.
         def find_fits_elements(subschema, path, combiner, ctx, recurse):
@@ -2179,21 +2163,21 @@ class MiriDataModel(DataModel):
 
     def dataname_to_hduname(self, name):
         """
-        
+
         Return the name of the FITS HDU associated with the named data item.
-        
+
         :Parameters:
-        
+
         name: str
             Name of data item (e.g. 'data', 'err' or 'dq').
-            
+
         :Returns:
-        
+
         hduname: str
             name of the FITS HDU associated with the named item.
-            Returns None if there is no match or there is no FITS HDU 
+            Returns None if there is no match or there is no FITS HDU
             name.
-        
+
         """
         # TODO: Modify to use walk_schema
         if 'properties' in self.schema:
@@ -2212,26 +2196,26 @@ class MiriDataModel(DataModel):
                             hduname = sublevel['properties'][name]['fits_hdu']
                             return hduname
         else:
-            raise AttributeError("MiriDataModel object has unrecognised schema format") 
+            raise AttributeError("MiriDataModel object has unrecognised schema format")
 
         return None
 
     def hduname_to_dataname(self, hduname):
         """
-        
+
         Obtain the name of the data item associated with the given
         FITS HDU.
-        
+
         :Parameters:
-        
+
         hduname: str
             Name of the FITS HDU (e.g. 'SCI', 'ERR' or 'DQ').
-            
+
         :Returns:
 
         name: str
             Name of the data item. Returns None if there is no match.
-        
+
         """
         # TODO: Modify to use walk_schema
         if 'properties' in self.schema:
@@ -2253,28 +2237,28 @@ class MiriDataModel(DataModel):
                             if hduname == fits_hdu:
                                 return subkey
         else:
-            raise AttributeError("MiriDataModel object has unrecognised schema format") 
+            raise AttributeError("MiriDataModel object has unrecognised schema format")
 
         return None
 
     def add_fits_comment(self, comment, hdu_name='PRIMARY'):
         """
-        
+
         Add a comment to the comment records contained in the metadata
         associated with a given FITS HDU.
-        
+
         NOTE: This function is deprecated. The add_comment function
         will be more reliable.
-        
+
         :Parameters:
-        
+
         comment: str
             A string containing a comment.
         hdu_name: str, optional, default='PRIMARY'
             The name of the FITS HDU the keyword is associated with.
             If None, any HDU is matched, but the keyword must be
             unique within the data structure.
-                        
+
         """
         # Define a function to be applied at each level of the schema.
         def find_fits_elements(subschema, path, combiner, ctx, recurse):
@@ -2325,23 +2309,23 @@ class MiriDataModel(DataModel):
 
     def get_fits_comments(self, hdu_name='ALL'):
         """
-        
+
         Locates all the COMMENT metadata from the given HDU and
         returns them as a list.
-        
+
         :Parameters:
-        
+
         hdu_name: str, optional, default='ALL'
             The name of the FITS HDU from which to extract the comments.
             If 'ALL', all comments will be included, regardless of HDU.
-        
+
         :Returns:
-        
+
         comments: list of list of strings
             All the comments found in the metadata. Each item in the top
             level list corresponds to one HDU and each item in the second
             level list corresponds to a separate COMMMENT entry.
-                
+
         """
         found = self.find_fits_values('COMMENT')
         # Extract the comments and check their HDU.
@@ -2352,13 +2336,13 @@ class MiriDataModel(DataModel):
             elif item[0] == hdu_name:
                 comments.append(item[1])
         return comments
-    
+
     def get_fits_comments_str(self):
         """
-        
+
         Return a structured string containing the comments
         associated with the data product.
-        
+
         """
         strg = ''
         commentlist = self.get_fits_comments(hdu_name='ALL')
@@ -2370,32 +2354,32 @@ class MiriDataModel(DataModel):
 
     def find_fits_values(self, keyword):
         """
-        
+
         Locates all the references to a particular FITS keyword
         in the schema and return a list of all the values found,
         identified by HDU.
-        
+
         NOTE: Unlike 'find_fits_keyword', this function also searches
         the "_extra_fits" tree  to match keywords not included in
         the schema file. This allows the function to track down
         ad-hoc comment and history records.
-        
+
         :Parameters:
-        
+
         keyword: str
             The keyword to be searched for.
-        
+
         :Returns:
-        
+
         values: list of (string, object)
             A list of the metadata items found. Each element in the
             list is a string containing name of the HDU plus an
             object containing the value.
-        
+
         :Requires:
-        
+
         Makes use of the search facilities in jwst.datamodels.schema
-        
+
         """
         # Define a function to be applied at each level of the schema.
         def find_fits_elements(subschema, path, combiner, ctx, recurse):
@@ -2420,12 +2404,12 @@ class MiriDataModel(DataModel):
 
     def get_elements_for_fits_hdu(self, schema, hdu_name='PRIMARY'):
         """
-        
+
         Returns a list of metadata element names that are stored in a
         given FITS HDU.
 
         :Parameters:
-        
+
         schema : Data model schema fragment
             Data model schema fragment
 
@@ -2437,7 +2421,7 @@ class MiriDataModel(DataModel):
         elements : dict
             The keys are FITS keywords, and the values are dot-separated
             paths to the metadata elements.
-            
+
         """
         def find_fits_elements(subschema, path, combiner, ctx, recurse):
             hdu = subschema.get('fits_hdu')
@@ -2455,27 +2439,27 @@ class MiriDataModel(DataModel):
 
     def get_fits_keyword(self, keyword, hdu_name='PRIMARY'):
         """
-  
+
         Return the value within the metadata associated with
         a FITS keyword. Only one value is returned.
-        
+
         See also the get_fits_header_dict method.
-     
+
         :Parameters:
-        
+
         keyword: str
             The keyword to be searched for.
         hdu_name: str, optional, default='PRIMARY'
             The name of the FITS HDU the keyword is associated with.
             If None, any HDU is matched, but the keyword must be
             unique within the data structure.
-        
+
         :Returns:
-        
+
         value: object
             An object containing the current value associated with the keyword.
             If multiple occurrences are matched, only the first will be returned.
-        
+
         """
         if hdu_name is None:
             # Find the keyword in any HDU
@@ -2501,7 +2485,7 @@ class MiriDataModel(DataModel):
                 metadict = self.get_elements_for_fits_hdu(self.schema,
                                                           hdu_name=hdu_name)
                 self._metadata_cache[hdu_name] = metadict
-                
+
             if keyword in metadict:
                 return self[metadict[keyword]]
             else:
@@ -2511,11 +2495,11 @@ class MiriDataModel(DataModel):
 
     def set_fits_keyword(self, keyword, value, hdu_name='PRIMARY'):
         """
-  
+
         Set the metadata associated with a FITS keyword to a given value.
-     
+
         :Parameters:
-        
+
         keyword: str
             The keyword to be searched for.
         value: object
@@ -2523,7 +2507,7 @@ class MiriDataModel(DataModel):
         hdu_name: str, optional, default='PRIMARY'
             The name of the FITS HDU the keyword is associated with.
             If None, any HDU is matched.
-        
+
         """
         if hdu_name is None:
             # Find the keyword in any HDU
@@ -2562,23 +2546,23 @@ class MiriDataModel(DataModel):
     #
     def find_schema_components(self, component):
         """
-        
+
         Return the location of a specific data array within the schema.
-        
+
         :Parameters:
-        
+
         component: str
             Name of the schema components to be located.
-        
+
         :Returns:
-        
+
         componentList: dict
             A dictionary of component values, looked up by name.
-        
+
         :Requires:
-        
+
         Makes use of the search facilities in jwst.datamodels.schema
-        
+
         """
         # Define a function to be applied at each level of the schema.
         def locate_component(subschema, path, combiner, ctx, recurse):
@@ -2595,12 +2579,12 @@ class MiriDataModel(DataModel):
 
     def get_title(self, underline=False, underchar="-", maxlen=None):
         """
-        
+
         Return a top level title string describing the data product,
         which may be underlined.
-        
+
         :Parameters:
-        
+
         underline: bool, optional
             Set to True if the title should be underlined. The default
             is False.
@@ -2609,12 +2593,12 @@ class MiriDataModel(DataModel):
         maxlen: int, optional
             The maximum title length acceptable. If not specified, the
             length is unlimited.
-        
+
         :Returns:
-        
+
         title: str
             A title string
-        
+
         """
         # The schema title will either be found at the top
         # level or be inside an "allOf" structure. If the latter,
@@ -2639,14 +2623,14 @@ class MiriDataModel(DataModel):
             strg += "\n"
             strg += underchar * len1
         return strg
-           
+
     def get_meta_title(self, underline=False, underchar="-", maxlen=None):
         """
-        
+
         Return the metadata title.
-     
+
         :Parameters:
-        
+
         underline: bool, optional
             Set to True if the title should be underlined. The default
             is False.
@@ -2655,12 +2639,12 @@ class MiriDataModel(DataModel):
         maxlen: int, optional
             The maximum title length acceptable. If not specified, the
             length is unlimited.
-        
+
         :Returns:
-        
+
         title: str
             A title string.
-        
+
         """
         titles = self.find_schema_components('title')
         if 'meta' in titles:
@@ -2680,11 +2664,11 @@ class MiriDataModel(DataModel):
     def get_meta_str(self, includenulls=False, includeunits=False,
                      underline=False, underchar="-"):
         """
-        
+
         Get a readable string describing the metadata.
-     
+
         :Parameters:
-        
+
         includenulls: bool, optional
             If True, the description will include all the metadata items
             with null values. The default is False.
@@ -2696,12 +2680,12 @@ class MiriDataModel(DataModel):
             The default is False.
         underchar: str, optional
             If underline is True, the character to be used (default '-').
-        
+
         :Returns:
-        
+
         strg: str
             A string describing the metadata.
-        
+
         """
         strg = self.get_meta_title(underline=underline, underchar=underchar) + "\n"
         # Locate all the metadata associated with FITS keywords and
@@ -2722,14 +2706,14 @@ class MiriDataModel(DataModel):
                 if includenulls or (value is not None):
                     strg += strgfmt2 % (keyw, fitskey, str(value), fitscomment)
         return strg
- 
+
     def get_data_title(self, name, underline=False, underchar="-", maxlen=None):
         """
-        
+
         Return the title of the named data item, which may be underlined.
-        
+
         :Parameters:
-        
+
         name: str
             The name of the data array
         underline: bool, optional
@@ -2740,12 +2724,12 @@ class MiriDataModel(DataModel):
         maxlen: int, optional
             The maximum title length acceptable. If not specified, the
             length is unlimited.
-        
+
         :Returns:
-        
+
         title: str
             A title string.
-        
+
         """
         titles = self.find_schema_components('title')
         if name in titles:
@@ -2754,7 +2738,7 @@ class MiriDataModel(DataModel):
             title = "Data table \'" + name + "\'"
         else:
             title = "Data array \'" + name + "\'"
-   
+
         # Truncate and/or underline the title if needed.
         if maxlen is not None:
             title = _truncate_string_left( title, maxlen )
@@ -2766,20 +2750,20 @@ class MiriDataModel(DataModel):
 
     def get_data_axes(self, name):
         """
-        
+
         Return the axes of the named data item.
-        
+
         :Parameters:
-        
+
         name: str
             The name of the data array or table.
-        
+
         :Returns:
-        
+
         axes: tuple of str
             A list of axis names. Returns ['records'] if the item is a table.
             Returns None if the data name does not match, or if it has no axes.
-        
+
         """
         titles = self.find_schema_components('axes')
         if name in titles:
@@ -2795,20 +2779,20 @@ class MiriDataModel(DataModel):
 
     def get_data_labels(self, name):
         """
-        
+
         Return a human readable string labelling the axes of the
         named data item.
-        
+
         :Parameters:
-        
+
         name: str
             The name of the data array.
-        
+
         :Returns:
-        
+
         label: str
             A string describing the structure of the data axes.
-        
+
         """
         axes = self.get_data_axes(name)
         labels = None
@@ -2820,22 +2804,22 @@ class MiriDataModel(DataModel):
 
     def get_data_units(self, name):
         """
-        
+
         Return the units of the named data item (data array or data table)
-        
+
         :Parameters:
-        
+
         name: str
             The name of the data array or data table
-        
+
         :Returns:
-        
+
         units: str
-            The data item units. Returns None if the data name does not 
+            The data item units. Returns None if the data name does not
             match, or if it has no units.
             Returns a single string for a data array.
             Returns a string containing a list of column units for a data table.
-        
+
         """
         # The data units should be defined in the metadata.
         units = None
@@ -2859,7 +2843,7 @@ class MiriDataModel(DataModel):
                 units = "(" +  ", ".join(colunits) + ")"
                 # Convert undefined units to null strings.
                 units = units.replace('\"None\"', '\"\"')
-        
+
         # If no units are defined in the metadata, see if there are
         # default units in the schema.
         if not units:
@@ -2870,19 +2854,19 @@ class MiriDataModel(DataModel):
 
     def get_table_units(self, name):
         """
-        
+
         Return the units of the columns within a named data table
-        
+
         :Parameters:
-        
+
         name: str
             The name of the data table
-        
+
         :Returns:
-        
+
         unitlist: list of str
             A list of column units for the data table.
-        
+
         """
         # The data units should be defined in the metadata.
         unitlist = []
@@ -2905,7 +2889,7 @@ class MiriDataModel(DataModel):
                         unitlist.append('')
                     col += 1
                     unitname = 'tunit%s' % col
-        
+
         # If no units are defined in the metadata, see if there are
         # default units in the schema.
         if not unitlist:
@@ -2916,11 +2900,11 @@ class MiriDataModel(DataModel):
 
     def set_data_units(self, name, units=None):
         """
-        
+
         Define the units of the named data array.
-        
+
         :Parameters:
-        
+
         name: str
             The name of the data array
         units: str (optional)
@@ -2931,18 +2915,18 @@ class MiriDataModel(DataModel):
             A warning will be issued if the data model already
             defines units that are different from those expected
             by the schema.
-        
+
         :Returns:
-        
+
         units: str
             The actual data units as defined.
-            
+
         :Raises:
-        
+
         AttributeError:
             Raised if there are no data units defined in the schema
             or if the data item does not exist.
-        
+
         """
         # If the units have not been explicitly specified, get a default
         # from the schema. Search for a .units components of the named item.
@@ -2961,7 +2945,7 @@ class MiriDataModel(DataModel):
 
         # If there are valid units, define them by setting the metadata
         # (if available).
-        if units is not None:      
+        if units is not None:
             if hasattr( self.meta, name):
                 metaname = getattr(self.meta, name)
                 if hasattr(metaname, 'units'):
@@ -3002,11 +2986,11 @@ class MiriDataModel(DataModel):
 
     def set_table_units(self, name, units=None):
         """
-          
+
         Define the column units of the named data table.
-          
+
         :Parameters:
-          
+
         name: str
             The name of the data table
         units: list of str (optional)
@@ -3017,18 +3001,18 @@ class MiriDataModel(DataModel):
             A warning will be issued if the data model already defines
             column units that are different from those expected by the
             schema.
-          
+
         :Returns:
-          
+
         tableunits: list of str
             The actual table column units as defined.
-              
+
         :Raises:
-          
+
         AttributeError:
             Raised if there are no table units defined in the schema
             or if the data item does not exist.
-          
+
         """
         tableunits = []
         # Get the field (column) names contained in the table
@@ -3068,7 +3052,7 @@ class MiriDataModel(DataModel):
                                             str(fromunits)
                                         strg += "defined in the schema (%s)." % \
                                             str(tableunits[ii])
-                                        warnings.warn(strg)    
+                                        warnings.warn(strg)
                                 else:
                                     # Either the data model units are blank or
                                     # an explicit value has been provided. The unit
@@ -3086,7 +3070,7 @@ class MiriDataModel(DataModel):
                                 strg = "Table \'%s\': " % name
                                 strg += "Column \'%s\' not found in data model. " % fieldnames[ii]
                                 strg += "Cannot check the column units."
-                                warnings.warn(strg)    
+                                warnings.warn(strg)
                     # Write back the modified table
                     setattr(self, name, mytable)
 # The following warning happens whenever an empty data model is created to be
@@ -3100,13 +3084,13 @@ class MiriDataModel(DataModel):
                 strg += "any self.meta.%s.tunits attributes." % name
                 raise AttributeError(strg)
         return tableunits
-                
+
     def get_data_stats(self, name):
         """
-        
+
         Get a string summarising the contents of the named data item.
         The following statistics are included:
-        
+
         * Number of zero elements
         * Number of non-zero elements
         * Minimum value
@@ -3114,20 +3098,20 @@ class MiriDataModel(DataModel):
         * Mean value
         * Median value (if appropriate)
         * Standard devision (if appropriate)
-        
+
         NOTE: If a masked version of a data array is available,
         the masked version is used to derive the statistics.
-        
+
         :Parameters:
-        
+
         name: str
             The name of the data item.
-        
+
         :Returns:
-        
+
         description: str
             A string giving statistics for the named data item.
-        
+
         """
         strg = ''
         data_title = self.get_data_title(name)
@@ -3170,11 +3154,11 @@ class MiriDataModel(DataModel):
 
     def get_data_str(self, name, underline=False, underchar="-"):
         """
-        
+
         Get a string describing the named data item.
-        
+
         :Parameters:
-        
+
         name: str
             The name of the data item.
         underline: bool, optional
@@ -3183,12 +3167,12 @@ class MiriDataModel(DataModel):
         underchar: str, optional
             If underline is True, the underline character to be used
             (default '-').
-         
+
         :Returns:
-        
+
         description: str
             A string describing the named data item.
-        
+
         """
         strg = '\n'
         data_title = self.get_data_title(name)
@@ -3221,22 +3205,22 @@ class MiriDataModel(DataModel):
 
     def stats(self):
         """
-        
+
         Return statistics about a generic MIRI data object as a
         readable string.
-        
+
         The string contains a list of data arrays together with
         statistics for the range of values contained in those
         data arrays.
-        
+
         The string also contains a list of data tables contained
         in the structure, together with the column names.
-        
+
         :Returns:
-        
+
         description: str
             A string containing statistics of the contents.
-        
+
         """
         # Start with the data object title
         strg = self.get_title(underline=True, underchar="=") + "\n"
@@ -3254,7 +3238,7 @@ class MiriDataModel(DataModel):
             # Display statistics for each data array.
             for dataname in list_of_arrays:
                 strg += self.get_data_stats(dataname)
-        
+
         # Count the data tables.
         list_of_tables = self.list_data_tables()
         ntables = len(list_of_tables)
@@ -3274,7 +3258,7 @@ class MiriDataModel(DataModel):
                 addstr += "data table:"
             # Add a section title plus an underline.
             strg += addstr + '\n' + (len(addstr) * '-') + '\n'
-                
+
             # Display column names for each table.
             for tablename in list_of_tables:
                 strg += "Data table \'%s\'\n" % tablename
@@ -3292,15 +3276,15 @@ class MiriDataModel(DataModel):
 
     def get_title_and_metadata(self):
         """
-        
+
         Return the title and metadata of a MIRI data object as a readable
         string.
-        
+
         :Returns:
-        
+
         description: str
             A string containing a description.
-        
+
         """
         # Start with the data object title, metadata and history
         strg = self.get_title(underline=True, underchar="=") + "\n"
@@ -3310,24 +3294,24 @@ class MiriDataModel(DataModel):
 
     def __str__(self):
         """
-        
+
         Return the contents of a generic MIRI data object as a readable
         string.
-        
+
         :Returns:
-        
+
         description: str
             A string containing a summary of the contents.
-        
+
         """
         # Start with the data object title, metadata and history
         strg = self.get_title_and_metadata()
-        
+
         # Display the data arrays.
         list_of_arrays = self.list_data_arrays()
         for dataname in list_of_arrays:
             strg += self.get_data_str(dataname, underline=True, underchar="-")
-        
+
         # Display the data tables.
         list_of_tables = self.list_data_tables()
         for tablename in list_of_tables:
@@ -3336,7 +3320,7 @@ class MiriDataModel(DataModel):
 
     def on_save(self, path=None):
         """
-        
+
         Use the "on_save" hook within the JWST data models to
         check the metadata before saving a data mode to a file.
 
@@ -3344,25 +3328,25 @@ class MiriDataModel(DataModel):
         ----------
         path : str
             The path to the file that we're about to save to.
-            
+
         """
         # Report if an attempt is made to save a data model with
         # faulty metadata.
         self._report_deprecated_values('on_save')
-            
+
         # Switch to the hook defined in the base model.
         super(MiriDataModel, self).on_save(path)
 
     def plot(self, description='', visitor=None, **kwargs):
         """
-        
+
         Plot the data product using the algorithm contained in the
         specified visitor class.
 
         NOTE: This plot method can be considered a quick look method.
-        
+
         :Parameters:
-        
+
         description: str, optional
             Description to be added to the plot title, if required.
             This is only used if a visitor object is not provided.
@@ -3380,24 +3364,24 @@ class MiriDataModel(DataModel):
         # If a visitor object is not given, create one using the default class.
         if visitor is None:
             visitor = DataModelPlotVisitor(description=description)
-            
+
         # Invoke the visitor plot method on this data object.
         visitor.visit(self, **kwargs)
 
     def dump_schema(self):
         """
-        
+
         Dump the schema to a heirarchical string
-        
+
         :Returns:
-        
+
         strg: str
             String version of the schema layout.
-        
+
         :Requires:
-        
+
         Makes use of the search facilities in jwst.datamodels.schema
-        
+
         """
         # Define a function to be applied at each level of the schema.
         def schema_to_string(subschema, path, combiner, ctx, recurse):
@@ -3415,12 +3399,12 @@ class MiriDataModel(DataModel):
         # Walk through the schema and apply the search function.
         results = []
         mschema.walk_schema(self.schema, schema_to_string, results)
-        
+
         strg = self.__class__.__name__ + " schema dump:\n"
         for line in results:
             strg += line + "\n"
         return strg
- 
+
     # "info" is a short alias for the string returned by the
     # "get_title_and_metadata()" function.
     @property
@@ -3430,7 +3414,7 @@ class MiriDataModel(DataModel):
     @info.setter
     def info(self, value):
         raise AttributeError(".info attribute is read-only")
- 
+
     # "summary" is a short alias for the string returned by the
     # "stats()" function.
     @property
@@ -3474,7 +3458,7 @@ if __name__ == '__main__':
 #         testdata.set_pointing_metadata(ra_v1=12.20, dec_v1=-7.15, pa_v3=2.0)
         testdata.set_target_metadata(ra=12.0, dec=-7.0)
         testdata.set_instrument_metadata(detector='MIRIMAGE', filt='F560W',
-                                channel='', ccc_pos='OPEN', 
+                                channel='', ccc_pos='OPEN',
                                 deck_temperature=10.0,
                                 detector_temperature=7.0)
         # Basic data model does not include wcsinfo schema
@@ -3492,7 +3476,7 @@ if __name__ == '__main__':
             "This object has been created to try out the MiriDataModel class.")
         testdata.add_history( \
             "This line has been added to the history as a test.")
-        
+
         # Try reading back the metadata
         (detector, modelnam, detsetng) = testdata.get_instrument_detector()
         print("Read back detector metadata:", detector, modelnam, detsetng)
@@ -3503,11 +3487,11 @@ if __name__ == '__main__':
         print("Read back exposure metadata:", readpatt, nints, ngroups, nframes)
         (name, xstart, ystart, xsize, ysize) = testdata.get_subarray_metadata()
         print("Read back subarray metadata:", name, xstart, ystart, xsize, ysize)
-        
+
         # Display the metadata as a formatted string.
         # Also tests the fits_metadata_dict() function.
         print("Metadata string:\n" + testdata.get_meta_str())
-        
+
         # Search for specific items in the metadata.
         print("All occurences of BUNIT: " + \
               str(testdata.find_fits_values('BUNIT')))
@@ -3515,20 +3499,22 @@ if __name__ == '__main__':
               str(testdata.find_fits_values('DATE')))
         print("All comments:\n" + testdata.get_comments_str())
         print("All history:\n" + testdata.get_history_str())
-        
+
         print("Get INSTRUME FITS keyword: " + \
               testdata.get_fits_keyword('INSTRUME'))
         print("Get TELESCOP FITS keyword: " + \
               testdata.get_fits_keyword('TELESCOP'))
         print("Get SUBARRAY FITS keyword: " + \
               testdata.get_fits_keyword('SUBARRAY'))
-        
+
         # The following will be empty lists
         dataarrays = testdata.list_data_arrays()
+        print("dataarrays=", str(dataarrays))
         assert len(dataarrays) == 0
         datatables = testdata.list_data_tables()
+        print("datatables=", str(datatables))
         assert len(datatables) == 0
-        
+
         print(testdata)
         if PLOTTING:
             testdata.plot(description="Empty data model")
@@ -3536,5 +3522,5 @@ if __name__ == '__main__':
             testdata.save("test_base_model.fits", overwrite=True)
 
         del testdata
-        
+
     print("Test finished.")

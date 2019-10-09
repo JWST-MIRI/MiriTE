@@ -79,6 +79,8 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
+07 Oct 2019: Updated flat_reference_flags to include only standard flag
+             names. Removed '.yaml' suffix from schema references.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -98,8 +100,8 @@ __all__ = ['MiriPointSpreadFunctionModel', 'MiriImagingPointSpreadFunctionModel'
            'MiriLrsPointSpreadFunctionModel', 'MiriMrsPointSpreadFunctionModel']
 
 psf_reference_setup = \
-            [(0, 'DO_NOT_USE',         'Bad pixel. Do not use.'),
-             (1, 'CDP_LOW_QUAL',       'Data of low quality'),
+            [(0, 'DO_NOT_USE',           'Bad pixel. Do not use.'),
+             (1, 'UNRELIABLE_SLOPE',     'Data of low quality'),  # Was CDP_LOW_QUAL
              (2, 'CDP_UNRELIABLE_ERROR', 'Data without reliable error estimate')]
 psf_reference_flags = insert_value_column( psf_reference_setup )
 
@@ -162,7 +164,7 @@ class MiriPointSpreadFunctionModel(MiriMeasuredModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
     
     """
-    schema_url = "miri_psf.schema.yaml"
+    schema_url = "miri_psf.schema"
     _default_dq_def = psf_reference_flags
 
     def __init__(self, init=None, data=None, dq=None, err=None, dq_def=None,
@@ -275,7 +277,7 @@ class MiriImagingPointSpreadFunctionModel(MiriPointSpreadFunctionModel):
         The pixel size for which these PSF data are valid.
     
     """
-    schema_url = "miri_psf_imaging.schema.yaml"
+    schema_url = "miri_psf_imaging.schema"
     fieldnames = ('XFIELD', 'YFIELD', 'STACK', 'COL_FIELD', 'ROW_FIELD', \
                   'XAN_FIELD', 'YAN_FIELD')
 
@@ -352,7 +354,7 @@ class MiriLrsPointSpreadFunctionModel(MiriPointSpreadFunctionModel):
         If not given, the type defaults to the generic term 'PSF'.
     
     """
-    schema_url = "miri_psf_lrs.schema.yaml"
+    schema_url = "miri_psf_lrs.schema"
 
     def __init__(self, init=None, psftype=None, **kwargs):
         """
@@ -406,7 +408,7 @@ class MiriMrsPointSpreadFunctionModel(MiriPointSpreadFunctionModel):
     World coordinates?
     
     """
-    schema_url = "miri_psf_mrs.schema.yaml"
+    schema_url = "miri_psf_mrs.schema"
 
     def __init__(self, init=None, wavelength=None, **kwargs):
         """

@@ -23,6 +23,8 @@ Setup file for installing the MiriTE software
 08 Oct 2018: Added convert_mrs_resolution script.
 11 Oct 2018: Added append_lrs_photom script.
 12 Oct 2018: Added cdp_remove_junk script.
+07 Oct 2019: Require Python 3.6. Corrected bug in the checking of
+             conda_prefix.
 
 @author: MIRI Software Team
 
@@ -76,8 +78,8 @@ def get_conda_prefix():
 
 
 # Test the command arguments given with this script.
-# Only unzip data files when building or installing, not when 
-# cleaning. If a "clean" is requested on its own, the previously 
+# Only unzip data files when building or installing, not when
+# cleaning. If a "clean" is requested on its own, the previously
 # unzipped files are deleted.
 if len(sys.argv[0]) > 0:
     argv = sys.argv
@@ -99,7 +101,7 @@ if verbose:
 # ------------------------------------------------------------------
 # Unzip the data files contained in the simulators data directories.
 #
-# The simulator detector data files are found relative to the 
+# The simulator detector data files are found relative to the
 # directory containing this Python script.
 (this_dir, this_file) = os.path.split(__file__)
 cr_data_path = os.path.join(this_dir, "simulators/data/cosmic_rays")
@@ -210,6 +212,9 @@ elif cleanflag:
                 except Exception:
                     pass
 
+
+entry_points = dict(asdf_extensions=['miri_datamodel = miri.datamodels.miri_extension:MIRIExtension'])
+
 # ------------------------------------------------------------------
 
 
@@ -222,7 +227,7 @@ setup(
     author_email="mirisim@roe.ac.uk",
     license="See LICENCE file",
     platforms=["Linux", "Mac OS X"],
-    python_requires='>=3.5',
+    python_requires='>=3.6',
     packages=['miri',
               'miri.tools', 'miri.tools.tests',
               'miri.datamodels', 'miri.datamodels.tests',
@@ -289,11 +294,12 @@ setup(
              'simulators/scasim/scripts/plot_exposure_data.py',
              'simulators/scasim/scripts/scasim.py',
             ],
-    data_files=[('', ['LICENCE', 'README'])]
+    data_files=[('', ['LICENCE', 'README'])],
+    entry_points=entry_points,
 )
 
 if not cleanflag:
-    if not ('miri' in conda_prefix) and not ('MIRI' in conda_prefix):
+    if not ('/envs' in conda_prefix):
         print("\n*** WARNING: MIRI software installed into the root environment! ***")
         print("If you didn't want to do this, remove the above package from site-packages, execute")
         print("\n\tsource activate <name-of-miricle-environment>")

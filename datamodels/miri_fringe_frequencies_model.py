@@ -69,7 +69,7 @@ class MiriMrsFringeFrequenciesModel(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_fringe_frequencies_mrs.schema.yaml"
+    schema_url = "miri_fringe_frequencies_mrs.schema"
     fieldnames = ('sub_band', 'wavenumber', 'deltawavenumber', 'maxamplitude')
     
     def __init__(self, init=None, fringefreq_table=None, **kwargs):

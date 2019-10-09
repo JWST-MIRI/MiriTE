@@ -1,7 +1,7 @@
 allOf:
 - $ref: miri_measured.schema.yaml
 - $ref: keyword_photuja2.schema.yaml
-- $ref: http://jwst.stsci.edu/schemas/keyword_photmjsr.schema.yaml
+- $ref: http://stsci.edu/schemas/jwst_datamodel/keyword_photmjsr.schema
 - type: object
   title: MIRI MRS flux conversion model
   properties:

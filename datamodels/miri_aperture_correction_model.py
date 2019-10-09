@@ -76,7 +76,7 @@ class MiriMrsApertureCorrectionModel(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_aperture_correction_mrs.schema.yaml"
+    schema_url = "miri_aperture_correction_mrs.schema"
     fieldnames = ('wavelength', 'solution', 'a_aperture',
                   'a_annulus_in', 'a_annulus_out',
                   'a_over_b', 'pos_angle', 'aper_corr', 'aper_corr_err')

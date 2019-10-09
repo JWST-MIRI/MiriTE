@@ -132,7 +132,7 @@ class MiriMrsResolutionModel(MiriDataModel):
         See the jwst_lib documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_spectral_spatial_resolution_mrs.schema.yaml"
+    schema_url = "miri_spectral_spatial_resolution_mrs.schema"
     fieldnames_resolving = ('SUB_BAND', 'R_CENTRE', 'R_A_LOW', 'R_B_LOW', 'R_C_LOW',
                             'R_A_HIGH', 'R_B_HIGH', 'R_C_HIGH',
                             'R_A_AVG', 'R_B_AVG', 'R_C_AVG')

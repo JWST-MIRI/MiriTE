@@ -32,7 +32,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              JWST build 7.1 data models release. meta.reffile.type also
              changed to meta.reftype. TYPE keyword replaced by DATAMODL.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
-15 Nov 2018: New data model which uses the JWST schema, saturation.schema.yaml.
+15 Nov 2018: New data model which uses the JWST schema, saturation.schema.
              Previous data model renamed to MiriMrsStraylightModel_CDP3.
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
@@ -100,7 +100,7 @@ class MiriMrsStraylightModel(MiriDataModel, HasData):
         See the jwst.datamodels documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_straylight_mrs.schema.yaml"
+    schema_url = "miri_straylight_mrs.schema"
                                                  
     def __init__(self, init=None, data=None, dq=None, dq_def=None, detector=None,
                  **kwargs):
@@ -183,7 +183,7 @@ class MiriMrsStraylightModel_CDP3(MiriBadPixelMaskModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_straylight_mrs_CDP3.schema.yaml"
+    schema_url = "miri_straylight_mrs_CDP3.schema"
     
     # Set the default dq_def table to the JWST master flags
     # TODO: Can the default declared in the schema be used?

@@ -86,7 +86,7 @@ class MiriMrsWavelengthCorrectionModel(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_wavelength_correction_mrs.schema.yaml"
+    schema_url = "miri_wavelength_correction_mrs.schema"
     fieldnames_optical = ('SUB_BAND', 'BETA_SLICE', 'WAVE_MIN', 'WAVE_MAX',
                           'SRP_MIN', 'SRP_MAX')
     fieldnames_xslice =  ('XSLICE_MIN', 'XSLICE_MAX')

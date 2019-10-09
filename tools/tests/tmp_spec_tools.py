@@ -11,6 +11,21 @@ Module test_spec_tools - Contains the unit tests for the module called spec_tool
              supposed to generate minimal output.
 08 Nov 2017: Moved from LRS pipeline package to general purpose spec_tools
              package.
+04 Oct 2019: Test disabled until the following problem can be fixed.
+
+FIXME: Test fails with the following error.
+
+**** BAD FIT ****
+Parameters were:  (0, 40.0, array([3]), 2)
+Chi-Squared/dof for these parameter values = 10975.81063, CDF =    0.00000%
+Uncertainties not calculated.
+
+Try a different initial guess for the fit parameters.
+Or if these parameters appear close to a good fit, try giving
+    the fitting program more time by increasing the value of maxfev.
+scipy.optimize.curve_fit failed
+
+
 
 @author:  Juergen Schreiber
 

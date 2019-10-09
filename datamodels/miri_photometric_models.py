@@ -121,7 +121,7 @@ class MiriPhotometricModel(MiriDataModel):
         If provided, the value is written to the PIXAR_A2 keyword.
     
     """
-    schema_url = "miri_photom.schema.yaml"
+    schema_url = "miri_photom.schema"
     fieldnames = ('filter', 'subarray', 'photmjsr', 'uncertainty', 'nelem',
                   'wavelength', 'relresponse', 'relresperror')
 
@@ -322,7 +322,7 @@ class MiriPhotometricModel_CDP5(MiriDataModel):
     See the MiriPhotometricModel class for full documentation.
     
     """
-    schema_url = "miri_photom_CDP5.schema.yaml"
+    schema_url = "miri_photom_CDP5.schema"
     fieldnames = ('filter', 'subarray', 'photmjsr', 'uncertainty', 'nelem',
                   'wavelength', 'relresponse')
 
@@ -525,7 +525,7 @@ class MiriImagingPhotometricModel(MiriPhotometricModel):
     
     """
     # Both models use exactly the same schema.
-    schema_url = "miri_photom.schema.yaml"
+    schema_url = "miri_photom.schema"
     fieldnames = ('filter', 'subarray', 'photmjsr', 'uncertainty', 'nelem',
                   'wavelength', 'relresponse', 'relresperror')
 
@@ -617,7 +617,7 @@ class MiriLrsPhotometricModel(MiriPhotometricModel):
     
     """
     # Both models use exactly the same schema.
-    schema_url = "miri_photom.schema.yaml"
+    schema_url = "miri_photom.schema"
     fieldnames = ('filter', 'subarray', 'photmjsr', 'uncertainty', 'nelem',
                   'wavelength', 'relresponse', 'relresperror')
 
@@ -792,7 +792,7 @@ class MiriPixelAreaModel(MiriDataModel, HasData):
         If provided, the value is written to the PIXAR_A2 keyword.
     
     """
-    schema_url = "miri_pixelarea.schema.yaml"
+    schema_url = "miri_pixelarea.schema"
 
     def __init__(self, init=None, data=None, pixar_sr=None, pixar_a2=None,
                  **kwargs):
