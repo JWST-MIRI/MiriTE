@@ -716,7 +716,7 @@ class MiriLrsNewPhotometricModel(MiriDataModel):
     
     """
     # Both models use exactly the same schema.
-    schema_url = "miri_photom_lrs.schema.yaml"
+    schema_url = "miri_photom_lrs.schema"
     fieldnames = ('filter', 'subarray', 'mean_pixar_ar2','mean_pixar_sr', 'photmjsr', 'uncertainty', 'nelem',
                   'wavelength', 'relresponse', 'relresperror')
     def __init__(self, init=None, phot_table=None, **kwargs):

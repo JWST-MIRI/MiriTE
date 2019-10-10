@@ -127,15 +127,14 @@ class TestLrsExtract(unittest.TestCase):
         self.assertTrue(len(spec.data)== 2)
         self.assertTrue(len(spec.err)== 2)
 #         print "run lrs_extract_spec_with_fit"
-        spec1 = lrs_extract_spec_with_fit(prod.copy(), makeplot=False,
-                                          verbose=False)
+        spec1 = lrs_extract_spec_with_fit(prod.copy())
         self.assertTrue( len(spec1) == 3)
 #         print "run optimalSpecExtract"
         spec1 = optimalSpecExtraction(prod.copy())
         self.assertTrue( len(spec1.data) == 9)        
         self.assertTrue( len(spec1.err) == 9)  
 #         print "run get_psf_fit"
-        spec1 = get_psf_fit(prod.copy(), verbose=False)
+        spec1 = get_psf_fit(prod.copy())
         self.assertTrue( len(spec1) == 4)
         
 #         print "run interpolWaveOnRows"

@@ -325,8 +325,8 @@ def lrs_extract_spec(data):
 
 
 _sigma_clip = 1.
-def lrs_extract_spec_with_fit(data, minX = 0, leftY = 0, verbose = True,
-                              makeplot = True):
+def lrs_extract_spec_with_fit(data, minX = 0, leftY = 0, verbose = False,
+                              makeplot = False):
     """
     
     Extracts spectra from the data by summing along the spatial-x axis considering NaNs.
@@ -446,7 +446,7 @@ def lrs_extract_spec_with_fit(data, minX = 0, leftY = 0, verbose = True,
     return data, newXpixel, line
 
 
-def get_psf_fit(data, minX = 0, leftY = 0, verbose = True, makeplot = False):
+def get_psf_fit(data, minX = 0, leftY = 0, verbose = False, makeplot = False):
     """
     
     fits a pinhole (point source) continuum spectrum by a Gaussian for each row (x axis).
@@ -489,10 +489,12 @@ def get_psf_fit(data, minX = 0, leftY = 0, verbose = True, makeplot = False):
         simax = np.max(si)
         stdevSi = np.std(si)
         if simax <= 0 or stdevSi == 0:
-            print("signal is below or equal zero in row ", i)
+            if verbose:
+                print("signal is below or equal zero in row ", i)
             continue
         if simax/stdevSi < 1. or simax < np.mean(sigErr):
-            print("signal too low in row ", i)
+            if verbose:
+                print("signal too low in row ", i)
             continue
         maxind = np.where(si == simax)[0][0]
         p_guess = (0, simax, maxind,2)
@@ -824,11 +826,11 @@ if __name__ == '__main__':
     if PLOTTING:  
         sp.plot()    
     print("lrs_extract_spec_with_fit")
-    sp = lrs_extract_spec_with_fit(product.copy())
+    sp = lrs_extract_spec_with_fit(product.copy(), verbose = True, makeplot=True)
     print(sp)         
     
     print("get_psf_fit")
-    sp = get_psf_fit(product.copy(), makeplot=False)
+    sp = get_psf_fit(product.copy(), verbose = True, makeplot=True)
     print(sp)         
     
     

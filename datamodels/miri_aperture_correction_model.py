@@ -144,7 +144,7 @@ class MiriLrsThroughputCorrectionModel(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_throughput_correction_lrs.schema.yaml"
+    schema_url = "miri_throughput_correction_lrs.schema"
     fieldnames = ('wavelength', 'through_corr', 'through_corr_err')
     
     def __init__(self, init=None, throughcorr_table=None, **kwargs):
@@ -210,7 +210,7 @@ class MiriLrsApertureCorrectionModel(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_aperture_correction_lrs.schema.yaml"
+    schema_url = "miri_aperture_correction_lrs.schema"
     fieldnames = ('wavelength', 'width', 'apcorr')
     
     def __init__(self, init=None, apcorr_table=None, **kwargs):
@@ -275,7 +275,7 @@ class MiriLrsPositionCorrectionModel(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
         
     """
-    schema_url = "miri_position_correction_lrs.schema.yaml"
+    schema_url = "miri_position_correction_lrs.schema"
     fieldnames = ('wavelength', 'pos_corr')
     
     def __init__(self, init=None, poscorr_table=None, **kwargs):
