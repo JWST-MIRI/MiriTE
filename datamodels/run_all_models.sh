@@ -35,3 +35,4 @@ python miri_transmission_correction_model.py >>miri_transmission_correction_mode
 python miri_wavelength_correction_model.py >>miri_wavelength_correction_model.log 2>&1
 python miri_filters.py >>miri_filters.log 2>&1
 python miri_measurement.py >>miri_measurement.log 2>&1
+python spectraldata.py >>spectraldata.log 2>&1

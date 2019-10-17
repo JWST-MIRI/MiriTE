@@ -128,6 +128,9 @@ miri_filters.py
 miri_measurement.py
     Tools for managing variable measurements.
 
+spectraldata.py
+    Contains example data models for spectral data.
+
 Scripts
 -------
 cdp_convert.py:
