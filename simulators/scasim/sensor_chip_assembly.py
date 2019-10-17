@@ -3224,7 +3224,7 @@ class SensorChipAssembly(object):
                 # is not present the the MiriMeasuredModel schema.
                 slope_model.copy_metadata(self.exposure_data)
                 # The new slope data has only 2 WCS aces
-                cube_model.meta.wcsinfo.wcsaxes = 2
+                slope_model.meta.wcsinfo.wcsaxes = 2
                  # Write the cube data to the given output file.
                 slope_model.save(filename, overwrite=overwrite)
                 # Tidy up the temporary cube model.
