@@ -50,6 +50,7 @@ Longer description, references, class hierarchy...
 13 Nov 2012: Major restructuring of the package folder.
              Import statements updated.
 15 Mar 2013: condense and convGauss created
+12 Jul 2013: Original library of spectral flattening tools.
 20 Feb 2014: Old data product removed.
 02 Dec 2014: Replaced DQ max function to prevent failure
              of unit test.
@@ -58,8 +59,9 @@ Longer description, references, class hierarchy...
              under numpy 1.12.1).
 08 Nov 2017: Moved from LRS pipeline package to general purpose spec_tools
              package.
+17 Oct 2019: Merged with the spectral flattening tools from MiriTeam
 
-@author:  Juergen Schreiber
+@author:  Juergen Schreiber, Steven Beard (UKATC)
 
 """
 
@@ -754,6 +756,255 @@ def calcStraightLine(x0, y0, x1, y1):
     b = (x1*y0 - x0*y1)/(x1 - x0)
     return m, b
 
+def _get_weights( error, weighted, max_weight_gain ):
+    """
+    
+    Helper function to convert an error array into a weights array.
+    
+    """
+    if weighted and (error is not None):
+        error = np.asarray(error)
+        if error.min() > 0.0:
+            # Prevent very tiny error estimates from skewing the result by
+            # ignoring abnormally large weights.
+            # TODO: Is this adjustment sensible? max_weight_gain is arbitrary.
+            error_limit = error.mean() / max_weight_gain
+            toosmall = np.where(error < error_limit)
+            error[toosmall] = error_limit
+            
+            weights = 1.0 / error     
+        else:
+            weights = None      
+    else:
+        weights = None
+    return weights
+
+def _flatten_error_array( error, axis ):
+    """
+    
+    Helper function to flatten an error array by taking the
+    root mean square of the contributing pixels rather than
+    the mean.
+    
+    """
+    if error is not None:
+        error_squared = error * error
+        flat_errorsq = np.average( error_squared, axis=axis )
+        flat_error = np.sqrt( flat_errorsq )
+    else:
+        flat_error = None
+    return flat_error
+
+def _flatten_quality_array( quality, axis, perfect ):
+    """
+    
+    Helper function to flatten a quality array, with the result
+    depending on whether perfection is required or not.
+    
+    """
+    if quality is not None:
+        if perfect:
+            # Perfection is needed.
+            # The overall quality is the maximum of the contributing quality.
+            flat_quality = np.max( quality, axis=axis)
+        else:
+            # Perfection isn't needed.
+            # The overall quality is the minimum of the contributing quality.
+            flat_quality = np.min( quality, axis=axis)
+    else:
+        flat_quality = None
+        
+    return flat_quality
+
+def spec2d_to_spec1d(data, error, quality, waveaxis=0, weighted=True,
+                     max_weight_gain=10000.0, perfect=False):
+    """
+        
+    Flatten a 2-D spectrum in the spatial direction to generate one
+    combined spectrum.
+        
+    The output signal is the (weighted) average of the input signal.
+    The output error is the RMS of the input error.
+    The output quality is a combination of the input quality.
+    
+    :Parameters:
+        
+    data: array-like
+        The 2-D spectrum to be flattened.
+    error: array-like
+        The 2-D error array associated with the data array.
+    quality: array-like
+        The 2-D data quality array associated with the data array.
+        Good data elements are assumed to have quality=0.
+    waveaxis: int, optional, default=0
+        The wavelength axis for the data arrays.
+    weighted: bool, optional
+        Set to True to use the error array (if present) to make a
+        weighted average.
+        Set to False for an unweighted average.
+    max_weight_gain: float, optional, default=10000.0
+        Small errors can't weight a pixel by more than the average
+        weighting multiplied by this amount.
+    perfect: bool, optional
+        Set to True to regard as bad any pixel in the spectrum
+        which has contributing bad pixel.
+        Set to False to regard a pixel in the spectrum as bad only
+        if all of the contributing pixels are bad (and use the
+        error array to mark the reduction in quality).
+
+    :Returns:
+
+    (flat_data, flat_error, flat_quality)
+        A tuple containing a triplet of data arrays giving the signal,
+        error and quality arrays for the extracted spectrum.
+        
+    """
+    if waveaxis == 0:
+        spatialaxis = 1
+    else:
+        spatialaxis = 0
+        
+    # If required, the signal average is weighted by the inverse of the error.
+    weights = _get_weights( error, weighted, max_weight_gain )
+
+    data = np.asarray(data)
+    flat_data = np.average( data, axis=spatialaxis, weights=weights)
+    flat_error = _flatten_error_array( error, axis=spatialaxis)
+    flat_quality = _flatten_quality_array( quality, axis=spatialaxis,
+                                           perfect=perfect)
+
+    return (flat_data, flat_error, flat_quality)
+
+def spec3d_to_spec1d(data, error, quality, waveaxis=0, weighted=True,
+                     max_weight_gain=10000.0, perfect=False):
+    """
+        
+    Flatten a spectral data cube in the spatial directions to
+    generate one combined spectrum.
+        
+    The output signal is the (weighted) average of the input signal.
+    The output error is the RMS of the input error.
+        
+    Not a particularly useful function unless the entire data cube
+    contains the spectrum of one object.
+    
+    :Parameters:
+        
+    data: array-like
+        The 2-D spectrum to be flattened.
+    error: array-like
+        The 2-D error array associated with the data array.
+    quality: array-like
+        The 2-D data quality array associated with the data array.
+        Good data elements are assumed to have quality=0.
+    waveaxis: int, optional, default=0
+        The wavelength axis for the data arrays.
+    weighted: bool, optional
+        Set to True to use the error array (if present) to make a
+        weighted average.
+        Set to False for an unweighted average.
+    max_weight_gain: float, optional, default=10000.0
+        Small errors can't weight a pixel by more than the average
+        weighting multiplied by this amount.
+    perfect: bool, optional
+        Set to True to regard as bad any pixel in the spectrum
+        which has contributing bad pixel.
+        Set to False to regard a pixel in the spectrum as bad only
+        if all of the contributing pixels are bad (and use the
+        error array to mark the reduction in quality).
+
+    :Returns:
+
+    (flat_data, flat_error, flat_quality)
+        A tuple containing a triplet of data arrays giving the signal,
+        error and quality arrays for the extracted spectrum.
+        
+    """
+    # Determine a formula which averages every axis except the
+    # wavelength axis.
+    if waveaxis == 0:
+        axis_list = (-1, -1)
+    elif waveaxis == 1:
+        axis_list = (-1, 0)
+    else:
+        axis_list = (1, 0)
+        
+    # If required, the signal average is weighted by the inverse of the error.
+    weights1 = _get_weights( error, weighted, max_weight_gain )
+
+    data = np.asarray(data)
+    flat_data1 = np.average( data, axis=axis_list[0], weights=weights1)
+    flat_error1 = _flatten_error_array( error, axis=axis_list[0])
+    flat_quality1 = _flatten_quality_array( quality, axis=axis_list[0],
+                                            perfect=perfect)
+
+    weights2 = _get_weights( flat_error1, weighted, max_weight_gain )
+
+    flat_data2 = np.average( flat_data1, axis=axis_list[1], weights=weights2)
+    flat_error2 = _flatten_error_array( flat_error1, axis=axis_list[1])
+    flat_quality2 = _flatten_quality_array( flat_quality1, axis=axis_list[1],
+                                            perfect=perfect)
+             
+    return (flat_data2, flat_error2, flat_quality2)
+
+
+def spec3d_to_image(data, error, quality, waveaxis=0, weighted=True,
+                    max_weight_gain=10000.0, perfect=False):
+    """
+        
+    Flatten a spectral data cube in the wavelength direction to
+    generate one combined image.
+        
+    The output signal is the (weighted) average of the input signal.
+    The output error is the RMS of the input error.
+        
+    Not a particularly useful function unless the entire data cube
+    contains the spectrum of one object.
+    
+    :Parameters:
+        
+    data: array-like
+        The 2-D spectrum to be flattened.
+    error: array-like
+        The 2-D error array associated with the data array.
+    quality: array-like
+        The 2-D data quality array associated with the data array.
+        Good data elements are assumed to have quality=0.
+    waveaxis: int, optional, default=0
+        The wavelength axis for the data arrays.
+    weighted: bool, optional
+        Set to True to use the error array (if present) to make a
+        weighted average.
+        Set to False for an unweighted average.
+    max_weight_gain: float, optional, default=10000.0
+        Small errors can't weight a pixel by more than the average
+        weighting multiplied by this amount.
+    perfect: bool, optional
+        Set to True to regard as bad any pixel in the spectrum
+        which has contributing bad pixel.
+        Set to False to regard a pixel in the spectrum as bad only
+        if all of the contributing pixels are bad (and use the
+        error array to mark the reduction in quality).
+
+    :Returns:
+
+    (flat_data, flat_error, flat_quality)
+        A tuple containing a triplet of data arrays giving the signal,
+        error and quality arrays for the flattened image.
+        
+    """
+    # If required, the signal average is weighted by the inverse of the error.
+    weights = _get_weights( error, weighted, max_weight_gain )
+
+    data = np.asarray(data)
+    flat_data = np.average( data, axis=waveaxis, weights=weights)
+    flat_error = _flatten_error_array( error, axis=waveaxis) 
+    flat_quality = _flatten_quality_array( quality, axis=waveaxis,
+                                           perfect=perfect)
+
+    return (flat_data, flat_error, flat_quality)
+
+
 
 # A minimal test is run when this file is run as a main program.
 if __name__ == '__main__':
@@ -859,3 +1110,4 @@ if __name__ == '__main__':
     print("calcStraightLine")
     print(calcStraightLine(1,2,3,4))
     print("Test finished.")
+

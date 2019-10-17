@@ -1,0 +1,73 @@
+allOf:
+- "$ref": http://stsci.edu/schemas/miri_datamodel/miri_measured.schema
+- type: object
+  title: MIRI 3-D spectral data
+  properties:
+    meta:
+      type: object
+      properties:
+        alpha:
+          type: object
+          title: Information about the alpha axis
+          properties:
+            units:
+              type: string
+              title: Units of the alpha axis
+              fits_hdu: ALPHA
+              fits_keyword: BUNIT
+        beta:
+          type: object
+          title: Information about the beta axis
+          properties:
+            units:
+              type: string
+              title: Units of the beta axis
+              fits_hdu: BETA
+              fits_keyword: BUNIT
+        wavelength:
+          type: object
+          title: Information about the wavelength axis
+          properties:
+            units:
+              type: string
+              title: Units of the wavelength axis
+              fits_hdu: WAVELENGTH
+              fits_keyword: BUNIT
+    data:
+      title: Signal array
+      fits_hdu: SCI
+      ndim: 3
+      axes: [wavelength, beta, alpha]
+      units: ''
+    err:
+      title: Error array
+      fits_hdu: ERR
+      ndim: 3
+      axes: [wavelength, beta, alpha]
+      units: ''
+    dq:
+      title: Data quality array
+      fits_hdu: DQ
+      ndim: 3
+      axes: [wavelength, beta, alpha]
+    wavelength:
+      title: Wavelength axis array
+      fits_hdu: WAVELENGTH
+      ndim: 1
+      units: microns
+      default: 0.0
+      datatype: float32
+    alpha:
+      title: Alpha axis array
+      fits_hdu: ALPHA
+      ndim: 1
+      units: pixels
+      default: 0.0
+      datatype: float32
+    beta:
+      title: Beta axis array
+      fits_hdu: BETA
+      ndim: 1
+      units: pixels
+      default: 0.0
+      datatype: float32

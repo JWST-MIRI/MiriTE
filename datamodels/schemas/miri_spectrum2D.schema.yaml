@@ -1,0 +1,56 @@
+allOf:
+- "$ref": http://stsci.edu/schemas/miri_datamodel/miri_measured.schema
+- type: object
+  title: MIRI 2-D spectral data
+  properties:
+    meta:
+      type: object
+      properties:
+        wavelength:
+          type: object
+          title: Information about the wavelength axis
+          properties:
+            units:
+              type: string
+              title: Units of the wavelength axis
+              fits_hdu: WAVELENGTH
+              fits_keyword: BUNIT
+        slit:
+          type: object
+          title: Information about the slit axis
+          properties:
+            units:
+              type: string
+              title: Units of the slit axis
+              fits_hdu: SLIT
+              fits_keyword: BUNIT
+    data:
+      title: Signal array
+      fits_hdu: SCI
+      ndim: 2
+      axes: [wavelength, slit]
+    err:
+      title: Error array
+      fits_hdu: ERR
+      ndim: 2
+      axes: [wavelength, slit]
+      units: ''
+    dq:
+      title: Data quality array
+      fits_hdu: DQ
+      ndim: 2
+      axes: [wavelength, slit]
+    wavelength:
+      title: Wavelength axis array
+      fits_hdu: WAVELENGTH
+      ndim: 1
+      units: microns
+      default: 0.0
+      datatype: float32
+    slit:
+      title: Slit axis array
+      fits_hdu: SLIT
+      ndim: 1
+      units: pixels
+      default: 0.0
+      datatype: float32

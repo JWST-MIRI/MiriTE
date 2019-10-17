@@ -1,0 +1,41 @@
+allOf:
+- "$ref": http://stsci.edu/schemas/miri_datamodel/miri_measured.schema
+- type: object
+  title: MIRI 1-D spectral data
+  properties:
+    meta:
+      type: object
+      properties:
+        wavelength:
+          type: object
+          title: Information about the wavelength axis
+          properties:
+            units:
+              type: string
+              title: Units of the wavelength axis
+              fits_hdu: WAVELENGTH
+              fits_keyword: BUNIT
+    data:
+      title: Signal array
+      fits_hdu: SCI
+      ndim: 1
+      axes: [wavelength]
+      units: ''
+    err:
+      title: Error array
+      fits_hdu: ERR
+      ndim: 1
+      axes: [wavelength]
+      units: ''
+    dq:
+      title: Data quality array
+      fits_hdu: DQ
+      ndim: 1
+      axes: [wavelength]
+    wavelength:
+      title: Wavelength axis array
+      fits_hdu: WAVELENGTH
+      ndim: 1
+      units: microns
+      default: 0.0
+      datatype: float32
