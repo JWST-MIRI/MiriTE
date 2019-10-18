@@ -9,7 +9,7 @@ allOf:
         apcorr_table:
           type: object
           title: Information about the aperture correction table
-          properties:
+          properties:        
             tunit1:
               type: string
               title: Column 1 units
@@ -19,15 +19,21 @@ allOf:
             tunit2:
               type: string
               title: Column 2 units
-              default: pixels
+              default: ''
               fits_hdu: APCORR
-              fits_keyword: TUNIT2
+              fits_keyword: TUNIT2            
             tunit3:
               type: string
               title: Column 3 units
-              default: ''
+              default: pixels
               fits_hdu: APCORR
               fits_keyword: TUNIT3
+            tunit4:
+              type: string
+              title: Column 4 units
+              default: ''
+              fits_hdu: APCORR
+              fits_keyword: TUNIT4
  
 - type: object
   properties:
@@ -38,6 +44,8 @@ allOf:
       - name: wavelength
         datatype: float32
         unit: micron
+      - name: nelem
+        datatype: uint8
       - name: width
         datatype: uint8
         shape: [40]

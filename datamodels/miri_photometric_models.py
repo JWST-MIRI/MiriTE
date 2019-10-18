@@ -717,9 +717,9 @@ class MiriLrsNewPhotometricModel(MiriDataModel):
     """
     # Both models use exactly the same schema.
     schema_url = "miri_photom_lrs.schema"
-    fieldnames = ('filter', 'subarray', 'mean_pixar_ar2','mean_pixar_sr', 'photmjsr', 'uncertainty', 'nelem',
+    fieldnames = ('filter', 'subarray', 'photmjsr', 'uncertainty', 'nelem',
                   'wavelength', 'relresponse', 'relresperror')
-    def __init__(self, init=None, phot_table=None, **kwargs):
+    def __init__(self, init=None, phot_table=None, pixar_sr=None, pixar_a2=None, **kwargs):
         """
         
         Initialises the MiriPhotometricModel class.
@@ -727,7 +727,7 @@ class MiriLrsNewPhotometricModel(MiriDataModel):
         Parameters: See class doc string.
 
         """
-        super(MiriLrsNewPhotometricModel, self).__init__(init=init, **kwargs)
+        super(MiriLrsNewPhotometricModel, self).__init__(init=init, phot_table = phot_table, **kwargs)
 
         # Data type is photometric flux conversion.
         self.meta.reftype = 'PHOTOM'
@@ -748,7 +748,11 @@ class MiriLrsNewPhotometricModel(MiriDataModel):
             
         # Copy the table column units from the schema, if defined.
         phot_table_units = self.set_table_units('phot_table')
-
+        # If provided, define the pixel area metadata.
+        if pixar_sr is not None:
+            self.meta.photometry.pixelarea_steradians = pixar_sr
+        if pixar_a2 is not None:
+            self.meta.photometry.pixelarea_arcsecsq = pixar_a2
         # Define the exposure type (if not already contained in the data model)
         # NOTE: This will only define an exposure type when a valid detector
         # is defined in the metadata.
@@ -984,12 +988,10 @@ if __name__ == '__main__':
     
     
     
-    phot_lrs = [('P750L',  'FULL',          0.121, 0.001, 1.0,  0.0,  nelm, wavelength, relresponse, relresperror),
-                ('P750L',  'SLITLESSPRISM', 0.121, 0.001, 0.9,  0.0,  nelm, wavelength, relresponse, relresperror)
-               ]
+    phot_lrs = [('P750L',  'FULL',  1.0,  0.0,  nelm, wavelength, relresponse, relresperror)]
 
     print("\nLRS PHOTOM with defined wavelength and relresponse arrays:")
-    with MiriLrsNewPhotometricModel( phot_table=phot_lrs) as testphot4:
+    with MiriLrsNewPhotometricModel( phot_table=phot_lrs, pixar_a2=pixar_a2, pixar_sr=pixar_sr) as testphot4:
         testphot4.set_instrument_metadata(detector='MIRIMAGE',
                                           ccc_pos='OPEN', filt='P750L',
                                           deck_temperature=11.0,
@@ -1004,6 +1006,7 @@ if __name__ == '__main__':
                                            version='1.0', date='TODAY',
                                            useafter='TODAY',
                                            description='Test data')
+        testphot4.set_subarray_metadata("FULL")
         print(testphot4)
         if PLOTTING:
             testphot4.plot(description="testphot4")

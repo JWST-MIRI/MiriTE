@@ -211,7 +211,7 @@ class MiriLrsApertureCorrectionModel(MiriDataModel):
         
     """
     schema_url = "miri_aperture_correction_lrs.schema"
-    fieldnames = ('wavelength', 'width', 'apcorr')
+    fieldnames = ('wavelength', 'nelem' 'width', 'apcorr')
     
     def __init__(self, init=None, apcorr_table=None, **kwargs):
         """
@@ -387,13 +387,13 @@ if __name__ == '__main__':
         del testposcorr_lrs
    
     apcorr = np.zeros([40])
-    apcorr = np.linspace(0.5,1,num = 40) 
+    apcorr = np.linspace(1.5,1,num = 40) 
     width = np.arange(40) + 1
     
     apcorr_table=[]
-    apcorr_table.append((wave[0], width.tolist(), apcorr.tolist()))
-    apcorr_table.append((wave[1], width.tolist(), apcorr.tolist()))
-    apcorr_table.append((wave[2], width.tolist(), apcorr.tolist()))
+    apcorr_table.append((wave[0], 40, width.tolist(), apcorr.tolist()))
+    apcorr_table.append((wave[1], 40, width.tolist(), apcorr.tolist()))
+    apcorr_table.append((wave[2], 40, width.tolist(), apcorr.tolist()))
     print(apcorr_table)
     
     with MiriLrsApertureCorrectionModel( apcorr_table=apcorr_table) as testapcorr_lrs:

@@ -25,7 +25,7 @@ Or if these parameters appear close to a good fit, try giving
     the fitting program more time by increasing the value of maxfev.
 scipy.optimize.curve_fit failed
 
-
+10 Oct 2019: Test enabled again.
 
 @author:  Juergen Schreiber
 
