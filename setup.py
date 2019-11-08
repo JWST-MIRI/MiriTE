@@ -233,6 +233,7 @@ setup(
               'miri.datamodels', 'miri.datamodels.tests',
               'miri.simulators', 'miri.simulators.tests',
               'miri.simulators.scasim', 'miri.simulators.scasim.tests',
+              'miri.apt_parser',
              ],
     package_dir={
                  'miri': '',
@@ -244,6 +245,7 @@ setup(
                  'miri.simulators.tests': 'simulators/tests',
                  'miri.simulators.scasim': 'simulators/scasim',
                  'miri.simulators.scasim.tests': 'simulators/scasim/tests',
+                 'miri.apt_parser':'apt_parser',
                 },
     package_data={'miri.tools': ['data/__init__.py'],
                   'miri.datamodels': ['schemas/*.yaml', 'data/*.fits',
