@@ -1,7 +1,7 @@
 import logging
-LOG = logging.getLogger('parse_apt.dithering')
-
 from . import constants as c
+
+LOG = logging.getLogger(__name__)
 
 
 def parse_dither(dither_el, ns):

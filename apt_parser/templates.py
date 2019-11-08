@@ -1,10 +1,10 @@
 import re
 import logging
 
-LOG = logging.getLogger('parse_apt.templates')
-
 from . import dithering
 from . import constants as c
+
+LOG = logging.getLogger('parse_apt.templates')
 
 
 class Template(object):
@@ -26,7 +26,8 @@ class Template(object):
 
     def extract_dither_id(self, text):
         """
-        In observations, the dither is given like this: "Dither 1", this correspond to the 0-th element in the dither list.
+        In observations, the dither is given like this: "Dither 1",
+        this correspond to the 0-th element in the dither list.
 
         This function return 0 if given Dither 1, 1 if given Dither 2, etc...
 
@@ -343,9 +344,7 @@ class MiriExternalFlat(Template):
         elif detector == "ALL":
             # Dual mode MRS+IMA
             subarray = self.template.find("{}:Subarray".format(self.NS), c.ns).text
-            # primary_channel = self.template.find("{}:PrimaryChannel".format(self.NS), parser.ns).text
             common_metadata["subarray"] = subarray
-            # common_metadata["primary_channel"] = primary_channel
 
             self.parse_exposure = self.parse_all_exposure
         else:
@@ -506,9 +505,7 @@ class MiriDark(Template):
         elif detector == "ALL":
             # Dual mode MRS+IMA
             subarray = self.template.find("{}:Subarray".format(self.NS), c.ns).text
-            # primary_channel = self.template.find("{}:PrimaryChannel".format(self.NS), parser.ns).text
             common_metadata["subarray"] = subarray
-            # common_metadata["primary_channel"] = primary_channel
 
             self.parse_exposure = self.parse_all_exposure
         else:

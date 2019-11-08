@@ -146,5 +146,5 @@ def test_get_prediction(input, expected):
 
     npt.assert_almost_equal(time, ref_time, err_msg="Time prediction different than expected")
 
-    assert exps == ref_exps, "In get_prediction, Number of exposures ({}) different than expected ({}).".format(exps,
-                                                                                                                ref_exps)
+    assert exps == ref_exps, "In get_prediction, Number of exposures ({}) different than expected ({}).".format(
+        exps, ref_exps)

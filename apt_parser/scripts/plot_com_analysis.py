@@ -10,6 +10,7 @@ import glob
 import os
 from miri import apt_parser
 import logging
+
 apt_parser.init_log()
 
 LOG = logging.getLogger('parse_apt')
@@ -23,7 +24,7 @@ with open("commissioning_analysis.dat", 'w') as of:
     of.write("APT_sim = {\n")
     for k in sorted(list(APT_sim.keys())):
         v = APT_sim[k]
-        of.write("'{}': {},\n".format(k,v))
+        of.write("'{}': {},\n".format(k, v))
     of.write("}\n")
 
     of.write("mem_volume = {\n")
@@ -31,7 +32,7 @@ with open("commissioning_analysis.dat", 'w') as of:
         v = mem_volume[k]
 
         formatted_list = ", ".join(map(lambda x: "{:.1f}".format(x), v))
-        of.write("'{}': [{}]\n".format(k,formatted_list))
+        of.write("'{}': [{}]\n".format(k, formatted_list))
     of.write("}\n")
     of.write("time_volume = {\n")
 
@@ -45,14 +46,12 @@ with open("commissioning_analysis.dat", 'w') as of:
 cars = list(time_volume.keys())
 cars.sort()
 
-
-
 total_time = np.zeros((len(cars)))
-max_time   = np.zeros_like(total_time)
-max_ram    = np.zeros_like(total_time)
-total_time_dict   = {}
-max_ram_dict    = {}
-simulations =  []
+max_time = np.zeros_like(total_time)
+max_ram = np.zeros_like(total_time)
+total_time_dict = {}
+max_ram_dict = {}
+simulations = []
 
 for (i, car) in enumerate(cars):
     total_time[i] = time_volume[car].sum()
@@ -66,10 +65,7 @@ mem_threshold = 16.  # GB
 # Split CARs in big and low memory
 (big_mem_mask,) = np.where(max_ram > mem_threshold)
 
-
 colors = iter(cm.nipy_spectral(np.linspace(0, 1, len(big_mem_mask))))
-
-
 
 x = []
 y = []
@@ -84,7 +80,8 @@ for i in big_mem_mask:
     # We have to repeat a subarray for each exposure and dither
     name = []
     for d in APT_sim[car]:
-        tmp = ["{}: {}, {}, {}".format(d["filename"], d["template"], d["obs_id"], d["subarray"])] * (d["exposures"] * d["NDither"])
+        tmp = ["{}: {}, {}, {}".format(d["filename"], d["template"], d["obs_id"], d["subarray"])] * (
+                    d["exposures"] * d["NDither"])
         if d["subarray"] == "BOTH":
             tmp *= 2
         try:
@@ -97,17 +94,18 @@ for i in big_mem_mask:
 
     x.extend(memory)
     y.extend(time)
-    c.extend([color]*len(time))
+    c.extend([color] * len(time))
     names.extend(name)
 
 
 def stacked_bar(bar_dict, ylabel=None, cl_label=None):
     """
 
-    :param bar_dict: Each bar is a key in this dictionnary. The corresponding value is a numpy array containing all the Y-value for that bar
+    :param bar_dict: Each bar is a key in this dictionnary. The corresponding value is a numpy array
+        containing all the Y-value for that bar
     :type bar_dict: dict(np.ndarray)
-    :param ylabel: Unit of the Y axis
-    :type ylabel: str
+    :param str ylabel: Unit of the Y axis
+    :param str cl_label: unit of the colorbar
     :return:
     :rtype:
     """
@@ -121,7 +119,6 @@ def stacked_bar(bar_dict, ylabel=None, cl_label=None):
     y_start = 0
     bar_labels = list(bar_dict.keys())
     bar_labels.sort()
-    nbars = len(bar_labels)
 
     # We convert values to numpy array if necessary
     # flatten ensure that a single value is converted to a list.
@@ -143,8 +140,7 @@ def stacked_bar(bar_dict, ylabel=None, cl_label=None):
         norm = mpl.colors.Normalize(vmin=0, vmax=max_value)
 
         # Get normalized color for given value
-        get_color = lambda x: cmap(x/max_value)
-
+        get_color = lambda x: cmap(x / max_value)
 
         cbar_ax = fig.add_axes([0.9, 0.05, 0.025, 0.9])  # [left, bottom, width, height]
         cb1 = mpl.colorbar.ColorbarBase(cbar_ax, cmap=cmap,
@@ -165,12 +161,12 @@ def stacked_bar(bar_dict, ylabel=None, cl_label=None):
     for key in bar_labels:
         bar = bar_dict[key]
         height = y_start
-        tick_position.append(x+bar_w/2)
+        tick_position.append(x + bar_w / 2)
         for val in bar:
             y = height
             height += val
-            ymax = max(ymax, height) # We update ymax if necessary
-            rect = Rectangle((x, y), bar_w , val , facecolor=get_color(val), edgecolor=edgecolor, linewidth=linewidth)
+            ymax = max(ymax, height)  # We update ymax if necessary
+            rect = Rectangle((x, y), bar_w, val, facecolor=get_color(val), edgecolor=edgecolor, linewidth=linewidth)
             ax.add_patch(rect)
         x += bar_w + bar_sep
 
@@ -186,7 +182,6 @@ def stacked_bar(bar_dict, ylabel=None, cl_label=None):
         ax.set_ylabel(ylabel)
     ax.set_axisbelow(True)
     ax.yaxis.grid(True, which='major', color='#000000', linestyle='--')
-
 
     return fig
 
@@ -212,17 +207,16 @@ def hover_plot(x, y, names, colors, xlabel, ylabel):
 
     """
 
-
-    norm = plt.Normalize(1,4)
+    norm = plt.Normalize(1, 4)
     cmap = plt.cm.RdYlGn
 
-    fig,ax = plt.subplots()
+    fig, ax = plt.subplots()
     sc = ax.scatter(x, y, c=colors, s=100, cmap=cmap, norm=norm)
 
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
 
-    annot = ax.annotate("", xy=(0,0), xytext=(20,20),textcoords="offset points",
+    annot = ax.annotate("", xy=(0, 0), xytext=(20, 20), textcoords="offset points",
                         bbox=dict(boxstyle="round", fc="w"),
                         arrowprops=dict(arrowstyle="->"))
     annot.set_visible(False)
@@ -231,13 +225,10 @@ def hover_plot(x, y, names, colors, xlabel, ylabel):
 
         pos = sc.get_offsets()[ind["ind"][0]]
         annot.xy = pos
-        # text = " ".join([names[n] for n in ind["ind"]])
         text = "\n".join([names[n] for n in ind["ind"]])
-        # text = names[ind["ind"][0]]
         annot.set_text(text)
         annot.get_bbox_patch().set_facecolor(colors[ind["ind"][0]])
         annot.get_bbox_patch().set_alpha(0.4)
-
 
     def hover(event):
         vis = annot.get_visible()
@@ -254,11 +245,13 @@ def hover_plot(x, y, names, colors, xlabel, ylabel):
 
     fig.canvas.mpl_connect("motion_notify_event", hover)
 
+
 print("CAR & nb files & min RAM [GB] & Total time [h] \\\\\hline")
 nb_exposures = 0
 full_time = 0
 for car in cars:
-    msg = "{} & {} & {:.1f} GB & {:.1f} h\\\\\hline".format(car, len(mem_volume[car]), max_ram_dict[car], total_time_dict[car])
+    msg = "{} & {} & {:.1f} GB & {:.1f} h\\\\\hline".format(car, len(mem_volume[car]), max_ram_dict[car],
+                                                            total_time_dict[car])
     print(msg)
     nb_exposures += len(mem_volume[car])
     full_time += total_time_dict[car]
@@ -274,8 +267,3 @@ fig_max_ram = stacked_bar(max_ram_dict, ylabel="Max RAM used [GB]")
 fig_max_ram.savefig("commissioning_max_memory.pdf", bbox_inches="tight", pad_inches=0.1)
 
 plt.show()
-
-# TODO plots barre cumulative pour chaque CAR (cumulé en temps, et en GB)
-#TODO enumérer les problèmes du pipeline que mon paquet corrige (threads Numpy, effets de bords parce que le
-# process n'est pas tué, gestion de la RAM)
-#TODO faire 2e figure avec le fit sur l'autre ordinateur pour montrer la dépendance en puissance du CPU
