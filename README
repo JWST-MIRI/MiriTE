@@ -6,8 +6,10 @@ simulators and pipeline algorithms and support the development of
 STScI JWST pipeline software (while not being part of that
 pipeline software).
 
-The software depends on the JWST infrastructure libraries and STScI
-ASDF package. JWST documentation can be found in "JDox" articles at
+The software depends on MIRICLE, the MIRI software installation system,
+which includes the JWST infrastructure libraries and STScI ASDF package.
+See INSTALLATION for more information on MIRICLE. JWST documentation can
+be found in "JDox" articles at
 
 https://jwst-docs.stsci.edu/display/HOM/JWST+User+Documentation+Home
 
@@ -86,7 +88,13 @@ repository and built and installed manually with the command
    python setup.py install
 
 but in this case the user is responsible for ensuring all other dependent
-packages are installed.
+packages are installed. A formal list of the packages managed by MIRICLE
+may be found at
+
+https://github.com/JWST-MIRI/MIRICLE2/blob/conda-devel/miricle-linux-py36.0.txt
+
+The top-level script miri_installation_check.py can be run to verify the
+MiriTE package has been installed successfully.
 
 TROUBLESHOOTING
 ---------------
@@ -104,7 +112,7 @@ circumstance):
 2) Remove old versions of the MIRI software from the current anaconda
    environment before building a new version
 
-   source activate <environment>
+   conda activate <environment>
    \rm -rf ${CONDA_PREFIX}/lib/python3.5/site-packages/miri-*
    python setup.py install
 
