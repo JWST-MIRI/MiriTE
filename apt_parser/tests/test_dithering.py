@@ -34,7 +34,7 @@ testdata = [
         <mef:NumberOfSets>4</mef:NumberOfSets>
         <mef:Direction>POSITIVE</mef:Direction>
         <mef:OptimizeFor>POINT SOURCE</mef:OptimizeFor>
-    </mef:DitherSpec>""", 16), # APT 1027, obs_id 19
+    </mef:DitherSpec>""", 16),  # APT 1027, obs_id 19
 ]
 
 

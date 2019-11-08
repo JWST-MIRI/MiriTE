@@ -1,5 +1,5 @@
 from miri.apt_parser import templates
-from miri.apt_parser.utils import assertListDictEqual, read_fake_xml
+from miri.apt_parser.utils import assert_list_dict_equal, read_fake_xml
 
 
 def test_MiriCoron():
@@ -41,10 +41,10 @@ def test_MiriCoron():
     output_dict = obj.getobs()
 
     expected_dict = [{'readDetect': 'FAST', 'filter': 'F1065C', 'NDither': 5, 'subarray': 'FOUR_QPM',
-                     'obs_id': '1', 'ima_frames': 80, 'filename': 'apt/1406.aptx', 'exposures': 1,
-                     'template': 'MiriCoron', 'ima_integrations': 10, 'instrument': 'MIRI'}]
+                      'obs_id': '1', 'ima_frames': 80, 'filename': 'apt/1406.aptx', 'exposures': 1,
+                      'template': 'MiriCoron', 'ima_integrations': 10, 'instrument': 'MIRI'}]
 
-    assertListDictEqual(output_dict, expected_dict)
+    assert_list_dict_equal(output_dict, expected_dict)
 
 
 def test_MiriCpc():
@@ -76,10 +76,10 @@ def test_MiriCpc():
     output_dict = obj.getobs()
 
     expected_dict = [{'filter': 'F1065C', 'ima_frames': 100, 'obs_id': '1', 'filename': 'apt/1045.aptx',
-                     'ima_integrations': 1, 'instrument': 'MIRI', 'exposures': 1, 'readDetect': 'FAST',
-                     'template': 'MiriCpc', 'NDither': 1, 'subarray': 'MASK1065', 'instrument': 'MIRI'}]
+                      'ima_integrations': 1, 'instrument': 'MIRI', 'exposures': 1, 'readDetect': 'FAST',
+                      'template': 'MiriCpc', 'NDither': 1, 'subarray': 'MASK1065', 'instrument': 'MIRI'}]
 
-    assertListDictEqual(output_dict, expected_dict)
+    assert_list_dict_equal(output_dict, expected_dict)
 
 
 def test_MiriDark():
@@ -113,9 +113,9 @@ def test_MiriDark():
 
     expected_dict = [{'ima_frames': 6, 'ima_integrations': 3, 'obs_id': '1', 'filename': 'apt/1046.aptx',
                       'exposures': 2, 'subarray': 'FULL', 'instrument': 'MIRI', 'NDither': 1,
-                        'readDetect': 'SLOW', 'template': 'MiriDark', 'detector': 'IMAGER'}]
+                      'readDetect': 'SLOW', 'template': 'MiriDark', 'detector': 'IMAGER'}]
 
-    assertListDictEqual(output_dict, expected_dict)
+    assert_list_dict_equal(output_dict, expected_dict)
 
 
 def test_MiriExternalFlat():
@@ -161,10 +161,11 @@ def test_MiriExternalFlat():
     output_dict = obj.getobs()
 
     expected_dict = [{'ima_frames': 4, 'ima_integrations': 1, 'obs_id': '9', 'filename': 'apt/1027.aptx',
-                     'dither_type': 'true', 'exposures': 1, 'subarray': 'FULL', 'filter': 'F2550WR', 'instrument': 'MIRI', 'NDither': 16,
-                     'readDetect': 'FAST', 'template': 'MiriExternalFlat', 'detector': 'IMAGER'}]
+                      'dither_type': 'true', 'exposures': 1, 'subarray': 'FULL', 'filter': 'F2550WR',
+                      'instrument': 'MIRI', 'NDither': 16,
+                      'readDetect': 'FAST', 'template': 'MiriExternalFlat', 'detector': 'IMAGER'}]
 
-    assertListDictEqual(output_dict, expected_dict)
+    assert_list_dict_equal(output_dict, expected_dict)
 
 
 def test_MiriImaging():
@@ -224,18 +225,19 @@ def test_MiriImaging():
     obj = templates.MiriImaging(tree, metadata=metadata)
     output_dict = obj.getobs()
 
-    expected_dict = [{'filter': 'F770W', 'ima_frames': 100, 'ima_integrations': 1, 'obs_id': '1', 'filename': 'apt/1052.aptx',
-                     'exposures': 1, 'readDetect': 'FAST', 'instrument': 'MIRI', 'template': 'MiriImaging',
-                     'NDither': 3, 'subarray': 'FULL'},
-                     {'filter': 'F1280W', 'ima_frames': 100, 'ima_integrations': 1, 'obs_id': '1', 'filename': 'apt/1052.aptx',
-                      'exposures': 1, 'readDetect': 'FAST', 'instrument': 'MIRI', 'template': 'MiriImaging',
-                      'NDither': 3, 'subarray': 'FULL'},
-                     {'filter': 'F1500W', 'ima_frames': 100, 'ima_integrations': 1, 'obs_id': '1', 'filename': 'apt/1052.aptx',
-                      'exposures': 1, 'readDetect': 'FAST', 'instrument': 'MIRI', 'template': 'MiriImaging',
-                      'NDither': 3, 'subarray': 'FULL'}
-                     ]
+    expected_dict = [
+        {'filter': 'F770W', 'ima_frames': 100, 'ima_integrations': 1, 'obs_id': '1', 'filename': 'apt/1052.aptx',
+         'exposures': 1, 'readDetect': 'FAST', 'instrument': 'MIRI', 'template': 'MiriImaging',
+         'NDither': 3, 'subarray': 'FULL'},
+        {'filter': 'F1280W', 'ima_frames': 100, 'ima_integrations': 1, 'obs_id': '1', 'filename': 'apt/1052.aptx',
+         'exposures': 1, 'readDetect': 'FAST', 'instrument': 'MIRI', 'template': 'MiriImaging',
+         'NDither': 3, 'subarray': 'FULL'},
+        {'filter': 'F1500W', 'ima_frames': 100, 'ima_integrations': 1, 'obs_id': '1', 'filename': 'apt/1052.aptx',
+         'exposures': 1, 'readDetect': 'FAST', 'instrument': 'MIRI', 'template': 'MiriImaging',
+         'NDither': 3, 'subarray': 'FULL'}
+        ]
 
-    assertListDictEqual(output_dict, expected_dict)
+    assert_list_dict_equal(output_dict, expected_dict)
 
 
 def test_MiriLRS():
@@ -271,10 +273,11 @@ def test_MiriLRS():
     obj = templates.MiriLRS(tree, metadata=metadata)
     output_dict = obj.getobs()
 
-    expected_dict = [{'ima_frames': 10, 'ima_integrations': 3, 'obs_id': '1', 'filename': 'apt/1042.aptx', 'instrument': 'MIRI',
-                     'exposures': 1, 'readDetect': 'FAST', 'template': 'MiriLRS', 'NDither': 45, 'subarray': 'FULL'}]
+    expected_dict = [
+        {'ima_frames': 10, 'ima_integrations': 3, 'obs_id': '1', 'filename': 'apt/1042.aptx', 'instrument': 'MIRI',
+         'exposures': 1, 'readDetect': 'FAST', 'template': 'MiriLRS', 'NDither': 45, 'subarray': 'FULL'}]
 
-    assertListDictEqual(output_dict, expected_dict)
+    assert_list_dict_equal(output_dict, expected_dict)
 
 
 def test_MiriMRS():
@@ -350,23 +353,24 @@ def test_MiriMRS():
     obj = templates.MiriMRS(tree, metadata=metadata)
     output_dict = obj.getobs()
 
-    expected_dict = [{'LW_integrations': 1, 'disperser': 'SHORT', 'SW_frames': 6, 'obs_id': '1', 'filename': 'apt/1031.aptx',
-                     'SW_integrations': 1, 'subarray': 'BOTH', 'simultaneous_imaging': 'NO', 'instrument': 'MIRI',
-                     'detector': 'MRS', 'exposures': 1, 'LW_frames': 6, 'readDetect': 'FAST',
-                     'template': 'MiriMRS', 'NDither': 4},
-                     {'LW_integrations': 1, 'disperser': 'MEDIUM', 'SW_frames': 6, 'obs_id': '1',
-                      'filename': 'apt/1031.aptx',
-                      'SW_integrations': 1, 'subarray': 'BOTH', 'simultaneous_imaging': 'NO', 'instrument': 'MIRI',
-                      'detector': 'MRS', 'exposures': 1, 'LW_frames': 6, 'readDetect': 'FAST',
-                      'template': 'MiriMRS', 'NDither': 4},
-                     {'LW_integrations': 1, 'disperser': 'LONG', 'SW_frames': 6, 'obs_id': '1',
-                      'filename': 'apt/1031.aptx',
-                      'SW_integrations': 1, 'subarray': 'BOTH', 'simultaneous_imaging': 'NO', 'instrument': 'MIRI',
-                      'detector': 'MRS', 'exposures': 1, 'LW_frames': 6, 'readDetect': 'FAST',
-                      'template': 'MiriMRS', 'NDither': 4}
-                     ]
+    expected_dict = [
+        {'LW_integrations': 1, 'disperser': 'SHORT', 'SW_frames': 6, 'obs_id': '1', 'filename': 'apt/1031.aptx',
+         'SW_integrations': 1, 'subarray': 'BOTH', 'simultaneous_imaging': 'NO', 'instrument': 'MIRI',
+         'detector': 'MRS', 'exposures': 1, 'LW_frames': 6, 'readDetect': 'FAST',
+         'template': 'MiriMRS', 'NDither': 4},
+        {'LW_integrations': 1, 'disperser': 'MEDIUM', 'SW_frames': 6, 'obs_id': '1',
+         'filename': 'apt/1031.aptx',
+         'SW_integrations': 1, 'subarray': 'BOTH', 'simultaneous_imaging': 'NO', 'instrument': 'MIRI',
+         'detector': 'MRS', 'exposures': 1, 'LW_frames': 6, 'readDetect': 'FAST',
+         'template': 'MiriMRS', 'NDither': 4},
+        {'LW_integrations': 1, 'disperser': 'LONG', 'SW_frames': 6, 'obs_id': '1',
+         'filename': 'apt/1031.aptx',
+         'SW_integrations': 1, 'subarray': 'BOTH', 'simultaneous_imaging': 'NO', 'instrument': 'MIRI',
+         'detector': 'MRS', 'exposures': 1, 'LW_frames': 6, 'readDetect': 'FAST',
+         'template': 'MiriMRS', 'NDither': 4}
+        ]
 
-    assertListDictEqual(output_dict, expected_dict)
+    assert_list_dict_equal(output_dict, expected_dict)
 
 
 def test_MiriMRS_parallel():
@@ -446,21 +450,21 @@ def test_MiriMRS_parallel():
     output_dict = obj.getobs()
 
     expected_dict = [
-                    {'LW_frames': 10, 'LW_integrations': 10, 'NDither': 4, 'SW_frames': 10,
-                     'SW_integrations': 10, 'detector': 'ALL', 'disperser': 'SHORT',
-                    'exposures': 1, 'filename': 'apt/1024.aptx', 'filter': 'F770W',
-                    'ima_frames': 10, 'ima_integrations': 10, 'instrument': 'MIRI',
-                    'obs_id': '1', 'primary_channel': 'CHANNEL1', 'readDetect': 'FAST',
-                    'simultaneous_imaging': 'YES', 'subarray': 'FULL', 'template': 'MiriMRS'},
-                     {'LW_frames': 10, 'LW_integrations': 10, 'NDither': 4, 'SW_frames': 10,
-                     'SW_integrations': 10, 'detector': 'ALL', 'disperser': 'SHORT',
-                     'exposures': 1, 'filename': 'apt/1024.aptx', 'filter': 'F770W',
-                     'ima_frames': 10, 'ima_integrations': 10, 'instrument': 'MIRI',
-                     'obs_id': '1', 'primary_channel': 'CHANNEL1', 'readDetect': 'FAST',
-                     'simultaneous_imaging': 'YES', 'subarray': 'FULL', 'template': 'MiriMRS'}
-                     ]
+        {'LW_frames': 10, 'LW_integrations': 10, 'NDither': 4, 'SW_frames': 10,
+         'SW_integrations': 10, 'detector': 'ALL', 'disperser': 'SHORT',
+         'exposures': 1, 'filename': 'apt/1024.aptx', 'filter': 'F770W',
+         'ima_frames': 10, 'ima_integrations': 10, 'instrument': 'MIRI',
+         'obs_id': '1', 'primary_channel': 'CHANNEL1', 'readDetect': 'FAST',
+         'simultaneous_imaging': 'YES', 'subarray': 'FULL', 'template': 'MiriMRS'},
+        {'LW_frames': 10, 'LW_integrations': 10, 'NDither': 4, 'SW_frames': 10,
+         'SW_integrations': 10, 'detector': 'ALL', 'disperser': 'SHORT',
+         'exposures': 1, 'filename': 'apt/1024.aptx', 'filter': 'F770W',
+         'ima_frames': 10, 'ima_integrations': 10, 'instrument': 'MIRI',
+         'obs_id': '1', 'primary_channel': 'CHANNEL1', 'readDetect': 'FAST',
+         'simultaneous_imaging': 'YES', 'subarray': 'FULL', 'template': 'MiriMRS'}
+    ]
 
-    assertListDictEqual(output_dict, expected_dict)
+    assert_list_dict_equal(output_dict, expected_dict)
 
 
 def test_MiriMRSCrossGratingEngineering():
@@ -565,34 +569,34 @@ def test_MiriMRSCrossGratingEngineering():
     output_dict = obj.getobs()
 
     expected_dict = [{'LW_integrations': 10, 'LW_frames': 10, 'obs_id': '2', 'filename': 'apt/1050.aptx',
-        'SW_integrations': 20, 'SW_frames': 5, 'subarray': 'FULL', 'detector': 'BOTH', 'exposures': 1,
-        'template': 'MiriMRSCrossGratingEngineering', 'instrument': 'MIRI', 'NDither': 1},
-        {'LW_integrations': 1, 'LW_frames': 2, 'obs_id': '2', 'filename': 'apt/1050.aptx',
-        'SW_integrations': 1, 'SW_frames': 2, 'subarray': 'FULL', 'detector': 'BOTH', 'exposures': 1,
-        'template': 'MiriMRSCrossGratingEngineering', 'instrument': 'MIRI', 'NDither': 1},
-        {'LW_integrations': 1, 'LW_frames': 2, 'obs_id': '2', 'filename': 'apt/1050.aptx',
-        'SW_integrations': 1, 'SW_frames': 2, 'subarray': 'FULL', 'detector': 'BOTH', 'exposures': 1,
-        'template': 'MiriMRSCrossGratingEngineering', 'instrument': 'MIRI', 'NDither': 1},
-        {'LW_integrations': 10, 'LW_frames': 10, 'obs_id': '2', 'filename': 'apt/1050.aptx',
-        'SW_integrations': 20, 'SW_frames': 5, 'subarray': 'FULL', 'detector': 'BOTH', 'exposures': 1,
-        'template': 'MiriMRSCrossGratingEngineering', 'instrument': 'MIRI', 'NDither': 1},
-        {'LW_integrations': 1, 'LW_frames': 2, 'obs_id': '2', 'filename': 'apt/1050.aptx',
-        'SW_integrations': 1, 'SW_frames': 2, 'subarray': 'FULL', 'detector': 'BOTH', 'exposures': 1,
-        'template': 'MiriMRSCrossGratingEngineering', 'instrument': 'MIRI', 'NDither': 1},
-        {'LW_integrations': 1, 'LW_frames': 2, 'obs_id': '2', 'filename': 'apt/1050.aptx',
-        'SW_integrations': 1, 'SW_frames': 2, 'subarray': 'FULL', 'detector': 'BOTH', 'exposures': 1,
-        'template': 'MiriMRSCrossGratingEngineering', 'instrument': 'MIRI', 'NDither': 1},
-        {'LW_integrations': 10, 'LW_frames': 10, 'obs_id': '2', 'filename': 'apt/1050.aptx',
-        'SW_integrations': 20, 'SW_frames': 5, 'subarray': 'FULL', 'detector': 'BOTH', 'exposures': 1,
-        'template': 'MiriMRSCrossGratingEngineering', 'instrument': 'MIRI', 'NDither': 1},
-        {'LW_integrations': 1, 'LW_frames': 2, 'obs_id': '2', 'filename': 'apt/1050.aptx',
-        'SW_integrations': 1, 'SW_frames': 2, 'subarray': 'FULL', 'detector': 'BOTH', 'exposures': 1,
-        'template': 'MiriMRSCrossGratingEngineering', 'instrument': 'MIRI', 'NDither': 1},
-        {'LW_integrations': 1, 'LW_frames': 2, 'obs_id': '2', 'filename': 'apt/1050.aptx',
-        'SW_integrations': 1, 'SW_frames': 2, 'subarray': 'FULL', 'detector': 'BOTH', 'exposures': 1,
-        'template': 'MiriMRSCrossGratingEngineering', 'instrument': 'MIRI', 'NDither': 1}]
+                      'SW_integrations': 20, 'SW_frames': 5, 'subarray': 'FULL', 'detector': 'BOTH', 'exposures': 1,
+                      'template': 'MiriMRSCrossGratingEngineering', 'instrument': 'MIRI', 'NDither': 1},
+                     {'LW_integrations': 1, 'LW_frames': 2, 'obs_id': '2', 'filename': 'apt/1050.aptx',
+                      'SW_integrations': 1, 'SW_frames': 2, 'subarray': 'FULL', 'detector': 'BOTH', 'exposures': 1,
+                      'template': 'MiriMRSCrossGratingEngineering', 'instrument': 'MIRI', 'NDither': 1},
+                     {'LW_integrations': 1, 'LW_frames': 2, 'obs_id': '2', 'filename': 'apt/1050.aptx',
+                      'SW_integrations': 1, 'SW_frames': 2, 'subarray': 'FULL', 'detector': 'BOTH', 'exposures': 1,
+                      'template': 'MiriMRSCrossGratingEngineering', 'instrument': 'MIRI', 'NDither': 1},
+                     {'LW_integrations': 10, 'LW_frames': 10, 'obs_id': '2', 'filename': 'apt/1050.aptx',
+                      'SW_integrations': 20, 'SW_frames': 5, 'subarray': 'FULL', 'detector': 'BOTH', 'exposures': 1,
+                      'template': 'MiriMRSCrossGratingEngineering', 'instrument': 'MIRI', 'NDither': 1},
+                     {'LW_integrations': 1, 'LW_frames': 2, 'obs_id': '2', 'filename': 'apt/1050.aptx',
+                      'SW_integrations': 1, 'SW_frames': 2, 'subarray': 'FULL', 'detector': 'BOTH', 'exposures': 1,
+                      'template': 'MiriMRSCrossGratingEngineering', 'instrument': 'MIRI', 'NDither': 1},
+                     {'LW_integrations': 1, 'LW_frames': 2, 'obs_id': '2', 'filename': 'apt/1050.aptx',
+                      'SW_integrations': 1, 'SW_frames': 2, 'subarray': 'FULL', 'detector': 'BOTH', 'exposures': 1,
+                      'template': 'MiriMRSCrossGratingEngineering', 'instrument': 'MIRI', 'NDither': 1},
+                     {'LW_integrations': 10, 'LW_frames': 10, 'obs_id': '2', 'filename': 'apt/1050.aptx',
+                      'SW_integrations': 20, 'SW_frames': 5, 'subarray': 'FULL', 'detector': 'BOTH', 'exposures': 1,
+                      'template': 'MiriMRSCrossGratingEngineering', 'instrument': 'MIRI', 'NDither': 1},
+                     {'LW_integrations': 1, 'LW_frames': 2, 'obs_id': '2', 'filename': 'apt/1050.aptx',
+                      'SW_integrations': 1, 'SW_frames': 2, 'subarray': 'FULL', 'detector': 'BOTH', 'exposures': 1,
+                      'template': 'MiriMRSCrossGratingEngineering', 'instrument': 'MIRI', 'NDither': 1},
+                     {'LW_integrations': 1, 'LW_frames': 2, 'obs_id': '2', 'filename': 'apt/1050.aptx',
+                      'SW_integrations': 1, 'SW_frames': 2, 'subarray': 'FULL', 'detector': 'BOTH', 'exposures': 1,
+                      'template': 'MiriMRSCrossGratingEngineering', 'instrument': 'MIRI', 'NDither': 1}]
 
-    assertListDictEqual(output_dict, expected_dict)
+    assert_list_dict_equal(output_dict, expected_dict)
 
 
 if __name__ == '__main__':

@@ -3,7 +3,7 @@
 
 import glob
 import os
-import apt_parser
+from miri import apt_parser
 import logging
 apt_parser.init_log()
 

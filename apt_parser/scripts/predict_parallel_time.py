@@ -4,7 +4,7 @@
 import numpy as np
 import glob
 import os
-import apt_parser
+from miri import apt_parser
 from pipeline_parallel.fake_server import FakeServer
 import logging
 apt_parser.init_log()
