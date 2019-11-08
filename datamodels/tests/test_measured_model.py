@@ -63,7 +63,7 @@ in the datamodels.miri_measured_model module.
 04 Oct 2019: Removed pixeldq_def and groupdq_def tables completely.
              Added test for group table in ramp data.
 07 Oct 2019: FIXME: dq_def removed from unit tests until data corruption
-             bug fixed.
+             bug fixed (Bug 589).
 
 @author: Steven Beard (UKATC)
 
@@ -335,7 +335,7 @@ class TestMiriMeasuredModel(unittest.TestCase):
             with MiriMeasuredModel(self.testfile2) as readback:
                 assert_products_equal( self, self.dataproduct, readback,
                                        arrays=['data', 'err', 'dq'])
-                # FIXME: removed dq_def until data corruption bug fixed.
+                # FIXME: removed dq_def until data corruption bug fixed. Bug 589
                 #                       tables='dq_def' )
                 del readback
 
@@ -525,7 +525,7 @@ class TestMiriMeasuredModel(unittest.TestCase):
         self.assertTrue( np.allclose(c4x1, newdp1.dq) )
 
         # 5x1 is not broadcastable onto 4x3 and this statement should fail.
-	# FIXME: This assertion no longer works. Test commented out.
+	# FIXME: This assertion no longer works. Test commented out. Bug 591.
         #self.assertRaises(TypeError, MiriMeasuredModel, data=a4x3,
         #                  err=b5x1, dq=c5x1)
         
@@ -986,7 +986,7 @@ class TestMiriSlopeModel(unittest.TestCase):
                                arrays=['data', 'err', 'dq',
                                        'nreads', 'readsat', 'ngoodseg',
                                        'zeropt', 'fiterr'])
-        # FIXME: removed dq_def until data corruption bug fixed.
+        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
         #                       tables='dq_def' )
         del datacopy
 
@@ -1003,7 +1003,7 @@ class TestMiriSlopeModel(unittest.TestCase):
                                        arrays=['data', 'err', 'dq',
                                                'nreads', 'readsat', 'ngoodseg',
                                                'zeropt', 'fiterr'])
-                # FIXME: removed dq_def until data corruption bug fixed.
+                # FIXME: removed dq_def until data corruption bug fixed. Bug 589
                 #                       tables='dq_def' )
                 del readback
         

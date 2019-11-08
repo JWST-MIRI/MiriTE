@@ -26,7 +26,7 @@ in the datamodels.miri_straylight_model module.
 15 Nov 2018: New data model which uses the JWST schema, saturation.schema.
              Previous data model renamed to MiriMrsStraylightModel_CDP3.
 07 Oct 2019: FIXME: dq_def removed from unit tests until data corruption
-             bug (589) is fixed.
+             bug fixed (Bug 589).
 
 @author: Steven Beard (UKATC)
 
@@ -218,7 +218,7 @@ class TestMiriMrsStraylightModel_CDP3(unittest.TestCase):
         self.assertIsNotNone(datacopy)
         assert_products_equal( self, self.dataproduct, datacopy,
                                arrays=['dq'])
-        # FIXME: removed dq_def until data corruption bug fixed.
+        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
         #                       tables='dq_def' )
         del datacopy
         

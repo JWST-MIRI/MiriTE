@@ -12,6 +12,8 @@ Simple tests of the data model utility functions in datamodels/util.py.
 05 Sep 2018: Flatfield CDPs must now include FILTER, CHANNEL and BAND.
              Rewritten to use Python context manager.
 04 Oct 2019: BUG IN DQ_DEF!! Disabled verify_cdp
+07 Oct 2019: FIXME: test_verify_cdp_file removed from unit tests until
+             data corruption bug fixed (Bug 589).
 
 @author: Steven Beard (UKATC)
 
@@ -134,7 +136,7 @@ class TestFileIO(unittest.TestCase):
         # Check that the CDP verification function passes the simple
         # files created by this test.
         print("test_verify_cdp_file disabled due to dq_def corruption bug (589)!")
-        # FIXME: Track down the source of the dq_def corruption bug
+        # FIXME: Track down the source of the dq_def corruption bug Bug 589
         #for (filename, datamodel) in self.cdp_models_to_test:
         #    util.verify_cdp_file(filename, overwrite=True)
 

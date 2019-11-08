@@ -34,7 +34,7 @@ in the datamodels.miri_flatfield_model module.
 30 Jan 2019: Test that the REFTYPE and DATAMODL metadata is not altered
              when the data model is saved to a file.
 07 Oct 2019: FIXME: dq_def removed from unit tests until data corruption
-             bug fixed.
+             bug fixed (Bug 589).
 
 @author: Steven Beard (UKATC)
 
@@ -141,7 +141,7 @@ class TestMiriFlatfieldModel(unittest.TestCase):
         self.assertIsNotNone(datacopy)
         assert_products_equal( self, self.dataproduct, datacopy,
                                arrays=['data', 'err', 'dq'])
-        # FIXME: removed dq_def until data corruption bug fixed.
+        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
         #                       tables='dq_def' )
         del datacopy
         
@@ -160,7 +160,7 @@ class TestMiriFlatfieldModel(unittest.TestCase):
                                  readback.meta.model_type)
                 assert_products_equal( self, self.dataproduct, readback,
                                        arrays=['data', 'err', 'dq'])
-        # FIXME: removed dq_def until data corruption bug fixed.
+        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
         #                               tables='dq_def' )
                 del readback
         
@@ -278,7 +278,7 @@ class TestMiriSkyFlatfieldModel(unittest.TestCase):
         self.assertIsNotNone(datacopy)
         assert_products_equal( self, self.dataproduct, datacopy,
                                arrays=['data', 'err', 'dq'])
-        # FIXME: removed dq_def until data corruption bug fixed.
+        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
         #                       tables='dq_def' )
         del datacopy
         
@@ -297,7 +297,7 @@ class TestMiriSkyFlatfieldModel(unittest.TestCase):
                                  readback.meta.model_type)
                 assert_products_equal( self, self.dataproduct, readback,
                                        arrays=['data', 'err', 'dq'])
-                # FIXME: removed dq_def until data corruption bug fixed.
+                # FIXME: removed dq_def until data corruption bug fixed. Bug 589
                 #                       tables='dq_def' )
                 del readback
         
@@ -415,7 +415,7 @@ class TestMiriFringeFlatfieldModel(unittest.TestCase):
         self.assertIsNotNone(datacopy)
         assert_products_equal( self, self.dataproduct, datacopy,
                                arrays=['data', 'err', 'dq'])
-        # FIXME: removed dq_def until data corruption bug fixed.
+        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
         #                       tables='dq_def' )
         del datacopy
         
@@ -434,7 +434,7 @@ class TestMiriFringeFlatfieldModel(unittest.TestCase):
                                  readback.meta.model_type)
                 assert_products_equal( self, self.dataproduct, readback,
                                        arrays=['data', 'err', 'dq'])
-                # FIXME: removed dq_def until data corruption bug fixed.
+                # FIXME: removed dq_def until data corruption bug fixed. Bug 589
                 #                       tables='dq_def' )
                 del readback
         
@@ -552,7 +552,7 @@ class TestMiriTargetFlatfieldModel(unittest.TestCase):
         self.assertIsNotNone(datacopy)
         assert_products_equal( self, self.dataproduct, datacopy,
                                arrays=['data', 'err', 'dq'])
-        # FIXME: removed dq_def until data corruption bug fixed.
+        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
         #                       tables='dq_def' )
         del datacopy
         
@@ -571,7 +571,7 @@ class TestMiriTargetFlatfieldModel(unittest.TestCase):
                                  readback.meta.model_type)
                 assert_products_equal( self, self.dataproduct, readback,
                                        arrays=['data', 'err', 'dq'])
-                # FIXME: removed dq_def until data corruption bug fixed.
+                # FIXME: removed dq_def until data corruption bug fixed. Bug 589
                 #                       tables='dq_def' )
                 del readback
         

@@ -48,7 +48,7 @@ in the datamodels.miri_psf_model module.
 30 Jan 2019: Test that the REFTYPE and DATAMODL metadata is not altered
              when the data model is saved to a file.
 07 Oct 2019: FIXME: dq_def removed from unit tests until data corruption
-             bug (589) is fixed.
+             bug fixed (Bug 589).
 
 @author: Steven Beard (UKATC)
 
@@ -161,7 +161,7 @@ class TestMiriPointSpreadFunctionModel(unittest.TestCase):
         self.assertIsNotNone(datacopy)
         assert_products_equal( self, self.dataproduct, datacopy,
                                arrays=['data', 'err', 'dq'])
-        # FIXME: removed dq_def until data corruption bug fixed.
+        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
         #                       tables='dq_def' )
         del datacopy
         
@@ -178,7 +178,7 @@ class TestMiriPointSpreadFunctionModel(unittest.TestCase):
                                  readback.meta.reftype)
                 assert_products_equal( self, self.dataproduct, readback,
                                        arrays=['data', 'err', 'dq'])
-                # FIXME: removed dq_def until data corruption bug fixed.
+                # FIXME: removed dq_def until data corruption bug fixed. Bug 589
                 #                       tables='dq_def' )
                 del readback
         
@@ -285,7 +285,7 @@ class TestMiriImagingPointSpreadFunctionModel(unittest.TestCase):
         self.assertIsNotNone(datacopy)
         assert_products_equal( self, self.dataproduct, datacopy,
                                arrays=['data', 'err', 'dq'],
-        # FIXME: removed dq_def until data corruption bug fixed.
+        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
         #                      tables=['dq_def', 'psf_lut'] )
                                tables=['psf_lut'] )
         del datacopy
@@ -305,7 +305,7 @@ class TestMiriImagingPointSpreadFunctionModel(unittest.TestCase):
                                  readback.meta.model_type)
                 assert_products_equal( self, self.dataproduct, readback,
                                        arrays=['data', 'err', 'dq'],
-                # FIXME: removed dq_def until data corruption bug fixed.
+                # FIXME: removed dq_def until data corruption bug fixed. Bug 589
                 #                       tables=['dq_def', 'psf_lut'] )
                                        tables=['psf_lut'] )
                 del readback
@@ -331,7 +331,7 @@ class TestMiriImagingPointSpreadFunctionModel(unittest.TestCase):
                                  readback.meta.reftype)
                 assert_products_equal( self, testproduct, readback,
                                        arrays=['data', 'err', 'dq'],
-                # FIXME: removed dq_def until data corruption bug fixed.
+                # FIXME: removed dq_def until data corruption bug fixed. Bug 589
 #                                       tables=['dq_def', 'psf_lut'] )
                                        tables=['psf_lut'] )
                 del readback
@@ -423,7 +423,7 @@ class TestMiriLrsPointSpreadFunctionModel(unittest.TestCase):
         self.assertIsNotNone(datacopy)
         assert_products_equal( self, self.dataproduct, datacopy,
                                arrays=['data', 'err', 'dq'])
-        # FIXME: removed dq_def until data corruption bug fixed.
+        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
         #                       tables=['dq_def'] )
         del datacopy
         
@@ -442,7 +442,7 @@ class TestMiriLrsPointSpreadFunctionModel(unittest.TestCase):
                                  readback.meta.model_type)
                 assert_products_equal( self, self.dataproduct, readback,
                                        arrays=['data', 'err', 'dq'])
-                # FIXME: removed dq_def until data corruption bug fixed.
+                # FIXME: removed dq_def until data corruption bug fixed. Bug 589
                 #                       tables=['dq_def'] )
                 del readback
 
@@ -461,7 +461,7 @@ class TestMiriLrsPointSpreadFunctionModel(unittest.TestCase):
                                  readback.meta.reftype)
                 assert_products_equal( self, testproduct, readback,
                                        arrays=['data', 'err', 'dq'])
-                # FIXME: removed dq_def until data corruption bug fixed.
+                # FIXME: removed dq_def until data corruption bug fixed. Bug 589
                 #                       tables=['dq_def',] )
                 del readback
         
@@ -549,7 +549,7 @@ class TestMiriMrsPointSpreadFunctionModel(unittest.TestCase):
         self.assertIsNotNone(datacopy)
         assert_products_equal( self, self.dataproduct, datacopy,
                                arrays=['data', 'err', 'dq'])
-        # FIXME: removed dq_def until data corruption bug fixed.
+        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
         #                       tables=['dq_def'] )
         del datacopy
         
@@ -568,7 +568,7 @@ class TestMiriMrsPointSpreadFunctionModel(unittest.TestCase):
                                  readback.meta.model_type)
                 assert_products_equal( self, self.dataproduct, readback,
                                        arrays=['data', 'err', 'dq'])
-                # FIXME: removed dq_def until data corruption bug fixed.
+                # FIXME: removed dq_def until data corruption bug fixed. Bug 589
                 #                       tables=['dq_def'] )
                 del readback
         

@@ -35,7 +35,7 @@ in the datamodels.miri_linearity_model module.
              appropriate for a reference file.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 07 Oct 2019: FIXME: dq_def removed from unit tests until data corruption
-             bug (589) is fixed.
+             bug fixed (Bug 589).
 
 @author: Steven Beard (UKATC)
 
@@ -137,7 +137,7 @@ class TestMiriLinearityModel(unittest.TestCase):
         assert_products_equal( self, self.dataproduct, datacopy,
                                arrays=['data', 'err', 'dq'])
 #                                        'minimage', 'maximage', 'fiterr'],
-        # FIXME: removed dq_def until data corruption bug fixed.
+        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
         #                       tables='dq_def' )
         del datacopy
        
@@ -153,7 +153,7 @@ class TestMiriLinearityModel(unittest.TestCase):
                 assert_products_equal( self, self.dataproduct, readback,
                                        arrays=['data', 'err', 'dq'])
 #                                                'minimage', 'maximage', 'fiterr'],
-                # FIXME: removed dq_def until data corruption bug fixed.
+                # FIXME: removed dq_def until data corruption bug fixed. Bug 589
                 #                       tables='dq_def' )
                 del readback
         

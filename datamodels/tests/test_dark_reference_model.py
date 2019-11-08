@@ -38,7 +38,7 @@ in the datamodels.miri_dark_reference_model module.
              accepted with 4-D data, err and dq arrays.
 15 Nov 2018: Schema switched to use JWST darkMIRI.schema.
 07 Oct 2019: FIXME: dq_def removed from unit tests until data corruption
-             bug (589) is fixed.
+             bug fixed (Bug 589).
 
 @author: Steven Beard (UKATC)
 
@@ -144,7 +144,7 @@ class TestMiriDarkReferenceModel(unittest.TestCase):
         self.assertIsNotNone(datacopy)
         assert_products_equal( self, self.dataproduct, datacopy,
                                arrays=['data', 'err', 'dq'])
-        # FIXME: removed dq_def until data corruption bug fixed.
+        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
         #                       tables='dq_def' )
         del datacopy
         
@@ -159,7 +159,7 @@ class TestMiriDarkReferenceModel(unittest.TestCase):
             with MiriDarkReferenceModel(self.testfile) as readback:
                 assert_products_equal( self, self.dataproduct, readback,
                                        arrays=['data', 'err', 'dq'])
-        # FIXME: removed dq_def until data corruption bug fixed.
+        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
         #                               tables='dq_def' )
                 del readback
         
