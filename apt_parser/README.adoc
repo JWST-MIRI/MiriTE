@@ -1,0 +1,244 @@
+= APT_parser Documentation
+:author: Christophe Cossou
+:revnumber: 1.0
+:revdate: {docdate}
+:doctype: article
+:encoding: utf-8
+:lang: en
+:numbered:
+:toc: left
+:toclevels: 4
+:source-language: python
+
+== Purpose
+Parse .aptx or XML relative to APT files. Will return a list of simulations that these files contains.
+
+Only works for MIRI observations.
+
+Version 0.2.0 supports APT 27.1
+Version 0.3.0 add support for MIRISim simulation generation (IMA/MRS)
+Version 0.4.0 add support for LRS MIRISim simulation generation
+
+NOTE: There is no installation procedure as it is now a sub-package of MiriTE.
+
+== Tests
+To launch the unit test suite, simply run:
+[source, bash]
+----
+pytest
+----
+
+However, in the case you installed a *develop* version of the package, run:
+[source, bash]
+----
+python -m pytest
+----
+This is due to the *mirisim* submodule that cannot be imported in tests without forcing the local package. Or, if that doesn't work, install the package before running the tests.
+
+== How to parse an APT file
+[source,python]
+----
+import miri.apt_parser
+import logging
+
+# Only if using as a standalone code
+miri.apt_parser.init_log()
+LOG = logging.getLogger('parse_apt')
+
+simulations = miri.apt_parser.parse_apt("1027.aptx")
+----
+
+== Constants
+
+* *MIRI_CAR* : Dictionnary where each key is the STScI proposal number and the value is the corresponding MIRI CAR number
+* *MIRI_STSCI_ID* The opposite of *MIRI_CAR* dictionnary
+
+== Functions
+=== analyse_apt_list
+
+Given a list of APT files, will run parse_apt on each of them, then count_datavolume on each simulation list.
+
+.Will return a tuple of 3 dict. For each dict, a key represent a different APT file. The values are in that order:
+. list of simulation parameter for each APT
+. list of memory prediction for each APT (in GB)
+. list of computation time prediction for each APT (in hours)
+
+.Parameters:
+[cols="1, 1, 4",options="header",]
+|====
+|Parameter |Type or Values |Description
+| files | list(str) |List of APT filenames (relative or absolute path also works)
+|====
+
+[source,python]
+----
+import os
+import glob
+import miri.apt_parser
+
+folder = "apt"
+files = glob.glob(os.path.join(folder, "*.aptx"))
+(APT_sim, mem_volume, time_volume) = miri.apt_parser.analyse_apt_list(files)
+----
+
+=== count_datavolume
+
+Will extract from the given input the amount of time (in hours)
+and the memory (in GB) you need to process each simulation through the JWST pipeline
+
+.Parameters:
+[cols="1, 1, 4",options="header",]
+|====
+|Parameter |Type or Values |Description
+| sim_dict | dict | key represent a different APT file. Value are output of *parse_apt* function
+|====
+
+[source,python]
+----
+import miri.apt_parser
+(mem_volume, time_volume) = miri.apt_parser.count_datavolume(APT_sim)
+----
+
+=== init_log
+
+Init logging configuration file. Must be used before any other
+package you could think of and that might use logging as well.
+If it doesn't work the way you expect, try inverting the imports
+to see if it changes.
+
+Logs will be displayed on screen, but also stored in a file. This function
+has as a parameter the filename, and loglevel for the file, or screen output.
+
+You can also set a dictionnary of extra parameters you want to add in your logging configDict.
+
+
+.Parameters:
+[cols="1, 1, 4",options="header",]
+|====
+|Parameter |Type or Values |Description
+| log | str | filename where to store logs. By default "pipeline.log"
+| stdout_loglevel | ERROR, WARNING, INFO, DEBUG |log level for standard output (default: INFO)
+| file_loglevel | ERROR, WARNING, INFO, DEBUG |log level for log file (default: DEBUG)
+|extra_config | dict | [optional] Set of extra properties to be added to the dict_config for logging
+|====
+
+[source,python]
+----
+import miri.apt_parser
+miri.apt_parser.init_log(log="parse_apt.log", stdout_loglevel="INFO"
+                    , file_loglevel="DEBUG", extra_config=None)
+----
+
+
+Example of extra config dict:
+[source,python]
+----
+extra_config = {"loggers":
+            {
+
+                "paramiko":
+                {
+                        "level": "WARNING",
+                    },
+
+                "matplotlib":
+                {
+                        "level": "WARNING",
+                    },
+
+                "astropy":
+                {
+                        "level": "WARNING",
+                    },
+            },}
+----
+
+NOTE: The architecture of the *extra_config* directory should match the original configDict.
+
+=== parse_apt
+Will parse an APT file given its filename (can be either .aptx or .apt/XML)
+
+The output will be a list of individual simulations for that APT file.
+
+.Parameters:
+[cols="1, 1, 4",options="header",]
+|====
+|Parameter |Type or Values |Description
+|filename | str | Filename of the input APT file (can be .aptx or XML)
+|====
+
+[source,python]
+----
+import miri.apt_parser
+
+simulations = miri.apt_parser.parse_apt(filename)
+----
+
+== MIRISim support
+Since v0.3.0, apt_parser can generate MIRISim parameters from the APT file.
+
+=== Only retrieve simulation parameters
+If you just want the list of simulation parameters without running anything, do:
+[source]
+----
+import miri.apt_parser
+import mirisim.apt
+miri.apt_parser.init_log()
+
+from mirisim import config_parser as parser  # SimConfig, SimulatorConfig, SceneConfig
+
+observations = miri.apt_parser.parse_apt("1232.aptx")
+
+simulations = mirisim.apt.get_simulations(observations)
+----
+
+=== One scene to sim them all
+
+Here is an example on how to run simulation directly from the APT:
+[source]
+----
+import miri.apt_parser
+import mirisim.apt
+miri.apt_parser.init_log()
+
+from mirisim import config_parser as parser  # SimConfig, SimulatorConfig, SceneConfig
+
+# See MIRISim documentation for details to create a scene
+scene_config = parser.SceneConfig.from_default()
+
+observations = miri.apt_parser.parse_apt("1232.aptx")
+
+mirisim.apt.run(observations, scene_config)
+----
+
+.Optional parameters:
+* *dryrun*: If `True`, will create folders with simulation `.ini` files without running the simulation
+* *simulator*: Provide a custom *SimulatorConfig* object in case you don't want default values
+
+=== One scene per target
+In the APT file, you have a list of targets, for instance:
+
+* `1 NGC-188-FTS107-1`
+* `2 NGC-188-FTS107-2`
+
+You then have to provide one SceneConfig object per target:
+[source]
+----
+import miri.apt_parser
+import mirisim.apt
+apt_parser.init_log()
+
+from mirisim import config_parser as parser  # SimConfig, SimulatorConfig, SceneConfig
+
+# See MIRISim documentation for details to create a scene
+scene_config = parser.SceneConfig.from_default()
+
+scene = {
+'1 NGC-188-FTS107-1':scene_config,
+'2 NGC-188-FTS107-2':scene_config
+}
+
+observations = miri.apt_parser.parse_apt("1232.aptx")
+
+mirisim.apt.run(observations, scene)
+----
