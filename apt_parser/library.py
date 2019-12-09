@@ -59,7 +59,13 @@ def get_element_tree(filename):
             return None
     elif ext == ".aptx":
         zf = zipfile.ZipFile(filename, 'r')
-        f = zf.read("{}.xml".format(bare_name))
+
+        # Since the .xml file can have a different name from the .aptx file (in case you renamed it), we get the name
+        # from the .zip file filelist itself. You're not supposed to have multiple .xml file in there, code will behave
+        # erratically if it does
+        xml_filename = next(filter(lambda x: ".xml" in x, zf.namelist()))
+
+        f = zf.read(xml_filename)
         root = ET.fromstring(f)
     else:
         LOG.error("Unknown file extension: {} ({})".format(ext, filename))

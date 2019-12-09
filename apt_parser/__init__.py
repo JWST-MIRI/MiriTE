@@ -1,4 +1,4 @@
-__version__ = "0.6.0"
+__version__ = "0.7.0"
 
 from . import constants
 from .library import count_datavolume, init_log, parse_apt, analyse_apt_list
