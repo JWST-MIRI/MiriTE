@@ -182,6 +182,8 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 04 Oct 2019: MIR_DARK exposure type has changed to MIR_DARKALL, MIR_DARKIMG
              and MIR_DARKMRS.
 07 Oct 2019: Removed '.yaml' suffix from schema references.
+13 Dec 2019: Modified copy_metadata to prevent DATAMODL, FILETYPE, FILENAME
+             and REFTYPE keywords being copied.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -1571,7 +1573,7 @@ class MiriDataModel(DataModel):
         NOTE: This method will only copy the metadata defined in the
         schemas for both the current and "other" data models. Other
         metadata will be ignored (and a warning issued). Use the 'ignore'
-        parameter to specify keywords that are know to be missing or
+        parameter to specify keywords that are known to be missing or
         irrelevant.
 
         :Parameters:
@@ -1585,6 +1587,9 @@ class MiriDataModel(DataModel):
         """
         assert isinstance(other, MiriDataModel)
         if hasattr(other, 'meta'):
+            # The following keywords are fundamental to the data type
+            # and must never be copied.
+            alwaysignore = ['DATAMODL', 'FILETYPE', 'REFTYPE', 'FILENAME']
 
             # Copy all metadata apart from keyword matches specified
             # in the ignore list.
@@ -1594,7 +1599,7 @@ class MiriDataModel(DataModel):
             names = []
             for key in metakeys:
                 tobecopied = True
-                for ignorekw in ignore:
+                for ignorekw in ignore+alwaysignore:
                     if ignorekw and (ignorekw in key):
                         # Skip to the next keyword
                         tobecopied = False

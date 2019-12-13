@@ -102,6 +102,8 @@ It has been superceeded by the datamodels/miri_exposure_model.py
 30 Apr 2018: Replaced xrange with range for Python 3.
 17 May 2018: Python 3: Converted dictionary keys return into a list.
 12 Mar 2019: Removed use of astropy.extern.six (since Python 2 no longer used).
+13 Dec 2019: Modified from_data_object to prevent DATAMODL, FILETYPE, FILENAME
+             and REFTYPE keywords being copied.
 
 @author: Steven Beard
 
@@ -441,7 +443,7 @@ class Metadata(object):
             else:
                 return False
 
-    def from_data_object(self, data_object, hdu_name='PRIMARY'):
+    def from_data_object(self, data_object, hdu_name='PRIMARY', ignore=[]):
         """
         
         Create the metadata from the metadata found in a new MIRI
@@ -453,6 +455,8 @@ class Metadata(object):
             The data object from which to extract the metadata.
         hdu_name: string, optional
             The name of the HDU the metadata should be associated with.
+        ignore: list, optional
+            If defined, a list of keywords not to be copied.
             
         :Returns:
         
@@ -467,9 +471,16 @@ class Metadata(object):
                 data_object.__class__.__name__
             raise TypeError(strg)
 
+        # The following keywords are fundamental to the data type
+        # and must never be copied.
+        alwaysignore = ['meta.model_type', 'meta.filetype', 'meta.reftype',
+                        'meta.filename']
         metadict = data_object.fits_metadata_dict()
         metakeys = list(metadict.keys())
         for keyw in metakeys:
+            if keyw in ignore or keyw in alwaysignore:
+                # Skip this keyword
+                continue
             (fitshdu, fitskey, fitscomment) = metadict[keyw]
             value = data_object[keyw]
             if value is not None and fitshdu == hdu_name:
