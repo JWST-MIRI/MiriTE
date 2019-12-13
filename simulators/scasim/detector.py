@@ -2073,6 +2073,7 @@ class DetectorArray(object):
             
         """
         if subarray is None:
+            # FULL frame. The data shape is the same as the detector shape.
             detector_columns = self.left_columns + self.illuminated_shape[1] + \
                                self.right_columns
             refout_rows = self.illuminated_shape[0]
@@ -2080,6 +2081,8 @@ class DetectorArray(object):
             self.refout_shape = (refout_rows, refout_columns)
             return self.detector_shape
         else:
+            # Subarray mode. The data shape is the subarray size with
+            # reference rows added.
             subrows_illuminated = subarray[2]
             subrows_bottom = int(subrows_illuminated * \
                                  self.bottom_rows / self.illuminated_shape[0])
@@ -2672,11 +2675,13 @@ class DetectorArray(object):
                 dead_zones = np.where((self.bad_pixels & MASK_DEAD) > 0)
                 detector_flux[dead_zones] = 0.0
                 
-            # Multiply the flux by the flat-field
+            # Multiply the flux by the flat-field.
+            # NOTE: The flat-field data includes the reference pixels.
             if self.flat_map is not None:
                 detector_flux = detector_flux * self.flat_map
 
             # The dark current is applied here ONLY if it has been averaged.
+            # NOTE: The dark data includes the reference pixels.
             if self.dark_averaged:
                 # The dark current affects all parts of the detector
                 if self.dark_map is not None:

@@ -570,12 +570,17 @@ class MiriIlluminationModel(MiriDataModel):
         # and rightcrop are non zero.
         # FIXME: Is this correct? Output array seems garbled.
         if lcrop == 0 and rcrop == 0:
+            # No cropping needed. Place the illumination data directly
+            # into the flux array.
             new_illumination[r1:r2, c1:c2] = illumination
         elif rcrop == 0:
+            # Left cropping only.
             new_illumination[r1:r2, c1:c2] = illumination[:, lcrop:]
         elif lcrop == 0:
+            # Right cropping only.
             new_illumination[r1:r2, c1:c2] = illumination[:, :rcrop]
         else:
+            # Both left and right cropping.
             new_illumination[r1:r2, c1:c2] = illumination[:, lcrop:rcrop]
                             
         del illumination
