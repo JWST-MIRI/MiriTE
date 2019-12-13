@@ -12,6 +12,7 @@ the DATAMODL metadata.
 30 Jan 2019: Created
 22 Mar 2019: Return a blank string when a data model does not have an
              STScI equivalent.
+13 Dec 2019: MIRIRampModel replaced with RampModel.
 
 
 @author: Steven Beard (UKATC)
@@ -26,8 +27,8 @@ the DATAMODL metadata.
 #       Uncertain mappings are commented out.
 #
 PARENT_DICT = {'MiriDataModel' : 'DataModel', \
-               'MiriRampModel' : 'MIRIRampModel', \
-               'MiriExposureModel' : 'MIRIRampModel', \
+               'MiriRampModel' : 'RampModel', \
+               'MiriExposureModel' : 'RampModel', \
                'MiriSlopeModel' : 'ImageModel', \
                'MiriMrsApertureCorrectionModel' : '', \
                'MiriBadPixelMaskModel' :    'MaskModel', \
