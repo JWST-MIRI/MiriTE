@@ -7,10 +7,10 @@ import zipfile
 import collections
 import re
 
-LOG = logging.getLogger('parse_apt.library')
-
 from . import templates as tp
 from . import constants as c
+
+LOG = logging.getLogger('parse_apt.library')
 
 
 def get_simplified_tag(tag):
@@ -38,6 +38,7 @@ def get_simplified_tag(tag):
     else:
         raise ValueError("Regexp {} don't match in '{}'".format(regexp, tag))
 
+
 def get_element_tree(filename):
     """
     return xml.etree.ElementTree from the input file (.xml or .aptx)
@@ -59,7 +60,13 @@ def get_element_tree(filename):
             return None
     elif ext == ".aptx":
         zf = zipfile.ZipFile(filename, 'r')
-        f = zf.read("{}.xml".format(bare_name))
+
+        # Since the .xml file can have a different name from the .aptx file (in case you renamed it), we get the name
+        # from the .zip file filelist itself. You're not supposed to have multiple .xml file in there, code will behave
+        # erratically if it does
+        xml_filename = next(filter(lambda x: ".xml" in x, zf.namelist()))
+
+        f = zf.read(xml_filename)
         root = ET.fromstring(f)
     else:
         LOG.error("Unknown file extension: {} ({})".format(ext, filename))
@@ -96,6 +103,7 @@ def get_target(template):
 
     return output_dict
 
+
 def parse_apt(filename):
     """
     Parse an APT file given its filename (can be either .aptx or .apt/XML)
@@ -115,22 +123,16 @@ def parse_apt(filename):
 
     skip_obs = ["MiriAnneal"]
 
-
     # Select all targets
     xml_targets = root.findall('.//apt:Targets/apt:Target', c.ns)
 
-    targets = {}
-    targets["NONE"] = {'name': None, "background": None}  # Default target for template where it's irrelevant
+    targets = {"NONE": {'name': None, "background": None}}
     for xml_target in xml_targets:
         target = get_target(xml_target)
         targets["{} {}".format(target["number"], target["name"])] = target
 
     # Select all observation regardless of their position from root
     observations = root.findall('.//apt:ObservationGroup/apt:Observation', c.ns)
-
-    #miri_imaging_list = root.findall('.//apt:Observation//mi:MiriImaging', parser.ns)
-
-
 
     for obs in observations:
         obs_id = obs.find("apt:Number", c.ns).text
@@ -141,18 +143,17 @@ def parse_apt(filename):
         # we take the first child of Template as we don't expect something else
         template = obs.find("apt:Template//", c.ns)
 
-
-        #MIRIImaging
+        # MIRIImaging
         tag = get_simplified_tag(template.tag)
 
         if tag in skip_obs:
             continue
 
         metadata = {
-            "obs_id":obs_id,
-            "instrument":instrument,
-            "filename":filename,
-            "target_id":target_id,
+            "obs_id": obs_id,
+            "instrument": instrument,
+            "filename": filename,
+            "target_id": target_id,
             "background": target["background"]
 
         }
@@ -165,10 +166,8 @@ def parse_apt(filename):
         except KeyError:
             LOG.info("{}: Observation {}".format(filename, template.tag))
 
-
-
-
     return simulation_list
+
 
 def get_prediction(sim):
     """
@@ -193,7 +192,7 @@ def get_prediction(sim):
 
     # Values extracted from my benchmark, done with Pipeline 7.3 (July 2019)
     ram = 0.05 * sim[integration_key] * sim[frame_key] + 1.7
-    time = (8.75 * sim[integration_key] * sim[frame_key] + 50.)/ 3600.  # In hours
+    time = (8.75 * sim[integration_key] * sim[frame_key] + 50.) / 3600.  # In hours
 
     # Correct for detector size (compared to FULL ARRAY)
     corr_factor = c.SUBARRAY_PIX[sim["subarray"]] / (1032. * 1024.)
@@ -206,6 +205,7 @@ def get_prediction(sim):
         nb_exps *= 2
 
     return ram, time, nb_exps
+
 
 def count_datavolume(sim_dict):
     """
@@ -227,11 +227,11 @@ def count_datavolume(sim_dict):
             if "detector" in sim.keys():
                 if sim["detector"] in ["IMAGER", "ALL"]:
                     tmp = {
-                        "integrations":sim["ima_integrations"],
-                        "frames":sim["ima_frames"],
-                        "exposures":sim["exposures"],
-                        "subarray":sim["subarray"],
-                        "NDither":sim["NDither"],
+                        "integrations": sim["ima_integrations"],
+                        "frames": sim["ima_frames"],
+                        "exposures": sim["exposures"],
+                        "subarray": sim["subarray"],
+                        "NDither": sim["NDither"],
                     }
                     (ram, time, nb_exps) = get_prediction(tmp)
                     memory.extend([ram] * nb_exps)  # For each exposure we have one identical file to analyse
@@ -260,7 +260,6 @@ def count_datavolume(sim_dict):
                     memory.extend([ram] * nb_exps)  # For each exposure we have one identical file to analyse
                     times.extend([time] * nb_exps)  # For each exposure we have one identical file to analyse
 
-
             else:
                 (ram, time, nb_exps) = get_prediction(sim)
                 memory.extend([ram] * nb_exps)  # For each exposure we have one identical file to analyse
@@ -274,8 +273,8 @@ def count_datavolume(sim_dict):
 
 def init_log(log="parse_apt.log", stdout_loglevel="INFO", file_loglevel="DEBUG", extra_config=None):
     """
-    Init logging configuration file. Must be used before any other package you could think of and that might use logging as well.
-    If it doesn't work the way you expect, try inverting the imports to see if it changes.
+    Init logging configuration file. Must be used before any other package you could think of and that
+    might use logging as well. If it doesn't work the way you expect, try inverting the imports to see if it changes.
 
     :param str log: filename where to store logs. By default "pipeline.log"
     :param str stdout_loglevel: log level for standard output (ERROR, WARNING, INFO, DEBUG)
@@ -336,6 +335,7 @@ def init_log(log="parse_apt.log", stdout_loglevel="INFO", file_loglevel="DEBUG",
 
     logging.config.dictConfig(log_config)
 
+
 def update_dict(d, u):
     """
     Recursively merge or update dict-like objects.
@@ -356,6 +356,7 @@ def update_dict(d, u):
             d[k] = v
     return d
 
+
 def analyse_apt_list(files):
     """
     Parse a list of APT files and store in a dictionnary the list of simulations corresponding to each APT file.
@@ -365,7 +366,8 @@ def analyse_apt_list(files):
     :param files: list of .aptx filenames
     :type files: list(str)
 
-    :return: (APT_sim, mem_volume, time_volume) list of simulation parameter, prediction for memory and computation time for each car
+    :return: (APT_sim, mem_volume, time_volume) list of simulation parameter, prediction for memory and
+    computation time for each car
     :rtype: (dict(car:list(dict(parameters))), dict(car:list(memory in GB)), dict(car:list(time in hours)))
     """
     cars = []
@@ -390,4 +392,4 @@ def analyse_apt_list(files):
 
     (mem_volume, time_volume) = count_datavolume(APT_sim)
 
-    return (APT_sim, mem_volume, time_volume)
+    return APT_sim, mem_volume, time_volume
