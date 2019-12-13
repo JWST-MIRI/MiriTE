@@ -775,7 +775,7 @@ class SensorChipAssembly(object):
             * 'FAST' - 1 sample per readout and defaults of ngroups=1 and
               nints=10
             * 'FASTINTAVG' - same as FAST but with groups of 4 integrations
-              averaged to reduce data volume.
+              averaged to reduce data volume. OBSOLETE.
             * 'FASTGRPAVG' - same as FAST but with groups of 4 groups
               averaged to reduce data volume.
           
@@ -1923,7 +1923,7 @@ class SensorChipAssembly(object):
             * 'FAST' - 1 sample per readout and defaults of ngroups=1
               and nints=10
             * 'FASTINTAVG' - same as FAST but with groups of 4
-              integrations averaged to reduce data volume.
+              integrations averaged to reduce data volume. OBSOLETE.
             * 'FASTGRPAVG' - same as FAST but with groups of 4 groups
               averaged to reduce data volume.
               
@@ -3385,7 +3385,7 @@ class SensorChipAssembly(object):
             * 'FAST' - 1 sample per readout and defaults of ngroups=1 and
               nints=10.
             * 'FASTINTAVG' - same as FAST but with groups of 4 integrations
-              averaged.
+              averaged. OBSOLETE.
             * 'FASTGRPAVG' - same as FAST but with groups of 4 groups
               averaged.
           
@@ -3815,7 +3815,7 @@ class SensorChipAssembly(object):
             * 'FAST' - 1 sample per readout and defaults of ngroups=1 and
               nints=10.
             * 'FASTINTAVG' - same as FAST but with groups of 4 integrations
-              averaged.
+              averaged. OBSOLETE.
             * 'FASTGRPAVG' - same as FAST but with groups of 4 groups
               averaged.
           
@@ -4378,7 +4378,7 @@ def simulate_sca(inputfile, outputfile, detectorid, scale=1.0, fringemap=None,
         * 'FAST' - 1 sample per readout and defaults of ngroups=1 and
           nints=10.
         * 'FASTINTAVG' - same as FAST but with groups of 4 integrations
-          averaged.
+          averaged. OBSOLETE.
         * 'FASTGRPAVG' - same as FAST but with groups of 4 groups
           averaged.
           
@@ -4682,7 +4682,7 @@ def simulate_sca_list(inputfile, outputfile, detectorid, scale=1.0,
         * 'FAST' - 1 sample per readout and defaults of ngroups=1 and
           nints=10.
         * 'FASTINTAVG' - same as FAST but with groups of 4 integrations
-          averaged.
+          averaged. OBSOLETE.
         * 'FASTGRPAVG' - same as FAST but with groups of 4 groups
           averaged.
           
@@ -4984,7 +4984,7 @@ def simulate_sca_pipeline(illumination_map, scale=1.0,
         * 'FAST' - 1 sample per readout and defaults of ngroups=1 and
           nints=10.
         * 'FASTINTAVG' - same as FAST but with groups of 4 integrations
-          averaged.
+          averaged. OBSOLETE.
         * 'FASTGRPAVG' - same as FAST but with groups of 4 groups
           averaged.
           
