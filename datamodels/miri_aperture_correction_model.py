@@ -24,7 +24,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
 
-@author: Steven Beard (UKATC), Vincent Geers (UKATC)
+@author: Steven Beard (UKATC), Vincent Geers (UKATC), Juergen Schreiber (MPIA)
 
 """
 
@@ -211,7 +211,7 @@ class MiriLrsApertureCorrectionModel(MiriDataModel):
         
     """
     schema_url = "miri_aperture_correction_lrs.schema"
-    fieldnames = ('wavelength', 'nelem' 'width', 'apcorr')
+    fieldnames = ('wavelength', 'nelem', 'width', 'apcorr')
     
     def __init__(self, init=None, apcorr_table=None, **kwargs):
         """
