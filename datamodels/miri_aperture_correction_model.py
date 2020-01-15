@@ -205,6 +205,10 @@ class MiriLrsApertureCorrectionModel(MiriDataModel):
         Or: A numpy record array containing the same information as above.
         A aperture correction table must either be defined in the
         initializer or in this parameter. A blank table is not allowed.
+        The table contains the columns wavelength, nelem (number of apertures),
+        width (width of aperture in pixels) and apcorr which is the correction
+        factor for each width to an infinite aperture
+        
     \*\*kwargs:
         All other keyword arguments are passed to the DataModel initialiser.
         See the jwst.datamodels documentation for the meaning of these keywords.
