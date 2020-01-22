@@ -775,7 +775,7 @@ class SensorChipAssembly(object):
             * 'FAST' - 1 sample per readout and defaults of ngroups=1 and
               nints=10
             * 'FASTINTAVG' - same as FAST but with groups of 4 integrations
-              averaged to reduce data volume.
+              averaged to reduce data volume. OBSOLETE.
             * 'FASTGRPAVG' - same as FAST but with groups of 4 groups
               averaged to reduce data volume.
           
@@ -1391,10 +1391,30 @@ class SensorChipAssembly(object):
             self.illumination_map.truncate([self._sca['ILLUMINATED_COLUMNS'],
                                             self._sca['ILLUMINATED_ROWS']] )
 
+        # If a scaling factor is given, scale the illumination data by the
+        # given factor. This feature is normally used only for testing.
         if scale is not None and scale != 1.0:
             self.illumination_map.apply_scale(scale)
+
+        # There are two possible variations of illumination data input:
+        # 1) If the illumination data defines a subarray mode it represents
+        #    the illumination incident on that particular subarray on a
+        #    normal-sized full-frame detector. If the subarray touches the
+        #    left edge of the detector it can contain reference pixels.
+        #    The subarray will be placed at the right location on the surface
+        #    of a simulated detector. A subarray region may or may not
+        #    include reference columns, depending on its location.
+        #    This mode is also assumed if the size of the illumination data
+        #    exactly matches the output subarray mode. 
+        # 2) If the illumination data does not define a subarray mode it is
+        #    assumed to contain full-frame data. The data can be any size:
+        #    the size of the data defining the size of the detector. Full
+        #    frame arrays smaller than the actual detector size are normally
+        #    used for testing with small amounts of data. Full-frame input
+        #    data will be padded with reference columns.
         if self.illumination_map.meta.subarray.name and \
            self.illumination_map.meta.subarray.name != "GENERIC":
+            # Variation (1). The input subarray mode has been specified.
             self.subarray_input_str = self.illumination_map.meta.subarray.name
         else:
             # If the input subarray mode is undefined or GENERIC but the
@@ -1405,13 +1425,17 @@ class SensorChipAssembly(object):
                 ishape = self.illumination_map.get_illumination_shape()
                 if (self.subarray[2] == ishape[0]) and \
                    (self.subarray[3] == ishape[1]):
+                    # Variation (1). Input subarray mode assumed the same as
+                    # the output subarray mode.
                     self.subarray_input_str = self.subarray_str
                     if self._verbose > 2:
                         self.logger.info( "Input subarray mode assumed to be %s." % \
                             self.subarray_input_str )
                 else:
+                    # Variation (2). Full frame input data assumed.
                     self.subarray_input_str = 'FULL'
             else:
+                # Variation (2). Full frame input data assumed.
                 self.subarray_input_str = 'FULL'
 
         # Get the subarray location and dimensions from the detector
@@ -1899,7 +1923,7 @@ class SensorChipAssembly(object):
             * 'FAST' - 1 sample per readout and defaults of ngroups=1
               and nints=10
             * 'FASTINTAVG' - same as FAST but with groups of 4
-              integrations averaged to reduce data volume.
+              integrations averaged to reduce data volume. OBSOLETE.
             * 'FASTGRPAVG' - same as FAST but with groups of 4 groups
               averaged to reduce data volume.
               
@@ -2190,14 +2214,30 @@ class SensorChipAssembly(object):
         # illumination map or the QE measurement changes.
         if self.flux is None:
             if self.subarray_input is None:
+                # The input data is FULL frame. The flux array is the
+                # illuminated area of the detector, not including
+                # reference pixels.
                 flux = self.illumination_map.get_illumination( usefilter=self.qe )
             else:
-                dleft  = self._sca['LEFT_COLUMNS']
-                dright = self._sca['RIGHT_COLUMNS']  
+                # The input data is a subarray. The flux array is still the
+                # illuminated area of the detector, not including reference
+                # pixels. The subarray coordinates do include reference pixels,
+                # which means they are shifted to the left by 4 pixels with
+                # respect to the flux array. Subarrays which touch the left
+                # edge of the detector will have their left-most 4 columns
+                # cropped when placed onto the flux array.
+                dleft  = self.detector.left_columns
+                dright = self.detector.right_columns
                 dshape = self.detector.illuminated_shape
                 # Bug 558: Subarray locations include the reference columns
-                location = (self.subarray_input[0], self.subarray_input[1]-dleft)      
-#                location = (self.subarray_input[0], self.subarray_input[1])      
+                # INCORRECT! This left-shift was double-counted within the
+                # get_illumination_enlarged function.
+                #location = (self.subarray_input[0], self.subarray_input[1]-dleft)
+                location = (self.subarray_input[0], self.subarray_input[1])
+
+                # Generate a flux array consisting of the subarray illumination
+                # placed onto a full-frame flux array.
+                location = (self.subarray_input[0], self.subarray_input[1])      
                 flux = self.illumination_map.get_illumination_enlarged(
                             dshape, usefilter=self.qe, location=location,
                             leftcrop=dleft, rightcrop=dright)
@@ -2474,6 +2514,7 @@ class SensorChipAssembly(object):
         # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             
         # If the DARK calibration is not averaged, it is added here.
+        # NOTE: DARK calibration data includes reference columns.
         if self.detector.simulate_dark_current and not self.detector.dark_averaged:
             if self.detector.dark_map is not None:
                 self.logger.info("Adding the DARK calibration from %s" % \
@@ -2508,9 +2549,9 @@ class SensorChipAssembly(object):
         metadata = Metadata("Metadata of simulated exposure")
         metadata.from_data_object( self.illumination_map )
         
-        # Import the primary metadata (but ignore the TYPE keyword)
+        # Import the primary metadata (but ignore the FILETYPE and DATAMODL keywords)
         for key in list(metadata.keys()):
-            if key == 'TYPE':
+            if key == 'FILETYPE' or key == 'DATAMODL':
                 continue # Output data will have a different TYPE
             self.metadata[key] = metadata[key]
         comments = metadata.get_comments()
@@ -2560,6 +2601,8 @@ class SensorChipAssembly(object):
 
         # Subarray mode
         self.metadata["SUBARRAY"] = self.subarray_str
+        # Get exposure data size and reference output size according
+        # to the output subarray mode.
         (subrows, subcols) = self.detector.get_subarray_shape(self.subarray)
         if self.subarray is not None:
             #(namps, nref) = self._amplifier_count()
@@ -2899,7 +2942,7 @@ class SensorChipAssembly(object):
         # object.
         if self.exposure_data is None:
             # Get exposure data size and reference output size according
-            # to the subarray mode.
+            # to the output subarray mode.
             data_shape = self.detector.get_subarray_shape(self.subarray)
             refout_shape = self.detector.refout_shape
 
@@ -3342,7 +3385,7 @@ class SensorChipAssembly(object):
             * 'FAST' - 1 sample per readout and defaults of ngroups=1 and
               nints=10.
             * 'FASTINTAVG' - same as FAST but with groups of 4 integrations
-              averaged.
+              averaged. OBSOLETE.
             * 'FASTGRPAVG' - same as FAST but with groups of 4 groups
               averaged.
           
@@ -3772,7 +3815,7 @@ class SensorChipAssembly(object):
             * 'FAST' - 1 sample per readout and defaults of ngroups=1 and
               nints=10.
             * 'FASTINTAVG' - same as FAST but with groups of 4 integrations
-              averaged.
+              averaged. OBSOLETE.
             * 'FASTGRPAVG' - same as FAST but with groups of 4 groups
               averaged.
           
@@ -4335,7 +4378,7 @@ def simulate_sca(inputfile, outputfile, detectorid, scale=1.0, fringemap=None,
         * 'FAST' - 1 sample per readout and defaults of ngroups=1 and
           nints=10.
         * 'FASTINTAVG' - same as FAST but with groups of 4 integrations
-          averaged.
+          averaged. OBSOLETE.
         * 'FASTGRPAVG' - same as FAST but with groups of 4 groups
           averaged.
           
@@ -4639,7 +4682,7 @@ def simulate_sca_list(inputfile, outputfile, detectorid, scale=1.0,
         * 'FAST' - 1 sample per readout and defaults of ngroups=1 and
           nints=10.
         * 'FASTINTAVG' - same as FAST but with groups of 4 integrations
-          averaged.
+          averaged. OBSOLETE.
         * 'FASTGRPAVG' - same as FAST but with groups of 4 groups
           averaged.
           
@@ -4941,7 +4984,7 @@ def simulate_sca_pipeline(illumination_map, scale=1.0,
         * 'FAST' - 1 sample per readout and defaults of ngroups=1 and
           nints=10.
         * 'FASTINTAVG' - same as FAST but with groups of 4 integrations
-          averaged.
+          averaged. OBSOLETE.
         * 'FASTGRPAVG' - same as FAST but with groups of 4 groups
           averaged.
           

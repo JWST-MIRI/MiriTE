@@ -540,6 +540,7 @@ class MiriIlluminationModel(MiriDataModel):
         # will occupy within the new data. 1 is subtracted because
         # locations start at 1 but array indices start at 0.
         # The coordinates are shifted to the left by leftcrop columns.
+        # TODO: Bug 612. Check this placement is done correctly.
         try:
             r1 = int(location[0]) - 1
             c1 = int(location[1]) - 1 - leftcrop
@@ -568,14 +569,18 @@ class MiriIlluminationModel(MiriDataModel):
         
         # The original illumination data is only sliced when leftcrop
         # and rightcrop are non zero.
-        # FIXME: Is this correct? Output array seems garbled.
         if lcrop == 0 and rcrop == 0:
+            # No cropping needed. Place the illumination data directly
+            # into the flux array.
             new_illumination[r1:r2, c1:c2] = illumination
         elif rcrop == 0:
+            # Left cropping only.
             new_illumination[r1:r2, c1:c2] = illumination[:, lcrop:]
         elif lcrop == 0:
+            # Right cropping only.
             new_illumination[r1:r2, c1:c2] = illumination[:, :rcrop]
         else:
+            # Both left and right cropping.
             new_illumination[r1:r2, c1:c2] = illumination[:, lcrop:rcrop]
                             
         del illumination
