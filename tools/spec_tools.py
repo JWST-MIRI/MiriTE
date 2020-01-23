@@ -710,8 +710,8 @@ def interpolLin(wave, spec, new_wave):
     inter = interpolate.interp1d(wave, spec, bounds_error = False)
     return inter(new_wave)
 
-@nb.jit(nopython=True, parallel=False)
-def interpol_lin(wave, spec, new_wave):
+@nb.jit(nopython=True, parallel=True)
+def interpol_lin(wave, spec, new_wave, extra = True):
     """
     
     linear interpolation of a spectrum to new wavelengths without using scipy interpolation
@@ -726,6 +726,10 @@ def interpol_lin(wave, spec, new_wave):
     
     new_wave: array 
         corresponding new wavelengths
+
+    extra: boolean
+        if True, extrapolates with edge values
+        if False, sets the rest to NaN
    
     :Returns:
     
@@ -739,10 +743,15 @@ def interpol_lin(wave, spec, new_wave):
     ret_spec = np.zeros(new_dim)
     for i in range(new_dim):
         nw = new_wave[i]
-        if nw <= wave[0]:
-            ret_spec[i]= spec[0]
-        if nw >= wave[-1]:
-            ret_spec[i] = spec[-1]
+        if extra:
+            if nw <= wave[0]:
+                ret_spec[i]= spec[0]
+            if nw >= wave[-1]:
+                ret_spec[i] = spec[-1]
+        else:
+            if (nw < wave[0] or nw > wave[-1]):
+                ret_spec[i] = np.NaN
+                continue
         wave_diff_abs = np.abs(wave - nw)
         min_wave_diff = np.min(wave_diff_abs) 
         ind = np.where(wave_diff_abs == min_wave_diff)[0][0]
