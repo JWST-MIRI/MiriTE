@@ -69,28 +69,28 @@ properties:
         fits_keyword: EXPTIME
       read_noise:
         type: number
-        title: Mean simulated read noise (electrons)
+        title: Mean simulated read noise (DN)
         fits_keyword: RDNOISE
       read_noise1:
         type: number
-        title: Simulated read noise for amplifier 1 (electrons)
+        title: Simulated read noise for amplifier 1 (DN)
         fits_keyword: RDNOISE1
       read_noise2:
         type: number
-        title: Simulated read noise for amplifier 2 (electrons)
+        title: Simulated read noise for amplifier 2 (DN)
         fits_keyword: RDNOISE2
       read_noise3:
         type: number
-        title: Simulated read noise for amplifier 3 (electrons)
+        title: Simulated read noise for amplifier 3 (DN)
         fits_keyword: RDNOISE3
       read_noise4:
         type: number
-        title: Simulated read noise for amplifier 4 (electrons)
+        title: Simulated read noise for amplifier 4 (DN)
         fits_keyword: RDNOISE4
       read_noise5:
         type: number
-        title: Simulated read noise for amplifier 5 (electrons)
-        fits_keyword: RDNOISE1
+        title: Simulated read noise for amplifier 5 (DN)
+        fits_keyword: RDNOISE5
       read_bias:
         type: number
         title: Mean simulated bias (electrons)
@@ -105,15 +105,15 @@ properties:
         fits_keyword: RDBIAS2
       read_bias3:
         type: number
-        title: Simulated bias for amplifier 2 (electrons)
+        title: Simulated bias for amplifier 3 (electrons)
         fits_keyword: RDBIAS3
       read_bias4:
         type: number
-        title: Simulated bias for amplifier 2 (electrons)
+        title: Simulated bias for amplifier 4 (electrons)
         fits_keyword: RDBIAS4
       read_bias5:
         type: number
-        title: Simulated bias for amplifier 2 (electrons)
+        title: Simulated bias for amplifier 5 (electrons)
         fits_keyword: RDBIAS5
       amplifier_gain_function:
         type: string
@@ -130,19 +130,19 @@ properties:
         fits_keyword: GAINCF1
       amplifier_gain2:
         type: number
-        title: Simulated gain coefficient for amplifier 1 (e/DN)
+        title: Simulated gain coefficient for amplifier 2 (e/DN)
         fits_keyword: GAINCF2
       amplifier_gain3:
         type: number
-        title: Simulated gain coefficient for amplifier 1 (e/DN)
+        title: Simulated gain coefficient for amplifier 3 (e/DN)
         fits_keyword: GAINCF3
       amplifier_gain4:
         type: number
-        title: Simulated gain coefficient for amplifier 1 (e/DN)
+        title: Simulated gain coefficient for amplifier 4 (e/DN)
         fits_keyword: GAINCF4
       amplifier_gain5:
         type: number
-        title: Simulated gain coefficient for amplifier 1 (e/DN)
+        title: Simulated gain coefficient for amplifier 5 (e/DN)
         fits_keyword: GAINCF5
       amplifier_dynamic_range:
         title: Mean simulated dynamic range (DN)

@@ -1048,7 +1048,6 @@ class DetectorArray(object):
                         self.noise_factor = self.noise_factor * \
                             math.sqrt(1.0 - nsquared)
         else:
-            self.read_noise = 0.0
             self.noise_factor = 1.0
 
     def _clear_calibration_data(self):
@@ -2162,7 +2161,8 @@ class DetectorArray(object):
                 # Only determine the mean read noise in non-zero areas
                 # (i.e. skipping non-illuminated  pixels)
                 valid_rn = np.where(self.readnoise_map > 0.0)
-                mean_rn = self.readnoise_map[valid_rn].mean()
+                mean_gain = max(0.001, self.gain_map.mean())
+                mean_rn = self.readnoise_map[valid_rn].mean() / mean_gain
                 metadata["RDNOISE"] = float("%.4f" % mean_rn)
                 if comments_possible and (self.noise_factor != 1.0):
                     metadata.add_comment( \
@@ -2809,17 +2809,18 @@ class DetectorArray(object):
                  
             # Determine the amount of read noise to by applied to the detector
             # data. The noise is reduced when there is more than one sample.
-            if total_samples > 1:
+            #if total_samples > 1:
+            if False: # MIRI-703: Never reduce the noise by total_samples.
                 if self._verbose > 3:
                     self.logger.debug( "Applying readout noise in the range of " + \
-                        "%f to %f (e), sampled %d times." % \
+                        "%f to %f, with mean %f (e), sampled %d times." % \
                         (np.min(self.readnoise_map), np.max(self.readnoise_map),
-                         total_samples) )
+                         np.mean(self.readnoise_map), total_samples) )
                 noise = self.readnoise_map / np.sqrt(total_samples)
             else:
                 if self._verbose > 3:
-                    self.logger.debug( "Applying readout noise in the range of %f to %f (e)." % \
-                        (np.min(self.readnoise_map), np.max(self.readnoise_map)) )
+                    self.logger.debug( "Applying readout noise in the range of %f to %f, with mean %f (e)." % \
+                        (np.min(self.readnoise_map), np.max(self.readnoise_map), np.mean(self.readnoise_map)) )
                 noise = self.readnoise_map
             # Multiply by the noise scaling factor.
             # FIXME: The multiplication is needed, even when x 1.0 because it changes the data type.
