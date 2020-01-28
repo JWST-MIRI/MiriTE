@@ -39,7 +39,7 @@ import numpy as np
 from miri.tools.spec_tools import condense, convGauss
 from miri.tools.spec_tools import lrs2D_spextract, lrs_extract_spec, \
    lrs_extract_spec_with_fit, get_psf_fit, optimalSpecExtraction, \
-   subtractBackground, interpolWaveOnRows, interpolLin, interpolSpline
+   subtractBackground, interpolWaveOnRows, interpolLin, interpol_lin, interpolSpline
 
 from miri.datamodels.miri_measured_model import MiriMeasuredModel
 
@@ -111,7 +111,6 @@ class TestLrsExtract(unittest.TestCase):
         # Test the method Class1.method1
         # See http://docs.python.org/library/unittest.html#test-cases for further
         # information
-#         print "run lrs2D_spextract"
         prod = self.dataproduct.copy()
         result1 = lrs2D_spextract(prod, xmin = 0, xmax = 2, ymin = 0, ymax = 2)
 
@@ -119,25 +118,25 @@ class TestLrsExtract(unittest.TestCase):
         # python >=2.5 are listed below with a usage example
         self.assertTrue(np.shape(result1.data)[0] ==2)
         self.assertTrue(np.shape(result1.data)[1] ==2)
-#         print "run subtractBackground"
+
         sub = subtractBackground(result1, result1)
         self.assertTrue(sub.data[0,0] == 0.)
-#         print "run lrs_extract_spec"
+
         spec = lrs_extract_spec(sub)
         self.assertTrue(len(spec.data)== 2)
         self.assertTrue(len(spec.err)== 2)
-#         print "run lrs_extract_spec_with_fit"
+
         spec1 = lrs_extract_spec_with_fit(prod.copy())
         self.assertTrue( len(spec1) == 3)
-#         print "run optimalSpecExtract"
+        
         spec1 = optimalSpecExtraction(prod.copy())
         self.assertTrue( len(spec1.data) == 9)        
         self.assertTrue( len(spec1.err) == 9)  
-#         print "run get_psf_fit"
+
         spec1 = get_psf_fit(prod.copy())
         self.assertTrue( len(spec1) == 4)
         
-#         print "run interpolWaveOnRows"
+
         wave = np.arange(5, 10, 0.5)
         pos = np.arange(0, 5, 0.5)
         rows, new_wave = interpolWaveOnRows(pos, wave)
@@ -146,13 +145,17 @@ class TestLrsExtract(unittest.TestCase):
         
         self.assertTrue(np.alltrue(np.equal(np.mod(new_wave,1),0)))
         
-#         print "run interpolLin"
+
         spec = np.arange(100, 105, 0.5)
         new_spec = interpolLin(wave, spec, new_wave)
         self.assertTrue(len(new_spec)==5)
         self.assertTrue(np.alltrue(np.equal(np.mod(new_spec,1),0)))
         
-#         print "run interpolSpline"
+        spec = np.arange(100, 105, 0.5)
+        new_spec = interpol_lin(wave, spec, new_wave)
+        self.assertTrue(len(new_spec)==5)
+        self.assertTrue(np.alltrue(np.equal(np.mod(new_spec,1),0)))
+        
         spec = np.arange(100, 105, 0.5)
         new_spec = interpolSpline(wave, spec, new_wave)
         self.assertTrue(len(new_spec)==5)             

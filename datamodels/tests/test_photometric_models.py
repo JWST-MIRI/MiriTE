@@ -28,7 +28,7 @@ import warnings
 import numpy as np
 
 from miri.datamodels.miri_photometric_models import \
-    MiriPhotometricModel,  MiriImagingPhotometricModel, MiriPixelAreaModel
+    MiriPhotometricModel,  MiriImagingPhotometricModel, MiriPixelAreaModel, MiriLrsNewPhotometricModel
 from miri.datamodels.tests.util import assert_recarray_equal, \
     assert_products_equal
 
@@ -295,6 +295,81 @@ class TestMiriImagingPhotometricModel(unittest.TestCase):
         self.assertIsNotNone(descr)
         del descr
 
+
+class TestLrsNewPhotometricModel(unittest.TestCase):
+    def setUp(self):
+        # Create a typical imaging data product.
+        # The wavelength and relresponse arrays will be automatically zeroed.
+        n_elem = MAX_NLEM
+        pixar_a2 = 0.11
+        pixar_sr = 0.01
+        relresp = np.zeros(n_elem)
+        relresp_error = np.zeros(n_elem)
+        wavelength = np.arange(5,10,0.01)
+        self.phot_table = \
+             [('P750L', 'FULL', 2.41,  0.26, n_elem, wavelength, relresp, relresp_error)]
+
+        self.dataproduct = MiriLrsNewPhotometricModel( phot_table=self.phot_table, 
+                                                 pixar_a2=pixar_a2, pixar_sr = pixar_sr )
+        self.testfile = "MiriLrsNewPhotometric_test.fits"
+        print(self.dataproduct)
+        
+    def tearDown(self):
+        # Tidy up
+        del self.dataproduct
+        # Remove temporary file, if able to.
+        if os.path.isfile(self.testfile):
+            try:
+                os.remove(self.testfile)
+            except Exception as e:
+                strg = "Could not remove temporary file, " + self.testfile + \
+                    "\n   " + str(e)
+                warnings.warn(strg)
+    
+    def test_referencefile(self):
+        # Check that the data product contains the standard
+        # reference file metadata.
+        type1 = self.dataproduct.meta.model_type
+        type2 = self.dataproduct.meta.reftype
+        self.assertIsNotNone(type1)
+        self.assertIsNotNone(type2)
+        pedigree = self.dataproduct.meta.pedigree
+        self.assertIsNotNone(pedigree)
+        self.assertAlmostEqual(self.dataproduct.phot_table[0][2], self.phot_table[0][2], delta = 0.000001)
+    
+    def test_creation(self):
+        # It must be possible to create an empty data product.    
+        nullproduct = MiriLrsNewPhotometricModel( )
+        del nullproduct
+        
+    def test_fitsio(self):
+        # Suppress metadata warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+
+            # Check that the data product can be written to a FITS
+            # file and read back again without changing the data.
+            self.dataproduct.save(self.testfile, overwrite=True)
+            with MiriLrsNewPhotometricModel(self.testfile) as readback:
+                self.assertEqual(self.dataproduct.meta.reftype,
+                                 readback.meta.reftype)
+                self.assertEqual(self.dataproduct.meta.model_type,
+                                 readback.meta.model_type)
+                self.assertEqual(self.dataproduct.meta.photometry.pixelarea_arcsecsq, readback.meta.photometry.pixelarea_arcsecsq)
+                #assert_products_equal(self, self.dataproduct, readback )
+                self.assertEqual(self.dataproduct.phot_table[0][2], readback.phot_table[0][2])
+                del readback
+    
+    def test_description(self):
+        # Test that the querying and description functions work.
+        # For the test to pass these need to run without error
+        # and generate non-null strings.
+        descr = str(self.dataproduct)
+        self.assertIsNotNone(descr)
+        del descr
+        descr = repr(self.dataproduct)
+        self.assertIsNotNone(descr)
+        del descr
 
 class TestMiriPixelAreaModel(unittest.TestCase):
     

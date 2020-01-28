@@ -24,7 +24,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
 
-@author: Steven Beard (UKATC), Vincent Geers (UKATC)
+@author: Steven Beard (UKATC), Vincent Geers (UKATC), Juergen Schreiber (MPIA)
 
 """
 
@@ -205,13 +205,17 @@ class MiriLrsApertureCorrectionModel(MiriDataModel):
         Or: A numpy record array containing the same information as above.
         A aperture correction table must either be defined in the
         initializer or in this parameter. A blank table is not allowed.
+        The table contains the columns wavelength, nelem (number of apertures),
+        width (width of aperture in pixels) and apcorr which is the correction
+        factor for each width to an infinite aperture
+        
     \*\*kwargs:
         All other keyword arguments are passed to the DataModel initialiser.
         See the jwst.datamodels documentation for the meaning of these keywords.
         
     """
     schema_url = "miri_aperture_correction_lrs.schema"
-    fieldnames = ('wavelength', 'nelem' 'width', 'apcorr')
+    fieldnames = ('wavelength', 'nelem', 'width', 'apcorr')
     
     def __init__(self, init=None, apcorr_table=None, **kwargs):
         """

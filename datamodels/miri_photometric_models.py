@@ -42,7 +42,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
 
-@author: Steven Beard (UKATC)
+@author: Steven Beard (UKATC), Juergen Schreiber (MPIA)
 
 """
 
@@ -57,7 +57,7 @@ from miri.datamodels.operations import HasData
 
 # List all classes and global functions here.
 __all__ = ['MiriPhotometricModel', 'MiriImagingPhotometricModel', 'MiriPhotometricModel_CDP5',
-           'MiriLrsPhotometricModel', 'MiriPixelAreaModel', 'MAX_NELEM']
+           'MiriLrsPhotometricModel', 'MiriLrsNewPhotometricModel', 'MiriPixelAreaModel', 'MAX_NELEM']
 
 # Useful constants
 ARCSEC2_PER_STERADIAN = ((180.0/math.pi) * 3600.0)**2 # Square arcsec per steradian
@@ -688,41 +688,38 @@ class MiriLrsNewPhotometricModel(MiriDataModel):
         * File path: Initialize from the given file.
         * Readable file object: Initialize from the given file object.
         * pyfits.HDUList: Initialize from the given pyfits.HDUList.
-    phot_table. list of tuples or numpy record array (optional)
-        A list of tuples, or a numpy record array, where each record
-        contains the following information:
-        
-        * FILTER: A string containing a filter name. Compulsory.
-        * SUBARRAY: A string containing a subarray name.
-        * MEAN_PIXAR_A2: mean pixel area in arcsec^2
-        * MEAN_PIXAR_SR: mean pixel area in steradian 
-        * PHOTMJSR: A conversion factor for the given subarray
-          at 7 micron, converting from DN/s to MJy/sr.
-        * UNCERTAINTY: error of PHOTMJSR at 7 micron (unit Mjy/sr).
-        * NELM: An integer (range 0 to 500) giving the number of elements
-          in the wavelength and relresponse arrays to be used. If NELM=0,
-          the wavelength and response arrays are ignored.
-        * WAVELENGTH: An array of 500 floats containing wavelengths in microns.
-          Unused parts of the array are padded with zero.
-        * RELRESPONSE: An array of 500 floats containing the relative
-          response of the instrument at each wavelength. To be multiplicated with PHOTMJSR.
-          Unused parts of the array are padded with zero.
-        * RELRESPERROR: An array of 500 floats containing the relative
-          response error of the instrument at each wavelength. To be multiplicated with UNCERTAINTY.
-          Unused parts of the array are padded with zero.  
-
+    
+        -phot_table: list of tuples or numpy record array (optional)
+                that contains the following information:   
+            * FILTER: A string containing a filter name. Compulsory.
+            * SUBARRAY: A string containing a subarray name.
+            * PHOTMJSR: A conversion factor for the given subarray
+              at 7 micron, converting from DN/s to MJy/sr.
+            * UNCERTAINTY: error of PHOTMJSR at 7 micron (unit MJy/sr).
+            * NELEM: An integer (range 0 to 500) giving the number of elements
+              in the wavelength and relresponse arrays to be used. If NELEM=0,
+              the wavelength and response arrays are ignored.
+            * WAVELENGTH: An array of 500 floats containing wavelengths in microns.
+              Unused parts of the array are padded with zero.
+            * RELRESPONSE: An array of 500 floats containing the relative
+              response of the instrument at each wavelength. To be multiplied by PHOTMJSR.
+              Unused parts of the array are padded with zero.
+            * RELRESPERROR: An array of 500 floats containing the relative
+             response error of the instrument at each wavelength. To be multiplied by UNCERTAINTY.
+             Unused parts of the array are padded with zero.  
+        -pixar_sr: mean pixel area in arcsec^2
+        -pixar_a2: mean pixel area in steradian
         A phot_table must either be defined in the initializer or in
         this parameter. A blank table is not allowed.
     
     """
-    # Both models use exactly the same schema.
     schema_url = "miri_photom_lrs.schema"
     fieldnames = ('filter', 'subarray', 'photmjsr', 'uncertainty', 'nelem',
                   'wavelength', 'relresponse', 'relresperror')
     def __init__(self, init=None, phot_table=None, pixar_sr=None, pixar_a2=None, **kwargs):
         """
         
-        Initialises the MiriPhotometricModel class.
+        Initialises the MiriLrsNewPhotometricModel class.
         
         Parameters: See class doc string.
 

@@ -70,6 +70,7 @@ Longer description, references, class hierarchy...
 
 # Import packages/modules from the MIRI development environment
 import numpy as np
+import numba as nb
 import scipy.signal as sig
 from scipy import interpolate
 
@@ -708,7 +709,69 @@ def interpolLin(wave, spec, new_wave):
     """        
     inter = interpolate.interp1d(wave, spec, bounds_error = False)
     return inter(new_wave)
+
+@nb.jit(nopython=True, parallel=True)
+def interpol_lin(wave, spec, new_wave, extra = True):
+    """
     
+    linear interpolation of a spectrum to new wavelengths without using scipy interpolation
+    
+    :Parameters:
+    
+    wave: array 
+        original wavelengths
+    
+    spec: array 
+        spectrum
+    
+    new_wave: array 
+        corresponding new wavelengths
+
+    extra: boolean
+        if True, extrapolates with edge values
+        if False, sets the rest to NaN
+   
+    :Returns:
+    
+    spectrum: array 
+        interpolated to new wavelengths
+    
+    """        
+    if len(wave) != len(spec):
+        raise Exception("dimensions of wavelength and spectrum array are different")
+    new_dim = len(new_wave)
+    ret_spec = np.zeros(new_dim)
+    for i in range(new_dim):
+        nw = new_wave[i]
+        if extra:
+            if nw <= wave[0]:
+                ret_spec[i]= spec[0]
+            if nw >= wave[-1]:
+                ret_spec[i] = spec[-1]
+        else:
+            if (nw < wave[0] or nw > wave[-1]):
+                ret_spec[i] = np.NaN
+                continue
+        wave_diff_abs = np.abs(wave - nw)
+        min_wave_diff = np.min(wave_diff_abs) 
+        ind = np.where(wave_diff_abs == min_wave_diff)[0][0]
+        wave_diff = wave[ind] - nw
+        
+        if wave_diff == 0:
+            ret_spec[i] = spec[ind]
+            continue
+        elif wave_diff < 0:
+            pre_ind = ind-1
+            post_ind = ind
+        else: 
+            pre_ind = ind
+            post_ind = ind+1  
+        
+        weight = (nw - wave[pre_ind])/(wave[post_ind]-wave[pre_ind])
+        ret_spec[i] = spec[pre_ind] + weight* (spec[post_ind]-spec[pre_ind])
+    
+    return ret_spec
+
 def interpolSpline(wave, spec, new_wave):
     """
     
@@ -1100,7 +1163,13 @@ if __name__ == '__main__':
     print("original spectrum ", spec)
     new_spec = interpolLin(wave, spec, new_wave)
     print("new spectrum ", new_spec)
-                
+    
+    print("interpol_lin")
+    spec = np.arange(100, 105, 0.5)
+    print("original spectrum ", spec)
+    new_spec = interpol_lin(wave, spec, new_wave)
+    print("new spectrum ", new_spec)            
+    
     print("interpolSpline")
     spec = np.arange(100, 105, 0.5)
     print("original spectrum ", spec)
