@@ -460,7 +460,7 @@ allOf:
         datatype: float64
       - name: DLSF_WID
         datatype: float64
-      - name: DSLF_NO_ETA_WID
+      - name: DLSF_NO_ETA_WID
         datatype: float64
       - name: MLSF_WIDTH
         datatype: float64
@@ -478,7 +478,7 @@ allOf:
         datatype: float64
       - name: s
         datatype: float64
-      - name: co
+      - name: c0
         datatype: float64
       - name: c1
         datatype: float64
