@@ -2161,7 +2161,10 @@ class DetectorArray(object):
                 # Only determine the mean read noise in non-zero areas
                 # (i.e. skipping non-illuminated  pixels)
                 valid_rn = np.where(self.readnoise_map > 0.0)
-                mean_gain = max(0.001, self.gain_map.mean())
+                if self.gain_map is not None:
+                    mean_gain = max(0.001, self.gain_map.mean())
+                else:
+                    mean_gain = 1.0
                 mean_rn = self.readnoise_map[valid_rn].mean() / mean_gain
                 metadata["RDNOISE"] = float("%.4f" % mean_rn)
                 if comments_possible and (self.noise_factor != 1.0):
