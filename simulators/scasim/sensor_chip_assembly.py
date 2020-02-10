@@ -343,6 +343,8 @@ Calibration Data Products (CDPs).
 28 Nov 2018: Added the ability to simulate cosmic rays of a single energy.
 07 Feb 2019: Added cdp_ftp_host parameter.
 04 Oct 2019: Removed use of astropy.extern.six (since Python 2 no longer used)
+13 Dec 2019: Subarray pixel locations corrected (Bug 612), which reverted
+             change made for Bug 558.
 
 @author: Steven Beard
 

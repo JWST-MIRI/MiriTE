@@ -57,6 +57,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 21 Jun 2018: Define the FILETYPE keyword.
 28 Jun 2018: Switch to using get_title_and_metadata() to display data model
              information.
+13 Dec 2019: get_illumination_enlarged function documented (Bug 612).
 
 @author: Steven Beard (UKATC)
 
