@@ -184,6 +184,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 07 Oct 2019: Removed '.yaml' suffix from schema references.
 13 Dec 2019: Modified copy_metadata to prevent DATAMODL, FILETYPE, FILENAME
              and REFTYPE keywords being copied.
+10 Feb 2020: Corrected typo in the list_data_arrays function.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -1657,7 +1658,7 @@ class MiriDataModel(DataModel):
             #print("Found type=", type, "subdtype=", subdtype)
             #print("subdtype is a", str(subdtype.__class__.__name__))
             if type is None and subdtype is not None:
-                if not isinstance(subdtype, (str,tuple,list)):
+                if not isinstance(subdtype, (tuple,list)):
                     # Ensure each entry is made only once.
                     pathstr = '.'.join(path)
                     if pathstr not in results:
@@ -1693,6 +1694,8 @@ class MiriDataModel(DataModel):
             # Data objects have a datatype and do not have a type
             type = subschema.get('type')
             subdtype = subschema.get('datatype')
+            #print("Found type=", type, "subdtype=", subdtype)
+            #print("subdtype is a", str(subdtype.__class__.__name__))
             if type is None and subdtype is not None:
                 if isinstance(subdtype, (tuple,list)):
                     # Skip date fields
@@ -1700,6 +1703,7 @@ class MiriDataModel(DataModel):
                         # Ensure each entry is made only once.
                         pathstr = '.'.join(path)
                         if pathstr not in results:
+                            #print("Found data table at", pathstr)
                             results.append(pathstr)
 
         # Walk through the schema and apply the search function.
