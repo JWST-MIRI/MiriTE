@@ -16,6 +16,7 @@ its capabilities and modes of operation. It exists to ensure the
 12 Nov 2018: Added compulsory metadata for imager and MRS CDPs.
              Updated list of detector settings.
 15 Nov 2018: Added CDP_USEAFTER_DICT.
+13 Dec 2019: Removed obsolete FASTINTAVG readout mode.
 
 @author: Steven Beard (UKATC)
 
@@ -54,7 +55,7 @@ its capabilities and modes of operation. It exists to ensure the
 READOUT_MODE = {}
 READOUT_MODE['SLOW'] =       (8,   1,  3,  1,  0, 10,  1,  1,  1)
 READOUT_MODE['FAST'] =       (1,   0,  3,  1,  0,  1, 10,  1,  1)
-READOUT_MODE['FASTINTAVG'] = (1,   0,  3,  1,  0,  1,  4,  1,  4)
+#READOUT_MODE['FASTINTAVG'] = (1,   0,  3,  1,  0,  1,  4,  1,  4)
 READOUT_MODE['FASTGRPAVG'] = (1,   0,  3,  1,  0,  4,  1,  4,  1)
 # The following four readout modes were used for MIRI testing only, and they
 # will upset the JWST pipeline software if used.
