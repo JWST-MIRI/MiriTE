@@ -779,7 +779,8 @@ class PoissonIntegrator(object):
             min = np.min( readout_array )
             max = np.max( readout_array )
             mean = np.mean( readout_array )
-            self.logger.debug("   min=%.1f, max=%.1f, mean=%.1f" % (min, max, mean))
+            std = np.std( readout_array )
+            self.logger.debug("   min=%.1f, max=%.1f, mean=%.2f, std=%.2f" % (min, max, mean, std))
         
         # Return the readout converted to int to make a discrete count.
         return readout_array.astype(np.uint32)
