@@ -35,6 +35,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 12 Jul 2017: set_data_fill and set_err_fill options added to HasDataErrAndDq.
 27 Jun 2018: Added HasDataErrAndGroups class to be used with ramp data.
 12 Mar 2019: Removed use of astropy.extern.six (since Python 2 no longer used).
+12 Feb 2020: Added _check_broadcastable() methods.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -44,7 +45,6 @@ import sys
 import numpy as np
 import numpy.ma as ma
 
-#import miri.datamodels.dqflags as dqflags
 from miri.datamodels.dqflags import master_flags, combine_quality
 
 # Import the STScI image model and utilities
@@ -52,7 +52,41 @@ import jwst.datamodels.util as jmutil
 from jwst.datamodels.model_base import DataModel
 
 # List all classes and global functions here.
-__all__ = ['HasMask', 'HasData', 'HasDataErrAndDq']
+__all__ = ['are_broadcastable', 'HasMask', 'HasData', 'HasDataErrAndDq']
+
+
+def are_broadcastable( *shapes ):
+    """
+
+    Check whether an arbitrary list of array shapes are broadcastable.
+
+    :Parameters:
+
+    *shapes: tuple or list
+       A set of array shapes.
+
+    :Returns:
+
+    broadcastable: bool
+       True if all the shapes are broadcastable.
+       False if they are not broadcastable.
+
+    """
+    if len(shapes) < 2:
+        # A single shape is always broadcastable against itself.
+        return True
+    else:
+        # Extract the dimensions and check they are either
+        # equal to each other or equal to 1.
+        for dim in zip(*[shape[::-1] for shape in shapes]):
+            if len(set(dim).union({1})) <= 2:
+                # Dimensions match or are 1. Try the next one.
+                pass
+            else:
+                # Dimensions do not match. Not broadcastable.
+                return False
+        # All dimensions are broadcastable.
+        return True
 
 
 class HasMask(object):
@@ -80,6 +114,16 @@ class HasMask(object):
     @mask.setter
     def mask(self, dq):
         self.dq = dq
+
+    def _check_broadcastable(self):
+        """
+
+        Helper function which raises an exception if the
+        linked data arrays are not broadcastable.
+
+        """
+        # A single data array is always broadcastable
+        pass
 
     def _check_for_mask(self):
         """
@@ -244,6 +288,16 @@ class HasData(object):
     def __init__(self, data):
         if data is not None:
             self.data = data
+
+    def _check_broadcastable(self):
+        """
+
+        Helper function which raises an exception if the
+        linked data arrays are not broadcastable.
+
+        """
+        # A single data array is always broadcastable
+        pass
 
     def _check_for_data(self):
         """
@@ -475,6 +529,37 @@ class HasDataErrAndDq(HasData):
 
         if dq is not None:
             self.dq = dq
+
+    def _check_broadcastable(self):
+        """
+
+        Helper function which raises an exception if the
+        linked data arrays are not broadcastable.
+
+        """
+        if self._isvalid(self.data):
+            if hasattr(self, 'err') and self._isvalid(self.err) and \
+               hasattr(self, 'dq') and self._isvalid(self.dq):
+                if not are_broadcastable( self.data.shape, self.err.shape, self.dq.shape ):
+                    strg = "%s object does not contain broadcastable data arrays." % \
+                           self.__class__.__name__
+                    strg += "\n\tdata.shape=%s, err.shape=%s and dq=shape=%s" % \
+                           (str(self.data.shape), str(self.err.shape), str(self.dq.shape))
+                    raise TypeError(strg)
+            elif hasattr(self, 'err') and self._isvalid(self.err):
+                if not are_broadcastable( self.data.shape, self.err.shape ):
+                    strg = "%s object does not contain broadcastable data arrays." % \
+                           self.__class__.__name__
+                    strg += "\n\tdata.shape=%s and err.shape=%s" % \
+                           (str(self.data.shape), str(self.err.shape))
+                    raise TypeError(strg)
+            elif  hasattr(self, 'dq') and self._isvalid(self.dq):
+                if not are_broadcastable( self.data.shape, self.dq.shape ):
+                    strg = "%s object does not contain broadcastable data arrays." % \
+                           self.__class__.__name__
+                    strg += "\n\tdata.shape=%s, and dq=shape=%s" % \
+                           (str(self.data.shape), str(self.dq.shape))
+                    raise TypeError(strg)
 
     def set_data_fill(self, data_fill):
         """

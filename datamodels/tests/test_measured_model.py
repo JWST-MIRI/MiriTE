@@ -64,6 +64,7 @@ in the datamodels.miri_measured_model module.
              Added test for group table in ramp data.
 07 Oct 2019: FIXME: dq_def removed from unit tests until data corruption
              bug fixed (Bug 589).
+12 Feb 2020: Reinstated the array broadcasting test.
 
 @author: Steven Beard (UKATC)
 
@@ -525,9 +526,8 @@ class TestMiriMeasuredModel(unittest.TestCase):
         self.assertTrue( np.allclose(c4x1, newdp1.dq) )
 
         # 5x1 is not broadcastable onto 4x3 and this statement should fail.
-	# FIXME: This assertion no longer works. Test commented out. Bug 591.
-        #self.assertRaises(TypeError, MiriMeasuredModel, data=a4x3,
-        #                  err=b5x1, dq=c5x1)
+        self.assertRaises(TypeError, MiriMeasuredModel, data=a4x3,
+                          err=b5x1, dq=c5x1)
         
         # Combine two broadcastable object mathematically.
         # The + and - operations should be commutative and the result

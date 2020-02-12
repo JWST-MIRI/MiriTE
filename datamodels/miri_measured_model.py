@@ -115,6 +115,8 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 28 Jun 2019: Start setting dq_def once again.
 04 Oct 2019: References to pixeldq_def and groupdq_def removed completely.
 07 Oct 2019: Removed '.yaml' suffix from schema references.
+12 Feb 2020: Check for array broadcastability when creating a new model
+             from scratch.
 
 @author: Steven Beard (UKATC)
 
@@ -289,6 +291,19 @@ class MiriMeasuredModel(MiriDataModel, HasDataErrAndDq):
         else:
             # Data model has dq array for data quality.
             HasDataErrAndDq.__init__(self, data, err, dq, noerr=False)
+
+        # If the data model is being created from scratch from non-broadcastable
+        # arrays, raise an exception. If an existing data model contains
+        # non-broadcastable arrays, give a warning.
+        if data is None and err is None and dq is None:
+            # Opening an existing model
+            try:
+                self._check_broadcastable()
+            except TypeError as e:
+                warnings.warn(str(e))
+        else:
+            # Creating a new model.
+            self._check_broadcastable()
 
         # Copy the units of the data array from the schema, if defined.
         # The error array should have the same units as the data array,
