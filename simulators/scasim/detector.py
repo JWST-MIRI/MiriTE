@@ -233,6 +233,9 @@ Calibration Data Products (CDPs).
 04 Jun 2018: Added hard_reset function.
 15 Jan 2019: Added explicit garbage collection (commented out for now).
 07 Feb 2019: Added cdp_ftp_host parameter.
+23 Jan 2020: Do not reduce read noise by nsamples in SLOW mode.
+             Record mean read noise in the FITS header in DN rather than 
+             electrons.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
