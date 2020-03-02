@@ -79,7 +79,7 @@ Full MIRISim-compatible release. The release supports the following features:
       header keywords).
 
 The following features could be improved:
-      
+
     * The non-linearity coefficients are based on an approximate inverse
       of the MIRI calibration data product and could be improved.
       
@@ -87,6 +87,13 @@ The following features could be improved:
       improved, in particular the effect of flux building up on the
       detector in between integrations is not yet simulated, and the
       effect in SLOW mode has not been calibrated.
+
+    * The bias level simulated is arbitrary. Turning simulation effects
+      on or off can affect the bias level, and the fact that zero-point
+      drift is not simulated in SLOW mode can give the impression of a
+      difference in bias between SLOW and FAST mode. The absolute DN
+      zero-point may appear to be different, but the relative behaviour
+      is still the same. The slopes generated are not affected.
 
     * The "tree ring" and first frame effects are inherited from the
       dark current calibration data product. The last frame effect is

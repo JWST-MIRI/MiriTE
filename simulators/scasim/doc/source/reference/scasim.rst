@@ -187,16 +187,15 @@ The miri.simulators.scasim modules may be found in the simulators/scasim directo
 Measurement Data
 ~~~~~~~~~~~~~~~~
 :mod:`miri.scasim` comes with configuration data describing the cosmic ray,
-detector and amplifier properties, plus average dark current and
-quantum efficiency measurements. Other calibration data are extracted from
-the MIRI Calibration Data Products (CDP) repository. The onboard
-measurement data can be provided in ASCII or FITS format files. These
-files are normally stored in the scasim/data directory, but if SCASim
-detects files with the same name stored in the current working directory
-it will use those in preference. The ASCII files are useful for storing
-measurement data cut and pasted from elsewhere, whereas the FITS files are
-more useful because they can store ancilliary information (such as
-measurement comments) in their header.
+detector and amplifier properties, plus quantum efficiency measurements.
+Other calibration data are extracted from the MIRI Calibration Data Products
+(CDP) repository. The SCASim-specific measurement data can be provided in
+ASCII or FITS format files. These files are normally stored in the scasim/data
+directory, but if SCASim detects files with the same name stored in the
+current working directory it will use those in preference. The ASCII files
+are useful for storing measurement data cut and pasted from elsewhere,
+whereas the FITS files are more useful because they can store ancilliary
+information (such as measurement comments) in their header.
 The 'miri.datamodels.make_measurements_fits' and 'make_qe_fits' scripts may be
 used to convert the ASCII format data into FITS. The make_bad_pixel_mask
 script can be used to create a tailored bad pixel mask in FITS format.
@@ -204,12 +203,8 @@ Test calibration files (including bad pixel maps and dark maps) can be made
 with the make_sca_calibration script. Some examples are given below:
 
 *NOTE: SCAsim is now configured by default to obtain bad pixel data,
-dark current variation, read noise data, pixel flat-field data and
-amplifier gain data from the MIRI CDP repository.*
-
-./data/detector/dark_currentXXX.fits
-   A FITS file containing a dark current variation map (for Sensor Chip
-   Assembly XXX).
+dark current data, read noise data, pixel flat-field data, amplifier gain data
+and non-linearity data from the MIRI CDP repository.*
 
 ./data/detector/qe_measurementXXX.txt
    An ASCII file containing a detector quantum efficiency measurement
