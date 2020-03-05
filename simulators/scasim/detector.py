@@ -2005,10 +2005,16 @@ class DetectorArray(object):
                 return
     
             self.readnoise_map_filename = readnoise_model.meta.filename
+            #MIRI-703: Clip the data contained in the readnoise CDP.
+            clipped_noise = readnoise_model.get_truncated_noise()
+            
             # Multiply by the gain to convert the read noise from DN into electrons.
-            readnoise_map = readnoise_model.data[0:self.illuminated_shape[0],
-                                                 0:self.detector_shape[1]] * \
-                                                self.mean_gain
+            readnoise_map = clipped_noise[0:self.illuminated_shape[0],
+                                          0:self.detector_shape[1]] * \
+                                self.mean_gain
+#             readnoise_map = readnoise_model.data[0:self.illuminated_shape[0],
+#                                                  0:self.detector_shape[1]] * \
+#                               self.mean_gain
     
             rnshape = readnoise_map.shape
             if rnshape[0] == self.illuminated_shape[0] and \
@@ -2834,11 +2840,14 @@ class DetectorArray(object):
                 self.logger.debug( "Scaling noise by %f." % self.noise_factor )
             noise = noise * self.noise_factor
 
-            # Assume that bad pixels flagged as UNRELIABLE_SLOPE are noisy.
-            # TODO: The multiplication factor is arbitrary.
-            if self.bad_pixels is not None:
-                noisy_zones = np.where((self.bad_pixels & MASK_UNRELIABLE_SLOPE) > 0)
-                noise[noisy_zones] *= 5.0
+            # MIRI-703: Assume that the readnoise CDP has already taken care
+            # of defining raised noise levels for bad pixels. The following
+            # code commented out.
+#             # Assume that bad pixels flagged as UNRELIABLE_SLOPE are noisy.
+#             # TODO: The multiplication factor is arbitrary.
+#             if self.bad_pixels is not None:
+#                 noisy_zones = np.where((self.bad_pixels & MASK_UNRELIABLE_SLOPE) > 0)
+#                 noise[noisy_zones] *= 5.0
 
             read_data = read_data + (randArray * noise)   
             del randArray
