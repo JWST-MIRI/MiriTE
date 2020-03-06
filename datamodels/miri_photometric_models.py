@@ -704,7 +704,7 @@ class MiriLrsNewPhotometricModel(MiriDataModel):
             * RELRESPONSE: An array of 500 floats containing the relative
               response of the instrument at each wavelength. To be multiplied by PHOTMJSR.
               Unused parts of the array are padded with zero.
-            * RELRESPERROR: An array of 500 floats containing the relative
+            * RELUNCERTAINTY: An array of 500 floats containing the relative
              response error of the instrument at each wavelength. To be multiplied by UNCERTAINTY.
              Unused parts of the array are padded with zero.  
         -pixar_sr: mean pixel area in arcsec^2
@@ -715,7 +715,7 @@ class MiriLrsNewPhotometricModel(MiriDataModel):
     """
     schema_url = "miri_photom_lrs.schema"
     fieldnames = ('filter', 'subarray', 'photmjsr', 'uncertainty', 'nelem',
-                  'wavelength', 'relresponse', 'relresperror')
+                  'wavelength', 'relresponse', 'reluncertainty')
     def __init__(self, init=None, phot_table=None, pixar_sr=None, pixar_a2=None, **kwargs):
         """
         

@@ -85,7 +85,7 @@ allOf:
       - name: relresponse
         shape: [500]
         datatype: float32
-      - name: relresperror
+      - name: reluncertainty
         shape: [500]
         datatype: float32
 $schema: http://stsci.edu/schemas/fits-schema/fits-schema            

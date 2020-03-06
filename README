@@ -22,13 +22,13 @@ MiriTools
 Tools and utilities which are used by many MIRI applications.
 
 miri.tools - A collection of general purpose tools and utilities.
-See http://miri.ster.kuleuven.be/pub/Public/MIRISim_Public/miri_tools.pdf
+See https://wiki.miricle.org/pub/Public/MIRISim_Public/miri_tools.pdf
 
 miri.datamodels
            - MIRI data models, including two collections:
    .cdp    - Data models supporting MIRI Calibration Data Products
    .sim    - Data models supporting MIRI simulators
-See http://miri.ster.kuleuven.be/pub/Public/MIRISim_Public/miri_datamodels.pdf
+See https://wiki.miricle.org/pub/Public/MIRISim_Public/miri_datamodels.pdf
 
 miri.apt_parser
              - A tool to read APT XML files.
@@ -48,7 +48,7 @@ miri.simulators
    .scasim   - The MIRI Sensor Chip Assembly simulator (SCASim)
 
 More general documentation on the MIRI simulators may be found here
-http://miri.ster.kuleuven.be/bin/view/Public/MIRISim_Public
+https://wiki.miricle.org/Public/MIRISim_Public
 
 The top-level MiriTE directory contains the following top level tools,
 utilities and documents:
