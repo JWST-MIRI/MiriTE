@@ -5248,8 +5248,8 @@ if __name__ == '__main__':
     
     # Which simulations to include?
     QE_ADJUST = True,
-    #COSMIC_RAY_MODE = 'SOLAR_MIN'
-    COSMIC_RAY_MODE = 'NONE'
+    COSMIC_RAY_MODE = 'SOLAR_MIN'
+    #COSMIC_RAY_MODE = 'NONE'
     SIMULATE_POISSON_NOISE = True
     SIMULATE_READ_NOISE = True
     SIMULATE_REF_PIXELS = True
