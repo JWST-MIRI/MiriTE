@@ -236,6 +236,7 @@ Calibration Data Products (CDPs).
 23 Jan 2020: Do not reduce read noise by nsamples in SLOW mode.
              Record mean read noise in the FITS header in DN rather than 
              electrons.
+05 Mar 2020: Added print statements to debug readnoise variation.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -2818,7 +2819,6 @@ class DetectorArray(object):
             # the detector pixels.
             randArray = np.random.randn(read_data.shape[0],
                                         read_data.shape[1]).astype(np.double)
-                 
             # Determine the amount of read noise to by applied to the detector
             # data. The noise is reduced when there is more than one sample.
             #if total_samples > 1:
@@ -2849,7 +2849,10 @@ class DetectorArray(object):
 #                 noisy_zones = np.where((self.bad_pixels & MASK_UNRELIABLE_SLOPE) > 0)
 #                 noise[noisy_zones] *= 5.0
 
+
+            #print("read_data before noise has mean=%f and std=%f" % (np.mean(read_data), np.std(read_data)))     
             read_data = read_data + (randArray * noise)   
+            #print("read_data after noise has mean=%f and std=%f" % (np.mean(read_data), np.std(read_data)))
             del randArray
          
         # Apply the gain to convert electrons into DNs
@@ -2909,6 +2912,7 @@ class DetectorArray(object):
                 " max=" + str(read_data.max()) )
                 
         # Return the readout data converted back to unsigned integer
+        #print("Detector readout: mean=%f, std=%f" % (np.mean(read_data), np.std(read_data)))
         return read_data.astype(np.uint32)
 
     def _extract_subarray(self, full_data, subarray):

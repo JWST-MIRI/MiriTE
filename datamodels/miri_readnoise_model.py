@@ -32,6 +32,8 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
+05 Mar 2020: Added get_truncated_noise function, to remove the high noise
+             levels defined around bad pixels.
 
 @author: Vincent Geers (DIAS), Steven Beard (UKATC)
 
@@ -100,7 +102,7 @@ class MiriReadnoiseModel(MiriDataModel, HasData):
         # Update the data array if it has been specifically provided.
         HasData.__init__(self, data)
 
-    def get_truncated_noise(self, nsigma=3.0):
+    def get_truncated_noise(self, nsigma=4.0):
         """
         
         Returns a noise array with extreme values truncated.
@@ -109,7 +111,7 @@ class MiriReadnoiseModel(MiriDataModel, HasData):
         
         nsigma: float (optional)
             Values greater than nsigma from the mean noise are clipped.
-            By default nsigma = 3.0.
+            By default nsigma = 4.0.
         
         """
         # MIRI-703. Some readnoise CDPs contain arbitrary values of 1000.0 DN
@@ -117,13 +119,13 @@ class MiriReadnoiseModel(MiriDataModel, HasData):
         first_mean = np.mean( self.data )
         first_std = np.std( self.data )
         first_clip = first_mean + nsigma * first_std
-        print("First mean=", first_mean, "std=", first_std, "clip level=", first_clip)
+        #print("First mean=", first_mean, "std=", first_std, "clip level=", first_clip)
         clipped_data = np.clip(self.data, 0.0, first_clip)
         
         second_mean = np.mean( clipped_data )
         second_std = np.std( clipped_data )
         second_clip = second_mean + nsigma * second_std
-        print("Second mean=", second_mean, "std=", second_std, "clip level=", second_clip)
+        #print("Second mean=", second_mean, "std=", second_std, "clip level=", second_clip)
         clipped_data = np.clip(clipped_data, 0.0, second_clip)
         
         return clipped_data
@@ -142,6 +144,7 @@ if __name__ == '__main__':
     print("Readnoise data with data + err + dq:")
     with MiriReadnoiseModel(data=data3x3 ) as testdata:
         print(testdata)
+        clipped = testdata.get_truncated_noise()
         if PLOTTING:
             testdata.plot(description="testdata")
         if SAVE_FILES:

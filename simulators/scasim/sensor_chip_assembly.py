@@ -345,6 +345,10 @@ Calibration Data Products (CDPs).
 04 Oct 2019: Removed use of astropy.extern.six (since Python 2 no longer used)
 13 Dec 2019: Subarray pixel locations corrected (Bug 612), which reverted
              change made for Bug 558.
+06 Mar 2020: Removed the redundant integration_data attribute from the
+             SensorChipAssembly class. Added COSMIC_RAY_MODE to the self-tests
+             to control the cosmic ray mode. Made the self-tests more
+             resilient to particular tests being turned off.
 
 @author: Steven Beard
 
@@ -1006,7 +1010,6 @@ class SensorChipAssembly(object):
         
         # There is no integration data or exposure_data object until an
         # integration.
-        self.integration_data = None
         self.exposure_data = None
         self.include_pixeldq = include_pixeldq
         self.include_groupdq = include_groupdq
@@ -2152,8 +2155,7 @@ class SensorChipAssembly(object):
             
         :Returns:
         
-        integration_data: array_like uint32
-            An array of integration data.
+        None
             
         :Prerequisites:
         
@@ -2334,7 +2336,7 @@ class SensorChipAssembly(object):
         if intnum == 0:
             self.detector.reset(nresets=nresets, new_exposure=True)
         else:
-            self.detector.reset(nresets=nresets)            
+            self.detector.reset(nresets=nresets)
                 
         # >>>
         # >>> Step through the groups.        
@@ -2390,23 +2392,19 @@ class SensorChipAssembly(object):
             total_samples = self.nframes * self.samplesum
             if total_samples < 1:
                 total_samples = 1
-            # Assist the garbage collector by discarding the previous
-            # integration data.
-            if self.integration_data is not None:
-                del self.integration_data
-            self.integration_data = \
+            integration_data = \
                 self.detector.readout(subarray=self.subarray,
                                       total_samples=total_samples)
             if self._makeplot and self._verbose > 7:
-                mplt.plot_image2D(self.integration_data,
+                mplt.plot_image2D(integration_data,
                     xlabel='Columns', ylabel='Rows', withbar=True,
                     title='Readout for integration %d, group %d' % \
                         (intnum,group))
             
-            self.exposure_data.set_group(self.integration_data, group, intnum)
+            self.exposure_data.set_group(integration_data, group, intnum)
 
-        # Return the last set of integration data.
-        return self.integration_data
+        # There is no longer any need to return the integration_data
+        return
 
     def exposure(self, nints=None, frame_time=None, start_time=None):
         """
@@ -2924,7 +2922,7 @@ class SensorChipAssembly(object):
             self.logger.debug( self.exposure_data.statistics() )
  
         # Return the data from the last integration.
-        return self.integration_data
+        return self.exposure_data.get_integration( -1 )
 
     def _new_exposure_data(self):
         """
@@ -3692,7 +3690,7 @@ class SensorChipAssembly(object):
             if wait_time is not None and wait_time > 0.0:
                 self.wait(wait_time)
 
-            # Simulate an exposure and return some simulated data.
+            # Simulate an exposure and return the last integration data.
             simulated_data = self.exposure(frame_time=frame_time,
                                            start_time=start_time)
     
@@ -3709,7 +3707,7 @@ class SensorChipAssembly(object):
     
             # Plot the simulated data if requested.
             if makeplot:
-                strg = "Simulated exposure data from %s" % inputfile
+                strg = "Simulated exposure data from %s (last integration)" % inputfile
                 self.plot(description=strg)
                 if verbose > 3:
                     # Development and testing - plot a ramp for the central pixel
@@ -4102,7 +4100,7 @@ class SensorChipAssembly(object):
         if wait_time is not None and wait_time > 0.0:
             self.wait(wait_time)
     
-        # Simulate an exposure and return some simulated data.
+        # Simulate an exposure and return the last integration data.
         simulated_data = self.exposure(frame_time=frame_time,
                                        start_time=start_time)
 
@@ -4119,7 +4117,7 @@ class SensorChipAssembly(object):
     
         # Plot the simulated data if requested.
         if makeplot:
-            strg = "Simulated exposure data"
+            strg = "Simulated exposure data (last integration)"
             self.plot(description=strg)
             if verbose > 3:
                 # Development and testing - plot a ramp for the central pixel
@@ -5236,6 +5234,7 @@ if __name__ == '__main__':
     import random
     random.seed()
     
+#    test_input_file_name  = './scripts/ConstantIllumination.fits'
     test_input_file_name  = './data/SCATestHorseHead1024.fits'
 #     test_input_file_name  = './data/SCATestInput80x64.fits'
 #    test_input_file_name  = './data/DoesNotExist.fits'
@@ -5249,6 +5248,8 @@ if __name__ == '__main__':
     
     # Which simulations to include?
     QE_ADJUST = True,
+    #COSMIC_RAY_MODE = 'SOLAR_MIN'
+    COSMIC_RAY_MODE = 'NONE'
     SIMULATE_POISSON_NOISE = True
     SIMULATE_READ_NOISE = True
     SIMULATE_REF_PIXELS = True
@@ -5345,7 +5346,11 @@ if __name__ == '__main__':
         print("\nTesting simulate_pipe with all MRS bands...\n" + (50 * "*"))
         mode = 'SLOW'
         ngroups = 4
-        del sca
+        # Remove sca if created by the previous tests.
+        try:
+           del sca
+        except:
+           pass
         sca = SensorChipAssembly2()
         ii = 1
         # Shuffle the list of subarrays so it is tested each time in a random order.
@@ -5363,7 +5368,7 @@ if __name__ == '__main__':
                     print( illumination_map )
                 exposure_map = sca.simulate_pipe(illumination_map, scale=10.0,
                         readout_mode=mode, ngroups=ngroups, nints=1, start_time='NOW',
-                        cosmic_ray_mode='SOLAR_MIN', makeplot=PLOTTING,
+                        cosmic_ray_mode=COSMIC_RAY_MODE, makeplot=PLOTTING,
                         include_pixeldq=INCLUDE_PIXELDQ, qe_adjust=QE_ADJUST,
                         simulate_poisson_noise=SIMULATE_POISSON_NOISE,
                         simulate_read_noise=SIMULATE_READ_NOISE,
@@ -5392,7 +5397,11 @@ if __name__ == '__main__':
         print("\nTesting simulate_pipe with all subarray outputs...\n" + (50 * "*"))
         mode = 'FAST'
         ngroups = 16
-        del sca
+        # Remove sca if created by the previous tests.
+        try:
+           del sca
+        except:
+           pass
         sca = SensorChipAssembly3()
         ii = 1
         # Shuffle the list of subarrays so it is tested each time in a random order.
@@ -5413,7 +5422,7 @@ if __name__ == '__main__':
             exposure_map = sca.simulate_pipe(illumination_map, scale=10.0,
                     readout_mode=mode, subarray=subarray,
                     ngroups=ngroups, nints=1, start_time='NOW',
-                    cosmic_ray_mode='SOLAR_MIN', makeplot=PLOTTING,
+                    cosmic_ray_mode=COSMIC_RAY_MODE, makeplot=PLOTTING,
                     include_pixeldq=INCLUDE_PIXELDQ,  qe_adjust=QE_ADJUST,
                     simulate_poisson_noise=SIMULATE_POISSON_NOISE,
                     simulate_read_noise=SIMULATE_READ_NOISE,
@@ -5468,7 +5477,7 @@ if __name__ == '__main__':
                 # being masked by the flat-field.
                 exposure_map = sca.simulate_pipe(illumination_map, scale=10.0,
                         readout_mode=mode, subarray='FULL', ngroups=ngroups,
-                        nints=1, cosmic_ray_mode='SOLAR_MIN', 
+                        nints=1, cosmic_ray_mode=COSMIC_RAY_MODE, 
                         makeplot=PLOTTING, include_pixeldq=INCLUDE_PIXELDQ,
                         qe_adjust=False,
                         simulate_poisson_noise=SIMULATE_POISSON_NOISE,
@@ -5512,7 +5521,7 @@ if __name__ == '__main__':
             test_output_file_name = "%s_%s_TIME.fits" % (test_output_stub, mode)
             sca.simulate_files(test_input_file_name, test_output_file_name,
                     'MIRIFULONG', scale=10.0, readout_mode=mode, subarray='FULL',
-                    inttime=inttime, nints=1, cosmic_ray_mode='SOLAR_MIN',
+                    inttime=inttime, nints=1, cosmic_ray_mode=COSMIC_RAY_MODE,
                     fileformat='STScI', datashape='hypercube',
                     include_pixeldq=INCLUDE_PIXELDQ, overwrite=True,
                     qe_adjust=QE_ADJUST,
@@ -5534,7 +5543,7 @@ if __name__ == '__main__':
             test_output_file_name = "%s_%s_GROUPS.fits" % (test_output_stub, mode)
             sca.simulate_files(test_input_file_name, test_output_file_name,
                     'MIRIFUSHORT', scale=10.0, readout_mode=mode, ngroups=8, nints=2,
-                    cosmic_ray_mode='SOLAR_MIN',
+                    cosmic_ray_mode=COSMIC_RAY_MODE,
                     fileformat='STScI', datashape='hypercube',
                     include_pixeldq=INCLUDE_PIXELDQ, overwrite=True,
                     qe_adjust=QE_ADJUST,
