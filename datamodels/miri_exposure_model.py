@@ -86,6 +86,8 @@ https://jwst-docs.stsci.edu/display/JDAT/JWST+File+Names%2C+Formats%2C+and+Data+
              (for simulation).
 27 Feb 2018: Much more efficient nonlinearity correction.
 28 Nov 2018: Corrected a mistake in the schema for simulated data.
+09 Mar 2020: MIRI-768: Explicitly delete the ERR array before saving the
+             exposure data when one is not required.
 
 @author: Steven Beard (UKATC)
 
@@ -192,6 +194,10 @@ class MiriExposureModel(MiriRampModel):
         Or: A numpy record array containing the same information as above.
         If not specified, it will default to the default JWST GROUPDQ flags
         flags.
+    include_err: bool, optional
+        Set to False to remove the error array from the exposure data.
+        The default is False, since raw exposures do not normally contain
+        an error array.
     include_pixeldq: bool, optional
         Set to False to remove the pixeldq data array and pixeldq_def table
         from the exposure data. The default is True.
@@ -210,8 +216,8 @@ class MiriExposureModel(MiriRampModel):
     def __init__(self, rows, columns, ngroups, nints, readpatt, refrows,
                  refcolumns, grpavg=1, intavg=1, nframes=1,
                  groupgap=0, pixeldq=None, maskwith=None, pixeldq_def=None,
-                 groupdq_def=None, include_pixeldq=True, include_groupdq=True,
-                 **kwargs):
+                 groupdq_def=None, include_err=False, include_pixeldq=True,
+                 include_groupdq=True, **kwargs):
         """
         
         Initialises the MiriExposureModel class.
@@ -280,15 +286,25 @@ class MiriExposureModel(MiriRampModel):
         # Floating point is used here because the STScI RampModel also
         # declares floating point data.
         datashape = [int_nints, int_ngroups, int_rows, int_columns]
+        #print("MiriExposureModel: data shape (ints,groups,rows,columns)=", datashape)
         zerodata = np.zeros(datashape, dtype=np.float32)
         if include_groupdq:
+            #print("MiriExposureModel: Adding GROUPDQ of shape=", datashape)
             zerogdq = np.zeros(datashape, dtype=np.uint8)
         else:
             zerogdq = None
             groupdq_def = None
+
+        # If needed, add a zero-filled error array of the correct shape.
+        if include_err:
+            #print("MiriExposureModel: Adding ERR of shape=", datashape)
+            zeroerr = np.zeros(datashape, dtype=np.float32)
+        else:
+            zeroerr = None
         
         if int_refrows > 0 and int_refcolumns > 0:
             refoutshape = [int_nints, int_ngroups, int_refrows, int_refcolumns]
+            #print("MiriExposureModel: Adding REFOUT of shape=", refoutshape)
             zerorefout = np.zeros(refoutshape, dtype=np.float32)
         else:
             # Create an empty reference output with a single value (otherwise
@@ -296,7 +312,7 @@ class MiriExposureModel(MiriRampModel):
             zerorefout = np.zeros([1,1,1,1], dtype=np.float32)
             #zerorefout = None
         
-        super(MiriExposureModel, self).__init__(data=zerodata, err=None,
+        super(MiriExposureModel, self).__init__(data=zerodata, err=zeroerr,
                                                 refout=zerorefout,
                                                 pixeldq=pixeldq,
                                                 groupdq=zerogdq,
@@ -312,6 +328,8 @@ class MiriExposureModel(MiriRampModel):
         self.refcolumns = int_refcolumns
         # By default, there is no zero frame.
         self.meta.exposure.zero_frame = False
+        # Record whether there are ERR, PIXELDQ and GROUPDQ arrays included.
+        self.include_err = include_err
         self.include_pixeldq = include_pixeldq
         self.include_groupdq = include_groupdq
 
@@ -640,6 +658,7 @@ class MiriExposureModel(MiriRampModel):
         """
         # The given data must be the same size as the existing SCI_data array.
         data = np.asarray(data, dtype=self.data.dtype)
+        #print("MiriExposureModel (set exposure): Adding exposure of shape=", data.shape)
         if data.size == self.data.size:
             if data.ndim == 4:
                 # 4-D data is expected
@@ -783,6 +802,7 @@ class MiriExposureModel(MiriRampModel):
         data = np.asarray(data, dtype=self.data.dtype)
         detector_shape = (self.rows, self.columns)
         if data.shape == detector_shape:
+            #print("MiriExposureModel (set group): Adding group of shape=", data.shape)
             self.data[intg, group, :, :] = data  
             # Invalidate the averaged data
             self._data_averaged = None
@@ -1005,6 +1025,11 @@ class MiriExposureModel(MiriRampModel):
         if self.grpavg <= 1 and self.intavg <= 1:
             # Ensure the reference output data has been extracted.
             self._extract_refout()
+
+            # Explicitly delete the ERR array before saving if not needed.
+            if not self.include_err:
+                if hasattr(self, 'err'):
+                    del self.err
             
             # Explicitly delete the data quality arrays before saving
             # if they are not needed.
@@ -1041,6 +1066,12 @@ class MiriExposureModel(MiriRampModel):
                 newproduct.meta.exposure.groups_averaged = self.grpavg
                 newproduct.meta.exposure.integrations_averaged = self.intavg
                 newproduct.set_exposure(self.data_averaged)
+
+                # Explicitly delete the ERR array before saving if not needed.
+                if not self.include_err:
+                    if hasattr(self, 'err'):
+                        del self.err
+
                 # Explicitly delete the data quality arrays before saving
                 # if they are not needed.
                 if not self.include_pixeldq:
@@ -1053,6 +1084,8 @@ class MiriExposureModel(MiriRampModel):
                         del newproduct.groupdq
                     if hasattr(newproduct, 'groupdq_def'):
                         del newproduct.groupdq_def
+
+                # Save the averaged exposure.
                 super(MiriExposureModel, newproduct).save(path, *args, **kwargs)
                 del newproduct
 
