@@ -519,11 +519,11 @@ class MiriDataModel(DataModel):
         BAD_VALUE = 'ANY'
         nwarnings = 0
         strg = "%s\n  " % description
-        if self.meta.filename:
-            # Including the filename ensures there is a separate
-            # warning for each file.
-            strg += "%s: " % str(self.meta.filename)
         if hasattr(self, 'meta'):
+            if hasattr(self.meta, 'filename'):
+                # Including the filename (if available) ensures there is a separate
+                # warning for each file.
+                strg += "%s: " % str(self.meta.filename)
             if hasattr(self.meta, 'instrument'):
                 for testatt in INSTRUMENT_ATTRIBUTES:
                     value = getattr( self.meta.instrument, testatt, None )

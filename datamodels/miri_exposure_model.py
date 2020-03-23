@@ -585,7 +585,11 @@ class MiriExposureModel(MiriRampModel):
         else:
             cmean = mean
             cstd = std
-        
+
+        # FIXME: cstd is sometimes not scalar. This could be due to a scipy bug.
+        if not isinstance(cstd, (float,int)):
+            cstd = np.NaN
+
         strg = "mean=%f, stdev=%f; %.1f-sigma clipped mean=%f, stdev=%f" % \
             (mean, std, clip, cmean, cstd)
         return strg

@@ -1,5 +1,5 @@
 allOf:
-- $ref: http://stsci.edu/schemas/jwst_datamodel/photom.schema
+- $ref: http://stsci.edu/schemas/jwst_datamodel/photometry.schema
 - $ref: http://stsci.edu/schemas/jwst_datamodel/keyword_pixelarea.schema
 - type: object
   properties:
