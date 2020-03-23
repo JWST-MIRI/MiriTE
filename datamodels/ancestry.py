@@ -30,7 +30,7 @@ PARENT_DICT = {'MiriDataModel' : 'DataModel', \
                'MiriRampModel' : 'RampModel', \
                'MiriExposureModel' : 'RampModel', \
                'MiriSlopeModel' : 'ImageModel', \
-               'MiriMrsApertureCorrectionModel' : '', \
+               'MiriMrsApertureCorrectionModel' : 'MirImgApcorrModel', \
                'MiriBadPixelMaskModel' :    'MaskModel', \
                'MiriDarkReferenceModel' : 'DarkMIRIModel', \
                'MiriImagingDistortionModel' : 'DistortionModel', \
