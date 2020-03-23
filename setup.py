@@ -25,6 +25,7 @@ Setup file for installing the MiriTE software
 12 Oct 2018: Added cdp_remove_junk script.
 07 Oct 2019: Require Python 3.6. Corrected bug in the checking of
              conda_prefix.
+23 Mar 2020: Require Python 3.7.
 
 @author: MIRI Software Team
 
@@ -227,7 +228,7 @@ setup(
     author_email="mirisim@roe.ac.uk",
     license="See LICENCE file",
     platforms=["Linux", "Mac OS X"],
-    python_requires='>=3.6',
+    python_requires='>=3.7',
     packages=['miri',
               'miri.tools', 'miri.tools.tests',
               'miri.datamodels', 'miri.datamodels.tests',
