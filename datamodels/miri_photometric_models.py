@@ -346,9 +346,10 @@ class MiriPhotometricModel_CDP5(MiriDataModel):
         if not self.meta.useafter:
             self.meta.useafter = '2000-01-01T00:00:00'
         
-        # The default pedigree is 'GROUND'
-        if not self.meta.pedigree:
-            self.meta.pedigree = 'GROUND'
+        # The default pedigree is 'GROUND' (if it exists)
+        if hasattr(self.meta, 'pedigree'):
+            if not self.meta.pedigree:
+                self.meta.pedigree = 'GROUND'
 
         if phot_table is not None:
             try:
