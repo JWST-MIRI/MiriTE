@@ -12,6 +12,9 @@ Module util - Utility module containing functions shared by all the unit tests.
 29 Jun 2017: Explicitly test for identical NaN distributions using np.all()
              instead of using a subtraction.
 12 Mar 2019: Removed use of astropy.extern.six (since Python 2 no longer used).
+25 Mar 2020: MIRI-710: Don't use np.asarray on a record array. Test two record
+             arrays are the same by checking each individual record instead of
+             the whole array.
 
 @author: Steven Beard (UKATC), Michael Droettboom (STScI),
          Ruyman Azzollini (DIAS)
@@ -44,7 +47,12 @@ def assert_recarray_equal(a, b, msg=None):
     Raises an exception if the arrays are not identical.
      
     """
-    assert_array_equal(a, np.asarray(b, a.dtype), err_msg=msg)
+    # MIRI-710: This simple array test no longer works.
+    #assert_array_equal(a, np.asarray(b, a.dtype), err_msg=msg)
+
+    # Test each record in turn.
+    for (rec1, rec2) in zip(a, b):
+        assert_array_equal(rec1, rec2)
 
 def assert_products_equal(testobj, a, b, arrays='data', tables=''):
     """
@@ -113,5 +121,8 @@ def assert_products_equal(testobj, a, b, arrays='data', tables=''):
             testobj.assertIsNotNone( second, msg )
             msg = "%s: .%s table attributes differ" % \
                 (a.__class__.__name__, table_attribute)
-            assert_recarray_equal(np.asarray(first), np.asarray(second),
-                                  msg=msg)
+            # MIRI-710: np.asarray sometimes corrupts a record array.
+            #assert_recarray_equal(np.asarray(first), np.asarray(second),
+            #                      msg=msg)
+            assert_recarray_equal(first, second, msg=msg)
+
