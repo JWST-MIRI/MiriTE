@@ -104,10 +104,8 @@ class MiriDroopModel(MiriDataModel):
         """
         super(MiriDroopModel, self).__init__(init=init, **kwargs)
 
-        # Data type is droop.
-        self.meta.reftype = 'DROOP'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type        
+        # Initialise the data type
+        self._init_data_type()
 
         # This is a reference data model.
         self._reference_model()
@@ -131,6 +129,19 @@ class MiriDroopModel(MiriDataModel):
          
         # Copy the table column units from the schema, if defined.
         droop_units = self.set_table_units('droop_table')
+
+    def _init_data_type(self):
+        # Data type is droop.
+        self.meta.reftype = 'DROOP'
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+
+    def on_save(self, path):
+       super(MiriDroopModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
+
 
 
 #
