@@ -30,7 +30,8 @@ PARENT_DICT = {'MiriDataModel' : 'DataModel', \
                'MiriRampModel' : 'RampModel', \
                'MiriExposureModel' : 'RampModel', \
                'MiriSlopeModel' : 'ImageModel', \
-               'MiriMrsApertureCorrectionModel' : 'MirImgApcorrModel', \
+               'MiriImagingApertureCorrectionModel' : 'MirImgApcorrModel', \
+               'MiriMrsApertureCorrectionModel' : '', \
                'MiriBadPixelMaskModel' :    'MaskModel', \
                'MiriDarkReferenceModel' : 'DarkMIRIModel', \
                'MiriImagingDistortionModel' : 'DistortionModel', \
@@ -80,4 +81,5 @@ def get_my_model_type( input_model_name ):
     if input_model_name:
         if input_model_name in list(PARENT_DICT.keys()):
             output_model_name = PARENT_DICT[input_model_name]
+    #print("get_my_model_type: given \'%s\', returned \'%s\'" % (input_model_name, output_model_name ))
     return output_model_name
