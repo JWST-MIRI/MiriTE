@@ -205,7 +205,7 @@ class MiriFluxconversionModel(MiriDataModel):
         self.meta.model_type = model_type        
 
     def on_save(self, path):
-       super(MiriFlatfieldModel, self).on_save(path)
+       super(MiriFluxconversionModel, self).on_save(path)
         # Re-initialise data type on save
        self._init_data_type()
 

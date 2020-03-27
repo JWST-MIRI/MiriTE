@@ -180,7 +180,7 @@ class MiriPhotometricModel(MiriDataModel):
         self.meta.model_type = model_type        
 
     def on_save(self, path):
-       super(MiriPceModel, self).on_save(path)
+       super(MiriPhotometricModel, self).on_save(path)
         # Re-initialise data type on save
        self._init_data_type()
 
@@ -586,9 +586,10 @@ class MiriImagingPhotometricModel(MiriPhotometricModel):
         self.meta.model_type = model_type        
 
     def on_save(self, path):
-       super(MiriPceModel, self).on_save(path)
+       super(MiriImagingPhotometricModel, self).on_save(path)
         # Re-initialise data type on save
        self._init_data_type()
+
 
 class MiriLrsPhotometricModel(MiriPhotometricModel):
     """
@@ -696,7 +697,7 @@ class MiriLrsPhotometricModel(MiriPhotometricModel):
         self.meta.model_type = model_type        
 
     def on_save(self, path):
-       super(MiriPceModel, self).on_save(path)
+       super(MiriLrsPhotometricModel, self).on_save(path)
         # Re-initialise data type on save
        self._init_data_type()
     
@@ -793,7 +794,7 @@ class MiriLrsNewPhotometricModel(MiriDataModel):
         self.meta.model_type = model_type        
 
     def on_save(self, path):
-       super(MiriPceModel, self).on_save(path)
+       super(MiriLrsNewPhotometricModel, self).on_save(path)
         # Re-initialise data type on save
        self._init_data_type()
 
@@ -874,7 +875,7 @@ class MiriPixelAreaModel(MiriDataModel, HasData):
         self.meta.model_type = model_type        
 
     def on_save(self, path):
-       super(MiriPceModel, self).on_save(path)
+       super(MiriPixelAreaModel, self).on_save(path)
         # Re-initialise data type on save
        self._init_data_type()
 

@@ -621,9 +621,10 @@ class MiriLrsD2WModel(MiriDataModel):
         self.meta.model_type = model_type        
 
     def on_save(self, path):
-       super(MiriImagingDistortionModel, self).on_save(path)
+       super(MiriLrsD2WModel, self).on_save(path)
         # Re-initialise data type on save
        self._init_data_type()
+
 
 # TODO: Over-complicated data structure needs to be simplified.
 class MiriMrsDistortionModel12(MiriDataModel):
@@ -862,6 +863,16 @@ class MiriMrsDistortionModel12(MiriDataModel):
         # is defined in the metadata.
         if not self.meta.exposure.type:
             self.set_exposure_type()
+
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriMrsDistortionModel12, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
 
     def get_primary_array_name(self):
         """
@@ -1473,6 +1484,16 @@ class MiriMrsDistortionModel34(MiriDataModel):
         # is defined in the metadata.
         if not self.meta.exposure.type:
             self.set_exposure_type()
+
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriMrsDistortionModel34, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
 
     def get_primary_array_name(self):
         """
