@@ -43,6 +43,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
+26 Mar 2020: Ensure the model_type remains as originally defined when saving
+             to a file.
+
 @author: Steven Beard (UKATC)
 
 """
@@ -104,9 +107,10 @@ class MiriDroopModel(MiriDataModel):
         """
         super(MiriDroopModel, self).__init__(init=init, **kwargs)
 
-        # Initialise the data type
+        # Data type is droop.
+        self.meta.reftype = 'DROOP'        # Initialise the data type
+        # Initialise the model type
         self._init_data_type()
-
         # This is a reference data model.
         self._reference_model()
         
@@ -131,11 +135,9 @@ class MiriDroopModel(MiriDataModel):
         droop_units = self.set_table_units('droop_table')
 
     def _init_data_type(self):
-        # Data type is droop.
-        self.meta.reftype = 'DROOP'
+        # Initialise the data model type
         model_type = get_my_model_type( self.__class__.__name__ )
         self.meta.model_type = model_type        
-
 
     def on_save(self, path):
        super(MiriDroopModel, self).on_save(path)

@@ -91,7 +91,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 12 Sep 2019: Added CDP8 version of MRS distortion models
              while keeping CDP7 versions the default.
 07 Oct 2019: Removed '.yaml' suffix from schema references.
-
+26 Mar 2020: Ensure the model_type remains as originally defined when saving
+             to a file.
+             
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
 """
@@ -219,9 +221,8 @@ class MiriImagingDistortionModel(MiriDataModel):
 
         # Data type is distortion map.
         self.meta.reftype = 'DISTORTION'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type
-
+        # Initialise the model type
+        self._init_data_type()
         # This is a reference data model.
         self._reference_model()
 
@@ -470,6 +471,16 @@ class MiriImagingDistortionModel(MiriDataModel):
         # is defined in the metadata.
         if not self.meta.exposure.type:
             self.set_exposure_type()
+
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriImagingDistortionModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
            
     def get_primary_array_name(self):
         """
@@ -582,10 +593,8 @@ class MiriLrsD2WModel(MiriDataModel):
         # Data type is wavelength calibration world coordinates.
         #self.meta.reftype = 'DISTORTION'
         self.meta.reftype = 'SPECWCS'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type is not None:
-            self.meta.model_type = model_type        
-
+        # Initialise the model type
+        self._init_data_type()       
         # This is a reference data model.
         self._reference_model()
 
@@ -606,6 +615,15 @@ class MiriLrsD2WModel(MiriDataModel):
         if not self.meta.exposure.type:
             self.set_exposure_type()
 
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriImagingDistortionModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
 
 # TODO: Over-complicated data structure needs to be simplified.
 class MiriMrsDistortionModel12(MiriDataModel):
@@ -720,11 +738,8 @@ class MiriMrsDistortionModel12(MiriDataModel):
 
         # Data type is MRS DISTORTION.
         self.meta.reftype = 'DISTORTION'
-#         self.meta.reftype = 'SPECWCS'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type is not None:
-            self.meta.model_type = model_type        
-
+        # Initialise the model type
+        self._init_data_type()      
         # This is a reference data model.
         self._reference_model()
 
@@ -1002,11 +1017,8 @@ class MiriMrsDistortionModel12_CDP8(MiriDataModel):
 
         # Data type is MRS DISTORTION.
         self.meta.reftype = 'DISTORTION'
-#         self.meta.reftype = 'SPECWCS'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type is not None:
-            self.meta.model_type = model_type        
-
+        # Initialise the model type
+        self._init_data_type()     
         # This is a reference data model.
         self._reference_model()
 
@@ -1129,6 +1141,16 @@ class MiriMrsDistortionModel12_CDP8(MiriDataModel):
         # is defined in the metadata.
         if not self.meta.exposure.type:
             self.set_exposure_type()
+
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriMrsDistortionModel12_CDP8, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
 
     def get_primary_array_name(self):
         """
@@ -1327,11 +1349,8 @@ class MiriMrsDistortionModel34(MiriDataModel):
 
         # Data type is MRS DISTORTION.
         self.meta.reftype = 'DISTORTION'
-#         self.meta.reftype = 'SPECWCS'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type is not None:
-            self.meta.model_type = model_type        
- 
+        # Initialise the model type
+        self._init_data_type()     
         # This is a reference data model.
         self._reference_model()
 
@@ -1607,11 +1626,8 @@ class MiriMrsDistortionModel34_CDP8(MiriDataModel):
 
         # Data type is MRS DISTORTION.
         self.meta.reftype = 'DISTORTION'
-#         self.meta.reftype = 'SPECWCS'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type is not None:
-            self.meta.model_type = model_type        
- 
+        # Initialise the model type
+        self._init_data_type()      
         # This is a reference data model.
         self._reference_model()
 
@@ -1734,6 +1750,16 @@ class MiriMrsDistortionModel34_CDP8(MiriDataModel):
         # is defined in the metadata.
         if not self.meta.exposure.type:
             self.set_exposure_type()
+
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriMrsDistortionModel34_CDP8, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
 
     def get_primary_array_name(self):
         """

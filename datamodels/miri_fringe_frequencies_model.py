@@ -24,6 +24,8 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
+26 Mar 2020: Ensure the model_type remains as originally defined when saving
+             to a file.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -84,9 +86,8 @@ class MiriMrsFringeFrequenciesModel(MiriDataModel):
 
         # Data type is fringe frequencies.
         self.meta.reftype = 'FRINGEFREQ'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type        
-
+        # Initialise the model type
+        self._init_data_type()       
         # This is a reference data model.
         self._reference_model()
         
@@ -100,6 +101,16 @@ class MiriMrsFringeFrequenciesModel(MiriDataModel):
          
         # Copy the table column units from the schema, if defined.
         fringefreq_units = self.set_table_units('fringefreq_table')
+
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriMrsFringeFrequenciesModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
 
 
 #

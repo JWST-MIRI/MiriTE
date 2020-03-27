@@ -27,6 +27,8 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
 04 Oct 2019: Updated to match build 7.3 data model.
+26 Mar 2020: Ensure the model_type remains as originally defined when saving
+             to a file.
 
 @author: Steven Beard (UKATC)
 
@@ -105,9 +107,8 @@ class MiriResetSwitchChargeDecayModel(MiriDataModel):
 
         # Data type is RSCD.
         self.meta.reftype = 'RSCD'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type        
-
+        # Initialise the model type
+        self._init_data_type()       
         # This is a reference data model.
         self._reference_model()
         
@@ -131,6 +132,16 @@ class MiriResetSwitchChargeDecayModel(MiriDataModel):
         # NOTE: The JWST schema does not define any units.
 #         # Copy the table column units from the schema, if defined.
 #         rscd_units = self.set_table_units('rscd_table')
+
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriResetSwitchChargeDecayModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
 
 
 class MiriResetSwitchChargeDecayModel_CDP6(MiriResetSwitchChargeDecayModel):

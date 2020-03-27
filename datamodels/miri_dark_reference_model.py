@@ -63,7 +63,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
 07 Oct 2019: Removed '.yaml' suffix from schema references.
-
+26 Mar 2020: Ensure the model_type remains as originally defined when saving
+             to a file.
+             
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
 """
@@ -173,10 +175,9 @@ class MiriDarkReferenceModel(MiriMeasuredModel):
 
         # Data type is dark.
         self.meta.reftype = 'DARK'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type
+        # Initialise the model type
+        self._init_data_type()
         self.averaged = averaged
-        
         # This is a reference data model.
         self._reference_model()
 
@@ -213,6 +214,16 @@ class MiriDarkReferenceModel(MiriMeasuredModel):
 #
 #        # Set the units of the fiterr array, if defined in the schema.
 #        fitunits = self.set_data_units('fiterr')
+
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriDarkReferenceModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
         
     def __str__(self):
         """

@@ -86,6 +86,8 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
+26 Mar 2020: Ensure the model_type remains as originally defined when saving
+             to a file.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -181,9 +183,8 @@ class MiriFluxconversionModel(MiriDataModel):
 
         # Data type is flux conversion.
         self.meta.reftype = 'PHOTOM'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type        
-
+        # Initialise the model type
+        self._init_data_type()
         # This is a reference data model.
         self._reference_model()
 
@@ -197,6 +198,16 @@ class MiriFluxconversionModel(MiriDataModel):
  
         # Copy the table column units from the schema, if defined.
         tableunits = self.set_table_units('flux_table')
+
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriFlatfieldModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
 
 
 class MiriImagingFluxconversionModel(MiriFluxconversionModel):
@@ -235,8 +246,18 @@ class MiriImagingFluxconversionModel(MiriFluxconversionModel):
 
         # Data type is imaging flux conversion.
         self.meta.reftype = 'PHOTOM'
+        # Initialise the model type
+        self._init_data_type()
+
+    def _init_data_type(self):
+        # Initialise the data model type
         model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriImagingFluxconversionModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
 
 class MiriImagingColourCorrectionModel(MiriFluxconversionModel):
     """
@@ -266,8 +287,18 @@ class MiriImagingColourCorrectionModel(MiriFluxconversionModel):
                                                 **kwargs)
         # Data type is colour correction.
         self.meta.reftype = 'COLCORR'
+        # Initialise the model type
+        self._init_data_type()
+
+    def _init_data_type(self):
+        # Initialise the data model type
         model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriImagingColourCorrectionModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
 
 class MiriPowerlawColourCorrectionModel(MiriFluxconversionModel):
     """
@@ -297,8 +328,20 @@ class MiriPowerlawColourCorrectionModel(MiriFluxconversionModel):
                                                 **kwargs)
         # Data type is colour correction.
         self.meta.reftype = 'COLCORRPL'
+        # Initialise the model type
+        self._init_data_type()
+
+    def _init_data_type(self):
+        # Data type is droop.
+        self.meta.reftype = 'DROOP'
         model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriPowerlawColourCorrectionModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
+       
 
 class MiriLrsFluxconversionModel(MiriFluxconversionModel):
     """
@@ -333,8 +376,18 @@ class MiriLrsFluxconversionModel(MiriFluxconversionModel):
 
         # Data type is LRS flux conversion.
         self.meta.reftype = 'PHOTOM'
+        # Initialise the model type
+        self._init_data_type()
+
+    def _init_data_type(self):
+        # Initialise the data model type
         model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriLrsFluxconversionModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
 
     def plot_srf(self, description=''):
         """
@@ -440,9 +493,8 @@ class MiriMrsFluxconversionModel(MiriMeasuredModel):
 
         # Data type is MRS flux conversion.
         self.meta.reftype = 'PHOTOM'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        if model_type is not None:
-            self.meta.model_type = model_type        
+        # Initialise the model type
+        self._init_data_type()   
 
         # This is a reference data model.
         self._reference_model()
@@ -461,6 +513,16 @@ class MiriMrsFluxconversionModel(MiriMeasuredModel):
             # be converted with np.asarray but the data and err attributes
             # do not?
             self.pixsiz = np.asarray(pixsiz)
+
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriMrsFluxconversionModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
 
 #
 # A minimal test is run when this file is run as a main program.

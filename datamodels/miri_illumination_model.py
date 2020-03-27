@@ -145,8 +145,8 @@ class MiriIlluminationModel(MiriDataModel):
 
         # Data type is illumination map.
         self.meta.filetype = 'ILLUMINATION'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type
+        # Initialise the model type
+        self._init_data_type()  
             
         if intensity is not None:
             self.intensity = intensity      
@@ -178,6 +178,16 @@ class MiriIlluminationModel(MiriDataModel):
         self.set_data_units('wavelength')
         
         self._set_illumination_shape()
+
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriIlluminationModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
         
     def truncate(self, maxshape):
         """
@@ -687,8 +697,7 @@ class MiriIlluminationFringingModel(MiriIlluminationModel):
 
         # Copy the units of the these arrays, if defined.
         self.set_data_units('direction')
-
-            
+ 
     def _check_direction(self, intensity, direction=None):
         """
     

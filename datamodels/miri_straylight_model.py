@@ -37,6 +37,8 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
+26 Mar 2020: Ensure the model_type remains as originally defined when saving
+             to a file.
 
 @author: Vincent Geers (DIAS), Steven Beard (UKATC)
 
@@ -115,8 +117,8 @@ class MiriMrsStraylightModel(MiriDataModel, HasData):
 
         # Data type is Straylight mask.
         self.meta.reftype = 'STRAYMASK'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type        
+        # Initialise the model type
+        self._init_data_type()   
 
         # Set the instrument detector, if provided (backwards compatibility).
         if detector is not None:
@@ -132,6 +134,16 @@ class MiriMrsStraylightModel(MiriDataModel, HasData):
         else:
             HasData.__init__(self, dq)
 
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriMrsStraylightModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
+        
     def __str__(self):
         """
         

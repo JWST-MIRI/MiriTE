@@ -41,6 +41,8 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
+26 Mar 2020: Ensure the model_type remains as originally defined when saving
+             to a file.
 
 @author: Steven Beard (UKATC), Juergen Schreiber (MPIA)
 
@@ -138,9 +140,8 @@ class MiriPhotometricModel(MiriDataModel):
 
         # Data type is photometric flux conversion.
         self.meta.reftype = 'PHOTOM'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type        
-
+        # Initialise the model type
+        self._init_data_type()    
         # This is a reference data model.
         self._reference_model()
 
@@ -172,6 +173,16 @@ class MiriPhotometricModel(MiriDataModel):
         # is defined in the metadata.
         if not self.meta.exposure.type:
             self.set_exposure_type()
+
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriPceModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
 
     def append(self, other):
         """
@@ -566,8 +577,18 @@ class MiriImagingPhotometricModel(MiriPhotometricModel):
                                                           pixar_a2=pixar_a2,
                                                           **kwargs)
         #self.add_comment("WAVELENGTH and RELRESPONSE arrays are all zero for imager.")
+        # Initialise the model type
+        self._init_data_type()   
+
+    def _init_data_type(self):
+        # Initialise the data model type
         model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriPceModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
 
 class MiriLrsPhotometricModel(MiriPhotometricModel):
     """
@@ -666,9 +687,19 @@ class MiriLrsPhotometricModel(MiriPhotometricModel):
                                                       pixar_a2=pixar_a2,
                                                       **kwargs)
         #self.add_comment("RELRESPONSE is absolute response so PHOTMJSR is 1.0.")
+        # Initialise the model type
+        self._init_data_type() 
+
+    def _init_data_type(self):
+        # Initialise the data model type
         model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type
-            
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriPceModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
+    
 class MiriLrsNewPhotometricModel(MiriDataModel):
     """
     
@@ -729,9 +760,8 @@ class MiriLrsNewPhotometricModel(MiriDataModel):
 
         # Data type is photometric flux conversion.
         self.meta.reftype = 'PHOTOM'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type        
-
+        # Initialise the model type
+        self._init_data_type()      
         # This is a reference data model.
         self._reference_model()
 
@@ -756,6 +786,16 @@ class MiriLrsNewPhotometricModel(MiriDataModel):
         # is defined in the metadata.
         if not self.meta.exposure.type:
             self.set_exposure_type()
+
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriPceModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
 
 
 
@@ -809,8 +849,8 @@ class MiriPixelAreaModel(MiriDataModel, HasData):
 
         # Data type is AREA.
         self.meta.reftype = 'AREA'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type        
+        # Initialise the model type
+        self._init_data_type()     
         # This is a reference data model.
         self._reference_model()
 
@@ -827,6 +867,16 @@ class MiriPixelAreaModel(MiriDataModel, HasData):
 
         # Update the data array if it has been specifically provided.
         HasData.__init__(self, data)
+
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriPceModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
 
 
 #

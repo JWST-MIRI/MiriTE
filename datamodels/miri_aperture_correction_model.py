@@ -23,7 +23,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
-
+26 Mar 2020: Ensure the model_type remains as originally defined when saving
+             to a file.
+             
 @author: Steven Beard (UKATC), Vincent Geers (UKATC), Juergen Schreiber (MPIA)
 
 """
@@ -93,9 +95,8 @@ class MiriMrsApertureCorrectionModel(MiriDataModel):
 
         # Data type is aperture correction.
         self.meta.reftype = 'APERCORR'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type
-        
+        # Initialise the model type
+        self._init_data_type()
         # This is a reference data model.
         self._reference_model()
         
@@ -109,6 +110,16 @@ class MiriMrsApertureCorrectionModel(MiriDataModel):
             
         # Copy the table column units from the schema, if defined.
         apercorr_units = self.set_table_units('apercorr_table')
+ 
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriMrsApertureCorrectionModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
 
 
 class MiriLrsThroughputCorrectionModel(MiriDataModel):
@@ -159,9 +170,8 @@ class MiriLrsThroughputCorrectionModel(MiriDataModel):
 
         # Data type is throughput correction.
         self.meta.reftype = 'THROUGHCORR'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type
-        
+        # Initialise the model type
+        self._init_data_type()
         # This is a reference data model.
         self._reference_model()
         
@@ -175,6 +185,16 @@ class MiriLrsThroughputCorrectionModel(MiriDataModel):
             
         # Copy the table column units from the schema, if defined.
         throughcorr_units = self.set_table_units('throughcorr_table')
+        
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriLrsThroughputCorrectionModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
 
 class MiriLrsApertureCorrectionModel(MiriDataModel):
     """
@@ -229,9 +249,8 @@ class MiriLrsApertureCorrectionModel(MiriDataModel):
 
         # Data type is aperture correction.
         self.meta.reftype = 'APCORR'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type
-        
+        # Initialise the model type
+        self._init_data_type()
         # This is a reference data model.
         self._reference_model()
         
@@ -246,6 +265,17 @@ class MiriLrsApertureCorrectionModel(MiriDataModel):
         # Copy the table column units from the schema, if defined.
         apcorr_units = self.set_table_units('apcorr_table')
         
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriLrsApertureCorrectionModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
+
+
 class MiriLrsPositionCorrectionModel(MiriDataModel):
     """
     
@@ -294,9 +324,8 @@ class MiriLrsPositionCorrectionModel(MiriDataModel):
 
         # Data type is position correction.
         self.meta.reftype = 'POS_CORR'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type
-        
+        # Initialise the model type
+        self._init_data_type()
         # This is a reference data model.
         self._reference_model()
         
@@ -310,6 +339,16 @@ class MiriLrsPositionCorrectionModel(MiriDataModel):
         
         # Copy the table column units from the schema, if defined.
         poscorr_units = self.set_table_units('poscorr_table')        
+        
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriLrsPositionCorrectionModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
 
 
 #

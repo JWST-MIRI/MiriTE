@@ -117,6 +117,8 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 07 Oct 2019: Removed '.yaml' suffix from schema references.
 12 Feb 2020: Check for array broadcastability when creating a new model
              from scratch.
+26 Mar 2020: Ensure the model_type remains as originally defined when saving
+             to a file.
 
 @author: Steven Beard (UKATC)
 
@@ -330,7 +332,7 @@ class MiriMeasuredModel(MiriDataModel, HasDataErrAndDq):
                 # TODO: Can the default declared in the schema be used?
                 self.dq_def = self._default_dq_def
 
-            # FIXME: A work-around for a bug in the build 7.3 jwst data models.
+            # FIXME: MIRI-710 A work-around for a bug in the build 7.3 jwst data models.
             # Recognise and fix a dq_def table whose BIT or VALUE fields have been corrupted
             if self.dq_def is not None and len(self.dq_def) > 0:
                 new_dq_def = []
@@ -530,8 +532,8 @@ class MiriRampModel(MiriMeasuredModel, HasDataErrAndGroups):
                                             **kwargs)
         # Data type is MIRI ramp data (level 1b).
         self.meta.filetype = 'Ramp (level 1b)'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type
+        # Initialise the model type
+        self._init_data_type()
 
         # Define the REFOUT and ZEROFRAME data arrays which are unique to
         # ramp data.
@@ -577,6 +579,11 @@ class MiriRampModel(MiriMeasuredModel, HasDataErrAndGroups):
                 strg = "group must be a numpy record array or list of records."
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
+
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
 
     def plot_ramp(self, rows, columns, stime=1.0, tunit='', averaged=False,
                   show_ints=False, description=''):
@@ -747,6 +754,9 @@ class MiriRampModel(MiriMeasuredModel, HasDataErrAndGroups):
 
         super(MiriRampModel, self).on_save(path)
 
+        # Re-initialise data type on save
+        self._init_data_type()
+
     def __str__(self):
         """
         
@@ -858,8 +868,8 @@ class MiriSlopeModel(MiriMeasuredModel):
                                              **kwargs)
         # Data type is MIRI slope data.
         self.meta.filetype = 'Slope (level 2)'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type
+        # Initialise the model type
+        self._init_data_type()
         
         # If 3-D data is given, the 3rd dimension gives the number of
         # integrations.
@@ -916,6 +926,16 @@ class MiriSlopeModel(MiriMeasuredModel):
         # Copy the units of the these arrays, if defined.
         self.set_data_units('zeropt')
         self.set_data_units('fiterr')
+
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriSlopeModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
         
     def __str__(self):
         """

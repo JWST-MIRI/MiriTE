@@ -33,6 +33,8 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
+26 Mar 2020: Ensure the model_type remains as originally defined when saving
+             to a file.
 
 @author: Steven Beard (UKATC)
 
@@ -126,9 +128,8 @@ class MiriPixelSaturationModel(MiriMeasuredModel):
 
         # Data type is pixel saturation.
         self.meta.reftype = 'SATURATION'
-        model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type        
-
+        # Initialise the model type
+        self._init_data_type()      
         # This is a reference data model.
         self._reference_model()
         
@@ -139,6 +140,17 @@ class MiriPixelSaturationModel(MiriMeasuredModel):
             self.meta.sat_lower = lowlimit
         if median is not None:
             self.meta.sat_median = median
+
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriPixelSaturationModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
+
 #
 # A minimal test is run when this file is run as a main program.
 # For a more substantial test see miri/datamodels/tests.
