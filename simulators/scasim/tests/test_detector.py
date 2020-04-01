@@ -33,6 +33,8 @@ should be executed first.
              frame time calculation from Mike Ressler. SLOW mode now uses
              8 out of 9 samples. Test the new frame_rti function.
              Import more detector parameters from detector_properties.
+01 Apr 2020: Improve the memory usage by not opening full-sized CDP files
+             when running tests on a tiny detector.
 
 @author: Steven Beard (UKATC)
 
@@ -73,6 +75,7 @@ _REF_PIXELS_RIGHT = 4
 _REF_PIXELS_BOTTOM = 0
 _REF_PIXELS_TOP = 4
 
+
 class TestDetectorArray(unittest.TestCase):
     
     def setUp(self):
@@ -80,6 +83,9 @@ class TestDetectorArray(unittest.TestCase):
         # 4 extra reference columns at the left and right edge, no
         # reference rows at the bottom but an extra 4 reference rows at
         # the top.
+        # NOTE: All simulations requiring full-sized CDP files to be read
+        # are turned off because they waste memory and are irrelevant for
+        # this tiny test detector.
         self.detector = DetectorArray(_KNOWN_DETECTORS[0],
                                       _PIXELS_PER_SIDE, _PIXELS_PER_SIDE,
                                       _FIRST_DETECTOR['TARGET_TEMPERATURE'],
@@ -88,6 +94,12 @@ class TestDetectorArray(unittest.TestCase):
                                       bottom_rows=_REF_PIXELS_BOTTOM,
                                       top_rows=_REF_PIXELS_TOP,
                                       well_depth=_FIRST_DETECTOR['WELL_DEPTH'],
+                                      simulate_read_noise=False,
+                                      simulate_bad_pixels=False,
+                                      simulate_dark_current=False,
+                                      simulate_flat_field=False,
+                                      simulate_gain=False,
+                                      simulate_nonlinearity=False,
                                       verbose=0, logger=LOGGER)
         self.detector.set_seed(42)
         samples = detector_properties.get('READOUT_MODE', 'SLOW')
@@ -108,8 +120,14 @@ class TestDetectorArray(unittest.TestCase):
                                 right_columns=_REF_PIXELS_RIGHT,
                                 bottom_rows=_REF_PIXELS_BOTTOM,
                                 top_rows=_REF_PIXELS_TOP,
-                                well_depth=_FIRST_DETECTOR['WELL_DEPTH'], verbose=0,
-                                logger=LOGGER)
+                                well_depth=_FIRST_DETECTOR['WELL_DEPTH'],
+                                simulate_read_noise=False,
+                                simulate_bad_pixels=False,
+                                simulate_dark_current=False,
+                                simulate_flat_field=False,
+                                simulate_gain=False,
+                                simulate_nonlinearity=False,
+                                verbose=0, logger=LOGGER)
             del det
         self.assertRaises(KeyError, DetectorArray, 'No such SCA',
                           _PIXELS_PER_SIDE, _PIXELS_PER_SIDE,
@@ -118,7 +136,14 @@ class TestDetectorArray(unittest.TestCase):
                           right_columns=_REF_PIXELS_RIGHT,
                           bottom_rows=_REF_PIXELS_BOTTOM,
                           top_rows=_REF_PIXELS_TOP,
-                          well_depth=_FIRST_DETECTOR['WELL_DEPTH'], verbose=0, logger=LOGGER)
+                          well_depth=_FIRST_DETECTOR['WELL_DEPTH'],
+                          simulate_read_noise=False,
+                          simulate_bad_pixels=False,
+                          simulate_dark_current=False,
+                          simulate_flat_field=False,
+                          simulate_gain=False,
+                          simulate_nonlinearity=False,
+                          verbose=0, logger=LOGGER)
         # Zero or negative detector sizes should be rejected.
         self.assertRaises(ValueError, DetectorArray, _KNOWN_DETECTORS[0],
                           0, 0, _FIRST_DETECTOR['TARGET_TEMPERATURE'],
@@ -126,19 +151,34 @@ class TestDetectorArray(unittest.TestCase):
                           right_columns=_REF_PIXELS_RIGHT,
                           bottom_rows=_REF_PIXELS_BOTTOM,
                           top_rows=_REF_PIXELS_TOP,
-                          well_depth=_FIRST_DETECTOR['WELL_DEPTH'], verbose=0, logger=LOGGER)
+                          well_depth=_FIRST_DETECTOR['WELL_DEPTH'],
+                          simulate_read_noise=False,
+                          simulate_bad_pixels=False,
+                          simulate_dark_current=False,
+                          simulate_flat_field=False,
+                          simulate_gain=False,
+                          simulate_nonlinearity=False,
+                          verbose=0, logger=LOGGER)
         self.assertRaises(ValueError, DetectorArray, _KNOWN_DETECTORS[0],
                           -1, -1, _FIRST_DETECTOR['TARGET_TEMPERATURE'],
                           left_columns=_REF_PIXELS_LEFT,
                           right_columns=_REF_PIXELS_RIGHT,
                           bottom_rows=_REF_PIXELS_BOTTOM,
                           top_rows=_REF_PIXELS_TOP,
-                          well_depth=_FIRST_DETECTOR['WELL_DEPTH'], verbose=0)
+                          well_depth=_FIRST_DETECTOR['WELL_DEPTH'],
+                          simulate_read_noise=False,
+                          simulate_bad_pixels=False,
+                          simulate_dark_current=False,
+                          simulate_flat_field=False,
+                          simulate_gain=False,
+                          simulate_nonlinearity=False,
+                          verbose=0, logger=LOGGER)
         self.assertRaises(ValueError, DetectorArray, _KNOWN_DETECTORS[0],
                           _PIXELS_PER_SIDE, _PIXELS_PER_SIDE, 6.5,
                           left_columns=-1, right_columns=-1,
                           bottom_rows=-1, top_rows=-1,
-                          well_depth=_FIRST_DETECTOR['WELL_DEPTH'], verbose=0, logger=LOGGER)
+                          well_depth=_FIRST_DETECTOR['WELL_DEPTH'],
+                          verbose=0, logger=LOGGER)
         # Having no reference pixels at all should be ok
         det = DetectorArray(_KNOWN_DETECTORS[0],
                             _PIXELS_PER_SIDE, _PIXELS_PER_SIDE,
@@ -146,6 +186,12 @@ class TestDetectorArray(unittest.TestCase):
                             left_columns=0, right_columns=0,
                             bottom_rows=0, top_rows=0,
                             well_depth=_FIRST_DETECTOR['WELL_DEPTH'],
+                            simulate_read_noise=False,
+                            simulate_bad_pixels=False,
+                            simulate_dark_current=False,
+                            simulate_flat_field=False,
+                            simulate_gain=False,
+                            simulate_nonlinearity=False,
                             verbose=0, logger=LOGGER)
         del det
 
@@ -285,6 +331,12 @@ class TestDetectorArray(unittest.TestCase):
                                   left_columns=0, right_columns=0,
                                   bottom_rows=0, top_rows=0,
                                   well_depth=_FIRST_DETECTOR['WELL_DEPTH'],
+                                  simulate_read_noise=False,
+                                  simulate_bad_pixels=False,
+                                  simulate_dark_current=False,
+                                  simulate_flat_field=False,
+                                  simulate_gain=False,
+                                  simulate_nonlinearity=False,
                                   verbose=0, logger=LOGGER)
         dshape = detector.detector_shape
         # Create a flux array the same shape as the detector whose values
