@@ -180,7 +180,7 @@ data/example_filter.fits, example_measurements.fits:
 __project__ = 'MIRI Data Model Software'
 __author__ = 'MIRI Software Team'
 __maintainer__ = 'MIRI Software Team: mirisim@roe.ac.uk'
-__copyright__ = '2018, %s' % __author__
+__copyright__ = '2020, %s' % __author__
 
 # Import common data products
 from miri.datamodels.miri_model_base import MiriDataModel
