@@ -9,31 +9,49 @@ allOf:
         apcorr_table:
           type: object
           title: Information about the aperture correction table
-          properties:        
+          properties:    
             tunit1:
               type: string
               title: Column 1 units
-              default: micron
+              default: ''
               fits_hdu: APCORR
-              fits_keyword: TUNIT1
+              fits_keyword: TUNIT1           
             tunit2:
               type: string
               title: Column 2 units
-              default: ''
+              default: micron
               fits_hdu: APCORR
-              fits_keyword: TUNIT2            
+              fits_keyword: TUNIT2
             tunit3:
               type: string
               title: Column 3 units
-              default: pixels
+              default: ''
               fits_hdu: APCORR
-              fits_keyword: TUNIT3
+              fits_keyword: TUNIT3            
             tunit4:
               type: string
               title: Column 4 units
-              default: ''
+              default: pixels
               fits_hdu: APCORR
               fits_keyword: TUNIT4
+            tunit5:
+              type: string
+              title: Column 5 units
+              default: ''
+              fits_hdu: APCORR
+              fits_keyword: TUNIT5        
+            tunit6:
+              type: string
+              title: Column 6 units
+              default: ''
+              fits_hdu: APCORR
+              fits_keyword: TUNIT6
+            tunit7:
+              type: string
+              title: Column 7 units
+              default: ''
+              fits_hdu: APCORR
+              fits_keyword: TUNIT7
  
 - type: object
   properties:
@@ -41,15 +59,23 @@ allOf:
       title: Aperture correction table
       fits_hdu: APCORR
       datatype:
+      - name: subarray
+        datatype: [ascii, 15]
       - name: wavelength
         datatype: float32
+        shape: [388]
         unit: micron
-      - name: nelem
-        datatype: uint8
-      - name: width
+      - name: nelem_wl
+        datatype: uint16
+      - name: size
         datatype: uint8
         shape: [40]
         unit: pixels
+      - name: nelem_size
+        datatype: uint8
       - name: apcorr
         datatype: float32
-        shape: [40]
+        shape: [388, 40]
+      - name: apcorr_err
+        datatype: float32
+        shape: [388, 40]

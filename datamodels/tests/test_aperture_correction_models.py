@@ -143,15 +143,15 @@ class TestMiriLrsApertureCorrectionModel(unittest.TestCase):
         
     def setUp(self):
         # Create a typical photometric data product.
-        apcorr = np.zeros([40])
-        apcorr = np.linspace(1.5,1,num = 40) 
+        apcorr = np.zeros([388,40])
+        apcorr_err = np.zeros([388,40])
+        apcorr[:] = np.linspace(1.5,1,num = 40) 
         width = np.arange(40) + 1
-        wave = [5.,8.,11.]
+        wave = np.linspace(3.5, 14, num = 388)
         
         apcorr_table=[]
-        apcorr_table.append((wave[0], 40, width.tolist(), apcorr.tolist()))
-        apcorr_table.append((wave[1], 40, width.tolist(), apcorr.tolist()))
-        apcorr_table.append((wave[2], 40, width.tolist(), apcorr.tolist()))
+        apcorr_table.append(("FULL", wave.tolist(), 388, width.tolist(), 40, apcorr.tolist(), apcorr_err.tolist()))
+        apcorr_table.append(("SLITLESSPRISM", wave.tolist(), 388, width.tolist(), 40, apcorr.tolist(), apcorr_err.tolist()))
             
         self.apcorr_table = apcorr_table
 
