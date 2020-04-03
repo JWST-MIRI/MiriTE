@@ -145,7 +145,7 @@ class TestMiriLrsApertureCorrectionModel(unittest.TestCase):
         # Create a typical photometric data product.
         apcorr = np.zeros([388,40])
         apcorr_err = np.zeros([388,40])
-        apcorr[:] = np.linspace(1.5,1,num = 40) 
+        apcorr[:,:] = np.linspace(1.5,1,num = 40) 
         width = np.arange(40) + 1
         wave = np.linspace(3.5, 14, num = 388)
         
