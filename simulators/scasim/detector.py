@@ -427,7 +427,7 @@ def frame_rti(detectorrows, ampcolumns, colstart, colstop, rowstart, rowstop,
             rti_row_roi += ((colstop-2)-colstart+1) * pix_clocks
 #             strg += " + (%d * %d) " % (((colstop-2)-colstart+1), pix_clocks)
             rti_row_roi += refpix_clocks
-            strg += " + %d " % refpix_clocks
+#            strg += " + %d " % refpix_clocks
         else:
             rti_row_roi += (colstop-colstart+1) * pix_clocks
 #             strg += " + (%d * %d) " % ((colstop-colstart+1), pix_clocks)
@@ -2013,6 +2013,9 @@ class DetectorArray(object):
             readnoise_map = clipped_noise[0:self.illuminated_shape[0],
                                           0:self.detector_shape[1]] * \
                                 self.mean_gain
+            #Convert the CDP readnoise which is the correlated double sample noise to single sample by
+            #dividing by the square root of 2.
+            readnoise_map = readnoise_map / np.sqrt(2.0)
 #             readnoise_map = readnoise_model.data[0:self.illuminated_shape[0],
 #                                                  0:self.detector_shape[1]] * \
 #                               self.mean_gain
