@@ -71,7 +71,7 @@ if __name__ == "__main__":
     # Optional arguments
     
     parser.add_option("-p", "--plottype", dest="plottype", type="string",
-                     default='IMAGE', help="Plot type"
+                     default='IMAGE', help="Plot type (IMAGE, RAMP, AVERAGE)"
                      )
     parser.add_option("-r", "--row", dest="row", type="int",
                      default=1, help="Row number at which to plot ramp"

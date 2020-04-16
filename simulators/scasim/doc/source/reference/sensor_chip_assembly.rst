@@ -36,10 +36,6 @@ Assembly and its environment::
     cosmic_ray_properties.py
     detector_properties.py
 
-There is also a legacy class called Amplifier and its associated
-amplifier_properties.py file, which simulates the behaviour of individual
-amplifiers. The class is not used for MIRI simulations.
-
 Objects
 ~~~~~~~
 .. autoclass:: SensorChipAssembly
