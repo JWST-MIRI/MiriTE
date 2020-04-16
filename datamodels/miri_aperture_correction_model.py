@@ -235,7 +235,7 @@ class MiriLrsApertureCorrectionModel(MiriDataModel):
         
     """
     schema_url = "miri_aperture_correction_lrs.schema"
-    fieldnames = ('wavelength', 'nelem', 'width', 'apcorr')
+    fieldnames = ('subarray','wavelength', 'nelem_wl', 'size', 'nelem_size', 'apcorr', 'apcorr_err')
     
     def __init__(self, init=None, apcorr_table=None, **kwargs):
         """
@@ -429,14 +429,17 @@ if __name__ == '__main__':
         del poscorr_table
         del testposcorr_lrs
    
-    apcorr = np.zeros([40])
-    apcorr = np.linspace(1.5,1,num = 40) 
+    apcorr = np.zeros([388,40])
+    apcorr_x = np.linspace(1.5,1,num = 40)
+    apcorr[:,:] = apcorr_x
+    apcorr_err = np.zeros([388, 40]) 
     width = np.arange(40) + 1
-    
+    wav = np.arange(388)/100.
+    print(width.tolist())
+    print(apcorr.tolist())
     apcorr_table=[]
-    apcorr_table.append((wave[0], 40, width.tolist(), apcorr.tolist()))
-    apcorr_table.append((wave[1], 40, width.tolist(), apcorr.tolist()))
-    apcorr_table.append((wave[2], 40, width.tolist(), apcorr.tolist()))
+    apcorr_table.append(('FULL' ,wav.tolist(), 388, width.tolist(), 40, apcorr.tolist(), apcorr_err.tolist()))
+    apcorr_table.append(('SLITLESSPRISM' ,wav.tolist(), 388, width.tolist(), 40, apcorr.tolist(), apcorr_err.tolist()))
     print(apcorr_table)
     
     with MiriLrsApertureCorrectionModel( apcorr_table=apcorr_table) as testapcorr_lrs:

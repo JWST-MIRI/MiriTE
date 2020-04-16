@@ -94,6 +94,7 @@ DITHER_POINTS = {"4-Point-Sets": 4, "2-Point": 2, "REULEAUX": 12,  # Imager
                  "4-Point": 4,  # DUAL mode Imager/MRS
                  "MRS 2-Point": 2, "MRS 4-Point": 4,  # MRS
                  "5-POINT-SMALL-GRID": 5, "9-POINT-SMALL-GRID": 9,  # Coronograph
+                 'CYCLING-MICRO': 16,  # Specific to APT 1028 for PSF super resolution
                  }
 
 SUBARRAY_PIX = {

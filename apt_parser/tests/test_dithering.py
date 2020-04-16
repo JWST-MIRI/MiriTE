@@ -35,6 +35,10 @@ testdata = [
         <mef:Direction>POSITIVE</mef:Direction>
         <mef:OptimizeFor>POINT SOURCE</mef:OptimizeFor>
     </mef:DitherSpec>""", 16),  # APT 1027, obs_id 19
+
+    ("""<mef:DitherSpec>
+            <mef:DitherType>CYCLING-MICRO</mef:DitherType>
+        </mef:DitherSpec>""", 16),  # APT 1028, obs_id 1
 ]
 
 
