@@ -338,8 +338,6 @@ class PoissonIntegrator(object):
         # array which is truncated to integer when read out.
         self.zeropoint = np.zeros(self.shape)      # Zeropoint from which to begin counting.
         self.expected_count = np.zeros(self.shape) # The expected count after an integration.
-        self.expected_delta_count = np.zeros(self.shape)  # The expected delta counts in a frame
-        self.cosmic_ray_counts = np.zeros(self.shape) # the counts that were added due to cosmic rays
         self.last_count = np.zeros(self.shape)     # The expected count at last readout
         self.last_readout = np.zeros(self.shape, dtype=np.uint32) # The actual count at last readout
         self.flux = np.zeros(self.shape)           # The flux (in particles per time unit) being integrated.
@@ -372,8 +370,6 @@ class PoissonIntegrator(object):
             del self.last_readout
             del self.last_count
             del self.expected_count
-            del self.expected_delta_count
-            del self.cosmic_ray_counts
             del self.zeropoint
         except Exception:
             pass
@@ -617,13 +613,13 @@ class PoissonIntegrator(object):
                 self.flux[arenegative] = 0.0
        
                 # Apply the integrator function
-                self.expected_delta_count = \
+                self.expected_count = \
                     self._apply_integrator(self.expected_count, self.flux, time)
 
                 if self.verbose > 3:
                     strg = "Expected count after integration: "
                     strg += "min=%.2f to max=%.2f." % \
-                        (self.expected_delta_count.min(), self.expected_delta_count.max())
+                        (self.expected_count.min(), self.expected_count.max())
                     self.logger.debug( strg )
             else:
                 # Faulty flux array given - raise an exception.
@@ -675,9 +671,8 @@ class PoissonIntegrator(object):
         if bgflux > 0.0001:
             # Integrate the counter on the background flux.
             # TODO: Use a non-uniform background illumination?
-            self.expected_delta_count += \
-                self._apply_integrator(self.last_count +self.expected_delta_count,
-                                       bgflux, time)
+            self.expected_count = \
+                self._apply_integrator(self.expected_count, bgflux, time)
         
     def readout(self, nsamples=1):
         """
@@ -705,9 +700,7 @@ class PoissonIntegrator(object):
         if int(nsamples) <= 0:
             strg = "Number of samples must be at least 1."
             raise ValueError(strg)
-
-        #any change in expected_count must be due to cosmic rays (not the best way to handle this)
-        self.cosmic_ray_counts = self.expected_count - self.last_count
+        
         # Simulate Poisson noise when the poisson_noise flag is True,
         if self.simulate_poisson_noise:
             #
@@ -719,11 +712,11 @@ class PoissonIntegrator(object):
             # filtered out.
             #
             if self.verbose > 5:
-                strg = "Readout %d: Expected delta count is %g to %g" % \
-                    (self.readings+1, self.expected_delta_count.min(), \
-                     self.expected_delta_count.max())
+                strg = "Readout %d: Expected count is %g to %g" % \
+                    (self.readings+1, self.expected_count.min(), \
+                     self.expected_count.max())
                 self.logger.debug(strg)
-            filtered_diff = self.expected_delta_count
+            filtered_diff = self.expected_count - self.last_count
             # Filter out zero, negative or bad values.
             where_zero = np.where(filtered_diff <= 0)
             if where_zero:
@@ -751,17 +744,17 @@ class PoissonIntegrator(object):
                 raise ValueError(strg)
             #
             # With Poisson noise enabled, the new readout is the zero-point
-            # level, plus the previous count, plus any cosmic rays, plus the difference in
-            # counts with Poisson noise taken into account.
+            # level, plus the previous readout, plus the difference in
+            # readout with Poisson noise taken into account.
             #
-            readout_array = self.zeropoint + self.last_count + self.cosmic_ray_counts + read_diff
+            readout_array = self.zeropoint + self.last_readout + read_diff
         else:
             #
             # Without Poisson noise, the new readout is simply the zero-point
-            # level plus the last_count + current expected delta count.
+            # level plus the current expected count.
             #
-             readout_array = self.zeropoint + self.last_count + self.cosmic_ray_counts + self.expected_delta_count
-        self.expected_count = readout_array - self.zeropoint
+             readout_array = self.zeropoint + self.expected_count
+        
         # The latest readout cannot be less than zero or
         # (if specified) larger than the defined bucket size.
         if self.bucket_size is None:
@@ -1488,8 +1481,8 @@ class ImperfectIntegrator(PoissonIntegrator):
         # overflowing (which causes problems later for the Poisson
         # noise calculation). Negative counts are also not allowed.
         newdata = np.clip(temp_data, 0, _MAXEXPECTED)
-        del temp_data
-        return newcounts
+        del temp_data, newcounts
+        return newdata
 
     def hard_reset(self):
         """

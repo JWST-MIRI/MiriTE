@@ -1,5 +1,6 @@
 allOf:
 - $ref: miri_core.schema.yaml
+- $ref: http://stsci.edu/schemas/jwst_datamodel/keyword_pexptype.schema
 - type: object
   title: MIRI LRS aperture correction model
   properties:
