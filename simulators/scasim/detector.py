@@ -237,6 +237,7 @@ Calibration Data Products (CDPs).
              Record mean read noise in the FITS header in DN rather than 
              electrons.
 05 Mar 2020: Added print statements to debug readnoise variation.
+16 Apr 2020: Removed references to obsolete amplifier class.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -689,13 +690,6 @@ class DetectorArray(object):
         self.refpixsampleskip = 3
         self.nframes = 1
 
-# NOTE: AMPLIFIER CLASS IS STILL AVAILABLE BUT NO LONGER USED FOR MIRI.
-#         # Add the readout amplifiers associated with this detector
-#         self._add_amplifiers(temperature, min_illuminated_row,
-#                              max_illuminated_row,
-#                              simulate_read_noise=simulate_read_noise,
-#                              simulate_gain=simulate_gain)
-     
         # Create a particle counter with the specified properties.
         self.particle = particle
         self.time_unit = time_unit
@@ -768,121 +762,6 @@ class DetectorArray(object):
             self._clear_calibration_data()
         except Exception:
             pass
-
-# THIS CODE ALLOWS AMPLIFIERS TO BE TREATED SEPARATELY
-#     def _add_amplifiers(self, temperature,
-#                         min_illuminated_row, max_illuminated_row,
-#                         simulate_read_noise=True, simulate_gain=True,
-#                         simulate_nonlinearity=True):
-#         """
-#         
-#         Add the list of amplifiers associated with the detector.
-#         Helper function used during __init__().
-#         
-#         """
-#         # Create a list of amplifiers responsible for reading out
-#         # particular subsets of the rows and columns of the detector.
-#         # Each amplifier has its own gain and read noise.
-#         #
-#         # Amplifier 1 - Every 4th column starting at column 0
-#         #               for the illuminated rows only.
-#         # Amplifier 2 - Every 4th column starting at column 1
-#         #               for the illuminated rows only.
-#         # Amplifier 3 - Every 4th column starting at column 2
-#         #               for the illuminated rows only.
-#         # Amplifier 4 - Every 4th column starting at column 3
-#         #               for the illuminated rows only.
-#         self.amplifier_list = []
-#         self._normal_amps = 0
-#         self._ref_amps = 0
-#         namp = 0
-#         
-#         try:
-#             amplist = amplifier_properties.get('AMPLIFIERS_DICT',
-#                                                self.detectorid)
-#         except KeyError:
-#             strg = "Detector %s is " % self.detectorid
-#             strg += "not included in amplifier properties."
-#             raise KeyError(strg)
-# 
-#         total_amps = len(amplist)
-#         
-#         # If required, create a new plotting window to contain the read
-#         # noise plot.
-#         if self._makeplot:
-#             fig = mplt.new_figure(1, figsize=(10,8),
-#                                   stitle="Read noise measurements")
-# 
-#         for amp in amplist:
-#             namp += 1
-#             noisemv = MiriMeasurement(amp['READ_NOISE_FILE'], name="Read noise")
-#             column = amp['READ_NOISE_COL'] - 1
-#             read_noise = noisemv.lookup(temperature, column=column)
-# 
-#             # Plot the read noise if required, using a different
-#             # sub-plot for each amplifier.
-#             if self._makeplot:
-#                 pltstr = "for %s" % amp['NAME']
-#                 ax = mplt.add_subplot(plotfig=fig, subrows=2, subcols=3,
-#                                       subno=namp)
-#                 ax = noisemv.plot(plotfig=fig, plotaxis=ax, columns=column,
-#                                   title=pltstr)
-#                 if namp == total_amps:
-#                     strg = "Plotting read noise measurements. " \
-#                         "Close plot window to continue."
-#                     mplt.show_plot(prompt=strg)
-# 
-#             if amp['TYPE'] == "illuminated":
-#                 self._normal_amps += 1
-#                 colstart = int(amp['REGION'])
-#                 colstep = \
-#                     int(amplifier_properties.get('N_ILLUM_AMPLIFIERS', 
-#                                                  self.detectorid))
-#                 ampobject = Amplifier(
-#                                 namp,
-#                                 min_illuminated_row, max_illuminated_row,
-#                                 None, colstart, None, colstep,
-#                                 amp['BIAS'], amp['GAIN'],
-#                                 read_noise, amp['MAX_DN'],
-#                                 gaintype=amp['GAINTYPE'],
-#                                 simulate_read_noise=simulate_read_noise,
-#                                 simulate_gain=simulate_gain,
-#                                 simulate_nonlinearity=simulate_nonlinearity,
-#                                 verbose=self._verbose)
-# 
-#                 self.amplifier_list.append(ampobject)
-#             else:
-#                 self._ref_amps += 1
-#                 if amp['REGION'] == "bottom":
-#                     max_reference_row = min_illuminated_row - 1
-#                     ampobject = Amplifier(
-#                                     namp, None, max_reference_row, None,
-#                                     None, None, None,
-#                                     amp['BIAS'], amp['GAIN'],
-#                                     read_noise, amp['MAX_DN'],
-#                                     gaintype=amp['GAINTYPE'],
-#                                     simulate_read_noise=simulate_read_noise,
-#                                     simulate_gain=simulate_gain,
-#                                     simulate_nonlinearity=simulate_nonlinearity,
-#                                     verbose=self._verbose)
-#                     self.amplifier_list.append(ampobject)
-#                 else:
-#                     # Assume 'top'
-#                     min_reference_row = max_illuminated_row
-#                     ampobject = Amplifier(
-#                                     namp, min_reference_row, None, None,
-#                                     None, None, None,
-#                                     amp['BIAS'], amp['GAIN'],
-#                                     read_noise, amp['MAX_DN'],
-#                                     gaintype=amp['GAINTYPE'],
-#                                     simulate_read_noise=simulate_read_noise,
-#                                     simulate_gain=simulate_gain,
-#                                     simulate_nonlinearity=simulate_nonlinearity,
-#                                     verbose=self._verbose)
-#                     self.amplifier_list.append(ampobject)
-#                     
-#         # Set the initial electronic bias.
-#         set_reference_level(float(amplifier_properties['INITIAL_REF_LEVEL']))
 
     def add_calibration_data(self, detector, readpatt=None, subarray=None,
                     mirifilter=None, miriband=None,
@@ -2789,27 +2668,6 @@ class DetectorArray(object):
         # and generating spurious large values in the reference pixel
         # regions.
         read_data = self.pixels.readout(nsamples=total_samples).astype(np.double)
-
-#         # Apply a random drift to the amplifier electronics
-#         random_level_change(amplifier_properties['MAX_REF_DRIFT'])
-#         
-#         # Apply the readout effects from each of the list of amplifiers
-#         # associated with this detector array.
-#         for amp in self.amplifier_list:
-#             read_data = amp.readout(read_data)
-#             # Use for debugging only - tedious output.
-#             if self._makeplot and self._verbose > 7:
-#                 strg = "after readout from amplifier %s" % amp._count
-#                 amp.plot(description=strg)
-#                 amp.plot()
-#  
-#         # Check that all areas of the detector have been consistently
-#         # read out. This checks that the rows and columns covered by
-#         # the amplifiers do not overlap.
-#         if not check_readout():
-#             strg = "Inconsistent detector readout. " \
-#                 "Check the rows/columns assigned to the amplifiers"
-#             raise ValueError(strg)
 
         # Apply gain and readnoise effects. NOTE: Although the Poisson noise
         # and read noise are not added explicitly in quadrature,
