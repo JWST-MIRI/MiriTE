@@ -119,7 +119,7 @@ class MiriPhotometricModel(MiriDataModel):
     
     """
     schema_url = "miri_photom.schema"
-    fieldnames = ('filter', 'subarray', 'photmjsr', 'uncertainty', 'nelem')
+    fieldnames = ('filter', 'subarray', 'photmjsr', 'uncertainty')
 
     def __init__(self, init=None, phot_table=None, pixar_sr=None,
                  pixar_a2=None, **kwargs):
@@ -380,7 +380,7 @@ class MiriImagingPhotometricModel(MiriPhotometricModel):
 
         # Pass the phot_table to the generic model.
         super(MiriImagingPhotometricModel, self).__init__(init=init,
-                                                          phot_table=new_phot_table,
+                                                          phot_table=phot_table,
                                                           pixar_sr=pixar_sr,
                                                           pixar_a2=pixar_a2,
                                                           **kwargs)
@@ -397,6 +397,7 @@ class MiriImagingPhotometricModel(MiriPhotometricModel):
        super(MiriImagingPhotometricModel, self).on_save(path)
         # Re-initialise data type on save
        self._init_data_type()
+
 
 class MiriLrsPhotometricModel(MiriDataModel):
     """
@@ -630,7 +631,7 @@ if __name__ == '__main__':
                ]
 
     print("\nImaging PHOTOM model:")
-    with MiriPhotometricModel( phot_table=phot_im1, pixar_a2=pixar_a2,
+    with MiriImagingPhotometricModel( phot_table=phot_im1, pixar_a2=pixar_a2,
                                pixar_sr=pixar_sr ) as testphot1:
         testphot1.set_instrument_metadata(detector='MIRIMAGE',
                                           ccc_pos='OPEN',

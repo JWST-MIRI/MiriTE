@@ -18,6 +18,7 @@ in the datamodels.miri_fluxconversion_model module.
              when the data model is saved to a file.
 23 Mar 2020: Only test pedigree if it exists.
              TODO: Why does this problem only affect the photometric models?
+07 May 2020: Update to imager and LRS PHOTOM data models.
 
 @author: Steven Beard (UKATC)
 
@@ -30,7 +31,7 @@ import warnings
 import numpy as np
 
 from miri.datamodels.miri_photometric_models import \
-    MiriPhotometricModel,  MiriImagingPhotometricModel, MiriPixelAreaModel, MiriLrsNewPhotometricModel
+    MiriPhotometricModel,  MiriImagingPhotometricModel, MiriPixelAreaModel, MiriLrsPhotometricModel
 from miri.datamodels.tests.util import assert_recarray_equal, \
     assert_products_equal
 
@@ -46,40 +47,21 @@ class TestMiriPhotometricModel(unittest.TestCase):
         # This product is a combination of imager and LRS, which should
         # exercise the flexibility of the data model.
         pixar_a2 = 0.136
-        wavelength = []
-        relresponse = []
-        relresperror = []
-        resp = 0
-        nelm = 0
-        for ii in range(300):
-            wav = float(ii)/12.0
-            resp = (resp + 1) % 30
-            r10 = 0.1 + resp/35.0
-            wavelength.append(wav)
-            relresponse.append(r10)
-            relresperror.append(0.01)
-            nelm += 1
-        for ii in range(300,MAX_NLEM):
-            wavelength.append(0.0)
-            relresponse.append(0.0)
-            relresperror.append(0.0)
         self.phot_table = \
-              [('F560W',  'GENERIC', 2.41,  0.26,  0, wavelength, relresponse, relresperror),
-               ('F770W',  'GENERIC', 1.32,  0.013, 0, wavelength, relresponse, relresperror),
-               ('F1000W', 'GENERIC', 1.76,  0.12,  0, wavelength, relresponse, relresperror),
-               ('F1130W', 'GENERIC', 5.76,  0.43,  0, wavelength, relresponse, relresperror),
-               ('F1280W', 'GENERIC', 2.11,  0.16,  0, wavelength, relresponse, relresperror),
-               ('F1500W', 'GENERIC', 1.84,  0.01,  0, wavelength, relresponse, relresperror),
-               ('F1800W', 'GENERIC', 2.68,  0.23,  0, wavelength, relresponse, relresperror),
-               ('F2100W', 'GENERIC', 2.04,  0.15,  0, wavelength, relresponse, relresperror),
-               ('F2550W', 'GENERIC', 4.25,  0.4,   0, wavelength, relresponse, relresperror),
-               ('F2550WR','GENERIC', 4.60,  0.24,  0, wavelength, relresponse, relresperror),
-               ('F1065C', 'GENERIC', 1.37,  0.1,   0, wavelength, relresponse, relresperror),
-               ('F1140C', 'GENERIC', 1.43,  0.11,  0, wavelength, relresponse, relresperror),
-               ('F1550C', 'GENERIC', 1.81,  0.13,  0, wavelength, relresponse, relresperror),
-               ('F2300C', 'GENERIC', 3.65,  0.23,  0, wavelength, relresponse, relresperror),
-               ('P750L',  'FULL',          1.0,  0.0,  nelm, wavelength, relresponse, relresperror),
-               ('P750L',  'SLITLESSPRISM', 0.9,  0.0,  nelm, wavelength, relresponse, relresperror)
+              [('F560W',  'GENERIC', 2.41,  0.26),
+               ('F770W',  'GENERIC', 1.32,  0.013),
+               ('F1000W', 'GENERIC', 1.76,  0.12),
+               ('F1130W', 'GENERIC', 5.76,  0.43),
+               ('F1280W', 'GENERIC', 2.11,  0.16),
+               ('F1500W', 'GENERIC', 1.84,  0.01),
+               ('F1800W', 'GENERIC', 2.68,  0.23),
+               ('F2100W', 'GENERIC', 2.04,  0.15),
+               ('F2550W', 'GENERIC', 4.25,  0.4),
+               ('F2550WR','GENERIC', 4.60,  0.24),
+               ('F1065C', 'GENERIC', 1.37,  0.1),
+               ('F1140C', 'GENERIC', 1.43,  0.11),
+               ('F1550C', 'GENERIC', 1.81,  0.13),
+               ('F2300C', 'GENERIC', 3.65,  0.23),
                ]
 
         self.dataproduct = MiriPhotometricModel( phot_table=self.phot_table, 
@@ -239,7 +221,7 @@ class TestMiriImagingPhotometricModel(unittest.TestCase):
     def test_creation(self):
         # Check that the field names in the class variable are the same
         # as the ones declared in the schema.
-        class_names = list(MiriPhotometricModel.fieldnames)
+        class_names = list(MiriImagingPhotometricModel.fieldnames)
         schema_names = list(self.dataproduct.get_field_names('phot_table'))
         self.assertEqual(class_names, schema_names,
                          "'fieldnames' class variable does not match schema")
@@ -247,7 +229,7 @@ class TestMiriImagingPhotometricModel(unittest.TestCase):
         # It must be possible to create an empty data product.
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            nulldp = MiriPhotometricModel( )
+            nulldp = MiriImagingPhotometricModel( )
         descr1 = str(nulldp)
         self.assertIsNotNone(descr1)
         del nulldp, descr1 
@@ -274,7 +256,7 @@ class TestMiriImagingPhotometricModel(unittest.TestCase):
             # Check that the data product can be written to a FITS
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
-            with MiriPhotometricModel(self.testfile) as readback:
+            with MiriImagingPhotometricModel(self.testfile) as readback:
                 self.assertIsNotNone(readback.phot_table)
                 self.assertEqual( len(self.dataproduct.phot_table),
                                   len(readback.phot_table) )
@@ -300,7 +282,7 @@ class TestMiriImagingPhotometricModel(unittest.TestCase):
         del descr
 
 
-class TestLrsNewPhotometricModel(unittest.TestCase):
+class TestLrsPhotometricModel(unittest.TestCase):
     def setUp(self):
         # Create a typical imaging data product.
         # The wavelength and relresponse arrays will be automatically zeroed.
@@ -313,9 +295,9 @@ class TestLrsNewPhotometricModel(unittest.TestCase):
         self.phot_table = \
              [('P750L', 'FULL', 2.41,  0.26, n_elem, wavelength, relresp, relresp_error)]
 
-        self.dataproduct = MiriLrsNewPhotometricModel( phot_table=self.phot_table, 
+        self.dataproduct = MiriLrsPhotometricModel( phot_table=self.phot_table, 
                                                  pixar_a2=pixar_a2, pixar_sr = pixar_sr )
-        self.testfile = "MiriLrsNewPhotometric_test.fits"
+        self.testfile = "MiriLrsPhotometric_test.fits"
         #print(self.dataproduct)
         
     def tearDown(self):
@@ -344,7 +326,7 @@ class TestLrsNewPhotometricModel(unittest.TestCase):
     
     def test_creation(self):
         # It must be possible to create an empty data product.    
-        nullproduct = MiriLrsNewPhotometricModel( )
+        nullproduct = MiriLrsPhotometricModel( )
         del nullproduct
         
     def test_fitsio(self):
@@ -355,7 +337,7 @@ class TestLrsNewPhotometricModel(unittest.TestCase):
             # Check that the data product can be written to a FITS
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
-            with MiriLrsNewPhotometricModel(self.testfile) as readback:
+            with MiriLrsPhotometricModel(self.testfile) as readback:
                 self.assertEqual(self.dataproduct.meta.reftype,
                                  readback.meta.reftype)
                 self.assertEqual(self.dataproduct.meta.model_type,
