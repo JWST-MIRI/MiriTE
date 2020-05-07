@@ -43,6 +43,8 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              a corresponding model defined in ancestry.py).
 26 Mar 2020: Ensure the model_type remains as originally defined when saving
              to a file.
+07 May 2020: Removed nelm, wavelength, relresp and relresperror columns from
+             imager PHOTOM model to match JWST data model changes.
 
 @author: Steven Beard (UKATC), Juergen Schreiber (MPIA)
 
@@ -58,8 +60,8 @@ from miri.datamodels.miri_model_base import MiriDataModel
 from miri.datamodels.operations import HasData
 
 # List all classes and global functions here.
-__all__ = ['MiriPhotometricModel', 'MiriImagingPhotometricModel', 'MiriPhotometricModel_CDP5',
-           'MiriLrsPhotometricModel', 'MiriLrsNewPhotometricModel', 'MiriPixelAreaModel', 'MAX_NELEM']
+__all__ = ['MiriPhotometricModel', 'MiriImagingPhotometricModel',
+           'MiriLrsPhotometricModel', 'MiriPixelAreaModel', 'MAX_NELEM']
 
 # Useful constants
 ARCSEC2_PER_STERADIAN = ((180.0/math.pi) * 3600.0)**2 # Square arcsec per steradian
@@ -103,14 +105,7 @@ class MiriPhotometricModel(MiriDataModel):
         * PHOTMJSR: A conversion factor for the given filter and subarray
           combination, converting from DN/s/pixel to MJy/Sr, assuming that
           each pixel has the same area on the sky.
-        * NELM: An integer (range 0 to 500) giving the number of elements
-          in the wavelength and relresponse arrays to be used. If NELM=0,
-          the wavelength and response arrays are ignored.
-        * WAVELENGTH: An array of 500 floats containing wavelengths in microns.
-          Unused parts of the array are padded with zero.
-        * RELRESPONSE: An array of 500 floats containing the relative
-          response of the instrument at each wavelength.
-          Unused parts of the array are padded with zero.
+        * UNCERTAINTY: Uncertainty of the above factor.
 
         A phot_table must either be defined in the initializer or in
         this parameter. A blank table is not allowed.
@@ -124,8 +119,7 @@ class MiriPhotometricModel(MiriDataModel):
     
     """
     schema_url = "miri_photom.schema"
-    fieldnames = ('filter', 'subarray', 'photmjsr', 'uncertainty', 'nelem',
-                  'wavelength', 'relresponse', 'relresperror')
+    fieldnames = ('filter', 'subarray', 'photmjsr', 'uncertainty', 'nelem')
 
     def __init__(self, init=None, phot_table=None, pixar_sr=None,
                  pixar_a2=None, **kwargs):
@@ -214,277 +208,115 @@ class MiriPhotometricModel(MiriDataModel):
             new_phot_table.append( tuple(other_row) )
         self.phot_table = new_phot_table
 
-    def append_lrs(self, *args):
-        """
-        
-        Append the SRF tables contained in one or more MiriLrsFluxconversionModel
-        data models to the phot_table of this model. Each data mode given
-        results in a new row added at the end of the existing table.
-        
-        NOTE: This function has a variable number of parameters. Each
-        parameter is assumed to be a MiriLrsFluxconversionModel to be
-        appended.
-        
-        :Parameters:
+#    def append_lrs(self, *args):
+#        """
+#        
+#        Append the SRF tables contained in one or more MiriLrsFluxconversionModel
+#        data models to the phot_table of this model. Each data mode given
+#        results in a new row added at the end of the existing table.
+#        
+#        NOTE: This function has a variable number of parameters. Each
+#        parameter is assumed to be a MiriLrsFluxconversionModel to be
+#        appended.
+#        
+#        :Parameters:
+#            
+#        lrs_model1: MiriLrsFluxconversionModel
+#            A MiriLrsFluxconversionModel data model to be appended
+#            to this one.
+#        lrs_model2: MiriLrsFluxconversionModel
+#            A MiriLrsFluxconversionModel data model to be appended
+#            to this one.
+#        etc...
+#            
+#        :Attributes:
+#        
+#        phot_table: numpy recarray
+#            New row appended.
+#        
+#        """
+#        # The function only works is at least one MiriLrsFluxconversionModel
+#        # has been specified
+#        if len(args) > 0:
+#            # Initialise a new phot_table.
+#            new_phot_table = []
+#            for this_row in self.phot_table:
+#                new_phot_table.append( tuple(this_row) )
+#                
+#            # Append each LRS data model one at a time.
+#            # All LRS models use the same filter and define an absolute
+#            # response, so PHOTMJSR is 1.0 and UNCERTAINTY is 0.0.
+#            mirifilter = 'P750L'
+#            photmjsr = 1.0
+#            uncertainty = 0.0
+#            argnum = 0
+#            for lrs_model in args:
+#                argnum += 1
+#                if hasattr( lrs_model, 'flux_table'):
+#                    if hasattr(lrs_model, 'meta') and hasattr(lrs_model.meta, 'subarray'):
+#                        subarray = lrs_model.meta.subarray.name
+#                    else:
+#                        subarray = 'GENERIC'
+#                    # Add the SRF flux table to the data model.
+#                    # TODO: A slow but readable method. There is probably a
+#                    # faster way, but the function is not time critical for
+#                    # small CDPs.
+#                    wavelength = [0.0] * MAX_NELEM
+#                    relresponse = [0.0] * MAX_NELEM
+#                    relresperror = [0.0] * MAX_NELEM
+#                    ii = 0
+#                    for (wav, srf, unc) in lrs_model.flux_table:
+#                        wavelength[ii] = wav
+#                        relresponse[ii] = srf
+#                        relresperror[ii] = unc
+#                        ii += 1
+#                    nelem = len(lrs_model.flux_table)
+#                    new_phot_table.append( (mirifilter, subarray, photmjsr, uncertainty,
+#                                      nelem, tuple(wavelength), tuple(relresponse),
+#                                      tuple(relresperror)))
+#                else:
+#                    strg = "Function argument %d is not a MiriFluxconversionModel" % argnum
+#                    raise TypeError(strg)
+#            self.phot_table = new_phot_table
             
-        lrs_model1: MiriLrsFluxconversionModel
-            A MiriLrsFluxconversionModel data model to be appended
-            to this one.
-        lrs_model2: MiriLrsFluxconversionModel
-            A MiriLrsFluxconversionModel data model to be appended
-            to this one.
-        etc...
-            
-        :Attributes:
-        
-        phot_table: numpy recarray
-            New row appended.
-        
-        """
-        # The function only works is at least one MiriLrsFluxconversionModel
-        # has been specified
-        if len(args) > 0:
-            # Initialise a new phot_table.
-            new_phot_table = []
-            for this_row in self.phot_table:
-                new_phot_table.append( tuple(this_row) )
-                
-            # Append each LRS data model one at a time.
-            # All LRS models use the same filter and define an absolute
-            # response, so PHOTMJSR is 1.0 and UNCERTAINTY is 0.0.
-            mirifilter = 'P750L'
-            photmjsr = 1.0
-            uncertainty = 0.0
-            argnum = 0
-            for lrs_model in args:
-                argnum += 1
-                if hasattr( lrs_model, 'flux_table'):
-                    if hasattr(lrs_model, 'meta') and hasattr(lrs_model.meta, 'subarray'):
-                        subarray = lrs_model.meta.subarray.name
-                    else:
-                        subarray = 'GENERIC'
-                    # Add the SRF flux table to the data model.
-                    # TODO: A slow but readable method. There is probably a
-                    # faster way, but the function is not time critical for
-                    # small CDPs.
-                    wavelength = [0.0] * MAX_NELEM
-                    relresponse = [0.0] * MAX_NELEM
-                    relresperror = [0.0] * MAX_NELEM
-                    ii = 0
-                    for (wav, srf, unc) in lrs_model.flux_table:
-                        wavelength[ii] = wav
-                        relresponse[ii] = srf
-                        relresperror[ii] = unc
-                        ii += 1
-                    nelem = len(lrs_model.flux_table)
-                    new_phot_table.append( (mirifilter, subarray, photmjsr, uncertainty,
-                                      nelem, tuple(wavelength), tuple(relresponse),
-                                      tuple(relresperror)))
-                else:
-                    strg = "Function argument %d is not a MiriFluxconversionModel" % argnum
-                    raise TypeError(strg)
-            self.phot_table = new_phot_table
-            
-    def get_srf(self, filt, subarray):
-        """
-        
-        Return the SRF arrays associated with the given filter and subarray.
-        
-        This function is mainly designed for LRS data where filt='P750L'.
-        
-        :Parameters:
-            
-        filt: str
-            The MIRI filter whose SRF arrays are to be returned.
-            Use file='P750L' to obtain the LRS SRF arrays.
-        subarray: str
-            The subarray whose SRF arrays are to be returned.
-            Use subarray='FULL' or 'SLITLESSPRISM' to obtain the LRS SRF arrays.
-            
-        :Returned:
-        
-        srf_arrays: tuple of (wavelength, srf, uncertainty)
-            The wavelength, srf and uncertainty arrays
-        
-        """
-        # Find the relevant row in the PHOTOM table
-        for row in self.phot_table:
-            if str(row[0]).strip() == filt and str(row[1]).strip() == subarray:
-                # A matching row has been found
-                nelem = int(row[4])
-                if nelem > 0:
-                    return( row[5][:nelem], row[6][:nelem], row[7][:nelem] )
-                else:
-                    strg = "Table row for filter=\'%s\' subarray=\'%s\'" % (filt,subarray)
-                    strg += " has no spectral response data "
-                    warnings.warn(strg)
-                    return ([], [], [])
-        # No matching filter
-        strg = "No table row matching filter=\'%s\' subarray=\'%s\'" % (filt,subarray)
-        warnings.warn(strg)
-        return (None, None, None)
-
-class MiriPhotometricModel_CDP5(MiriDataModel):
-    """
-    
-    This class can be used to access the old CDP-6 version of the
-    MiriPhotometricModel data model.
-    
-    See the MiriPhotometricModel class for full documentation.
-    
-    """
-    schema_url = "miri_photom_CDP5.schema"
-    fieldnames = ('filter', 'subarray', 'photmjsr', 'uncertainty', 'nelem',
-                  'wavelength', 'relresponse')
-
-    def __init__(self, init=None, phot_table=None, pixar_sr=None,
-                 pixar_a2=None, **kwargs):
-        """
-        
-        Initialises the MiriPhotometricModel class.
-        
-        Parameters: See class doc string.
-
-        """
-        super(MiriPhotometricModel_CDP5, self).__init__(init=init, **kwargs)
-
-        # Data type is photometric flux conversion.
-        self.meta.model_type = 'PHOTOM'
-        self.meta.reftype = 'PHOTOM'
-            
-        # A USEAFTER date must exist. If not relevant, set it to an
-        # impossibly early date.
-        if not self.meta.useafter:
-            self.meta.useafter = '2000-01-01T00:00:00'
-        
-        # The default pedigree is 'GROUND' (if it exists)
-        if hasattr(self.meta, 'pedigree'):
-            if not self.meta.pedigree:
-                self.meta.pedigree = 'GROUND'
-
-        if phot_table is not None:
-            try:
-                #phot_table = np.recarray(phot_table)
-                self.phot_table = phot_table
-            except (ValueError, TypeError) as e:
-                strg = "phot_table must be a numpy record array or list of records."
-                strg += "\n   %s" % str(e)
-                raise TypeError(strg)
-
-        # If provided, define the pixel area metadata.
-        if pixar_sr is not None:
-            self.meta.photometry.pixelarea_steradians = pixar_sr
-            # Should both keywords be written?
-#             self.meta.photometry.arcsecsq = pixar_s2 * ARCSEC2_PER_STERADIAN
-        if pixar_a2 is not None:
-            self.meta.photometry.pixelarea_arcsecsq = pixar_a2
-            # Should both keywords be written?
-#             self.meta.photometry.pixelarea_steradians = \
-#                 pixar_s2 / ARCSEC2_PER_STERADIAN
-
-        # Define the exposure type (if not already contained in the data model)
-        # NOTE: This will only define an exposure type when a valid detector
-        # is defined in the metadata.
-        if not self.meta.exposure.type:
-            self.set_exposure_type()
-
-    def append(self, other):
-        """
-        
-        Append the phot_table from another MiriPhotometricModel to the
-        phot_table of this model. New rows are added at the end of the
-        existing table.
-         
-        :Parameters:
-        
-        other: MiriPhotometricModel
-            Other data model to be appended to this one.
-            
-        :Attributes:
-        
-        phot_table: numpy recarray
-            New rows appended.
-       
-        """
-        #import numpy.lib.recfunctions as rfn
-        assert isinstance(other, MiriPhotometricModel,
-                "append: must provide a MiriPhotometricModel object")
-        # TODO: A slow, brute force method. There is probably a faster way,
-        # but the function is not time critical for small CDPs..
-        new_phot_table = []
-        for this_row in self.phot_table:
-            new_phot_table.append( tuple(this_row) )
-        for other_row in other.phot_table:
-            new_phot_table.append( tuple(other_row) )
-        self.phot_table = new_phot_table
-
-    def append_lrs(self, *args):
-        """
-        
-        Append the SRF tables contained in one or more MiriLrsFluxconversionModel
-        data models to the phot_table of this model. Each data mode given
-        results in a new row added at the end of the existing table.
-        
-        NOTE: This function has a variable number of parameters. Each
-        parameter is assumed to be a MiriLrsFluxconversionModel to be
-        appended.
-        
-        :Parameters:
-            
-        lrs_model1: MiriLrsFluxconversionModel
-            A MiriLrsFluxconversionModel data model to be appended
-            to this one.
-        lrs_model2: MiriLrsFluxconversionModel
-            A MiriLrsFluxconversionModel data model to be appended
-            to this one.
-        etc...
-            
-        :Attributes:
-        
-        phot_table: numpy recarray
-            New row appended.
-        
-        """
-        # The function only works is at least one MiriLrsFluxconversionModel
-        # has been specified
-        if len(args) > 0:
-            # Initialise a new phot_table.
-            new_phot_table = []
-            for this_row in self.phot_table:
-                new_phot_table.append( tuple(this_row) )
-                
-            # Append each LRS data model one at a time.
-            # All LRS models use the same filter and define an absolute
-            # response, so PHOTMJSR is 1.0 and UNCERTAINTY is 0.0.
-            mirifilter = 'P750L'
-            photmjsr = 1.0
-            uncertainty = 0.0
-            argnum = 0
-            for lrs_model in args:
-                argnum += 1
-                if hasattr( lrs_model, 'flux_table'):
-                    if hasattr(lrs_model, 'meta') and hasattr(lrs_model.meta, 'subarray'):
-                        subarray = lrs_model.meta.subarray.name
-                    else:
-                        subarray = 'GENERIC'
-                    # Add the SRF flux table to the data model.
-                    # TODO: A slow but readable method. There is probably a
-                    # faster way, but the function is not time critical for
-                    # small CDPs.
-                    wavelength = [0.0] * MAX_NELEM
-                    relresponse = [0.0] * MAX_NELEM
-                    ii = 0
-                    for (wav, srf, unc) in lrs_model.flux_table:
-                        wavelength[ii] = wav
-                        relresponse[ii] = srf
-                        ii += 1
-                    nelem = len(lrs_model.flux_table)
-                    new_phot_table.append( (mirifilter, subarray, photmjsr, uncertainty,
-                                      nelem, tuple(wavelength), tuple(relresponse)))
-                else:
-                    strg = "Function argument %d is not a MiriFluxconversionModel" % argnum
-                    raise TypeError(strg)
-            self.phot_table = new_phot_table
+#    def get_srf(self, filt, subarray):
+#        """
+#        
+#        Return the SRF arrays associated with the given filter and subarray.
+#        
+#        This function is mainly designed for LRS data where filt='P750L'.
+#        
+#        :Parameters:
+#            
+#        filt: str
+#            The MIRI filter whose SRF arrays are to be returned.
+#            Use file='P750L' to obtain the LRS SRF arrays.
+#        subarray: str
+#            The subarray whose SRF arrays are to be returned.
+#            Use subarray='FULL' or 'SLITLESSPRISM' to obtain the LRS SRF arrays.
+#            
+#        :Returned:
+#        
+#        srf_arrays: tuple of (wavelength, srf, uncertainty)
+#            The wavelength, srf and uncertainty arrays
+#        
+#        """
+#        # Find the relevant row in the PHOTOM table
+#        for row in self.phot_table:
+#            if str(row[0]).strip() == filt and str(row[1]).strip() == subarray:
+#                # A matching row has been found
+#                nelem = int(row[4])
+#                if nelem > 0:
+#                    return( row[5][:nelem], row[6][:nelem], row[7][:nelem] )
+#                else:
+#                    strg = "Table row for filter=\'%s\' subarray=\'%s\'" % (filt,subarray)
+#                    strg += " has no spectral response data "
+#                    warnings.warn(strg)
+#                    return ([], [], [])
+#        # No matching filter
+#        strg = "No table row matching filter=\'%s\' subarray=\'%s\'" % (filt,subarray)
+#        warnings.warn(strg)
+#        return (None, None, None)
 
 
 class MiriImagingPhotometricModel(MiriPhotometricModel):
@@ -522,12 +354,8 @@ class MiriImagingPhotometricModel(MiriPhotometricModel):
         * PHOTMJSR: A conversion factor for the given filter and subarray
           combination, converting from DN/s/pixel to MJy/Sr, assuming that
           each pixel has the same area on the sky.
+        * UNCERTAINTY: Uncertainty of the above,
 
-        All the NELM, WAVELENGTH and RELESPONSE columns are automatically
-        initialised to zero.
-        A phot_table must either be defined in the initializer or in
-        this parameter. A blank table is not allowed.
-        
     pixar_sr: number (optional)
         The nominal pixel area for the detector in steradians.
         If provided, the value is written to the PIXAR_SR keyword.
@@ -538,8 +366,7 @@ class MiriImagingPhotometricModel(MiriPhotometricModel):
     """
     # Both models use exactly the same schema.
     schema_url = "miri_photom.schema"
-    fieldnames = ('filter', 'subarray', 'photmjsr', 'uncertainty', 'nelem',
-                  'wavelength', 'relresponse', 'relresperror')
+    fieldnames = ('filter', 'subarray', 'photmjsr', 'uncertainty')
 
     def __init__(self, init=None, phot_table=None, pixar_sr=None,
                  pixar_a2=None, **kwargs):
@@ -550,25 +377,6 @@ class MiriImagingPhotometricModel(MiriPhotometricModel):
         Parameters: See class doc string.
 
         """
-        if phot_table is not None:
-            # Construct a new phot_table from the given phot_table and
-            # some dummy wavelength and relreponse arrays.
-            wavelength = [0.0] * MAX_NELEM
-            relresponse = [0.0] * MAX_NELEM
-            relresperror = [0.0] * MAX_NELEM
-            new_phot_table = []
-            for phot_row in phot_table:
-                mirifilter = phot_row[0]
-                subarray = phot_row[1]
-                photmjsr = phot_row[2]
-                uncertainty = phot_row[3]
-                if not subarray:
-                    # Convert an empty SUBARRAY string to 'GENERIC'
-                    subarray = 'GENERIC'
-                new_phot_table.append( (mirifilter, subarray, photmjsr, uncertainty,
-                                    0, wavelength, relresponse, relresperror) )
-        else:
-            new_phot_table = None
 
         # Pass the phot_table to the generic model.
         super(MiriImagingPhotometricModel, self).__init__(init=init,
@@ -590,118 +398,7 @@ class MiriImagingPhotometricModel(MiriPhotometricModel):
         # Re-initialise data type on save
        self._init_data_type()
 
-
-class MiriLrsPhotometricModel(MiriPhotometricModel):
-    """
-    
-    A data model for MIRI LRS mode photometric flux conversion data.
-    Flux factors are looked up by filter name and subarray.
-    
-    This alternative call to the photometric model initialises the
-    filter, photmjsr and uncertainty arrays, so they don't
-    need to be defined by the caller.
-    
-    :Parameters:
-    
-    init: shape tuple, file path, file object, pyfits.HDUList, numpy array
-        An optional initializer for the data model, which can have one
-        of the following forms:
-        
-        * None: A default data model with no shape. (If a data array is
-          provided in the phot_table parameter, the shape is derived from
-          the array.)
-        * Shape tuple: Initialize with empty data of the given shape.
-        * File path: Initialize from the given file.
-        * Readable file object: Initialize from the given file object.
-        * pyfits.HDUList: Initialize from the given pyfits.HDUList.
-        
-    subarray: str
-        Subarray for which the following srf_table is valid. Compulsory
-        if srf_table provided. Expected to be 'FULL' or 'SLITLESSPRISM'
-        
-    srf_table. list of tuples or numpy record array (optional)
-        A list of tuples, or a numpy record array, where each record
-        contains the following information:
-        
-        * WAVELENGTH: Wavelength.
-        * SRF: Spectral response function.
-        * UNCERTAINTY: Uncertainty in the spectral response function.
-
-        The UNCERTAINTY data provided in the srf_table is ignored.
-        All the FILTER, PHOTMJSR and UNCERTAINTY columns in the phot_table
-        are automatically initialised.
-
-    pixar_sr: number (optional)
-        The nominal pixel area for the detector in steradians.
-        If provided, the value is written to the PIXAR_SR keyword.
-    pixel_a2: number (optional)
-        The nominal pixel area for the detector in square arcseconds
-        If provided, the value is written to the PIXAR_A2 keyword.
-    
-    """
-    # Both models use exactly the same schema.
-    schema_url = "miri_photom.schema"
-    fieldnames = ('filter', 'subarray', 'photmjsr', 'uncertainty', 'nelem',
-                  'wavelength', 'relresponse', 'relresperror')
-
-    def __init__(self, init=None, subarray=None, srf_table=None,
-                 pixar_sr=None, pixar_a2=None, **kwargs):
-        """
-        
-        Initialises the MiriLrsPhotometricModel class.
-        
-        Parameters: See class doc string.
-
-        """
-        if srf_table is not None:
-            # Construct a phot_table from the given subarray and srf_table and
-            # some dummy photmjsr and uncertainty arrays.
-            # TODO: A slow, brute force method. There is probably a faster way,
-            # but the function is not time critical for small CDPs..
-            mirifilter = 'P750L'
-            if subarray is None or not subarray:
-                strg = "If an srf_table is parameter provided, "
-                strg += "a subarray parameter must also be provided."
-                raise AttributeError(strg)
-            photmjsr = 1.0
-            uncertainty = 0.0
-            wavelength = [0.0] * MAX_NELEM
-            relresponse = [0.0] * MAX_NELEM
-            relresperror = [0.0] * MAX_NELEM
-            ii = 0
-            for (wav, srf, unc) in srf_table:
-                wavelength[ii] = wav
-                relresponse[ii] = srf
-                relresperror[ii] = unc
-                ii += 1
-            nelem = len(srf_table)
-            new_phot_table = [(mirifilter, subarray, photmjsr, uncertainty,
-                              nelem, tuple(wavelength), tuple(relresponse),
-                              tuple(relresperror))]
-        else:
-            new_phot_table = None
-
-        # Pass the phot_table to the generic model.
-        super(MiriLrsPhotometricModel, self).__init__(init=init,
-                                                      phot_table=new_phot_table,
-                                                      pixar_sr=pixar_sr,
-                                                      pixar_a2=pixar_a2,
-                                                      **kwargs)
-        #self.add_comment("RELRESPONSE is absolute response so PHOTMJSR is 1.0.")
-        # Initialise the model type
-        self._init_data_type() 
-
-    def _init_data_type(self):
-        # Initialise the data model type
-        model_type = get_my_model_type( self.__class__.__name__ )
-        self.meta.model_type = model_type        
-
-    def on_save(self, path):
-       super(MiriLrsPhotometricModel, self).on_save(path)
-        # Re-initialise data type on save
-       self._init_data_type()
-    
-class MiriLrsNewPhotometricModel(MiriDataModel):
+class MiriLrsPhotometricModel(MiriDataModel):
     """
     
     A data model for MIRI LRS mode photometric flux conversion data.
@@ -752,12 +449,12 @@ class MiriLrsNewPhotometricModel(MiriDataModel):
     def __init__(self, init=None, phot_table=None, pixar_sr=None, pixar_a2=None, **kwargs):
         """
         
-        Initialises the MiriLrsNewPhotometricModel class.
+        Initialises the MiriLrsPhotometricModel class.
         
         Parameters: See class doc string.
 
         """
-        super(MiriLrsNewPhotometricModel, self).__init__(init=init, phot_table = phot_table, **kwargs)
+        super(MiriLrsPhotometricModel, self).__init__(init=init, phot_table = phot_table, **kwargs)
 
         # Data type is photometric flux conversion.
         self.meta.reftype = 'PHOTOM'
@@ -794,7 +491,7 @@ class MiriLrsNewPhotometricModel(MiriDataModel):
         self.meta.model_type = model_type        
 
     def on_save(self, path):
-       super(MiriLrsNewPhotometricModel, self).on_save(path)
+       super(MiriLrsPhotometricModel, self).on_save(path)
         # Re-initialise data type on save
        self._init_data_type()
 
@@ -894,27 +591,23 @@ if __name__ == '__main__':
     pixar_a2 = 0.11 * 0.11 # MIRI imager pixels are 0.1 arcsec1 x 0.11 arcsec
     pixar_sr = pixar_a2 / ARCSEC2_PER_STERADIAN
     
-    # Imager photometric model. Dummy response values and blank (zero-filled)
-    # wavelength and response arrays
-    wavelength = [0.0] * MAX_NELEM
-    relresponse = [0.0] * MAX_NELEM
-    relresperror = [0.0] * MAX_NELEM
+    # Imager photometric model.
     # There is a separate response record for each filter, valid for all
     # subarrays.
-    phot_im1 = [('F560W',  'GENERIC', 2.41,  0.26,  0, wavelength, relresponse, relresperror),
-               ('F770W',   'GENERIC', 1.32,  0.013, 0, wavelength, relresponse, relresperror),
-               ('F1000W',  'GENERIC', 1.76,  0.12,  0, wavelength, relresponse, relresperror),
-               ('F1130W',  'GENERIC', 5.76,  0.43,  0, wavelength, relresponse, relresperror),
-               ('F1280W',  'GENERIC', 2.11,  0.16,  0, wavelength, relresponse, relresperror),
-               ('F1500W',  'GENERIC', 1.84,  0.01,  0, wavelength, relresponse, relresperror),
-               ('F1800W',  'GENERIC', 2.68,  0.23,  0, wavelength, relresponse, relresperror),
-               ('F2100W',  'GENERIC', 2.04,  0.15,  0, wavelength, relresponse, relresperror),
-               ('F2550W',  'GENERIC', 4.25,  0.4,   0, wavelength, relresponse, relresperror),
-               ('F2550WR', 'GENERIC', 4.60,  0.24,  0, wavelength, relresponse, relresperror),
-               ('F1065C',  'GENERIC', 1.37,  0.1,   0, wavelength, relresponse, relresperror),
-               ('F1140C',  'GENERIC', 1.43,  0.11,  0, wavelength, relresponse, relresperror),
-               ('F1550C',  'GENERIC', 1.81,  0.13,  0, wavelength, relresponse, relresperror),
-               ('F2300C',  'GENERIC', 3.65,  0.23,  0, wavelength, relresponse, relresperror),
+    phot_im1 = [('F560W',  'GENERIC', 2.41,  0.26),
+               ('F770W',   'GENERIC', 1.32,  0.013),
+               ('F1000W',  'GENERIC', 1.76,  0.12),
+               ('F1130W',  'GENERIC', 5.76,  0.43),
+               ('F1280W',  'GENERIC', 2.11,  0.16),
+               ('F1500W',  'GENERIC', 1.84,  0.01),
+               ('F1800W',  'GENERIC', 2.68,  0.23),
+               ('F2100W',  'GENERIC', 2.04,  0.15),
+               ('F2550W',  'GENERIC', 4.25,  0.4),
+               ('F2550WR', 'GENERIC', 4.60,  0.24),
+               ('F1065C',  'GENERIC', 1.37,  0.1),
+               ('F1140C',  'GENERIC', 1.43,  0.11),
+               ('F1550C',  'GENERIC', 1.81,  0.13),
+               ('F2300C',  'GENERIC', 3.65,  0.23),
                ]
 
     # An alternative way of defining an imaging photometric model, without
@@ -936,7 +629,7 @@ if __name__ == '__main__':
                ('F2300C',  '', 3.65,  0.23),
                ]
 
-    print("\nImaging PHOTOM model (with provided blank wavelength array):")
+    print("\nImaging PHOTOM model:")
     with MiriPhotometricModel( phot_table=phot_im1, pixar_a2=pixar_a2,
                                pixar_sr=pixar_sr ) as testphot1:
         testphot1.set_instrument_metadata(detector='MIRIMAGE',
@@ -961,30 +654,30 @@ if __name__ == '__main__':
             testphot1.save("test_img_photom_model1.fits", overwrite=True)
         del testphot1
 
-    print("\nImaging PHOTOM model (without needing a wavelength array):")
-    with MiriImagingPhotometricModel( phot_table=phot_im2, pixar_a2=pixar_a2,
-                                      pixar_sr=pixar_sr ) as testphot2:
-        testphot2.set_instrument_metadata(detector='MIRIMAGE',
-                                          ccc_pos='OPEN',
-                                          deck_temperature=11.0,
-                                          detector_temperature=6.0)
-        testphot2.set_exposure_metadata(readpatt='FAST',
-                                        nints=1, ngroups=1,
-                                        frame_time=1.0,
-                                        integration_time=10.0,
-                                        group_time=10.0,
-                                        reset_time=0, frame_resets=3)
-        testphot2.set_subarray_metadata('FULL')
-        testphot2.set_housekeeping_metadata('UK', author='MIRI team',
-                                           version='1.0', date='TODAY',
-                                           useafter='TODAY',
-                                           description='Test data')
-        print(testphot2)
-        if PLOTTING:
-            testphot2.plot(description="testphot2")
-        if SAVE_FILES:
-            testphot2.save("test_img_photom_model2.fits", overwrite=True)
-        del testphot2
+#    print("\nImaging PHOTOM model (without needing a wavelength array):")
+#    with MiriImagingPhotometricModel( phot_table=phot_im2, pixar_a2=pixar_a2,
+#                                      pixar_sr=pixar_sr ) as testphot2:
+#        testphot2.set_instrument_metadata(detector='MIRIMAGE',
+#                                          ccc_pos='OPEN',
+#                                          deck_temperature=11.0,
+#                                          detector_temperature=6.0)
+#        testphot2.set_exposure_metadata(readpatt='FAST',
+#                                        nints=1, ngroups=1,
+#                                        frame_time=1.0,
+#                                        integration_time=10.0,
+#                                        group_time=10.0,
+#                                        reset_time=0, frame_resets=3)
+#        testphot2.set_subarray_metadata('FULL')
+#        testphot2.set_housekeeping_metadata('UK', author='MIRI team',
+#                                           version='1.0', date='TODAY',
+#                                           useafter='TODAY',
+#                                           description='Test data')
+#        print(testphot2)
+#        if PLOTTING:
+#            testphot2.plot(description="testphot2")
+#        if SAVE_FILES:
+#            testphot2.save("test_img_photom_model2.fits", overwrite=True)
+#        del testphot2
 
     # LRS photometric model. Dummy response values and dummy wavelength and response arrays.
     wavelength = []
@@ -1008,39 +701,12 @@ if __name__ == '__main__':
     # The LRS data is for the P750L filter only, but there is separate
     # record for the SLITLESSPRISM subarray.
     phot_lrs = [('P750L',  'FULL',          1.0,  0.0,  nelm, wavelength, relresponse, relresperror),
-                ('P750L',  'SLITLESSPRISM', 0.9,  0.0,  nelm, wavelength, relresponse, relresperror)
+                ('P750L',  'SLITLESSPRISM', 0.9,  0.0,  nelm, wavelength, relresponse, relresperror),
                ]
+#    phot_lrs = [('P750L',  'FULL',  1.0,  0.0,  nelm, wavelength, relresponse, relresperror)]
 
     print("\nLRS PHOTOM with defined wavelength and relresponse arrays:")
-    with MiriPhotometricModel( phot_table=phot_lrs, pixar_a2=pixar_a2,
-                               pixar_sr=pixar_sr ) as testphot3:
-        testphot3.set_instrument_metadata(detector='MIRIMAGE',
-                                          ccc_pos='OPEN', filt='P750L',
-                                          deck_temperature=11.0,
-                                          detector_temperature=6.0)
-        testphot3.set_exposure_metadata(readpatt='FAST',
-                                        nints=1, ngroups=1,
-                                        frame_time=1.0,
-                                        integration_time=10.0,
-                                        group_time=10.0,
-                                        reset_time=0, frame_resets=3)
-        testphot3.set_housekeeping_metadata('UK', author='MIRI team',
-                                           version='1.0', date='TODAY',
-                                           useafter='TODAY',
-                                           description='Test data')
-        print(testphot3)
-        if PLOTTING:
-            testphot3.plot(description="testphot3")
-        if SAVE_FILES:
-            testphot3.save("test_lrs_photom_model3.fits", overwrite=True)
-        del testphot3
-    
-    
-    
-    phot_lrs = [('P750L',  'FULL',  1.0,  0.0,  nelm, wavelength, relresponse, relresperror)]
-
-    print("\nLRS PHOTOM with defined wavelength and relresponse arrays:")
-    with MiriLrsNewPhotometricModel( phot_table=phot_lrs, pixar_a2=pixar_a2, pixar_sr=pixar_sr) as testphot4:
+    with MiriLrsPhotometricModel( phot_table=phot_lrs, pixar_a2=pixar_a2, pixar_sr=pixar_sr) as testphot4:
         testphot4.set_instrument_metadata(detector='MIRIMAGE',
                                           ccc_pos='OPEN', filt='P750L',
                                           deck_temperature=11.0,

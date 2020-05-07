@@ -3,9 +3,9 @@ allOf:
   properties:
     meta:
       $ref: miri_metadata.schema.yaml
-- $ref: mirimg_photom.schema.yaml
+- $ref: http://stsci.edu/schemas/jwst_datamodel/mirimg_photom.schema
 - type: object
-  title: MIRI photometric flux conversion model
+  title: MIRI imager photometric flux conversion model
   properties:
     meta:
       type: object
@@ -38,28 +38,3 @@ allOf:
               default: "(MJ/sr)/(DN/s/pixel)"
               fits_hdu: PHOTOM
               fits_keyword: TUNIT4
-            tunit5:
-              type: string
-              title: Column 5 units
-              default: ''
-              fits_hdu: PHOTOM
-              fits_keyword: TUNIT5
-            tunit6:
-              type: string
-              title: Column 6 units
-              default: microns
-              fits_hdu: PHOTOM
-              fits_keyword: TUNIT6
-            tunit7:
-              type: string
-              title: Column 7 units
-              default: ''
-              fits_hdu: PHOTOM
-              fits_keyword: TUNIT7
-            tunit8:
-              type: string
-              title: Column 8 units
-              default: ''
-              fits_hdu: PHOTOM
-              fits_keyword: TUNIT8
-              

@@ -105,7 +105,7 @@ from miri.datamodels.miri_fluxconversion_models import \
     MiriImagingColourCorrectionModel, MiriPowerlawColourCorrectionModel, \
     MiriLrsFluxconversionModel, MiriMrsFluxconversionModel
 from miri.datamodels.miri_photometric_models import \
-    MiriPhotometricModel, MiriPhotometricModel_CDP5, MiriImagingPhotometricModel, \
+    MiriPhotometricModel, MiriImagingPhotometricModel, \
     MiriLrsPhotometricModel, MiriPixelAreaModel
 from miri.datamodels.miri_transmission_correction_model import \
     MiriMrsTransmissionCorrectionModel
@@ -213,9 +213,7 @@ CDP_DICT = { \
                                                      '6'   : MiriLrsFluxconversionModel, \
                                                      '7'   : MiriLrsPhotometricModel, \
                                                      'ANY' : MiriLrsPhotometricModel}, \
-                                          'ANY'   : {'5'   : MiriPhotometricModel_CDP5, \
-                                                     '6'   : MiriPhotometricModel_CDP5, \
-                                                     '7'   : MiriImagingPhotometricModel, \
+                                          'ANY'   : {'7'   : MiriImagingPhotometricModel, \
                                                      'ANY' : MiriImagingPhotometricModel}}, \
                          'MIRIFUSHORT' : MiriMrsFluxconversionModel, \
                          'MIRIFULONG'  : MiriMrsFluxconversionModel }, \

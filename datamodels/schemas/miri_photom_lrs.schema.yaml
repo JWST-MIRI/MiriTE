@@ -1,10 +1,9 @@
 allOf:
-- $ref: http://stsci.edu/schemas/jwst_datamodel/photometry.schema
-- $ref: http://stsci.edu/schemas/jwst_datamodel/keyword_pixelarea.schema
 - type: object
   properties:
     meta:
       $ref: miri_metadata.schema.yaml
+- $ref: http://stsci.edu/schemas/jwst_datamodel/mirlrs_photom.schema
 - type: object
   title: MIRI LRS photometric flux conversion model
   properties:
@@ -30,13 +29,13 @@ allOf:
             tunit3:
               type: string
               title: Column 3 units
-              default: "(MJy/sr)/(DN/s)"
+              default: "(MJ/sr)/(DN/s/pixel)"
               fits_hdu: PHOTOM
               fits_keyword: TUNIT3
             tunit4:
               type: string
               title: Column 4 units
-              default: "(MJy/sr)/(DN/s)"
+              default: "(MJ/sr)/(DN/s/pixel)"
               fits_hdu: PHOTOM
               fits_keyword: TUNIT4
             tunit5:
@@ -48,7 +47,7 @@ allOf:
             tunit6:
               type: string
               title: Column 6 units
-              default: micron
+              default: microns
               fits_hdu: PHOTOM
               fits_keyword: TUNIT6
             tunit7:
@@ -63,29 +62,4 @@ allOf:
               default: ''
               fits_hdu: PHOTOM
               fits_keyword: TUNIT8
-- type: object
-  properties:
-    phot_table:
-      title: Photometric LRS flux conversion factors table
-      fits_hdu: PHOTOM
-      datatype:
-      - name: filter
-        datatype: [ascii, 12]
-      - name: subarray
-        datatype: [ascii, 15]
-      - name: photmjsr
-        datatype: float32
-      - name: uncertainty
-        datatype: float32
-      - name: nelem
-        datatype: int16
-      - name: wavelength
-        shape: [500]
-        datatype: float32
-      - name: relresponse
-        shape: [500]
-        datatype: float32
-      - name: reluncertainty
-        shape: [500]
-        datatype: float32
-$schema: http://stsci.edu/schemas/fits-schema/fits-schema            
+              
