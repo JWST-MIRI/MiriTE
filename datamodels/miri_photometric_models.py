@@ -43,8 +43,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              a corresponding model defined in ancestry.py).
 26 Mar 2020: Ensure the model_type remains as originally defined when saving
              to a file.
-07 May 2020: Removed nelm, wavelength, relresp and relresperror columns from
-             imager PHOTOM model to match JWST data model changes.
+07 May 2020: Updated for CDP-8 and build 7.4. Removed nelm, wavelength, relresp
+             and relresperror columns from imager PHOTOM model to match JWST
+             data model changes.
 
 @author: Steven Beard (UKATC), Juergen Schreiber (MPIA)
 

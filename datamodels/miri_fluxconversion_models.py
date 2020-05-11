@@ -86,6 +86,11 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 30 Jan 2019: self.meta.model_type now set to the name of the STScI data
              model this model is designed to match (skipped if there isn't
              a corresponding model defined in ancestry.py).
+14 Feb 2020: Updated for CDP-8. SCI and ERR extension units changed from
+             "DN sec^-1 mJy^-1 pixel" to "MJy/steradian/(DN/S)" so that the
+             content changes from divisive to multiplicative and the new units
+             are based on MJ and steradians. The units of the PIXSIZ extension
+             is also changed from "arcsec^2" to "steradian".
 26 Mar 2020: Ensure the model_type remains as originally defined when saving
              to a file.
 
@@ -459,15 +464,15 @@ class MiriMrsFluxconversionModel(MiriMeasuredModel):
     The same as MiriMeasuredModel (data, err, dq) plus
     
     pixsiz: numpy array (optional)
-        An array containing the pixel size data.
+        An array containing the pixel size data [in steradian].
         If a data parameter is provided, its contents overwrite the
         data initialized by the init parameter.
     srf_at_reference: number, optional
         The absolute spectral response at the reference wavelength
-        [in (DN/s)/Jy].
+        [in MJy/steradian/(DN/S).
     srf_error: number, optional
         The uncertainty in the absolute spectral response at the
-        reference wavelength [in (DN/s)/Jy].
+        reference wavelength [in MJy/steradian/(DN/S)].
     srf_wavelength: number, optional
         The reference wavelength [in microns].
     

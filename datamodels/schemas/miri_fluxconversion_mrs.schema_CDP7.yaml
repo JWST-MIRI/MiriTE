@@ -10,11 +10,11 @@ allOf:
       properties:
         srf_at_reference:
           type: number
-          title: Spectral response fn at ref wavelength in MJy sr^-1 DN^-1 sec
+          title: Spectral response fn at ref wavelength in DN sec^-1 mJy^-1
           fits_keyword: REFSRF
         srf_error:
           type: number
-          title: Uncertainty in REFSRF in MJy sr^-1 DN^-1 sec
+          title: Uncertainty in REFSRF in DN sec^-1 mJy^-1
           fits_keyword: REFERR
         srf_wavelength:
           type: number
@@ -33,16 +33,16 @@ allOf:
       title: Flux conversion data
       fits_hdu: SCI
       axes: [wavelength, rows, columns]
-      units: MJy sr^-1 DN^-1 sec
+      units: DN sec^-1 mJy^-1 pixel
     err:
       fits_hdu: ERR
       axes: [wavelength, rows, columns]
-      units: MJy sr^-1 DN^-1 sec
+      units: DN sec^-1 mJy^-1 pixel
     pixsiz:
       title: Pixel size data
       fits_hdu: PIXSIZ
       ndim: 2
       axes: [rows, columns]
-      units: steradian
+      units: arcsec^2
       datatype: float32
 
