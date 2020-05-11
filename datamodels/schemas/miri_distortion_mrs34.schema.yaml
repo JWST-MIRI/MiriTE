@@ -1466,7 +1466,7 @@ allOf:
               default: ''
               fits_hdu: Y_CH4
               fits_keyword: TUNIT26
-        albe_to_xanyan:
+        albe_to_v2v3:
           type: object
           title: Information about the MRS COORD table
           properties:
@@ -1474,33 +1474,33 @@ allOf:
               type: string
               title: Column 1 units
               default: ''
-              fits_hdu: albe_to_XANYAN
+              fits_hdu: ALBE_TO_V2V3
               fits_keyword: TUNIT1
             tunit2:
               type: string
               title: Column 2 units
               default: ''
-              fits_hdu: albe_to_XANYAN
+              fits_hdu: ALBE_TO_V2V3
               fits_keyword: TUNIT2
             tunit3:
               type: string
               title: Column 3 units
               default: ''
-              fits_hdu: albe_to_XANYAN
+              fits_hdu: ALBE_TO_V2V3
               fits_keyword: TUNIT3
             tunit4:
               type: string
               title: Column 4 units
               default: ''
-              fits_hdu: albe_to_XANYAN
+              fits_hdu: ALBE_TO_V2V3
               fits_keyword: TUNIT4
             tunit5:
               type: string
               title: Column 5 units
               default: ''
-              fits_hdu: albe_to_XANYAN
+              fits_hdu: ALBE_TO_V2V3
               fits_keyword: TUNIT5
-        xanyan_to_albe:
+        v2v3_to_albe:
           type: object
           title: Information about the MRS COORD table
           properties:
@@ -1508,31 +1508,31 @@ allOf:
               type: string
               title: Column 1 units
               default: ''
-              fits_hdu: XANYAN_to_albe
+              fits_hdu: V2V3_TO_ALBE
               fits_keyword: TUNIT1
             tunit2:
               type: string
               title: Column 2 units
               default: ''
-              fits_hdu: XANYAN_to_albe
+              fits_hdu: V2V3_TO_ALBE
               fits_keyword: TUNIT2
             tunit3:
               type: string
               title: Column 3 units
               default: ''
-              fits_hdu: XANYAN_to_albe
+              fits_hdu: V2V3_TO_ALBE
               fits_keyword: TUNIT3
             tunit4:
               type: string
               title: Column 4 units
               default: ''
-              fits_hdu: XANYAN_to_albe
+              fits_hdu: V2V3_TO_ALBE
               fits_keyword: TUNIT4
             tunit5:
               type: string
               title: Column 5 units
               default: ''
-              fits_hdu: XANYAN_to_albe
+              fits_hdu: V2V3_TO_ALBE
               fits_keyword: TUNIT5
     slicenumber:
       title: Slice number at a each pixel coordinate vs transmission
@@ -2015,9 +2015,9 @@ allOf:
         datatype: float64
       - name: VAR2_4_4
         datatype: float64
-    albe_to_xanyan:
+    albe_to_v2v3:
       title: Coefficients table for MRS coordinate transformation
-      fits_hdu: albe_to_XANYAN
+      fits_hdu: ALBE_TO_V2V3
       comment: Redesign schema to reduce duplication?
       datatype:
       - name: Label
@@ -2040,9 +2040,9 @@ allOf:
         datatype: float64
       - name: COEFF_2_2
         datatype: float64
-    xanyan_to_albe:
+    v2v3_to_albe:
       title: Coefficients table for MRS coordinate transformation
-      fits_hdu: XANYAN_to_albe
+      fits_hdu: V2V3_TO_ALBE
       comment: Redesign schema to reduce duplication?
       datatype:
       - name: Label

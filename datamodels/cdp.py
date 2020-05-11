@@ -78,6 +78,7 @@ http://ssb.stsci.edu/doc/jwst/jwst/introduction.html#crds-reference-files
 15 Nov 2018: Dictionary modified to include CDP-3 variant of the MRS
              straylight model.
 12 Mar 2019: Added 'SPECWCS' as an alias for 'DISTORTION'.
+11 May 2020: CDP-3, CDP-6 and CDP-7 versions of data models removed.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -90,9 +91,7 @@ from miri.datamodels.miri_dark_reference_model import \
     MiriDarkReferenceModel
 from miri.datamodels.miri_distortion_models import \
     MiriImagingDistortionModel, MiriLrsD2WModel, MiriMrsDistortionModel12, \
-    MiriMrsDistortionModel34, MiriMrsDistortionModel12_CDP6, \
-    MiriMrsDistortionModel34_CDP6, MiriMrsDistortionModel12_CDP8, \
-    MiriMrsDistortionModel34_CDP8
+    MiriMrsDistortionModel34
 from miri.datamodels.miri_droop_model import MiriDroopModel
 from miri.datamodels.miri_flatfield_model import \
     MiriFlatfieldModel, MiriSkyFlatfieldModel, MiriFringeFlatfieldModel, \
@@ -133,7 +132,7 @@ from miri.datamodels.miri_psf_models import \
 from miri.datamodels.miri_readnoise_model import MiriReadnoiseModel
 from miri.datamodels.miri_reset_model import MiriResetModel
 from miri.datamodels.miri_straylight_model import \
-    MiriMrsStraylightModel, MiriMrsStraylightModel_CDP3
+    MiriMrsStraylightModel
 from miri.datamodels.miri_telescope_emission_model import \
     MiriTelescopeEmissionModel
 
@@ -160,18 +159,6 @@ CDP_DICT = { \
             'GAIN'    : MiriGainModel, \
             'READNOISE' : MiriReadnoiseModel, \
             'LASTFRAME' : MiriLastFrameModel, \
-            # TODO: Remove this cdprelease complexity after CDP-7 release
-#             'RSCD'    : {'MIRIMAGE'    : {'ANY' : {'6'   : MiriResetSwitchChargeDecayModel_CDP6, \
-#                                                    '7'   : MiriResetSwitchChargeDecayModel, \
-#                                                    'ANY' : MiriResetSwitchChargeDecayModel}}, \
-#                          'MIRIFULONG'  : {'ANY' : {'6'   : MiriResetSwitchChargeDecayModel_CDP6, \
-#                          'MIRIFUSHORT' : {'ANY' : {'6'   : MiriResetSwitchChargeDecayModel_CDP6, \
-#                                                    '7'   : MiriResetSwitchChargeDecayModel, \
-#                                                    'ANY' : MiriResetSwitchChargeDecayModel}}, \
-#                          'MIRIFULONG'  : {'ANY' : {'6'   : MiriResetSwitchChargeDecayModel_CDP6, \
-#                                                    '7'   : MiriResetSwitchChargeDecayModel, \
-#                                                    'ANY' : MiriResetSwitchChargeDecayModel}}, \
-#                          'ANY'        : MiriResetSwitchChargeDecayModel }, \
             'RSCD'    : MiriResetSwitchChargeDecayModel, \
             'PCE'     : MiriPceModel, \
             'PSF'     : {'MIRIMAGE'    : {'P750L' : MiriLrsPointSpreadFunctionModel, \
@@ -180,26 +167,11 @@ CDP_DICT = { \
                          'MIRIFULONG'  : MiriMrsPointSpreadFunctionModel,
                          'ANY' : MiriPointSpreadFunctionModel }, \
             'PSF-OOF' : MiriImagingPointSpreadFunctionModel, \
-            # TODO: Remove this cdprelease complexity after CDP-7 release
-            'DISTORTION' : {'MIRIMAGE'    : {'P750L' : MiriLrsD2WModel, \
-                                             'ANY'   : MiriImagingDistortionModel}, \
-                            'MIRIFUSHORT' : {'ANY'   : {'6'   : MiriMrsDistortionModel12_CDP6, \
-                                                        '7'   : MiriMrsDistortionModel12, \
-                                                        '8'   : MiriMrsDistortionModel12_CDP8, \
-                                                        '8B'  : MiriMrsDistortionModel12_CDP8, \
-                                                        'ANY' : MiriMrsDistortionModel12}}, \
-                            'MIRIFULONG'  : {'ANY'   : {'6'   : MiriMrsDistortionModel34_CDP6, \
-                                                        '7'   : MiriMrsDistortionModel34, \
-                                                        '8'   : MiriMrsDistortionModel34_CDP8, \
-                                                        '8B'  : MiriMrsDistortionModel34_CDP8, \
-                                                        'ANY' : MiriMrsDistortionModel34}}, \
+            'DISTORTION' : {'MIRIMAGE'  : {'P750L' : MiriLrsD2WModel, \
+                                           'ANY'   : MiriImagingDistortionModel}, \
+                            'MIRIFUSHORT' : MiriMrsDistortionModel12, \
+                            'MIRIFULONG'  : MiriMrsDistortionModel34, \
                             'ANY'         : MiriImagingDistortionModel }, \
-# Previous code without the extra level for CDP version
-#             'DISTORTION' : {'MIRIMAGE'  : {'P750L' : MiriLrsD2WModel, \
-#                                            'ANY'   : MiriImagingDistortionModel}, \
-#                             'MIRIFUSHORT' : MiriMrsDistortionModel12, \
-#                             'MIRIFULONG'  : MiriMrsDistortionModel34, \
-#                             'ANY'         : MiriImagingDistortionModel }, \
             # The REFTYPE for spectroscopy distortion has changed to SPECWCS
             # so make this an alias for DISTORTION.
             'SPECWCS' :    {'MIRIMAGE'  : {'P750L' : MiriLrsD2WModel, \
@@ -232,11 +204,8 @@ CDP_DICT = { \
             'SKYFLAT' : MiriSkyFlatfieldModel,  \
             'FLAT-TA' : MiriTargetFlatfieldModel,  \
             'FRINGEFREQ' : MiriMrsFringeFrequenciesModel, \
-            # STRAYMASK corresponds to the new format CDP and STRAY to the old one.
             'STRAYMASK' : {'MIRIFUSHORT' : MiriMrsStraylightModel, \
                            'MIRIFULONG'  : MiriMrsStraylightModel }, \
-            'STRAY'   : {'MIRIFUSHORT' : MiriMrsStraylightModel_CDP3, \
-                         'MIRIFULONG'  : MiriMrsStraylightModel_CDP3 }, \
             'TRACORR' : MiriMrsTransmissionCorrectionModel, \
             'WAVCORR' : MiriMrsWavelengthCorrectionModel, \
             'RESOL'   : MiriMrsResolutionModel, \

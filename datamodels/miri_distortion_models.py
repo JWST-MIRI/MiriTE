@@ -93,6 +93,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 07 Oct 2019: Removed '.yaml' suffix from schema references.
 26 Mar 2020: Ensure the model_type remains as originally defined when saving
              to a file.
+11 May 2020: Removed CDP-6 versions of the data model and made the CDP-8
+             version the default. XANYAN changed back to V2V3.
+
              
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -113,8 +116,7 @@ from miri.datamodels.miri_model_base import MiriDataModel
 # List all classes and global functions here.
 __all__ = ['MiriImagingDistortionModel', 'MiriLrsD2WModel', \
            'MiriMrsDistortionModel12', 'MiriMrsDistortionModel34',
-           'MiriMrsDistortionModel12_CDP6', 'MiriMrsDistortionModel34_CDP6',
-           'MiriMrsDistortionModel12_CDP8', 'MiriMrsDistortionModel34_CDP8']
+           'MiriMrsDistortionModel12_CDP7', 'MiriMrsDistortionModel34_CDP7']
 
 
 class MiriImagingDistortionModel(MiriDataModel):
@@ -691,11 +693,11 @@ class MiriMrsDistortionModel12(MiriDataModel):
         Either: A list of tuples containing (...)
         Or: A numpy record array containing the same information as above.
         If not specified, no table will be defined.        
-    albe_xanyan: list of tuples or numpy record array (optional)
+    albe_v2v3: list of tuples or numpy record array (optional)
         Either: A list of tuples containing (...)
         Or: A numpy record array containing the same information as above.
         If not specified, no table will be defined.        
-    xanyan_albe: list of tuples or numpy record array (optional)
+    v2v3_albe: list of tuples or numpy record array (optional)
         Either: A list of tuples containing (...)
         Or: A numpy record array containing the same information as above.
         If not specified, no table will be defined.
@@ -726,7 +728,7 @@ class MiriMrsDistortionModel12(MiriDataModel):
     def __init__(self, init=None, slicenumber=None, fov_ch1=None, fov_ch2=None,
                  alpha_ch1=None, lambda_ch1=None, alpha_ch2=None, lambda_ch2=None,
                  x_ch1=None, y_ch1=None, x_ch2=None, y_ch2=None,
-                 albe_xanyan=None, xanyan_albe=None, bzero1=None, bdel1=None,
+                 albe_v2v3=None, v2v3_albe=None, bzero1=None, bdel1=None,
                  bzero2=None, bdel2=None, **kwargs):
         """
         
@@ -829,18 +831,18 @@ class MiriMrsDistortionModel12(MiriDataModel):
                 strg = "y_ch2 must be a numpy record array or list of records."
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
-        if albe_xanyan is not None:
+        if albe_v2v3 is not None:
             try:
-                self.albe_to_xanyan = albe_xanyan
+                self.albe_to_v2v3 = albe_v2v3
             except (ValueError, TypeError) as e:
-                strg = "albe_xanyan must be a numpy record array or list of records."
+                strg = "albe_v2v3 must be a numpy record array or list of records."
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
-        if xanyan_albe is not None:
+        if v2v3_albe is not None:
             try:
-                self.xanyan_to_albe = xanyan_albe
+                self.v2v3_to_albe = v2v3_albe
             except (ValueError, TypeError) as e:
-                strg = "xanyan_albe must be a numpy record array or list of records."
+                strg = "v2v3_albe must be a numpy record array or list of records."
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
         
@@ -855,8 +857,8 @@ class MiriMrsDistortionModel12(MiriDataModel):
         x_ch2_units = self.set_table_units('x_ch2')
         y_ch1_units = self.set_table_units('y_ch1')
         y_ch2_units = self.set_table_units('y_ch2')
-        albe_to_xanyan_units = self.set_table_units('albe_to_xanyan')
-        xanyan_to_albe_units = self.set_table_units('xanyan_to_albe')
+        albe_to_v2v3_units = self.set_table_units('albe_to_v2v3')
+        v2v3_to_albe_units = self.set_table_units('v2v3_to_albe')
 
         # Define the exposure type (if not already contained in the data model)
         # NOTE: This will only define an exposure type when a valid detector
@@ -912,11 +914,11 @@ class MiriMrsDistortionModel12(MiriDataModel):
         strg += self.get_data_str('x_ch2', underline=True, underchar="-")
         strg += self.get_data_str('y_ch2', underline=True, underchar="-")
  
-        strg += self.get_data_str('albe_to_xanyan', underline=True, underchar="-")
-        strg += self.get_data_str('xanyan_to_albe', underline=True, underchar="-")
+        strg += self.get_data_str('albe_to_v2v3', underline=True, underchar="-")
+        strg += self.get_data_str('v2v3_to_albe', underline=True, underchar="-")
         return strg
 
-class MiriMrsDistortionModel12_CDP8(MiriDataModel):
+class MiriMrsDistortionModel12(MiriDataModel):
     """
     
     A data model for a MIRI MRS distortion model - CHANNEL 12 VARIANT,
@@ -1001,7 +1003,7 @@ class MiriMrsDistortionModel12_CDP8(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
             
     """
-    schema_url = "miri_distortion_mrs12_CDP8.schema"
+    schema_url = "miri_distortion_mrs12.schema"
     fieldnames_fov = ('alpha_min', 'alpha_max')
     fieldnames_d2c = ['VAR1']
     for i in (0,1,2,3,4):
@@ -1024,7 +1026,7 @@ class MiriMrsDistortionModel12_CDP8(MiriDataModel):
         Parameters: See class doc string.
 
         """
-        super(MiriMrsDistortionModel12_CDP8, self).__init__(init=init, **kwargs)
+        super(MiriMrsDistortionModel12, self).__init__(init=init, **kwargs)
 
         # Data type is MRS DISTORTION.
         self.meta.reftype = 'DISTORTION'
@@ -1159,7 +1161,7 @@ class MiriMrsDistortionModel12_CDP8(MiriDataModel):
         self.meta.model_type = model_type        
 
     def on_save(self, path):
-       super(MiriMrsDistortionModel12_CDP8, self).on_save(path)
+       super(MiriMrsDistortionModel12, self).on_save(path)
         # Re-initialise data type on save
        self._init_data_type()
 
@@ -1201,51 +1203,9 @@ class MiriMrsDistortionModel12_CDP8(MiriDataModel):
         strg += self.get_data_str('x_ch2', underline=True, underchar="-")
         strg += self.get_data_str('y_ch2', underline=True, underchar="-")
  
-        strg += self.get_data_str('albe_to_xanyan', underline=True, underchar="-")
-        strg += self.get_data_str('xanyan_to_albe', underline=True, underchar="-")
+        strg += self.get_data_str('albe_to_v2v3', underline=True, underchar="-")
+        strg += self.get_data_str('v2v3_to_albe', underline=True, underchar="-")
         return strg
-
-class MiriMrsDistortionModel12_CDP6(MiriMrsDistortionModel12):
-    """
-    
-    This class can be used to access the old CDP-6 version of the
-    MiriMrsDistortionModel12 data model.
-    
-    See the MiriMrsDistortionModel12 class for full documentation.
-    
-    """
-    schema_url = "miri_distortion_mrs12_CDP6.schema"
-    fieldnames_fov = ('alpha_min', 'alpha_max')
-    fieldnames_d2c = ['VAR1']
-    for i in (0,1,2,3,4):
-        for j in (0,1,2,3,4):
-            fieldnames_d2c.append('VAR2_%d_%d' % (i,j))
-    fieldnames_trans = ['Label']
-    for i in (0,1):
-        for j in (0,1):
-            fieldnames_trans.append('COEFF_%d_%d' % (i,j))
-
-    def __init__(self, init=None, slicenumber=None, fov_ch1=None, fov_ch2=None,
-                 alpha_ch1=None, lambda_ch1=None, alpha_ch2=None, lambda_ch2=None,
-                 x_ch1=None, y_ch1=None, x_ch2=None, y_ch2=None,
-                 albe_xanyan=None, xanyan_albe=None, bzero1=None, bdel1=None,
-                 bzero2=None, bdel2=None, **kwargs):
-        """
-        
-        Initialises the MiriMrsDistortionModel12_CDP6 class.
-        
-        Parameters: See class doc string.
-
-        """
-        super(MiriMrsDistortionModel12_CDP6, self).__init__(init=init,
-                slicenumber=None, fov_ch1=fov_ch1, fov_ch2=fov_ch2,
-                 alpha_ch1=alpha_ch1, lambda_ch1=lambda_ch1,
-                 alpha_ch2=alpha_ch2, lambda_ch2=lambda_ch2,
-                 x_ch1=x_ch1, y_ch1=y_ch1, x_ch2=x_ch2, y_ch2=y_ch2,
-                 albe_xanyan=albe_xanyan, xanyan_albe=xanyan_albe,
-                 bzero1=bzero1, bdel1=bdel1,
-                 bzero2=bzero2, bdel2=bdel2, **kwargs)
-
 
 # TODO: Over-complicated data structure needs to be simplified.
 class MiriMrsDistortionModel34(MiriDataModel):
@@ -1312,11 +1272,11 @@ class MiriMrsDistortionModel34(MiriDataModel):
         Either: A list of tuples containing (...)
         Or: A numpy record array containing the same information as above.
         If not specified, no table will be defined.        
-    albe_xanyan: list of tuples or numpy record array (optional)
+    albe_v2v3: list of tuples or numpy record array (optional)
         Either: A list of tuples containing (...)
         Or: A numpy record array containing the same information as above.
         If not specified, no table will be defined.        
-    xanyan_albe: list of tuples or numpy record array (optional)
+    v2v3_albe: list of tuples or numpy record array (optional)
         Either: A list of tuples containing (...)
         Or: A numpy record array containing the same information as above.
         If not specified, no table will be defined.
@@ -1347,7 +1307,7 @@ class MiriMrsDistortionModel34(MiriDataModel):
     def __init__(self, init=None, slicenumber=None, fov_ch3=None, fov_ch4=None,
                  alpha_ch3=None, lambda_ch3=None, alpha_ch4=None, lambda_ch4=None,
                  x_ch3=None, y_ch3=None, x_ch4=None, y_ch4=None,
-                 albe_xanyan=None, xanyan_albe=None, bzero3=None, bdel3=None,
+                 albe_v2v3=None, v2v3_albe=None, bzero3=None, bdel3=None,
                  bzero4=None, bdel4=None, **kwargs):
         """
         
@@ -1450,18 +1410,18 @@ class MiriMrsDistortionModel34(MiriDataModel):
                 strg = "y_ch4 must be a numpy record array or list of records."
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
-        if albe_xanyan is not None:
+        if albe_v2v3 is not None:
             try:
-                self.albe_to_xanyan = albe_xanyan
+                self.albe_to_v2v3 = albe_v2v3
             except (ValueError, TypeError) as e:
-                strg = "albe_xanyan must be a numpy record array or list of records."
+                strg = "albe_v2v3 must be a numpy record array or list of records."
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
-        if xanyan_albe is not None:
+        if v2v3_albe is not None:
             try:
-                self.xanyan_to_albe = xanyan_albe
+                self.v2v3_to_albe = v2v3_albe
             except (ValueError, TypeError) as e:
-                strg = "xanyan_albe must be a numpy record array or list of records."
+                strg = "v2v3_albe must be a numpy record array or list of records."
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
 
@@ -1476,8 +1436,8 @@ class MiriMrsDistortionModel34(MiriDataModel):
         x_ch4_units = self.set_table_units('x_ch4')
         y_ch3_units = self.set_table_units('y_ch3')
         y_ch4_units = self.set_table_units('y_ch4')
-        albe_to_xanyan_units = self.set_table_units('albe_to_xanyan')
-        xanyan_to_albe_units = self.set_table_units('xanyan_to_albe')
+        albe_to_v2v3_units = self.set_table_units('albe_to_v2v3')
+        v2v3_to_albe_units = self.set_table_units('v2v3_to_albe')
 
         # Define the exposure type (if not already contained in the data model)
         # NOTE: This will only define an exposure type when a valid detector
@@ -1531,11 +1491,11 @@ class MiriMrsDistortionModel34(MiriDataModel):
         strg += self.get_data_str('x_ch4', underline=True, underchar="-")
         strg += self.get_data_str('y_ch4', underline=True, underchar="-")
  
-        strg += self.get_data_str('albe_to_xanyan', underline=True, underchar="-")
-        strg += self.get_data_str('xanyan_to_albe', underline=True, underchar="-")
+        strg += self.get_data_str('albe_to_v2v3', underline=True, underchar="-")
+        strg += self.get_data_str('v2v3_to_albe', underline=True, underchar="-")
         return strg
 
-class MiriMrsDistortionModel34_CDP8(MiriDataModel):
+class MiriMrsDistortionModel34(MiriDataModel):
     """
     
     A data model for a MIRI MRS distortion model - CHANNEL 34 VARIANT,
@@ -1620,7 +1580,7 @@ class MiriMrsDistortionModel34_CDP8(MiriDataModel):
         See the jwst.datamodels documentation for the meaning of these keywords.
             
     """
-    schema_url = "miri_distortion_mrs34_CDP8.schema"
+    schema_url = "miri_distortion_mrs34.schema"
     fieldnames_fov = ('alpha_min', 'alpha_max')
     fieldnames_d2c = ['VAR1']
     for i in (0,1,2,3,4):
@@ -1643,7 +1603,7 @@ class MiriMrsDistortionModel34_CDP8(MiriDataModel):
         Parameters: See class doc string.
 
         """
-        super(MiriMrsDistortionModel34_CDP8, self).__init__(init=init, **kwargs)
+        super(MiriMrsDistortionModel34, self).__init__(init=init, **kwargs)
 
         # Data type is MRS DISTORTION.
         self.meta.reftype = 'DISTORTION'
@@ -1778,7 +1738,7 @@ class MiriMrsDistortionModel34_CDP8(MiriDataModel):
         self.meta.model_type = model_type        
 
     def on_save(self, path):
-       super(MiriMrsDistortionModel34_CDP8, self).on_save(path)
+       super(MiriMrsDistortionModel34, self).on_save(path)
         # Re-initialise data type on save
        self._init_data_type()
 
@@ -1821,47 +1781,6 @@ class MiriMrsDistortionModel34_CDP8(MiriDataModel):
         strg += self.get_data_str('albe_to_v2v3', underline=True, underchar="-")
         strg += self.get_data_str('v2v3_to_albe', underline=True, underchar="-")
         return strg
-
-class MiriMrsDistortionModel34_CDP6(MiriMrsDistortionModel34):
-    """
-    
-    This class can be used to access the old CDP-6 version of the
-    MiriMrsDistortionModel34 data model.
-    
-    See the MiriMrsDistortionModel34 class for full documentation.
-    
-    """
-    schema_url = "miri_distortion_mrs34_CDP6.schema.yaml"
-    fieldnames_fov = ('alpha_min', 'alpha_max')
-    fieldnames_d2c = ['VAR1']
-    for i in (0,1,2,3,4):
-        for j in (0,1,2,3,4):
-            fieldnames_d2c.append('VAR2_%d_%d' % (i,j))
-    fieldnames_trans = ['Label']
-    for i in (0,1):
-        for j in (0,1):
-            fieldnames_trans.append('COEFF_%d_%d' % (i,j))
-            
-    def __init__(self, init=None, slicenumber=None, fov_ch3=None, fov_ch4=None,
-                 alpha_ch3=None, lambda_ch3=None, alpha_ch4=None, lambda_ch4=None,
-                 x_ch3=None, y_ch3=None, x_ch4=None, y_ch4=None,
-                 albe_xanyan=None, xanyan_albe=None, bzero3=None, bdel3=None,
-                 bzero4=None, bdel4=None, **kwargs):
-        """
-        
-        Initialises the MiriMrsDistortionModel34_CDP6 class.
-        
-        Parameters: See class doc string.
-
-        """
-        super(MiriMrsDistortionModel34_CDP6, self).__init__(init=init,
-                 slicenumber=slicenumber, fov_ch3=fov_ch3, fov_ch4=fov_ch4,
-                 alpha_ch3=alpha_ch3, lambda_ch3=lambda_ch3,
-                 alpha_ch4=alpha_ch4, lambda_ch4=lambda_ch4,
-                 x_ch3=x_ch3, y_ch3=y_ch3, x_ch4=x_ch4, y_ch4=y_ch4,
-                 albe_xanyan=albe_xanyan, xanyan_albe=xanyan_albe,
-                 bzero3=bzero3, bdel3=bdel3,
-                 bzero4=bzero4, bdel4=bdel4, **kwargs)
 
 #
 # A minimal test is run when this file is run as a main program.
@@ -1956,7 +1875,7 @@ if __name__ == '__main__':
     transform = [('T_CH3C,V2', 0.11, 0.21, 0.31, 0.41, 0.51, 0.61, 0.71, 0.81, 0.91),
                  ('T_CH3C,V3', 0.12, 0.22, 0.32, 0.42, 0.52, 0.62, 0.72, 0.82, 0.92)]
      
-    with MiriMrsDistortionModel12_CDP8( slicenumber=slicenumber3,
+    with MiriMrsDistortionModel12( slicenumber=slicenumber3,
                                  fov_ch1=fovdata, fov_ch2=fovdata,
                                  alpha_ch1=d2cdata, lambda_ch1=d2cdata,
                                  alpha_ch2=d2cdata, lambda_ch2=d2cdata,
@@ -1978,7 +1897,7 @@ if __name__ == '__main__':
 #             print(newmodel)
         del testdata1
 
-    with MiriMrsDistortionModel34_CDP8( slicenumber=slicenumber3,
+    with MiriMrsDistortionModel34( slicenumber=slicenumber3,
                                  fov_ch3=fovdata, fov_ch4=fovdata,
                                  alpha_ch3=d2cdata, lambda_ch3=d2cdata,
                                  alpha_ch4=d2cdata, lambda_ch4=d2cdata,

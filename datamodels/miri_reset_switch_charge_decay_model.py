@@ -29,6 +29,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 04 Oct 2019: Updated to match build 7.3 data model.
 26 Mar 2020: Ensure the model_type remains as originally defined when saving
              to a file.
+11 May 2020: Removed the CDP-6 version of the data model.
 
 @author: Steven Beard (UKATC)
 
@@ -42,7 +43,7 @@ from miri.datamodels.ancestry import get_my_model_type
 from miri.datamodels.miri_model_base import MiriDataModel
 
 # List all classes and global functions here.
-__all__ = ['MiriResetSwitchChargeDecayModel', 'MiriResetSwitchChargeDecayModel_CDP6']
+__all__ = ['MiriResetSwitchChargeDecayModel']
 
 
 class MiriResetSwitchChargeDecayModel(MiriDataModel):
@@ -143,31 +144,6 @@ class MiriResetSwitchChargeDecayModel(MiriDataModel):
         # Re-initialise data type on save
        self._init_data_type()
 
-
-class MiriResetSwitchChargeDecayModel_CDP6(MiriResetSwitchChargeDecayModel):
-    """
-    
-    This class can be used to access the old CDP-6 version of the
-    MiriMrsDistortionModel12 data model.
-    
-    See the MiriMrsDistortionModel12 class for full documentation.
-    
-    """
-    schema_url = "miri_reset_switch_charge_decay_CDP6.schema"
-    fieldnames = ('SUBARRAY', 'READPATT', 'ROWS', 'TAU1', 'SCALE1', 'TAU2', 'SCALE2')
-    
-    def __init__(self, init=None, rscd_table=None, detector=None, **kwargs):
-        """
-        
-        Initialises the MiriResetSwitchChargeDecayModel class.
-        
-        Parameters: See class doc string.
-
-        """
-        super(MiriResetSwitchChargeDecayModel_CDP6, self).__init__(init=init,
-                                rscd_table=rscd_table, detector=detector,
-                                **kwargs)
- 
 
 #
 # A minimal test is run when this file is run as a main program.

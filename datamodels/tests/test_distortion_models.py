@@ -371,7 +371,7 @@ class TestMiriMrsDistortionModel12(unittest.TestCase):
                                  alpha_ch2=d2cdata, lambda_ch2=d2cdata,
                                  x_ch1=c2ddata, y_ch1=c2ddata,
                                  x_ch2=c2ddata, y_ch2=c2ddata,
-                                 albe_xanyan=transform, xanyan_albe=transform,
+                                 albe_v2v3=transform, v2v3_albe=transform,
                                  bzero1=-1.772, bdel1=0.177,
                                  bzero2=-2.238, bdel2=0.280)
         # Add some example metadata.
@@ -463,11 +463,11 @@ class TestMiriMrsDistortionModel12(unittest.TestCase):
         table2 = np.asarray(datacopy.y_ch2)
         assert_recarray_equal(table1, table2)
         
-        table1 = np.asarray(self.dataproduct.albe_to_xanyan)
-        table2 = np.asarray(datacopy.albe_to_xanyan)
+        table1 = np.asarray(self.dataproduct.albe_to_v2v3)
+        table2 = np.asarray(datacopy.albe_to_v2v3)
         assert_recarray_equal(table1, table2)
-        table1 = np.asarray(self.dataproduct.xanyan_to_albe)
-        table2 = np.asarray(datacopy.xanyan_to_albe)
+        table1 = np.asarray(self.dataproduct.v2v3_to_albe)
+        table2 = np.asarray(datacopy.v2v3_to_albe)
         assert_recarray_equal(table1, table2)
         del datacopy
        
@@ -493,8 +493,8 @@ class TestMiriMrsDistortionModel12(unittest.TestCase):
                                                'alpha_ch2', 'lambda_ch2',
                                                'x_ch1', 'y_ch1',
                                                'x_ch2', 'y_ch2',
-                                               'albe_to_xanyan',
-                                               'xanyan_to_albe'] )
+                                               'albe_to_v2v3',
+                                               'v2v3_to_albe'] )
                 del readback
         
     def test_description(self):
@@ -546,7 +546,7 @@ class TestMiriMrsDistortionModel34(unittest.TestCase):
                                  alpha_ch4=d2cdata, lambda_ch4=d2cdata,
                                  x_ch3=c2ddata, y_ch3=c2ddata,
                                  x_ch4=c2ddata, y_ch4=c2ddata,
-                                 albe_xanyan=transform, xanyan_albe=transform,
+                                 albe_v2v3=transform, v2v3_albe=transform,
                                  bzero3=-1.772, bdel3=0.177,
                                  bzero4=-2.238, bdel4=0.280)
         # Add some example metadata.
@@ -637,11 +637,11 @@ class TestMiriMrsDistortionModel34(unittest.TestCase):
         table2 = np.asarray(datacopy.y_ch4)
         assert_recarray_equal(table1, table2)
         
-        table1 = np.asarray(self.dataproduct.albe_to_xanyan)
-        table2 = np.asarray(datacopy.albe_to_xanyan)
+        table1 = np.asarray(self.dataproduct.albe_to_v2v3)
+        table2 = np.asarray(datacopy.albe_to_v2v3)
         assert_recarray_equal(table1, table2)
-        table1 = np.asarray(self.dataproduct.xanyan_to_albe)
-        table2 = np.asarray(datacopy.xanyan_to_albe)
+        table1 = np.asarray(self.dataproduct.v2v3_to_albe)
+        table2 = np.asarray(datacopy.v2v3_to_albe)
         assert_recarray_equal(table1, table2)
         del datacopy
        
@@ -667,8 +667,8 @@ class TestMiriMrsDistortionModel34(unittest.TestCase):
                                                'alpha_ch4', 'lambda_ch4',
                                                'x_ch3', 'y_ch3',
                                                'x_ch4', 'y_ch4',
-                                               'albe_to_xanyan',
-                                               'xanyan_to_albe'] )
+                                               'albe_to_v2v3',
+                                               'v2v3_to_albe'] )
                 del readback
         
     def test_description(self):

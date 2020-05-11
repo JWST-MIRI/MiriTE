@@ -10,38 +10,38 @@ allOf:
           type: object
           title: Information about the slice number array
           properties:
-            bzero1:
+            bzero3:
               type: number
-              title: Beta coord for centre of slice 1 of ch 1
-              fits_keyword: B_ZERO1
-            bdel1:
+              title: Beta coord for centre of slice 1 of ch 3
+              fits_keyword: B_ZERO3
+            bdel3:
               type: number
-              title: Slice width (delta beta) for ch 1
-              fits_keyword: B_DEL1
-            lmin1:
+              title: Slice width (delta beta) for ch 3
+              fits_keyword: B_DEL3
+            lmin3:
               type: number
-              title: Minimum wavelength for ch 1
-              fits_keyword: L_MIN1
-            lmax1:
+              title: Minimum wavelength for ch 3
+              fits_keyword: L_MIN3
+            lmax3:
               type: number
-              title: Maximum wavelength for ch 1
-              fits_keyword: L_MAX1
-            bzero2:
+              title: Maximum wavelength for ch 3
+              fits_keyword: L_MAX3
+            bzero4:
               type: number
-              title: Beta coord for centre of slice 1 of ch 2
-              fits_keyword: B_ZERO2
-            bdel2:
+              title: Beta coord for centre of slice 1 of ch 4
+              fits_keyword: B_ZERO4
+            bdel4:
               type: number
-              title: Slice width (delta beta) for ch 2
-              fits_keyword: B_DEL2
-            lmin2:
+              title: Slice width (delta beta) for ch 4
+              fits_keyword: B_DEL4
+            lmin4:
               type: number
-              title: Minimum wavelength for ch 2
-              fits_keyword: L_MIN2
-            lmax2:
+              title: Minimum wavelength for ch 4
+              fits_keyword: L_MIN4
+            lmax4:
               type: number
-              title: Maximum wavelength for ch 2
-              fits_keyword: L_MAX2
+              title: Maximum wavelength for ch 4
+              fits_keyword: L_MAX4
         slicenumber:
           type: object
           title: Information about the slice number array
@@ -51,1422 +51,1422 @@ allOf:
               title: Units of the slice number array
               fits_hdu: Slice_Number
               fits_keyword: BUNIT
-        fov_ch1:
+        fov_ch3:
           type: object
-          title: Information about the FoV_CH1 table
+          title: Information about the FoV_CH3 table
           properties:
             tunit1:
               type: string
               title: Column 1 units
               default: arcsec
-              fits_hdu: FoV_CH1
+              fits_hdu: FoV_CH3
               fits_keyword: TUNIT1
             tunit2:
               type: string
               title: Column 2 units
               default: arcsec
-              fits_hdu: FoV_CH1
+              fits_hdu: FoV_CH3
               fits_keyword: TUNIT2
-        fov_ch2:
+        fov_ch4:
           type: object
-          title: Information about the FoV_CH2 table
+          title: Information about the FoV_CH4 table
           properties:
             tunit1:
               type: string
               title: Column 1 units
               default: arcsec
-              fits_hdu: FoV_CH2
+              fits_hdu: FoV_CH4
               fits_keyword: TUNIT1
             tunit2:
               type: string
               title: Column 2 units
               default: arcsec
-              fits_hdu: FoV_CH2
+              fits_hdu: FoV_CH4
               fits_keyword: TUNIT2
-        alpha_ch1:
+        alpha_ch3:
           type: object
-          title: Information about the Alpha_CH1 table
+          title: Information about the Alpha_CH3 table
           comment: Redesign schema to reduce duplication?
           properties:
             VAR1:
               type: string
               title: Variable defined in column 1
               default: x_s
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: VAR1
             VAR2:
               type: string
               title: Variable defined in columns 2-26
               default: K_as
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: VAR2
             tunit1:
               type: string
               title: Column 1 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT1
             tunit2:
               type: string
               title: Column 2 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT2
             tunit3:
               type: string
               title: Column 3 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT3
             tunit4:
               type: string
               title: Column 4 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT4
             tunit5:
               type: string
               title: Column 5 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT5
             tunit6:
               type: string
               title: Column 6 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT6
             tunit7:
               type: string
               title: Column 7 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT7
             tunit8:
               type: string
               title: Column 8 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT8
             tunit9:
               type: string
               title: Column 9 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT9
             tunit10:
               type: string
               title: Column 10 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT10
             tunit11:
               type: string
               title: Column 11 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT11
             tunit12:
               type: string
               title: Column 12 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT12
             tunit13:
               type: string
               title: Column 13 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT13
             tunit14:
               type: string
               title: Column 14 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT14
             tunit15:
               type: string
               title: Column 15 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT15
             tunit16:
               type: string
               title: Column 16 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT16
             tunit17:
               type: string
               title: Column 17 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT17
             tunit18:
               type: string
               title: Column 18 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT18
             tunit19:
               type: string
               title: Column 19 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT19
             tunit20:
               type: string
               title: Column 20 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT20
             tunit21:
               type: string
               title: Column 21 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT21
             tunit22:
               type: string
               title: Column 22 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT22
             tunit23:
               type: string
               title: Column 23 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT23
             tunit24:
               type: string
               title: Column 24 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT24
             tunit25:
               type: string
               title: Column 25 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT25
             tunit26:
               type: string
               title: Column 26 units
               default: ''
-              fits_hdu: Alpha_CH1
+              fits_hdu: Alpha_CH3
               fits_keyword: TUNIT26
-        lambda_ch1:
+        lambda_ch3:
           type: object
-          title: Information about the Lambda_CH1 table
+          title: Information about the Lambda_CH3 table
           comment: Redesign schema to reduce duplication?
           properties:
             var1:
               type: string
               title: Variable defined in column 1
               default: x_s
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: VAR1
             var2:
               type: string
               title: Variable defined in columns 2-26
               default: K_ls
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: VAR2
             tunit1:
               type: string
               title: Column 1 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT1
             tunit2:
               type: string
               title: Column 2 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT2
             tunit3:
               type: string
               title: Column 3 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT3
             tunit4:
               type: string
               title: Column 4 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT4
             tunit5:
               type: string
               title: Column 5 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT5
             tunit6:
               type: string
               title: Column 6 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT6
             tunit7:
               type: string
               title: Column 7 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT7
             tunit8:
               type: string
               title: Column 8 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT8
             tunit9:
               type: string
               title: Column 9 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT9
             tunit10:
               type: string
               title: Column 10 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT10
             tunit11:
               type: string
               title: Column 11 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT11
             tunit12:
               type: string
               title: Column 12 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT12
             tunit13:
               type: string
               title: Column 13 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT13
             tunit14:
               type: string
               title: Column 14 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT14
             tunit15:
               type: string
               title: Column 15 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT15
             tunit16:
               type: string
               title: Column 16 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT16
             tunit17:
               type: string
               title: Column 17 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT17
             tunit18:
               type: string
               title: Column 18 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT18
             tunit19:
               type: string
               title: Column 19 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT19
             tunit20:
               type: string
               title: Column 20 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT20
             tunit21:
               type: string
               title: Column 21 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT21
             tunit22:
               type: string
               title: Column 22 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT22
             tunit23:
               type: string
               title: Column 23 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT23
             tunit24:
               type: string
               title: Column 24 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT24
             tunit25:
               type: string
               title: Column 25 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT25
             tunit26:
               type: string
               title: Column 26 units
               default: ''
-              fits_hdu: Lambda_CH1
+              fits_hdu: Lambda_CH3
               fits_keyword: TUNIT26
-        alpha_ch2:
+        alpha_ch4:
           type: object
-          title: Information about the Alpha_CH2 table
+          title: Information about the Alpha_CH4 table
           comment: Redesign schema to reduce duplication?
           properties:
             var1:
               type: string
               title: Variable defined in column 1
               default: x_s
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: VAR1
             var2:
               type: string
               title: Variable defined in columns 2-26
               default: K_as
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: VAR2
             tunit1:
               type: string
               title: Column 1 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT1
             tunit2:
               type: string
               title: Column 2 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT2
             tunit3:
               type: string
               title: Column 3 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT3
             tunit4:
               type: string
               title: Column 4 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT4
             tunit5:
               type: string
               title: Column 5 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT5
             tunit6:
               type: string
               title: Column 6 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT6
             tunit7:
               type: string
               title: Column 7 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT7
             tunit8:
               type: string
               title: Column 8 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT8
             tunit9:
               type: string
               title: Column 9 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT9
             tunit10:
               type: string
               title: Column 10 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT10
             tunit11:
               type: string
               title: Column 11 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT11
             tunit12:
               type: string
               title: Column 12 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT12
             tunit13:
               type: string
               title: Column 13 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT13
             tunit14:
               type: string
               title: Column 14 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT14
             tunit15:
               type: string
               title: Column 15 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT15
             tunit16:
               type: string
               title: Column 16 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT16
             tunit17:
               type: string
               title: Column 17 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT17
             tunit18:
               type: string
               title: Column 18 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT18
             tunit19:
               type: string
               title: Column 19 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT19
             tunit20:
               type: string
               title: Column 20 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT20
             tunit21:
               type: string
               title: Column 21 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT21
             tunit22:
               type: string
               title: Column 22 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT22
             tunit23:
               type: string
               title: Column 23 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT23
             tunit24:
               type: string
               title: Column 24 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT24
             tunit25:
               type: string
               title: Column 25 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT25
             tunit26:
               type: string
               title: Column 26 units
               default: ''
-              fits_hdu: Alpha_CH2
+              fits_hdu: Alpha_CH4
               fits_keyword: TUNIT26
-        lambda_ch2:
+        lambda_ch4:
           type: object
-          title: Information about the Lambda_CH2 table
+          title: Information about the Lambda_CH4 table
           comment: Redesign schema to reduce duplication?
           properties:
             var1:
               type: string
               title: Variable defined in column 1
               default: x_s
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: VAR1
             var2:
               type: string
               title: Variable defined in columns 2-26
               default: K_ls
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: VAR2
             tunit1:
               type: string
               title: Column 1 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT1
             tunit2:
               type: string
               title: Column 2 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT2
             tunit3:
               type: string
               title: Column 3 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT3
             tunit4:
               type: string
               title: Column 4 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT4
             tunit5:
               type: string
               title: Column 5 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT5
             tunit6:
               type: string
               title: Column 6 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT6
             tunit7:
               type: string
               title: Column 7 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT7
             tunit8:
               type: string
               title: Column 8 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT8
             tunit9:
               type: string
               title: Column 9 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT9
             tunit10:
               type: string
               title: Column 10 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT10
             tunit11:
               type: string
               title: Column 11 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT11
             tunit12:
               type: string
               title: Column 12 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT12
             tunit13:
               type: string
               title: Column 13 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT13
             tunit14:
               type: string
               title: Column 14 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT14
             tunit15:
               type: string
               title: Column 15 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT15
             tunit16:
               type: string
               title: Column 16 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT16
             tunit17:
               type: string
               title: Column 17 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT17
             tunit18:
               type: string
               title: Column 18 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT18
             tunit19:
               type: string
               title: Column 19 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT19
             tunit20:
               type: string
               title: Column 20 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT20
             tunit21:
               type: string
               title: Column 21 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT21
             tunit22:
               type: string
               title: Column 22 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT22
             tunit23:
               type: string
               title: Column 23 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT23
             tunit24:
               type: string
               title: Column 24 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT24
             tunit25:
               type: string
               title: Column 25 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT25
             tunit26:
               type: string
               title: Column 26 units
               default: ''
-              fits_hdu: Lambda_CH2
+              fits_hdu: Lambda_CH4
               fits_keyword: TUNIT26
-        x_ch1:
+        x_ch3:
           type: object
-          title: Information about the X_CH1 table
+          title: Information about the X_CH3 table
           comment: Redesign schema to reduce duplication?
           properties:
             var1:
               type: string
               title: Variable defined in column 1
               default: l_s
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: VAR1
             var2:
               type: string
               title: Variable defined in columns 2-26
               default: M_xs
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: VAR2
             tunit1:
               type: string
               title: Column 1 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT1
             tunit2:
               type: string
               title: Column 2 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT2
             tunit3:
               type: string
               title: Column 3 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT3
             tunit4:
               type: string
               title: Column 4 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT4
             tunit5:
               type: string
               title: Column 5 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT5
             tunit6:
               type: string
               title: Column 6 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT6
             tunit7:
               type: string
               title: Column 7 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT7
             tunit8:
               type: string
               title: Column 8 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT8
             tunit9:
               type: string
               title: Column 9 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT9
             tunit10:
               type: string
               title: Column 10 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT10
             tunit11:
               type: string
               title: Column 11 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT11
             tunit12:
               type: string
               title: Column 12 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT12
             tunit13:
               type: string
               title: Column 13 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT13
             tunit14:
               type: string
               title: Column 14 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT14
             tunit15:
               type: string
               title: Column 15 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT15
             tunit16:
               type: string
               title: Column 16 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT16
             tunit17:
               type: string
               title: Column 17 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT17
             tunit18:
               type: string
               title: Column 18 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT18
             tunit19:
               type: string
               title: Column 19 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT19
             tunit20:
               type: string
               title: Column 20 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT20
             tunit21:
               type: string
               title: Column 21 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT21
             tunit22:
               type: string
               title: Column 22 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT22
             tunit23:
               type: string
               title: Column 23 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT23
             tunit24:
               type: string
               title: Column 24 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT24
             tunit25:
               type: string
               title: Column 25 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT25
             tunit26:
               type: string
               title: Column 26 units
               default: ''
-              fits_hdu: X_CH1
+              fits_hdu: X_CH3
               fits_keyword: TUNIT26
-        y_ch1:
+        y_ch3:
           type: object
-          title: Information about the Y_CH1 table
+          title: Information about the Y_CH3 table
           properties:
             var1:
               type: string
               title: Variable defined in column 1
               default: l_s
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: VAR1
             var2:
               type: string
               title: Variable defined in columns 2-26
               default: M_ys
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: VAR2
             tunit1:
               type: string
               title: Column 1 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT1
             tunit2:
               type: string
               title: Column 2 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT2
             tunit3:
               type: string
               title: Column 3 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT3
             tunit4:
               type: string
               title: Column 4 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT4
             tunit5:
               type: string
               title: Column 5 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT5
             tunit6:
               type: string
               title: Column 6 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT6
             tunit7:
               type: string
               title: Column 7 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT7
             tunit8:
               type: string
               title: Column 8 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT8
             tunit9:
               type: string
               title: Column 9 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT9
             tunit10:
               type: string
               title: Column 10 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT10
             tunit11:
               type: string
               title: Column 11 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT11
             tunit12:
               type: string
               title: Column 12 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT12
             tunit13:
               type: string
               title: Column 13 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT13
             tunit14:
               type: string
               title: Column 14 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT14
             tunit15:
               type: string
               title: Column 15 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT15
             tunit16:
               type: string
               title: Column 16 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT16
             tunit17:
               type: string
               title: Column 17 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT17
             tunit18:
               type: string
               title: Column 18 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT18
             tunit19:
               type: string
               title: Column 19 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT19
             tunit20:
               type: string
               title: Column 20 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT20
             tunit21:
               type: string
               title: Column 21 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT21
             tunit22:
               type: string
               title: Column 22 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT22
             tunit23:
               type: string
               title: Column 23 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT23
             tunit24:
               type: string
               title: Column 24 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT24
             tunit25:
               type: string
               title: Column 25 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT25
             tunit26:
               type: string
               title: Column 26 units
               default: ''
-              fits_hdu: Y_CH1
+              fits_hdu: Y_CH3
               fits_keyword: TUNIT26
-        x_ch2:
+        x_ch4:
           type: object
-          title: Information about the X_CH2 table
+          title: Information about the X_CH4 table
           comment: Redesign schema to reduce duplication?
           properties:
             var1:
               type: string
               title: Variable defined in column 1
               default: l_s
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: VAR1
             var2:
               type: string
               title: Variable defined in columns 2-26
               default: M_xs
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: VAR2
             tunit1:
               type: string
               title: Column 1 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT1
             tunit2:
               type: string
               title: Column 2 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT2
             tunit3:
               type: string
               title: Column 3 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT3
             tunit4:
               type: string
               title: Column 4 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT4
             tunit5:
               type: string
               title: Column 5 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT5
             tunit6:
               type: string
               title: Column 6 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT6
             tunit7:
               type: string
               title: Column 7 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT7
             tunit8:
               type: string
               title: Column 8 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT8
             tunit9:
               type: string
               title: Column 9 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT9
             tunit10:
               type: string
               title: Column 10 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT10
             tunit11:
               type: string
               title: Column 11 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT11
             tunit12:
               type: string
               title: Column 12 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT12
             tunit13:
               type: string
               title: Column 13 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT13
             tunit14:
               type: string
               title: Column 14 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT14
             tunit15:
               type: string
               title: Column 15 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT15
             tunit16:
               type: string
               title: Column 16 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT16
             tunit17:
               type: string
               title: Column 17 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT17
             tunit18:
               type: string
               title: Column 18 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT18
             tunit19:
               type: string
               title: Column 19 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT19
             tunit20:
               type: string
               title: Column 20 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT20
             tunit21:
               type: string
               title: Column 21 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT21
             tunit22:
               type: string
               title: Column 22 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT22
             tunit23:
               type: string
               title: Column 23 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT23
             tunit24:
               type: string
               title: Column 24 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT24
             tunit25:
               type: string
               title: Column 25 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT25
             tunit26:
               type: string
               title: Column 26 units
               default: ''
-              fits_hdu: X_CH2
+              fits_hdu: X_CH4
               fits_keyword: TUNIT26
-        y_ch2:
+        y_ch4:
           type: object
-          title: Information about the Y_CH2 table
+          title: Information about the Y_CH4 table
           comment: Redesign schema to reduce duplication?
           properties:
             var1:
               type: string
               title: Variable defined in column 1
               default: l_s
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: VAR1
             var2:
               type: string
               title: Variable defined in columns 2-26
               default: M_ys
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: VAR2
             tunit1:
               type: string
               title: Column 1 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT1
             tunit2:
               type: string
               title: Column 2 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT2
             tunit3:
               type: string
               title: Column 3 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT3
             tunit4:
               type: string
               title: Column 4 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT4
             tunit5:
               type: string
               title: Column 5 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT5
             tunit6:
               type: string
               title: Column 6 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT6
             tunit7:
               type: string
               title: Column 7 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT7
             tunit8:
               type: string
               title: Column 8 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT8
             tunit9:
               type: string
               title: Column 9 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT9
             tunit10:
               type: string
               title: Column 10 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT10
             tunit11:
               type: string
               title: Column 11 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT11
             tunit12:
               type: string
               title: Column 12 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT12
             tunit13:
               type: string
               title: Column 13 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT13
             tunit14:
               type: string
               title: Column 14 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT14
             tunit15:
               type: string
               title: Column 15 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT15
             tunit16:
               type: string
               title: Column 16 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT16
             tunit17:
               type: string
               title: Column 17 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT17
             tunit18:
               type: string
               title: Column 18 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT18
             tunit19:
               type: string
               title: Column 19 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT19
             tunit20:
               type: string
               title: Column 20 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT20
             tunit21:
               type: string
               title: Column 21 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT21
             tunit22:
               type: string
               title: Column 22 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT22
             tunit23:
               type: string
               title: Column 23 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT23
             tunit24:
               type: string
               title: Column 24 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT24
             tunit25:
               type: string
               title: Column 25 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT25
             tunit26:
               type: string
               title: Column 26 units
               default: ''
-              fits_hdu: Y_CH2
+              fits_hdu: Y_CH4
               fits_keyword: TUNIT26
-        albe_to_v2v3:
+        albe_to_xanyan:
           type: object
           title: Information about the MRS COORD table
           properties:
@@ -1474,33 +1474,33 @@ allOf:
               type: string
               title: Column 1 units
               default: ''
-              fits_hdu: ALBE_TO_V2V3
+              fits_hdu: albe_to_XANYAN
               fits_keyword: TUNIT1
             tunit2:
               type: string
               title: Column 2 units
               default: ''
-              fits_hdu: ALBE_TO_V2V3
+              fits_hdu: albe_to_XANYAN
               fits_keyword: TUNIT2
             tunit3:
               type: string
               title: Column 3 units
               default: ''
-              fits_hdu: ALBE_TO_V2V3
+              fits_hdu: albe_to_XANYAN
               fits_keyword: TUNIT3
             tunit4:
               type: string
               title: Column 4 units
               default: ''
-              fits_hdu: ALBE_TO_V2V3
+              fits_hdu: albe_to_XANYAN
               fits_keyword: TUNIT4
             tunit5:
               type: string
               title: Column 5 units
               default: ''
-              fits_hdu: ALBE_TO_V2V3
+              fits_hdu: albe_to_XANYAN
               fits_keyword: TUNIT5
-        v2v3_to_albe:
+        xanyan_to_albe:
           type: object
           title: Information about the MRS COORD table
           properties:
@@ -1508,31 +1508,31 @@ allOf:
               type: string
               title: Column 1 units
               default: ''
-              fits_hdu: V2V3_TO_ALBE
+              fits_hdu: XANYAN_to_albe
               fits_keyword: TUNIT1
             tunit2:
               type: string
               title: Column 2 units
               default: ''
-              fits_hdu: V2V3_TO_ALBE
+              fits_hdu: XANYAN_to_albe
               fits_keyword: TUNIT2
             tunit3:
               type: string
               title: Column 3 units
               default: ''
-              fits_hdu: V2V3_TO_ALBE
+              fits_hdu: XANYAN_to_albe
               fits_keyword: TUNIT3
             tunit4:
               type: string
               title: Column 4 units
               default: ''
-              fits_hdu: V2V3_TO_ALBE
+              fits_hdu: XANYAN_to_albe
               fits_keyword: TUNIT4
             tunit5:
               type: string
               title: Column 5 units
               default: ''
-              fits_hdu: V2V3_TO_ALBE
+              fits_hdu: XANYAN_to_albe
               fits_keyword: TUNIT5
     slicenumber:
       title: Slice number at a each pixel coordinate vs transmission
@@ -1541,27 +1541,27 @@ allOf:
       ndim: 3
       units: ''
       datatype: float32
-    fov_ch1:
+    fov_ch3:
       title: MRS field of view table
       comment: Redesign schema to reduce duplication?
-      fits_hdu: FoV_CH1
+      fits_hdu: FoV_CH3
       datatype:
       - name: alpha_min
         datatype: float64
       - name: alpha_max
         datatype: float64
-    fov_ch2:
+    fov_ch4:
       title: MRS field of view table
       comment: Redesign schema to reduce duplication?
-      fits_hdu: FoV_CH2
+      fits_hdu: FoV_CH4
       datatype:
       - name: alpha_min
         datatype: float64
       - name: alpha_max
         datatype: float64
-    alpha_ch1:
+    alpha_ch3:
       title: Coefficients table for MRS D2C distortion map
-      fits_hdu: Alpha_CH1
+      fits_hdu: Alpha_CH3
       comment: Redesign schema to reduce duplication?
       datatype:
       - name: VAR1
@@ -1616,9 +1616,9 @@ allOf:
         datatype: float64
       - name: VAR2_4_4
         datatype: float64
-    lambda_ch1:
+    lambda_ch3:
       title: Coefficients table for MRS D2C distortion map
-      fits_hdu: Lambda_CH1
+      fits_hdu: Lambda_CH3
       comment: Redesign schema to reduce duplication?
       datatype:
       - name: VAR1
@@ -1673,9 +1673,9 @@ allOf:
         datatype: float64
       - name: VAR2_4_4
         datatype: float64
-    alpha_ch2:
+    alpha_ch4:
       title: Coefficients table for MRS D2C distortion map
-      fits_hdu: Alpha_CH2
+      fits_hdu: Alpha_CH4
       comment: Redesign schema to reduce duplication?
       datatype:
       - name: VAR1
@@ -1730,9 +1730,9 @@ allOf:
         datatype: float64
       - name: VAR2_4_4
         datatype: float64
-    lambda_ch2:
+    lambda_ch4:
       title: Coefficients table for MRS D2C distortion map
-      fits_hdu: Lambda_CH2
+      fits_hdu: Lambda_CH4
       comment: Redesign schema to reduce duplication?
       datatype:
       - name: VAR1
@@ -1787,9 +1787,9 @@ allOf:
         datatype: float64
       - name: VAR2_4_4
         datatype: float64
-    x_ch1:
+    x_ch3:
       title: Coefficients table for MRS C2D distortion map
-      fits_hdu: X_CH1
+      fits_hdu: X_CH3
       comment: Redesign schema to reduce duplication?
       datatype:
       - name: VAR1
@@ -1844,9 +1844,9 @@ allOf:
         datatype: float64
       - name: VAR2_4_4
         datatype: float64
-    y_ch1:
+    y_ch3:
       title: Coefficients table for MRS C2D distortion map
-      fits_hdu: Y_CH1
+      fits_hdu: Y_CH3
       comment: Redesign schema to reduce duplication?
       datatype:
       - name: VAR1
@@ -1901,9 +1901,9 @@ allOf:
         datatype: float64
       - name: VAR2_4_4
         datatype: float64
-    x_ch2:
+    x_ch4:
       title: Coefficients table for MRS C2D distortion map
-      fits_hdu: X_CH2
+      fits_hdu: X_CH4
       comment: Redesign schema to reduce duplication?
       datatype:
       - name: VAR1
@@ -1958,9 +1958,9 @@ allOf:
         datatype: float64
       - name: VAR2_4_4
         datatype: float64
-    y_ch2:
+    y_ch4:
       title: Coefficients table for MRS C2D distortion map
-      fits_hdu: Y_CH2
+      fits_hdu: Y_CH4
       comment: Redesign schema to reduce duplication?
       datatype:
       - name: VAR1
@@ -2015,9 +2015,9 @@ allOf:
         datatype: float64
       - name: VAR2_4_4
         datatype: float64
-    albe_to_v2v3:
+    albe_to_xanyan:
       title: Coefficients table for MRS coordinate transformation
-      fits_hdu: ALBE_TO_V2V3
+      fits_hdu: albe_to_XANYAN
       comment: Redesign schema to reduce duplication?
       datatype:
       - name: Label
@@ -2040,9 +2040,9 @@ allOf:
         datatype: float64
       - name: COEFF_2_2
         datatype: float64
-    v2v3_to_albe:
+    xanyan_to_albe:
       title: Coefficients table for MRS coordinate transformation
-      fits_hdu: V2V3_TO_ALBE
+      fits_hdu: XANYAN_to_albe
       comment: Redesign schema to reduce duplication?
       datatype:
       - name: Label
