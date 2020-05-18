@@ -7,6 +7,18 @@ allOf:
     meta:
       type: object
       properties:
+        sizeunit:
+          type: string
+          title: units of aperture size
+          default: pixels
+          fits_hdu: APCORR
+          fits_keyword: SIZEUNIT     
+        waveunit:
+          type: string
+          title: unit of wavelengths
+          default: micron
+          fits_hdu: APCORR
+          fits_keyword: WAVEUNIT     
         apcorr_table:
           type: object
           title: Information about the aperture correction table
@@ -53,7 +65,7 @@ allOf:
               default: ''
               fits_hdu: APCORR
               fits_keyword: TUNIT7
- 
+
 - type: object
   properties:
     apcorr_table:

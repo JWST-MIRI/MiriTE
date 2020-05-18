@@ -245,6 +245,8 @@ class MiriLrsApertureCorrectionModel(MiriDataModel):
             
         # Copy the table column units from the schema, if defined.
         apcorr_units = self.set_table_units('apcorr_table')
+        self.set_fits_keyword("SIZEUNIT", "pixels", "APCORR")
+        self.set_fits_keyword("WAVEUNIT", "micron", "APCORR")
         
 class MiriLrsPositionCorrectionModel(MiriDataModel):
     """
@@ -317,7 +319,7 @@ class MiriLrsPositionCorrectionModel(MiriDataModel):
 # For a more substantial test see miri/datamodels/tests.
 #
 if __name__ == '__main__':
-    print("Testing the MiriMrsApertureCorrectionModel module.")
+    print("Testing the miri_aperture_correction_model module.")
     
     PLOTTING = False
     SAVE_FILES = False
@@ -405,7 +407,6 @@ if __name__ == '__main__':
     
     with MiriLrsApertureCorrectionModel( apcorr_table=apcorr_table) as testapcorr_lrs:
         testapcorr_lrs.set_instrument_metadata(detector='MIRIMAGE', filt='P750L')
-        testapcorr_lrs.set_subarray_metadata('FULL')
         testapcorr_lrs.set_housekeeping_metadata('MPIA', author='Juergen Schreiber',
                                            version='1.0', useafter='2019-07-19',
                                            description='Test data')
