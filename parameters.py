@@ -17,6 +17,7 @@ its capabilities and modes of operation. It exists to ensure the
              Updated list of detector settings.
 15 Nov 2018: Added CDP_USEAFTER_DICT.
 13 Dec 2019: Removed obsolete FASTINTAVG readout mode.
+05 Jun 2020: Reordered the subarray table to match the figure in PASP VIII.
 
 @author: Steven Beard (UKATC)
 
@@ -86,15 +87,15 @@ READOUT_MODE['FASTGRPAVG'] = (1,   0,  3,  1,  0,  4,  1,  4,  1)
 SUBARRAY = {}
 SUBARRAY['FULL'] =          (   1,   1, 1032, 1024 )
 SUBARRAY['GENERIC'] =       (   1,   1, 1032, 1024 )
-SUBARRAY['MASK1140'] =      (   1, 245,  288,  224 )
-SUBARRAY['MASK1550'] =      (   1, 467,  288,  224 )
-SUBARRAY['MASK1065'] =      (   1,  19,  288,  224 )
-SUBARRAY['MASKLYOT'] =      (   1, 717,  320,  304 )
 SUBARRAY['BRIGHTSKY'] =     ( 457,  51,  512,  512 )
 SUBARRAY['SUB256'] =        ( 413,  51,  256,  256 )
 SUBARRAY['SUB128'] =        (   1, 889,  136,  128 )
 SUBARRAY['SUB64'] =         (   1, 779,   72,   64 )
 SUBARRAY['SLITLESSPRISM'] = (   1, 529,   72,  416 )
+SUBARRAY['MASK1065'] =      (   1,  19,  288,  224 )
+SUBARRAY['MASK1140'] =      (   1, 245,  288,  224 )
+SUBARRAY['MASK1550'] =      (   1, 467,  288,  224 )
+SUBARRAY['MASKLYOT'] =      (   1, 717,  320,  304 )
 
 # --------------------------------------------------------------------------
 # Lists of selections, as defined in
@@ -117,8 +118,8 @@ MIRI_READPATTS = ['SLOW', 'FAST', 'FASTGRPAVG']
 
 # Available MIRI subarray modes. Compare with the SUBARRAY dictionary
 # defined above. Also = list(SUBARRAY.keys()) - ['FULL', 'GENERIC']
-MIRI_SUBARRAYS = ['MASK1140', 'MASK1550', 'MASK1065', 'MASKLYOT',
-                  'BRIGHTSKY', 'SUB256', 'SUB128', 'SUB64', 'SLITLESSPRISM']
+MIRI_SUBARRAYS = ['BRIGHTSKY', 'SUB256', 'SUB128', 'SUB64', 'SLITLESSPRISM',
+                  'MASK1065', 'MASK1140', 'MASK1550', 'MASKLYOT']
 
 # Available MIRI MRS channels. Calibration data can be relevant for a single
 # MRS channel or for a whole MRS detector containing two channels.
