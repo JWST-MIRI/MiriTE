@@ -25,6 +25,7 @@ Setup file for installing the MiriTE software
 12 Oct 2018: Added cdp_remove_junk script.
 07 Oct 2019: Require Python 3.6. Corrected bug in the checking of
              conda_prefix.
+09 Jun 2020: Added make_sca_subarray.py
 
 @author: MIRI Software Team
 
@@ -291,6 +292,7 @@ setup(
              'simulators/scasim/scripts/make_fringe_map.py',
              'simulators/scasim/scripts/make_sca_calibration.py',
              'simulators/scasim/scripts/make_sca_file.py',
+             'simulators/scasim/scripts/make_sca_subarray.py',
              'simulators/scasim/scripts/convert_exposure_data.py',
              'simulators/scasim/scripts/detector_latency_test.py',
              'simulators/scasim/scripts/plot_exposure_data.py',
