@@ -343,12 +343,15 @@ Calibration Data Products (CDPs).
 28 Nov 2018: Added the ability to simulate cosmic rays of a single energy.
 07 Feb 2019: Added cdp_ftp_host parameter.
 04 Oct 2019: Removed use of astropy.extern.six (since Python 2 no longer used)
-13 Dec 2019: Subarray pixel locations corrected (Bug 612), which reverted
-             change made for Bug 558.
+13 Dec 2019: Subarray pixel locations corrected for MIRI-700 (Bug 612),
+             which reverted change made for MIRI-647 (Bug 558).
 06 Mar 2020: Removed the redundant integration_data attribute from the
              SensorChipAssembly class. Added COSMIC_RAY_MODE to the self-tests
              to control the cosmic ray mode. Made the self-tests more
              resilient to particular tests being turned off.
+10 Jun 2020: Further changes for MIRI-700. Set the pixel world coordinates
+             according to subarray mode, rather than using the coordinates
+             defined in the illumination model.
 
 @author: Steven Beard
 
@@ -2233,9 +2236,9 @@ class SensorChipAssembly(object):
                 dleft  = self.detector.left_columns
                 dright = self.detector.right_columns
                 dshape = self.detector.illuminated_shape
-                # Bug 558: Subarray locations include the reference columns
+                # MIRI-647 (Bug 558): Subarray locations include the reference columns
                 # INCORRECT! This left-shift was double-counted within the
-                # get_illumination_enlarged function.
+                # get_illumination_enlarged function. Fix reverted.
                 #location = (self.subarray_input[0], self.subarray_input[1]-dleft)
                 location = (self.subarray_input[0], self.subarray_input[1])
 
@@ -2642,34 +2645,55 @@ class SensorChipAssembly(object):
                 # Imager data
                 intensity_metadata['WCSAXES'] = 2
 
+        # MIRI-700: Pixel metadata contained in the illumination model always has CRPIX1=0.
+        # It needs to be redefined according to the subarray.
         if 'CRPIX1' in self.metadata:
             crpix1 = intensity_metadata['CRPIX1']
         else:
-            crpix1 = 1
-        if self.subarray_input_str == 'FULL':
-            substrt1 = self.metadata["SUBSTRT1"]
-        else:
+            #crpix1 = 1
+            crpix1 = 0
+
+        # MIRI-700: This test was the wrong way round and should be based on the
+        # output subarray mode, not the input.
+        if self.subarray is None:
             substrt1 = 1
+        else:
+            #substrt1 = self.metadata["SUBSTRT1"]
+            substrt1 = self.subarray[1]
+
         if substrt1 > 1:
             # Reference columns not included in subarrays that do not
             # touch the left hand edge.
-            # Bug 558. Shift by the reference columns in all cases.
-#             intensity_metadata['CRPIX1'] = \
-#                         crpix1 + 1 - substrt1
-            intensity_metadata['CRPIX1'] = \
-                        crpix1 + 1 - substrt1 + self.detector.left_columns
+            # MIRI-647 (Bug 558): Shift by the reference columns in all cases.
+            # The coordinate system is the same for all subarrays.
+            # MIRI-700 (Bug 612): Previous change was incorrect. Detector coordinates
+            # start at the bottom left of the reference pixels, so none of the
+            # coordinates need to be shifted.
+             intensity_metadata['CRPIX1'] = \
+                         crpix1 + 1 - substrt1
+#            intensity_metadata['CRPIX1'] = \
+#                        crpix1 + 1 - substrt1 + self.detector.left_columns
         else:
-            intensity_metadata['CRPIX1'] = \
-                        crpix1 + 1 - substrt1 + self.detector.left_columns
+             intensity_metadata['CRPIX1'] = \
+                         crpix1 + 1 - substrt1
+#            intensity_metadata['CRPIX1'] = \
+#                        crpix1 + 1 - substrt1 + self.detector.left_columns
                         
+        # MIRI-700: Pixel metadata contained in the illumination model always has CRPIX1=0.
+        # It needs to be redefined according to the subarray.
         if 'CRPIX2' in self.metadata:
             crpix2 = intensity_metadata['CRPIX2']
         else:
-            crpix2 = 1
-        if self.subarray_input_str == 'FULL':
-            substrt2 = self.metadata["SUBSTRT2"]
-        else:
+            crpix2 = 0
+            #crpix2 = 1
+
+        # MIRI-700: This test was the wrong way round and should be based on the
+        # output subarray mode, not the input.
+        if self.subarray is None:
             substrt2 = 1
+        else:
+            #substrt2 = self.metadata["SUBSTRT2"]
+            substrt2 = self.subarray[0]
         intensity_metadata['CRPIX2'] = crpix2 + 1 - substrt2
 
 # REMOVED: Bugs 434 and 413
