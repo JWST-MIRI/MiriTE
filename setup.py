@@ -26,6 +26,7 @@ Setup file for installing the MiriTE software
 07 Oct 2019: Require Python 3.6. Corrected bug in the checking of
              conda_prefix.
 23 Mar 2020: Require Python 3.7.
+12 Jun 2020: Added 'install_requires' with required dependencies.
 
 @author: MIRI Software Team
 
@@ -36,7 +37,6 @@ import os
 import re
 import sys
 import zipfile
-import numpy
 
 try:
     from setuptools import Extension
@@ -53,13 +53,13 @@ except ImportError:
     from setuptools import setup
 
 
-
 def read(*names, **kwargs):
     with io.open(
         os.path.join(os.path.dirname(__file__), *names),
         encoding=kwargs.get("encoding", "utf8")
     ) as fp:
         return fp.read()
+
 
 def find_version(*file_paths):
     version_file = read(*file_paths)
@@ -68,6 +68,7 @@ def find_version(*file_paths):
     if version_match:
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
+
 
 def get_conda_prefix():
     import os
@@ -235,7 +236,7 @@ setup(
               'miri.simulators', 'miri.simulators.tests',
               'miri.simulators.scasim', 'miri.simulators.scasim.tests',
               'miri.apt_parser',
-             ],
+              ],
     package_dir={
                  'miri': '',
                  'miri.tools': 'tools/',
@@ -250,7 +251,7 @@ setup(
                 },
     package_data={'miri.tools': ['data/__init__.py'],
                   'miri.datamodels': ['schemas/*.yaml', 'data/*.fits',
-                                   'data/*.txt', 'data/__init__.py'],
+                                      'data/*.txt', 'data/__init__.py'],
                   'miri.simulators': ['schemas/*.yaml', 'data/*.fits',
                                       'data/*.txt', 'data/__init__.py',
                                       'data/amplifiers/*.fits',
@@ -262,9 +263,9 @@ setup(
                                       'data/filters/*.fits',
                                       'data/filters/*.txt'],
                   'miri.simulators.scasim': ['data/SCATestInput80x64.fits',
-                                      'data/SCATestHorseHead1024.fits',
-                                      'data/__init__.py'],
-                 },
+                                             'data/SCATestHorseHead1024.fits',
+                                             'data/__init__.py'],
+                  },
     scripts=['miri_installation_check.py',
              'datamodels/scripts/append_lrs_photom.py',
              'datamodels/scripts/cdp_add_filter_band.py',
@@ -296,9 +297,18 @@ setup(
              'simulators/scasim/scripts/detector_latency_test.py',
              'simulators/scasim/scripts/plot_exposure_data.py',
              'simulators/scasim/scripts/scasim.py',
-            ],
+             ],
     data_files=[('', ['LICENCE', 'README'])],
     entry_points=entry_points,
+    install_requires=[
+        'Cython>=0.29.15',
+        'jwst>=0.15.0',
+        'matplotlib>=3.1.0',
+        'numpy>=1.18.1',
+        'paramiko>=2.6.0',
+        'pysftp>=0.2.9',
+        'scipy>=1.4.1',
+    ],
 )
 
 if not cleanflag:
