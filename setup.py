@@ -307,8 +307,8 @@ setup(
         'numba>=0.45.1',
         'numpy>=1.18.1',
         'parameterized>=0.7.0',
-        'paramiko>=2.6.0',
-        'pysftp>=0.2.9',
+        'paramiko==2.6.0',
+        'pysftp==0.2.9',
         'scipy>=1.4.1',
     ],
 )
