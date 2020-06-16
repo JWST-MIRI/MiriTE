@@ -26,11 +26,13 @@ Setup file for installing the MiriTE software
 07 Oct 2019: Require Python 3.6. Corrected bug in the checking of
              conda_prefix.
 23 Mar 2020: Require Python 3.7.
+17 Apr 2020: MIRI-759: Restructured to make the developer install
+             work the same as a regular install.
+24 Apr 2020: Unzip the data files when creating a developer install.
+             Stop unzipping obsolete detector files.
 12 Jun 2020: Added 'install_requires' with required dependencies.
-16 Jun 2020: Do not unpack old detector test files or install obsolete
-             amplifer calibration files.
-16 Jun 2020: MIRI-759: Changed to new directory structure to support
-             developer install.
+16 Jun 2020: Do not install obsolete amplifer calibration files.
+             Do not install old and rarely used scrupts.
 
 @author: MIRI Software Team
 
@@ -89,7 +91,7 @@ def get_conda_prefix():
 # unzipped files are deleted.
 if len(sys.argv[0]) > 0:
     argv = sys.argv
-if ("build" in argv) or ("install" in argv):
+if ("build" in argv) or ("install" in argv) or ("develop" in argv)or ("test" in argv):
     zipflag = True
     cleanflag = False
 else:
@@ -252,7 +254,7 @@ setup(
                  'miri.simulators.tests': 'miri/simulators/tests',
                  'miri.simulators.scasim': 'miri/simulators/scasim',
                  'miri.simulators.scasim.tests': 'miri/simulators/scasim/tests',
-                 'miri.apt_parser':'apt_parser',
+                 'miri.apt_parser':'miri/apt_parser',
                 },
     package_data={'miri.tools': ['data/__init__.py'],
                   'miri.datamodels': ['schemas/*.yaml', 'data/*.fits',
@@ -270,19 +272,19 @@ setup(
                                              'data/__init__.py'],
                   },
     scripts=['miri_installation_check.py',
-             'miri/datamodels/scripts/append_lrs_photom.py',
+#             'miri/datamodels/scripts/append_lrs_photom.py',
              'miri/datamodels/scripts/cdp_add_filter_band.py',
              'miri/datamodels/scripts/cdp_add_history.py',
              'miri/datamodels/scripts/cdp_add_subarray.py',
-             'miri/datamodels/scripts/cdp_correct_band.py',
-             'miri/datamodels/scripts/cdp_correct_wildcard.py',
+#             'miri/datamodels/scripts/cdp_correct_band.py',
+#             'miri/datamodels/scripts/cdp_correct_wildcard.py',
              'miri/datamodels/scripts/cdp_get_doc.py',
              'miri/datamodels/scripts/cdp_print.py',
              'miri/datamodels/scripts/cdp_reduce_dark.py',
              'miri/datamodels/scripts/cdp_remove_junk.py',
              'miri/datamodels/scripts/cdp_verify.py',
              'miri/datamodels/scripts/convert_fits_to_asdf.py',
-             'miri/datamodels/scripts/convert_mrs_resolution.py',
+#             'miri/datamodels/scripts/convert_mrs_resolution.py',
              'miri/datamodels/scripts/convert_slope_data.py',
              'miri/datamodels/scripts/find_me_another.py',
              'miri/datamodels/scripts/dqflags_examples.py',
@@ -291,13 +293,13 @@ setup(
              'miri/datamodels/scripts/multicdp_remove_junk.csh',
              'miri/datamodels/scripts/multicdp_subarray.csh',
              'miri/datamodels/scripts/multicdp_verify.py',
-             'miri/datamodels/scripts/multicdp_wildcard.csh',
-             'miri/simulators/scasim/scripts/make_bad_pixel_mask.py',
-             'miri/simulators/scasim/scripts/make_fringe_map.py',
+#             'miri/datamodels/scripts/multicdp_wildcard.csh',
+#             'miri/simulators/scasim/scripts/make_bad_pixel_mask.py',
+#             'miri/simulators/scasim/scripts/make_fringe_map.py',
              'miri/simulators/scasim/scripts/make_sca_calibration.py',
              'miri/simulators/scasim/scripts/make_sca_file.py',
              'miri/simulators/scasim/scripts/convert_exposure_data.py',
-             'miri/simulators/scasim/scripts/detector_latency_test.py',
+#             'miri/simulators/scasim/scripts/detector_latency_test.py',
              'miri/simulators/scasim/scripts/plot_exposure_data.py',
              'miri/simulators/scasim/scripts/scasim.py',
              ],
