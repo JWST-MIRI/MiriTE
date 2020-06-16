@@ -91,12 +91,12 @@ def get_conda_prefix():
 # unzipped files are deleted.
 if len(sys.argv[0]) > 0:
     argv = sys.argv
-if ("build" in argv) or ("install" in argv) or ("develop" in argv)or ("test" in argv):
+if ("clean" in argv):
+    zipflag = False
+    cleanflag = not (("build" in argv) or ("install" in argv) or ("develop" in argv))
+else:
     zipflag = True
     cleanflag = False
-else:
-    zipflag = False
-    cleanflag = ("clean" in argv)
 if "--quiet" in argv:
     verbose = False
 else:
