@@ -27,6 +27,8 @@ Setup file for installing the MiriTE software
              conda_prefix.
 23 Mar 2020: Require Python 3.7.
 12 Jun 2020: Added 'install_requires' with required dependencies.
+16 Jun 2020: Do not unpack old detector test files or install obsolete
+             amplifer calibration files.
 
 @author: MIRI Software Team
 
@@ -124,12 +126,13 @@ if not os.path.isdir(scasim_data_path):
 # Unpack the 470 micron version of the cosmic ray library (which has better track lengths)
 fziplist0 = [zipfile.ZipFile(os.path.join(cr_data_path,'CRs_SiAs_470.zip'),'r')]
 # fziplist0 = [zipfile.ZipFile(os.path.join(cr_data_path,'CRs_SiAs_35.zip'),'r')]
-fziplist1 = [zipfile.ZipFile(os.path.join(detector_data_path,'bad_pixelsIM.zip'),'r'),
-             zipfile.ZipFile(os.path.join(detector_data_path,'bad_pixelsLW.zip'),'r'),
-             zipfile.ZipFile(os.path.join(detector_data_path,'bad_pixelsSW.zip'),'r'),
-             zipfile.ZipFile(os.path.join(detector_data_path,'dark_mapIM.zip'),'r'),
-             zipfile.ZipFile(os.path.join(detector_data_path,'dark_mapLW.zip'),'r'),
-             zipfile.ZipFile(os.path.join(detector_data_path,'dark_mapSW.zip'),'r')]
+fziplist1 = []
+#fziplist1 = [zipfile.ZipFile(os.path.join(detector_data_path,'bad_pixelsIM.zip'),'r'),
+#             zipfile.ZipFile(os.path.join(detector_data_path,'bad_pixelsLW.zip'),'r'),
+#             zipfile.ZipFile(os.path.join(detector_data_path,'bad_pixelsSW.zip'),'r'),
+#             zipfile.ZipFile(os.path.join(detector_data_path,'dark_mapIM.zip'),'r'),
+#             zipfile.ZipFile(os.path.join(detector_data_path,'dark_mapLW.zip'),'r'),
+#             zipfile.ZipFile(os.path.join(detector_data_path,'dark_mapSW.zip'),'r')]
 fziplist2 = [zipfile.ZipFile(os.path.join(scasim_data_path,'SCATestHorseHead1024.zip'),'r')]
 
 if zipflag:
@@ -254,8 +257,6 @@ setup(
                                       'data/*.txt', 'data/__init__.py'],
                   'miri.simulators': ['schemas/*.yaml', 'data/*.fits',
                                       'data/*.txt', 'data/__init__.py',
-                                      'data/amplifiers/*.fits',
-                                      'data/amplifiers/*.txt',
                                       'data/detector/*.fits',
                                       'data/detector/*.txt',
                                       'data/cosmic_rays/*.fits',
