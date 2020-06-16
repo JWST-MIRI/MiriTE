@@ -29,6 +29,8 @@ Setup file for installing the MiriTE software
 12 Jun 2020: Added 'install_requires' with required dependencies.
 16 Jun 2020: Do not unpack old detector test files or install obsolete
              amplifer calibration files.
+16 Jun 2020: MIRI-759: Changed to new directory structure to support
+             developer install.
 
 @author: MIRI Software Team
 
@@ -108,17 +110,17 @@ if verbose:
 # The simulator detector data files are found relative to the
 # directory containing this Python script.
 (this_dir, this_file) = os.path.split(__file__)
-cr_data_path = os.path.join(this_dir, "simulators/data/cosmic_rays")
+cr_data_path = os.path.join(this_dir, "miri/simulators/data/cosmic_rays")
 if not os.path.isdir(cr_data_path):
     strg = "Cosmic ray data directory %s not found" % cr_data_path
     raise EnvironmentError(strg)
 
-detector_data_path = os.path.join(this_dir, "simulators/data/detector")
+detector_data_path = os.path.join(this_dir, "miri/simulators/data/detector")
 if not os.path.isdir(detector_data_path):
     strg = "Detector data directory %s not found" % detector_data_path
     raise EnvironmentError(strg)
 
-scasim_data_path = os.path.join(this_dir, "simulators/scasim/data")
+scasim_data_path = os.path.join(this_dir, "miri/simulators/scasim/data")
 if not os.path.isdir(scasim_data_path):
     strg = "SCASIM data directory %s not found" % scasim_data_path
     raise EnvironmentError(strg)
@@ -126,13 +128,13 @@ if not os.path.isdir(scasim_data_path):
 # Unpack the 470 micron version of the cosmic ray library (which has better track lengths)
 fziplist0 = [zipfile.ZipFile(os.path.join(cr_data_path,'CRs_SiAs_470.zip'),'r')]
 # fziplist0 = [zipfile.ZipFile(os.path.join(cr_data_path,'CRs_SiAs_35.zip'),'r')]
-fziplist1 = []
 #fziplist1 = [zipfile.ZipFile(os.path.join(detector_data_path,'bad_pixelsIM.zip'),'r'),
 #             zipfile.ZipFile(os.path.join(detector_data_path,'bad_pixelsLW.zip'),'r'),
 #             zipfile.ZipFile(os.path.join(detector_data_path,'bad_pixelsSW.zip'),'r'),
 #             zipfile.ZipFile(os.path.join(detector_data_path,'dark_mapIM.zip'),'r'),
 #             zipfile.ZipFile(os.path.join(detector_data_path,'dark_mapLW.zip'),'r'),
 #             zipfile.ZipFile(os.path.join(detector_data_path,'dark_mapSW.zip'),'r')]
+fziplist1 = []
 fziplist2 = [zipfile.ZipFile(os.path.join(scasim_data_path,'SCATestHorseHead1024.zip'),'r')]
 
 if zipflag:
@@ -225,7 +227,7 @@ entry_points = dict(asdf_extensions=['miri_datamodel = miri.datamodels.miri_exte
 
 setup(
     name="miri",
-    version=find_version("__init__.py"),
+    version=find_version("miri/__init__.py"),
     description="MIRI tools, data models and simulator software",
     url="https://github.com/JWST-MIRI/MiriTE",
     author="MIRI European Consortium",
@@ -241,15 +243,15 @@ setup(
               'miri.apt_parser',
               ],
     package_dir={
-                 'miri': '',
-                 'miri.tools': 'tools/',
-                 'miri.tools.tests': 'tools/tests',
-                 'miri.datamodels': 'datamodels/',
-                 'miri.datamodels.tests': 'datamodels/tests',
-                 'miri.simulators': 'simulators/',
-                 'miri.simulators.tests': 'simulators/tests',
-                 'miri.simulators.scasim': 'simulators/scasim',
-                 'miri.simulators.scasim.tests': 'simulators/scasim/tests',
+                 'miri': 'miri',
+                 'miri.tools': 'miri/tools/',
+                 'miri.tools.tests': 'miri/tools/tests',
+                 'miri.datamodels': 'miri/datamodels/',
+                 'miri.datamodels.tests': 'miri/datamodels/tests',
+                 'miri.simulators': 'miri/simulators/',
+                 'miri.simulators.tests': 'miri/simulators/tests',
+                 'miri.simulators.scasim': 'miri/simulators/scasim',
+                 'miri.simulators.scasim.tests': 'miri/simulators/scasim/tests',
                  'miri.apt_parser':'apt_parser',
                 },
     package_data={'miri.tools': ['data/__init__.py'],
@@ -268,36 +270,36 @@ setup(
                                              'data/__init__.py'],
                   },
     scripts=['miri_installation_check.py',
-             'datamodels/scripts/append_lrs_photom.py',
-             'datamodels/scripts/cdp_add_filter_band.py',
-             'datamodels/scripts/cdp_add_history.py',
-             'datamodels/scripts/cdp_add_subarray.py',
-             'datamodels/scripts/cdp_correct_band.py',
-             'datamodels/scripts/cdp_correct_wildcard.py',
-             'datamodels/scripts/cdp_get_doc.py',
-             'datamodels/scripts/cdp_print.py',
-             'datamodels/scripts/cdp_reduce_dark.py',
-             'datamodels/scripts/cdp_remove_junk.py',
-             'datamodels/scripts/cdp_verify.py',
-             'datamodels/scripts/convert_fits_to_asdf.py',
-             'datamodels/scripts/convert_mrs_resolution.py',
-             'datamodels/scripts/convert_slope_data.py',
-             'datamodels/scripts/find_me_another.py',
-             'datamodels/scripts/dqflags_examples.py',
-             'datamodels/scripts/multicdp_band.csh',
-             'datamodels/scripts/multicdp_filter_band.csh',
-             'datamodels/scripts/multicdp_remove_junk.csh',
-             'datamodels/scripts/multicdp_subarray.csh',
-             'datamodels/scripts/multicdp_verify.py',
-             'datamodels/scripts/multicdp_wildcard.csh',
-             'simulators/scasim/scripts/make_bad_pixel_mask.py',
-             'simulators/scasim/scripts/make_fringe_map.py',
-             'simulators/scasim/scripts/make_sca_calibration.py',
-             'simulators/scasim/scripts/make_sca_file.py',
-             'simulators/scasim/scripts/convert_exposure_data.py',
-             'simulators/scasim/scripts/detector_latency_test.py',
-             'simulators/scasim/scripts/plot_exposure_data.py',
-             'simulators/scasim/scripts/scasim.py',
+             'miri/datamodels/scripts/append_lrs_photom.py',
+             'miri/datamodels/scripts/cdp_add_filter_band.py',
+             'miri/datamodels/scripts/cdp_add_history.py',
+             'miri/datamodels/scripts/cdp_add_subarray.py',
+             'miri/datamodels/scripts/cdp_correct_band.py',
+             'miri/datamodels/scripts/cdp_correct_wildcard.py',
+             'miri/datamodels/scripts/cdp_get_doc.py',
+             'miri/datamodels/scripts/cdp_print.py',
+             'miri/datamodels/scripts/cdp_reduce_dark.py',
+             'miri/datamodels/scripts/cdp_remove_junk.py',
+             'miri/datamodels/scripts/cdp_verify.py',
+             'miri/datamodels/scripts/convert_fits_to_asdf.py',
+             'miri/datamodels/scripts/convert_mrs_resolution.py',
+             'miri/datamodels/scripts/convert_slope_data.py',
+             'miri/datamodels/scripts/find_me_another.py',
+             'miri/datamodels/scripts/dqflags_examples.py',
+             'miri/datamodels/scripts/multicdp_band.csh',
+             'miri/datamodels/scripts/multicdp_filter_band.csh',
+             'miri/datamodels/scripts/multicdp_remove_junk.csh',
+             'miri/datamodels/scripts/multicdp_subarray.csh',
+             'miri/datamodels/scripts/multicdp_verify.py',
+             'miri/datamodels/scripts/multicdp_wildcard.csh',
+             'miri/simulators/scasim/scripts/make_bad_pixel_mask.py',
+             'miri/simulators/scasim/scripts/make_fringe_map.py',
+             'miri/simulators/scasim/scripts/make_sca_calibration.py',
+             'miri/simulators/scasim/scripts/make_sca_file.py',
+             'miri/simulators/scasim/scripts/convert_exposure_data.py',
+             'miri/simulators/scasim/scripts/detector_latency_test.py',
+             'miri/simulators/scasim/scripts/plot_exposure_data.py',
+             'miri/simulators/scasim/scripts/scasim.py',
              ],
     data_files=[('', ['LICENCE', 'README'])],
     entry_points=entry_points,
