@@ -47,7 +47,7 @@ allOf:
             tunit6:
               type: string
               title: Column 6 units
-              default: microns
+              default: micron
               fits_hdu: PHOTOM
               fits_keyword: TUNIT6
             tunit7:

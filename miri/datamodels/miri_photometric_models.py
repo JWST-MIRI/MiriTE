@@ -695,11 +695,11 @@ if __name__ == '__main__':
         relresponse.append(r10)
         relresperror.append(0.001)
         nelm += 1
-    for ii in range(300,MAX_NELEM):
-        # Pad unused elements with zero.
-        wavelength.append(0.0)
-        relresponse.append(0.0)
-        relresperror.append(0.0)
+    #for ii in range(300,MAX_NELEM):
+    #    # Pad unused elements with zero.
+    #    wavelength.append(0.0)
+    #    relresponse.append(0.0)
+    #    relresperror.append(0.0)
     # The LRS data is for the P750L filter only, but there is separate
     # record for the SLITLESSPRISM subarray.
     phot_lrs = [('P750L',  'FULL',          1.0,  0.0,  nelm, wavelength, relresponse, relresperror),
