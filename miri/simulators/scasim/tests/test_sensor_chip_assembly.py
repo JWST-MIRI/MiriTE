@@ -55,6 +55,8 @@ NOTE: Some tests within this module can take several minutes to run.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 19 Jul 2017: Make the DARK simulation optional for situations where the
              test system has limited memory
+17 Jun 2020: Work-around to allow the test to work with nosetests after
+             installation by pip. Unzip the data file if not found.
 
 @author: Steven Beard (UKATC)
 
@@ -72,6 +74,8 @@ import unittest
 import warnings
 import random
 import numpy as np
+
+from zipfile import ZipFile
 
 # Get the MIRI illumination data model and SensorChipAssembly classes
 from miri.datamodels.sim import MiriExposureModel, \
@@ -113,6 +117,7 @@ _DEFAULT_CR_MODE = cosmic_ray_properties['DEFAULT_CR_MODE']
 # These test input files are part of the scasim installation.
 _TEST_INPUT_FILE = os.path.join(_datapath, 'SCATestInput80x64.fits')
 _TEST_INPUT_FILE2 = os.path.join(_datapath, 'SCATestHorseHead1024.fits')
+_TEST_INPUT_FILE2_ZIP = os.path.join(_datapath, 'SCATestHorseHead1024.zip')
 
 # Find a writable directory and make up an output file stub guaranteed
 # not to overwrite any existing files accidentally.
@@ -448,6 +453,13 @@ class TestSensorChipAssembly(unittest.TestCase):
         del sca
       
     def test_pipeline(self):
+        # Make sure the test file has been unzipped.
+        if not os.path.isfile(_TEST_INPUT_FILE2):
+            if VERBOSE:
+                print( "Unzipping", _TEST_INPUT_FILE2_ZIP )
+            zf = ZipFile(_TEST_INPUT_FILE2_ZIP)
+            zf.extractall(_datapath)
+
         # Test the alternative pipeline API for the simulator.
         test_map = MiriIlluminationModel(_TEST_INPUT_FILE2)
         test_map.set_instrument_metadata(_DEFAULT_SCA)

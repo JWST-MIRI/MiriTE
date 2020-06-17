@@ -94,6 +94,9 @@ if len(sys.argv[0]) > 0:
 if ("clean" in argv):
     zipflag = False
     cleanflag = not (("build" in argv) or ("install" in argv) or ("develop" in argv))
+elif ("check" in argv):
+    zipflag = False
+    cleanflag = False
 else:
     zipflag = True
     cleanflag = False
