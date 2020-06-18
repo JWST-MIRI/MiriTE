@@ -710,7 +710,7 @@ def interpolLin(wave, spec, new_wave):
     inter = interpolate.interp1d(wave, spec, bounds_error = False)
     return inter(new_wave)
 
-@nb.jit(nopython=True, parallel=True)
+#@nb.jit(nopython=True, parallel=True)
 def interpol_lin(wave, spec, new_wave, extra = True):
     """
     
