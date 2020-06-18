@@ -70,7 +70,9 @@ Longer description, references, class hierarchy...
 
 # Import packages/modules from the MIRI development environment
 import numpy as np
-import numba as nb
+# "numba" import disabled due to segfault issue on import when Numba has been
+# installed via pip into a Conda environment, see MIRI-749.
+# import numba as nb
 import scipy.signal as sig
 from scipy import interpolate
 
@@ -710,7 +712,8 @@ def interpolLin(wave, spec, new_wave):
     inter = interpolate.interp1d(wave, spec, bounds_error = False)
     return inter(new_wave)
 
-#@nb.jit(nopython=True, parallel=True)
+# Numba JIT disabled due to issue with Numba, see MIRI-749.
+# @nb.jit(nopython=True, parallel=True)
 def interpol_lin(wave, spec, new_wave, extra = True):
     """
     

@@ -31,8 +31,10 @@ Setup file for installing the MiriTE software
 24 Apr 2020: Unzip the data files when creating a developer install.
              Stop unzipping obsolete detector files.
 12 Jun 2020: Added 'install_requires' with required dependencies.
-16 Jun 2020: Do not install obsolete amplifer calibration files.
+16 Jun 2020: Do not install obsolete amplifier calibration files.
              Do not install old and rarely used scrupts.
+18 Jun 2020: Removed "numba" from dependencies due to issues with Numba,
+             see MIRI-749.
 
 @author: MIRI Software Team
 
@@ -312,7 +314,6 @@ setup(
         'Cython>=0.29.15',
         'jwst>=0.15.0',
         'matplotlib>=3.1.0',
-        'numba>=0.45.1',
         'numpy>=1.18.1',
         'parameterized>=0.7.0',
         'paramiko==2.6.0',
