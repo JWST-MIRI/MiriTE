@@ -30,6 +30,7 @@ Setup file for installing the MiriTE software
              work the same as a regular install.
 24 Apr 2020: Unzip the data files when creating a developer install.
              Stop unzipping obsolete detector files.
+09 Jun 2020: Added make_sca_subarray.py
 12 Jun 2020: Added 'install_requires' with required dependencies.
 16 Jun 2020: Do not install obsolete amplifier calibration files.
              Do not install old and rarely used scrupts.
@@ -303,6 +304,7 @@ setup(
 #             'miri/simulators/scasim/scripts/make_fringe_map.py',
              'miri/simulators/scasim/scripts/make_sca_calibration.py',
              'miri/simulators/scasim/scripts/make_sca_file.py',
+             'miri/simulators/scasim/scripts/make_sca_subarray.py',
              'miri/simulators/scasim/scripts/convert_exposure_data.py',
 #             'miri/simulators/scasim/scripts/detector_latency_test.py',
              'miri/simulators/scasim/scripts/plot_exposure_data.py',

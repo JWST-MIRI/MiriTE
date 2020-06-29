@@ -690,4 +690,4 @@ if __name__ == "__main__":
     map_object.save(outputfile, overwrite=overwrite)
     
     if verbose > 0:
-        print( "New illumination map saved." )
+        print( "New illumination map saved to %s." % outputfile )

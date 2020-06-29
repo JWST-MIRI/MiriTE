@@ -199,4 +199,4 @@ if __name__ == "__main__":
     mask_object.save(outputfile, overwrite=overwrite)
     
     if verbose > 0:
-        print("New bad pixel mask map saved.")
+        print("New bad pixel mask map saved to %s." % outputfile)
