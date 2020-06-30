@@ -352,6 +352,10 @@ Calibration Data Products (CDPs).
 10 Jun 2020: Further changes for MIRI-700. Set the pixel world coordinates
              according to subarray mode, rather than using the coordinates
              defined in the illumination model.
+30 Jun 2020: Oversized illumination maps which exactly match the size of
+             an array containing reference columns are truncated by
+             removing reference columns.
+
 
 @author: Steven Beard
 
@@ -1385,19 +1389,32 @@ class SensorChipAssembly(object):
             strg = "Illumination map must be at least 2-D "
             strg += "(%d-D data provided)" % self.illumination_map.intensity.ndim
             raise TypeError(strg)
-        
+
         # The illumination map cannot be larger than the detector.
         # Give a warning and truncate an over-sized map.
         illum_shape = self.illumination_map.get_illumination_shape()
-        if illum_shape[0] > self._sca['ILLUMINATED_COLUMNS'] or \
-           illum_shape[1] > self._sca['ILLUMINATED_ROWS']:
-            strg = "***Illumination map of size %d x %d is too large! " % \
-                illum_shape
-            strg += "Truncating to detector size of %d x %d pixels." % \
-                (self._sca['ILLUMINATED_COLUMNS'], self._sca['ILLUMINATED_ROWS'])
-            self.logger.warning(strg)
+        if illum_shape[1] > self._sca['ILLUMINATED_COLUMNS'] or \
+           illum_shape[0] > self._sca['ILLUMINATED_ROWS']:
+            leftcolumns = 4   # TODO: Replace with detector properties
+            rightcolumns = 4
+            if illum_shape[1] == (leftcolumns+self._sca['ILLUMINATED_COLUMNS']+rightcolumns):
+                # Replacement of reference columns is not a warning
+                strg = "Removing reference columns from illumination map"
+                strg += " of size %d x %d " % illum_shape
+                strg += "to match detector size of %d x %d pixels." % \
+                    (self._sca['ILLUMINATED_COLUMNS'], self._sca['ILLUMINATED_ROWS'])
+                self.logger.info(strg)
+            else:
+                # General oversized data is a warning
+                strg = "***Illumination map of size %d x %d is too large! " % \
+                    illum_shape
+                strg += "Truncating to detector size of %d x %d pixels." % \
+                    (self._sca['ILLUMINATED_COLUMNS'], self._sca['ILLUMINATED_ROWS'])
+                self.logger.warning(strg)
             self.illumination_map.truncate([self._sca['ILLUMINATED_COLUMNS'],
-                                            self._sca['ILLUMINATED_ROWS']] )
+                                            self._sca['ILLUMINATED_ROWS']],
+                                           leftcolumns=leftcolumns,
+                                           rightcolumns=rightcolumns )
 
         # If a scaling factor is given, scale the illumination data by the
         # given factor. This feature is normally used only for testing.
@@ -1424,6 +1441,9 @@ class SensorChipAssembly(object):
            self.illumination_map.meta.subarray.name != "GENERIC":
             # Variation (1). The input subarray mode has been specified.
             self.subarray_input_str = self.illumination_map.meta.subarray.name
+            if self._verbose > 1:
+                self.logger.info("Input subarray mode defined as %s from metdata." % \
+                    self.subarray_input_str )
         else:
             # If the input subarray mode is undefined or GENERIC but the
             # output subarray mode matches the input data shape, assume the
@@ -1436,15 +1456,20 @@ class SensorChipAssembly(object):
                     # Variation (1). Input subarray mode assumed the same as
                     # the output subarray mode.
                     self.subarray_input_str = self.subarray_str
-                    if self._verbose > 2:
-                        self.logger.info( "Input subarray mode assumed to be %s." % \
+                    if self._verbose > 1:
+                        self.logger.info("Input subarray mode assumed to be %s (matching data shape)." % \
                             self.subarray_input_str )
                 else:
                     # Variation (2). Full frame input data assumed.
                     self.subarray_input_str = 'FULL'
+                    if self._verbose > 1:
+                        self.logger.info("Data shape does not match subarray. Input subarray mode assumed to be FULL.")
             else:
                 # Variation (2). Full frame input data assumed.
                 self.subarray_input_str = 'FULL'
+                if self._verbose > 1:
+                    self.logger.info("No output subarray defined. Input subarray mode assumed to be FULL.")
+
 
         # Get the subarray location and dimensions from the detector
         # properties, or failing that attempt to parse the input subarray
@@ -1453,9 +1478,15 @@ class SensorChipAssembly(object):
         if self.subarray_input_str in detector_properties['SUBARRAY']:
             self.subarray_input = \
                 detector_properties.get('SUBARRAY',self.subarray_input_str)
+            if self._verbose > 1:
+                self.logger.info("Detector properties translates input subarray %s into %s" % \
+                    (self.subarray_input_str, str(self.subarray_input)))
         else:
             try:
                 self.subarray_input = eval(self.subarray_input_str)
+                if self._verbose > 1:
+                     self.logger.info("Evaluation translates input subarray %s into %s" % \
+                        (self.subarray_input_str, str(self.subarray_input)))
             except Exception:
                 words = self.subarray_input_str.split()
                 try:
@@ -1465,6 +1496,9 @@ class SensorChipAssembly(object):
                     subcols = int(words[3].strip(','))
                     self.subarray_input = (firstrow, firstcol,
                                             subrows, subcols)
+                    if self._verbose > 1:
+                         self.logger.info("Word split translates input subarray %s into %s" % \
+                            (self.subarray_input_str, str(self.subarray_input)))
                 except Exception:
                     strg = "Unrecognised subarray mode specified "
                     strg += "in input file: %s" % self.subarray_input_str
@@ -1479,13 +1513,14 @@ class SensorChipAssembly(object):
                 self.subarray_input.__str__()
             raise TypeError(strg)
 
-        if self._verbose > 2:
+        if self._verbose > 1:
             if self.subarray_input is None:
                 strg = "Input subarray mode assumed %s." % \
                     self.subarray_input_str
             else:
                 strg = "Input subarray mode is %s " % self.subarray_input_str
-                strg += "(%d %d %d %d)." % self.subarray_input
+                strg += " %s." % str(self.subarray_input)
+                #strg += "(%d %d %d %d)." % tuple(self.subarray_input)
             self.logger.info( strg )
         
         # Check the integrity of the subarray declared in the input data.
@@ -1637,6 +1672,9 @@ class SensorChipAssembly(object):
                         subarray_input = illumination_map.meta.subarray.name
         if subarray_input is not None:
             self.subarray_input_str = str(subarray_input)
+            if self._verbose > 1:
+                self.logger.info("Input subarray mode obtained from illumination map: %s" % \
+                    self.subarray_input_str)
         else:
             # If the input subarray mode is undefined but the output subarray
             # mode matches the input data shape, assume the input and output
@@ -1646,13 +1684,17 @@ class SensorChipAssembly(object):
                 if (self.subarray[2] == ishape[0]) and \
                    (self.subarray[3] == ishape[1]):
                     self.subarray_input_str = self.subarray_str
-                    if self._verbose > 2:
-                        self.logger.info( "Input subarray mode assumed to be %s." % \
+                    if self._verbose > 1:
+                        self.logger.info( "Input subarray mode assumed to be %s (from output shape)." % \
                             self.subarray_input_str )
                 else:
                     self.subarray_input_str = 'FULL'
+                    if self._verbose > 1:
+                        self.logger.info("Data shape does not match. Input subarray mode assumed FULL.")
             else:
                 self.subarray_input_str = 'FULL'
+                if self._verbose > 1:
+                    self.logger.info("No output subarray mode. Input subarray mode assumed FULL.")
        
         # Define the illumination map and subarray mode.
         self._set_illumination_map(illumination_map, subarray_input)
@@ -1684,6 +1726,9 @@ class SensorChipAssembly(object):
             try:
                 self.subarray_input = \
                     detector_properties.get('SUBARRAY', subarray_input)
+                if self._verbose > 1:
+                    self.logger.info( "Detector properties translates input subarray %s into %s" % \
+                        (subarray_input, str(self.subarray_input)) )
             except KeyError:
                 # N.B. This function does not attempt to parse an
                 # unrecognised input subarray string. Just report an error.
@@ -1693,6 +1738,8 @@ class SensorChipAssembly(object):
         else:
             self.subarray_input_str = 'FULL'
             self.subarray_input = None
+            if self._verbose > 1:
+                self.logger.info( "Input subarray mode assumed FULL" )
         
         # Tidy up and prepare for new data.
         self._prepare_for_new_data()
@@ -1737,9 +1784,13 @@ class SensorChipAssembly(object):
         # into which the input subarray will be inserted.
         if self.subarray_input is None:
             ishape = self.illumination_map.get_illumination_shape()
+            if self._verbose > 2:
+                self.logger.debug("Maximum illuminated shape obtained from illumination map: %s" % str(ishape))
         else:
             ishape = (self._sca['ILLUMINATED_ROWS'], \
                       self._sca['ILLUMINATED_COLUMNS'])
+            if self._verbose > 2:
+                self.logger.debug("Maximum illuminated shape obtained from detector properties: %s" % str(ishape))
 
         # Query the filter name or band from the illumination model.
         mirifilter = self.illumination_map.get_fits_keyword('FILTER')
@@ -2225,6 +2276,9 @@ class SensorChipAssembly(object):
                 # illuminated area of the detector, not including
                 # reference pixels.
                 flux = self.illumination_map.get_illumination( usefilter=self.qe )
+                if self._verbose > 2:
+                    self.logger.debug("Flux array (FULL) of shape %s obtained from illumination map." % \
+                        str(flux.shape))
             else:
                 # The input data is a subarray. The flux array is still the
                 # illuminated area of the detector, not including reference
@@ -2248,6 +2302,9 @@ class SensorChipAssembly(object):
                 flux = self.illumination_map.get_illumination_enlarged(
                             dshape, usefilter=self.qe, location=location,
                             leftcrop=dleft, rightcrop=dright)
+                if self._verbose > 2:
+                    self.logger.debug("Flux array (subarray) of shape %s obtained from illumination map." % \
+                        str(flux.shape))
 
             # Check the amount of flux is within a sensible range.
             # Give a warning if the flux is likely to saturate the
@@ -2613,11 +2670,17 @@ class SensorChipAssembly(object):
             self.metadata["SUBSTRT2"] = self.subarray[0]
             self.metadata["SUBSIZE1"] = subcols
             self.metadata["SUBSIZE2"] = self.subarray[2]
+            if self._verbose > 1:
+                self.logger.info("Output subarray defined. SUBSTRT=(%d,%d), SUBSIZE=(%d,%d)" % \
+                    (self.subarray[1], self.subarray[0], subcols, self.subarray[2]))
         else:
             self.metadata["SUBSTRT1"] = 1 # 1 indexed
             self.metadata["SUBSTRT2"] = 1 # 1 indexed
             self.metadata["SUBSIZE1"] = subcols
             self.metadata["SUBSIZE2"] = self.shape[0]
+            if self._verbose > 1:
+                self.logger.info("Output subarray undefined or FULL. SUBSTRT=(1,1), SUBSIZE=(%d,%d)" % \
+                    (subcols, self.shape[0]))
         self.metadata["SUBBURST"] = self.subarray_burst_mode
 
         # Adjust the World Coordinates metadata contained in the INTENSITY
@@ -2695,6 +2758,10 @@ class SensorChipAssembly(object):
             #substrt2 = self.metadata["SUBSTRT2"]
             substrt2 = self.subarray[0]
         intensity_metadata['CRPIX2'] = crpix2 + 1 - substrt2
+
+        if self._verbose > 1:
+            self.logger.info("WCS keywords defined as CRPIX1=%d, CRPIX2=%d" % \
+                (intensity_metadata['CRPIX1'], intensity_metadata['CRPIX2']))
 
 # REMOVED: Bugs 434 and 413
 # As a compromise between Bugs 434 and 413 do not add the extra axes
@@ -3354,7 +3421,8 @@ class SensorChipAssembly(object):
         else:
             strg += "\n%sDetector subarray mode is %s " % \
                 (prefix, self.subarray_str)
-            strg += "(%d %d %d %d)." % tuple(self.subarray)
+            strg += " %s." % str(self.subarray)
+            #strg += "(%d %d %d %d)." % tuple(self.subarray)
         return strg
 
     def simulate_files(self, inputfile, outputfile, detectorid, scale=1.0,
