@@ -189,7 +189,7 @@ class MiriIlluminationModel(MiriDataModel):
         # Re-initialise data type on save
        self._init_data_type()
         
-    def truncate(self, maxshape):
+    def truncate(self, maxshape, leftcolumns=4, rightcolumns=4):
         """
         
         Truncate the illumination map to the given maximum size
@@ -198,32 +198,67 @@ class MiriIlluminationModel(MiriDataModel):
         assert(isinstance(maxshape, (list,tuple)))
         maxrows = maxshape[0]
         maxcolumns = maxshape[1]
-        if len(self.intensity.shape) > 2:
-            # 3-D data
-            if self.intensity.shape[2] > maxcolumns:
-                self.intensity = self.intensity[:,:,:maxcolumns]
-            if self.intensity.shape[1] > maxrows:
-                self.intensity = self.intensity[:,:maxrows,:]
+        
+        # A special case when the oversized data happens to be
+        # exactly the same number of columns as maximum columns
+        # plus reference columns. In this case cut off the
+        # reference columns rather than truncating the data.
+        if self.intensity.shape[1] == (leftcolumns + maxcolumns + rightcolumns):
+            # Special case. Cut off reference columns.
+            if len(self.intensity.shape) > 2:
+                # 3-D data
+                if self.intensity.shape[2] > maxcolumns:
+                    self.intensity = self.intensity[:,:,leftcolumns:maxcolumns+leftcolumns]
+                if self.intensity.shape[1] > maxrows:
+                    self.intensity = self.intensity[:,:maxrows,:]
+            else:
+                # 2-D data
+                if self.intensity.shape[1] > maxcolumns:
+                    self.intensity = self.intensity[:,leftcolumns:maxcolumns+leftcolumns]
+                if self.intensity.shape[0] > maxrows:
+                    self.intensity = self.intensity[:maxrows,:]
+    
+            if len(self.wavelength.shape) > 2:
+                # 3-D data
+                if self.wavelength.shape[2] > maxcolumns:
+                    self.wavelength = self.wavelength[:,:,leftcolumns:maxcolumns+leftcolumns]
+                if self.wavelength.shape[1] > maxrows:
+                    self.wavelength = self.wavelength[:,:maxrows,:]
+            else:
+                # 2-D data
+                if self.wavelength.shape[1] > maxcolumns:
+                    self.wavelength = self.wavelength[:,leftcolumns:maxcolumns+leftcolumns]
+                if self.wavelength.shape[0] > maxrows:
+                    self.wavelength = self.wavelength[:maxrows,:]
+           
         else:
-            # 2-D data
-            if self.intensity.shape[1] > maxcolumns:
-                self.intensity = self.intensity[:,:maxcolumns]
-            if self.intensity.shape[0] > maxrows:
-                self.intensity = self.intensity[:maxrows,:]
-
-        if len(self.wavelength.shape) > 2:
-            # 3-D data
-            if self.wavelength.shape[2] > maxcolumns:
-                self.wavelength = self.wavelength[:,:,:maxcolumns]
-            if self.wavelength.shape[1] > maxrows:
-                self.wavelength = self.wavelength[:,:maxrows,:]
-        else:
-            # 2-D data
-            if self.wavelength.shape[1] > maxcolumns:
-                self.wavelength = self.wavelength[:,:maxcolumns]
-            if self.wavelength.shape[0] > maxrows:
-                self.wavelength = self.wavelength[:maxrows,:]
- 
+            # General oversized data. Cut off the excess columns and rows.
+            if len(self.intensity.shape) > 2:
+                # 3-D data
+                if self.intensity.shape[2] > maxcolumns:
+                    self.intensity = self.intensity[:,:,:maxcolumns]
+                if self.intensity.shape[1] > maxrows:
+                    self.intensity = self.intensity[:,:maxrows,:]
+            else:
+                # 2-D data
+                if self.intensity.shape[1] > maxcolumns:
+                    self.intensity = self.intensity[:,:maxcolumns]
+                if self.intensity.shape[0] > maxrows:
+                    self.intensity = self.intensity[:maxrows,:]
+    
+            if len(self.wavelength.shape) > 2:
+                # 3-D data
+                if self.wavelength.shape[2] > maxcolumns:
+                    self.wavelength = self.wavelength[:,:,:maxcolumns]
+                if self.wavelength.shape[1] > maxrows:
+                    self.wavelength = self.wavelength[:,:maxrows,:]
+            else:
+                # 2-D data
+                if self.wavelength.shape[1] > maxcolumns:
+                    self.wavelength = self.wavelength[:,:maxcolumns]
+                if self.wavelength.shape[0] > maxrows:
+                    self.wavelength = self.wavelength[:maxrows,:]
+     
         if not self._check_wavelength(self.intensity, self.wavelength):
             strg = "Shape of wavelength array (%s) " % \
                 str(self.wavelength.shape)
