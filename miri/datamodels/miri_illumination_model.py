@@ -58,6 +58,10 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 28 Jun 2018: Switch to using get_title_and_metadata() to display data model
              information.
 13 Dec 2019: get_illumination_enlarged function documented (Bug 612).
+06 Jun 2020: Modified the truncate function to recognises an full-sized
+             illumination array that already contains reference pixels
+             (MIRI-700).
+
 
 @author: Steven Beard (UKATC)
 
@@ -203,7 +207,7 @@ class MiriIlluminationModel(MiriDataModel):
         # exactly the same number of columns as maximum columns
         # plus reference columns. In this case cut off the
         # reference columns rather than truncating the data.
-        if self.intensity.shape[2] == (leftcolumns + maxcolumns + rightcolumns):
+        if self.intensity.shape[-1] == (leftcolumns + maxcolumns + rightcolumns):
             # Special case. Cut off reference columns.
             if len(self.intensity.shape) > 2:
                 # 3-D data
