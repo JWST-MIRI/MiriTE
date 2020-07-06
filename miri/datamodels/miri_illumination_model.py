@@ -203,7 +203,7 @@ class MiriIlluminationModel(MiriDataModel):
         # exactly the same number of columns as maximum columns
         # plus reference columns. In this case cut off the
         # reference columns rather than truncating the data.
-        if self.intensity.shape[1] == (leftcolumns + maxcolumns + rightcolumns):
+        if self.intensity.shape[2] == (leftcolumns + maxcolumns + rightcolumns):
             # Special case. Cut off reference columns.
             if len(self.intensity.shape) > 2:
                 # 3-D data
