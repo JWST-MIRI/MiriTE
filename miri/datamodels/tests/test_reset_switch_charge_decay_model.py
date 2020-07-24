@@ -84,7 +84,7 @@ class TestMiriResetSwitchChargeDecayModel(unittest.TestCase):
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
             with MiriResetSwitchChargeDecayModel(self.testfile) as readback:
-                self.assertIsNotNone(readback.rscd_table)
+                self.assertIsNotNone(readback)
 #                self.assertEqual( len(self.dataproduct.rscd_table),
 #                                  len(readback.rscd_table) )
 #                original = np.asarray(self.dataproduct.rscd_table)
