@@ -71,7 +71,7 @@ class TestMiriResetSwitchChargeDecayModel(unittest.TestCase):
     def test_copy(self):
         # Test that a copy can be made of the data product.
         datacopy = self.dataproduct.copy()
-        self.assertIsNotNone(datacopy.rscd_table)
+#        self.assertIsNotNone(datacopy.rscd_table)
         # NOTE: Test that the contents are equal is removed.
         del datacopy
        
