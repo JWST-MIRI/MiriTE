@@ -184,7 +184,7 @@ if __name__ == "__main__":
     wdata = 5.0 * np.ones_like(datavalues)
     map_object = MiriIlluminationModel(intensity=datavalues, wavelength=wdata)
     map_object.set_instrument_metadata( "MIRIMAGE" )
-    if subarray_str is not None:
+    if subarray_str:
         map_object.set_subarray_metadata( subarray_str )
  
     if verbose > 1:
