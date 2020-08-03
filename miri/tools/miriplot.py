@@ -84,6 +84,7 @@ d = thin diamond
              Corrected references to old miri.miritools packages.
 18 May 2018: Changed deprecated logger.warn() to logger.warning(). Fixed
              incorrect log statements.
+03 Aug 2020: Corrected inconsistent use of pyplot.clear().
 
 @author: Steven Beard (UKATC)
 
@@ -417,10 +418,12 @@ def plot_text(text, xpos=0.05, ypos=0.95, pyplt=plt, plotfig=None,
         # displaying it. (Otherwise the caller is responsible for doing this).
         if showplot:
             pyplt.show()
-            plotfig.clear()
-            del plotfig, plotaxis
-#             pyplt.clf()
-#             pyplt.close()
+            pyplt.clf()
+            pyplt.close()
+            if plotfig is not None:
+                del plotfig
+            if plotaxis is not None:
+                del plotaxis
             plotaxis = None
             
         # Return the axis object in which the text was added.
@@ -579,13 +582,14 @@ def plot_xy(xdata, ydata, yerr=None, pyplt=plt, plotfig=None, plotaxis=None,
         # displaying it. (Otherwise the caller is responsible for doing this).
         if showplot:
             pyplt.show()
-            # Tidy up
-            plotfig.clear()
-            del plotfig, plotaxis
-#             pyplt.clf()
-#             pyplt.close()
+            pyplt.clf()
+            pyplt.close()
+            if plotfig is not None:
+                del plotfig
+            if plotaxis is not None:
+                del plotaxis
             plotaxis = None
-            
+
         # Return the axis object in which the plot was created.
         return plotaxis
     else:
@@ -772,7 +776,14 @@ def plot_circles(xdata, ydata, radii, pyplt=plt, plotfig=None, plotaxis=None,
         # displaying it. (Otherwise the caller is responsible for doing this).
         if showplot:
             pyplt.show()
-            
+            pyplt.clf()
+            pyplt.close()
+            if plotfig is not None:
+                del plotfig
+            if plotaxis is not None:
+                del plotaxis
+            plotaxis = None
+
         # Return the axis object in which the plot was created.
         return plotaxis
     else:
@@ -972,6 +983,13 @@ def plot_ellipses(xdata, ydata, majors, minors, tilts, pyplt=plt, plotfig=None, 
         # displaying it. (Otherwise the caller is responsible for doing this).
         if showplot:
             pyplt.show()
+            pyplt.clf()
+            pyplt.close()
+            if plotfig is not None:
+                del plotfig
+            if plotaxis is not None:
+                del plotaxis
+            plotaxis = None
             
         # Return the axis object in which the plot was created.
         return plotaxis
@@ -1148,12 +1166,10 @@ def plot_xycolumn(xdata, ylist, yerrlist=None, pyplt=plt, figsize=(8,10),
                         ylabels, plotxdata, ydata, yerr, **kwargs)
                 subno += 1
                 plotno += 1
-    
+
         if showplot:
             # Show the plot and tidy up.
             pyplt.show()
-            fig.clear()
-            del fig
             pyplt.clf()
             pyplt.close()
     else:
@@ -1330,13 +1346,14 @@ def plot_hist(data, bins=30, equalwidths=True, pyplt=plt, plotfig=None,
         # displaying it. (Otherwise the caller is responsible for doing this).
         if showplot:
             pyplt.show()
-            # Tidy up
-            plotfig.clear()
-            del plotfig, plotaxis
-#             pyplt.clf()
-#             pyplt.close()
+            pyplt.clf()
+            pyplt.close()
+            if plotfig is not None:
+                del plotfig
+            if plotaxis is not None:
+                del plotaxis
             plotaxis = None
-            
+
         # Return the axis object in which the plot was created.
         return plotaxis
     else:
@@ -1491,11 +1508,13 @@ def plot_image(data, pyplt=plt, plotfig=None, plotaxis=None, figsize=(10,10),
             # displaying it. (Otherwise the caller is responsible for doing this).
             if showplot:
                 pyplt.show()
-                # Tidy up
-                plotfig.clear()
-                del plotfig, plotaxis
-#                 pyplt.clf()
-#                 pyplt.close()
+                pyplt.clf()
+                pyplt.close()
+                if plotfig is not None:
+                    del plotfig
+                if plotaxis is not None:
+                    del plotaxis
+                plotaxis = None
 
         elif plotdata.ndim == 3:
             # For 3-D data there is no point in the caller providing a
@@ -1664,10 +1683,8 @@ def plot_images(datalist, pyplt=plt, figsize=(10,10), equal_aspect=False,
         if showplot:
             pyplt.show()
             # Tidy up
-            fig.clear()
-            del fig
-#             pyplt.clf()
-#             pyplt.close()
+            pyplt.clf()
+            pyplt.close()
     else:
         logger.warning("matplotlib.pyplot not available")
         return None
@@ -1852,13 +1869,14 @@ def plot_image2D(data, pyplt=plt, plotfig=None, plotaxis=None, figsize=(10,10),
         # displaying it. (Otherwise the caller is responsible for doing this).
         if showplot:
             pyplt.show()
-            # Tidy up
-            plotfig.clear()
-            del plotfig, plotaxis
-#             pyplt.clf()
-#             pyplt.close()
+            pyplt.clf()
+            pyplt.close()
+            if plotfig is not None:
+                del plotfig
+            if plotaxis is not None:
+                del plotaxis
             plotaxis = None
-            
+
         # Delete the temporary plot data
         del plotdata
             
@@ -2010,10 +2028,8 @@ def plot_image3D(data, pyplt=plt, plotfig=None, figsize=(10,10),
         if showplot:
             pyplt.show()
             # Tidy up
-            fig.clear()
-            del fig
-#             pyplt.clf()
-#             pyplt.close()
+            pyplt.clf()
+            pyplt.close()
     else:
         logger.warning("matplotlib.pyplot not available")
 
