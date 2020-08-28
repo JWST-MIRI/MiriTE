@@ -238,6 +238,7 @@ Calibration Data Products (CDPs).
              electrons.
 05 Mar 2020: Added print statements to debug readnoise variation.
 16 Apr 2020: Removed references to obsolete amplifier class.
+28 Aug 2020: MIRI-656: Extract reference pixel correction from DARK CDP.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -1268,6 +1269,43 @@ class DetectorArray(object):
 #         self.dark_averaged = True
 #         del dark_model
 
+    def _extract_refpix(self, dark_model ):
+        """
+        
+        Extract a reference pixel correction from the given dark data model.
+        
+        """
+        #print("_extract_refpix")
+        if dark_model is not None:
+            # Create a reference pixel correction model, if relevant
+            if self.left_columns > 0:
+                refpix_even = np.zeros([self.left_columns, dark_model.data.shape[-3]])
+                refpix_odd = np.zeros([self.left_columns, dark_model.data.shape[-3]])
+                #print("refpix_even shape", refpix_even.shape)
+                #print("dark shape", dark_model.data.shape)
+            
+                # Check if the DARK model touches the left edge.
+                if (dark_model.meta.subarray.name == "FULL") or \
+                   ((dark_model.meta.subarray.xstart == 1) and (dark_model.meta.subarray.xsize > self.left_columns)):
+                    # Subarray touches the left hand edge. Extract the reference pixel correction
+                    # from the median of all the odd and even columns.
+                    for group in range(0, dark_model.data.shape[-3]):
+                        for amp in range(0,self.left_columns):
+                            #print("Calcuating refpix correction for group", group, "amp", amp)
+                            refpix_even[amp,group] = np.median(dark_model.data[1,group,::2,amp])
+                            refpix_odd[amp,group] = np.median(dark_model.data[1,group,1::2,amp])
+                    #print("refpix_even", refpix_even)
+                    #print("refpix_odd", refpix_odd)
+                    return (refpix_even, refpix_odd)
+                else:
+                    # Subarray does not contain reference pixels. TODO.
+                    return None
+            else:
+                # No reference pixels
+                return None
+        else:
+            return None
+
 # This version fetches a DARK CDP from the repository.
     def add_dark_map_cdp(self, detector, readpatt=None, subarray=None,
                          averaged=False, cdp_ftp_host=None,
@@ -1313,6 +1351,7 @@ class DetectorArray(object):
             self.dark_map_filename = ''
             self.dark_averaged = averaged
             self.mean_dark = 0.0
+            self.refpix_correction = None
             return
  
 #         # Get the required CDP version numbers
@@ -1412,6 +1451,7 @@ class DetectorArray(object):
                 self.dark_map_filename = ''
                 self.mean_dark = 0.0
                 self.dark_averaged = averaged
+                self.refpix_correction = None
                 return
             
             self.dark_map_filename = local_filename
@@ -1457,6 +1497,7 @@ class DetectorArray(object):
                     new_map[:,self.bottom_rows:,:] = dark_map
                     dark_map = new_map
                 self.dark_averaged = True
+                self.refpix_correction = None
      
                 # Plot the dark map if requested.
                 if self._verbose > 1 and self._makeplot:
@@ -1472,6 +1513,9 @@ class DetectorArray(object):
                 self.dark_averaged = False
                 dark_map = dark_model.data
                 self.mean_dark = np.mean(dark_map[0,0,:,:])
+
+                # Extract a reference pixel correction from the dark model
+                self.refpix_correction = self._extract_refpix( dark_model )
     
                 # Plot the dark map if requested.
                 # Only a subset of the full data can be plotted.
@@ -1479,6 +1523,11 @@ class DetectorArray(object):
                     tstrg = "First group of dark map obtained from " + \
                         os.path.basename(self.dark_map_filename)
                     mplt.plot_image(dark_map[0,0,:,:], title=tstrg)
+
+                    if self.refpix_correction is not None:
+                        (even_refpix, odd_refpix) = self.refpix_correction
+                        mplt.plot_image(even_refpix, title="Even reference pixel correction")
+                        mplt.plot_image(odd_refpix, title="Odd reference pixel correction")
      
             if self.dark_map is not None:
                 del self.dark_map
