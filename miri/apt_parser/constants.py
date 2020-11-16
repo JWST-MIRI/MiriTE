@@ -74,7 +74,7 @@ MIRI_CAR = {"1024": "MIRI-007", "1027": "MIRI-011", "1028": "MIRI-012",
             "1054": "MIRI-075", "1171": "OTE-34", "1172": "OTE-35",
             "1173": "MIRI-001", "1259": "MIRI-076", "1261": "MIRI-077",
             "1406": "MIRI-078", "1011": "MIRI-002", "1012": "MIRI-004",
-            "1023": "MIRI-005"}
+            "1023": "MIRI-005", "1439": "MIRI-081", "1546": "MIRI-065"}
 
 # Invert previous dict
 MIRI_STSCI_ID = {v: k for k, v in MIRI_CAR.items()}
