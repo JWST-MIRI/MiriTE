@@ -507,6 +507,23 @@ class PoissonIntegrator(object):
         else:
             self.pedestal = None
 
+    def get_bucket_size(self):
+        """
+        
+        Return the bucket size
+        
+        """
+        return self.bucket_size
+
+    def new_bucket_size(self, bucket_size):
+        """
+        
+        Define a new bucket size, which will change the maximum count
+        used to define pixel saturation.
+        
+        """
+        self.bucket_size = bucket_size
+
     def reset(self, nresets=1, new_exposure=False):
         """
         

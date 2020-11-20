@@ -713,6 +713,7 @@ class DetectorArray(object):
             self.pixels.set_zeropoint(None, None)
         
         self.simulate_nonlinearity = simulate_nonlinearity
+        self.saturation_adjusted = False
         if self.simulate_nonlinearity and not NONLINEARITY_BY_TABLE:
             self.pixels.set_sensitivity( self._sca['SENSITIVITY'] )
         else:
@@ -847,8 +848,10 @@ class DetectorArray(object):
             self.add_gain_map(self._sca['DETECTOR'], cdp_ftp_host=cdp_ftp_host,
                               cdp_ftp_path=cdp_ftp_path,
                               cdp_version=gain_version)
+            mingain = float(max(1.0, self.gain_map.min()))
         else:
             self.add_gain_map(None)
+            mingain = 1.0
             
         # Extract the bias and dark current from the DARK CDP associated
         # with this detector.
@@ -893,16 +896,29 @@ class DetectorArray(object):
             self.add_flat_map(None)
 
         # Get the pixel flat-field associated with this detector.
+        # Adjust the detector saturation level to account for the linearity correction.
+        # The saturation adjustment should only happen once.
+        if not self.saturation_adjusted:
+            old_bucket_dn = int(self.pixels.get_bucket_size() / mingain)
+            if old_bucket_dn > 65535:
+                old_bucket_dn = None
+        else:
+            old_bucket_dn = None
         self.linearity_table_left = None
         self.linearity_table_right = None
         if self.simulate_nonlinearity and NONLINEARITY_BY_TABLE:
-            self.add_linearity_table(self._sca['DETECTOR'], mirifilter=mirifilter,
-                              miriband=miriband, cdp_ftp_host=cdp_ftp_host,
-                              cdp_ftp_path=cdp_ftp_path,
-                              cdp_version=linearity_version)
+            new_bucket_dn = self.add_linearity_table(self._sca['DETECTOR'],
+                                            mirifilter=mirifilter,
+                                            miriband=miriband, cdp_ftp_host=cdp_ftp_host,
+                                            cdp_ftp_path=cdp_ftp_path,
+                                            cdp_version=linearity_version,
+                                            old_saturation_dn=old_bucket_dn)
+            if new_bucket_dn is not None:
+                print("Changing saturation level from", old_bucket_dn, "to", new_bucket_dn)
+                self.pixels.new_bucket_size( int(new_bucket_dn * mingain) )
         else:
             self.add_linearity_table(None)
- 
+         
         # Get the read noise associated with this detector.
         self.readnoise_map = None
         if self.simulate_read_noise:
@@ -1706,7 +1722,7 @@ class DetectorArray(object):
 
     def add_linearity_table(self, detector, mirifilter=None, miriband=None,
                      cdp_ftp_host=None, cdp_ftp_path=SIM_CDP_FTP_PATH,
-                     cdp_version=''):
+                     cdp_version='', old_saturation_dn=None):
         """
         
         Add a linearity correction associated with the detector.
@@ -1735,6 +1751,15 @@ class DetectorArray(object):
             If not specified, the default CDP repository at Leuven is used.        
         cdp_version: string, optional, default=''
             A specific pixel flat-field CDP version number of the form 'x.y.z'.
+        old_saturation_dn: int, optional, default=None
+            If specified a saturation level (in DN) to be translated by the
+            linearity correction. A new level is returned.
+            
+        :Returns:
+        
+        new_saturation_dn: int
+            A new detector saturation level in DN.
+            None if no translation is requested.
        
         """
         # If a null detector label is given, clear the linearity correction.
@@ -1792,17 +1817,38 @@ class DetectorArray(object):
             return
 
         self.linearity_filename = linearity_model.meta.filename
+
         # Extract the linearity tables from the left and right halves of 
-        # the linearity CDP.
+        # the linearity CDP. First define the limits.
         ncolumns = linearity_model.data.shape[-1]
         nrows = linearity_model.data.shape[-2]
         leftcol = ncolumns//4
         rightcol = leftcol + ncolumns//2
         row = nrows//2
+                
+        # Use the forward tables to determine the expected saturation level.
+        if old_saturation_dn is not None:
+            forward_table_left = \
+                linearity_model.get_forward_table(row, leftcol)
+            forward_table_right = \
+                linearity_model.get_forward_table(row, rightcol)
+            new_saturation_dn = max(forward_table_left[old_saturation_dn],
+                                    forward_table_right[old_saturation_dn] )
+            # The saturation level should only be adjusted once.
+            self.saturation_adjusted = True
+        else:
+            new_saturation_dn = None
+
+        # Extract the reverse tables, ensuring they are long enough to cope with
+        # the maximum saturation level.
+        if new_saturation_dn is not None:
+            maxlevel = max(65535, new_saturation_dn)
+        else:
+            maxlevel = 65535
         self.linearity_table_left = \
-            linearity_model.get_reverse_table(row, leftcol)
+            linearity_model.get_reverse_table(row, leftcol, max_dn=maxlevel)
         self.linearity_table_right = \
-            linearity_model.get_reverse_table(row, rightcol)
+            linearity_model.get_reverse_table(row, rightcol, max_dn=maxlevel)
 
         # Plot the linearity tables if requested.
         if self._verbose > 1 and self._makeplot:
@@ -1820,6 +1866,7 @@ class DetectorArray(object):
 
         del linearity_model
         #gc.collect() # FIXME: Solve file open issue before using this.
+        return new_saturation_dn
 
     def add_readnoise_map(self, detector, readpatt=None, cdp_ftp_host=None, 
                           cdp_ftp_path=SIM_CDP_FTP_PATH, cdp_version=''):
