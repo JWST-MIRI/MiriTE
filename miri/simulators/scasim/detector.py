@@ -239,6 +239,8 @@ Calibration Data Products (CDPs).
 05 Mar 2020: Added print statements to debug readnoise variation.
 16 Apr 2020: Removed references to obsolete amplifier class.
 28 Aug 2020: MIRI-656: Extract reference pixel correction from DARK CDP.
+20 Nov 2020: MIRI-656: Correct the DARK CDP using the reference pixel
+             correction step.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -253,6 +255,8 @@ import os
 import math
 # import gc # FIXME: Solve file open issue before using this.
 import numpy as np
+
+import jwst.pipeline.calwebb_detector1 as calwebb_detector1
 
 # Import the miri.tools plotting module.
 import miri.tools.miriplot as mplt
@@ -1269,6 +1273,7 @@ class DetectorArray(object):
 #         self.dark_averaged = True
 #         del dark_model
 
+# MIRI-656
     def _extract_refpix(self, dark_model ):
         """
         
@@ -1506,6 +1511,10 @@ class DetectorArray(object):
                     mplt.plot_image(dark_map, title=tstrg)
                     #mplt.plot_hist(dark_map.ravel(), title=tstrg)
             else:
+                # MIRI-656: Apply a reference pixel correction to the DARK model.
+                # FIXME: This correction cannot be tested due to MemoryError.
+                dark_model = calwebb_detector1.refpix_step.refpix_correction( dark_model )
+
                 # The full-sized DARK model is added to the final ramp data in DN,
                 # so it does not need to be scaled by the gain.
                 # Since the full-sized DARK is already very large, it is not
@@ -1514,8 +1523,8 @@ class DetectorArray(object):
                 dark_map = dark_model.data
                 self.mean_dark = np.mean(dark_map[0,0,:,:])
 
-                # Extract a reference pixel correction from the dark model
-                self.refpix_correction = self._extract_refpix( dark_model )
+#                 # MIRI-656: Extract a reference pixel correction from the dark model
+#                 self.refpix_correction = self._extract_refpix( dark_model )
     
                 # Plot the dark map if requested.
                 # Only a subset of the full data can be plotted.
@@ -1524,10 +1533,11 @@ class DetectorArray(object):
                         os.path.basename(self.dark_map_filename)
                     mplt.plot_image(dark_map[0,0,:,:], title=tstrg)
 
-                    if self.refpix_correction is not None:
-                        (even_refpix, odd_refpix) = self.refpix_correction
-                        mplt.plot_image(even_refpix, title="Even reference pixel correction")
-                        mplt.plot_image(odd_refpix, title="Odd reference pixel correction")
+#                     # Plot the reference pixel correction if needed.
+#                     if self.refpix_correction is not None:
+#                         (even_refpix, odd_refpix) = self.refpix_correction
+#                         mplt.plot_image(even_refpix, title="Even reference pixel correction")
+#                         mplt.plot_image(odd_refpix, title="Odd reference pixel correction")
      
             if self.dark_map is not None:
                 del self.dark_map
