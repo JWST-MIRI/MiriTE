@@ -35,6 +35,10 @@ wheels/
 pip-log.txt
 pip-delete-this-directory.txt
 
+# Uncompressed versions of installed data files
+miri/simulators/data/cosmic_rays/*.fits
+miri/simulators/scasim/data/SCATestHorseHead1024.fits
+
 # Unit test / coverage reports
 htmlcov/
 .tox/
