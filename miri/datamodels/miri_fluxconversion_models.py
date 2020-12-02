@@ -93,6 +93,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              is also changed from "arcsec^2" to "steradian".
 26 Mar 2020: Ensure the model_type remains as originally defined when saving
              to a file.
+02 Dec 2020: Update import of jwst base model class to JwstDataModel.
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -106,7 +107,7 @@ LOGGER = logging.getLogger("miri.datamodels") # Get a logger
 import numpy as np
 
 # Import the MIRI base data model and utilities.
-from jwst.datamodels.model_base import DataModel
+from jwst.datamodels import JwstDataModel
 from miri.datamodels.ancestry import get_my_model_type
 from miri.datamodels.dqflags import insert_value_column
 from miri.datamodels.miri_model_base import MiriDataModel
@@ -120,7 +121,7 @@ __all__ = ['MiriFluxconversionModel', \
            'MiriLrsFluxconversionModel', \
            'MiriMrsFluxconversionModel']
 
-# class FluxModel(DataModel):
+# class FluxModel(JwstDataModel):
 #     """
 #     
 #     A data model for a trivial flux table. Used for testing.
@@ -145,7 +146,7 @@ class MiriFluxconversionModel(MiriDataModel):
     """
     
     A generic data model for a MIRI flux conversion table, based on the STScI
-    base model, DataModel.
+    base model, JwstDataModel.
     
     :Parameters:
     
@@ -169,7 +170,7 @@ class MiriFluxconversionModel(MiriDataModel):
         A flux table must either be defined in the initializer or in
         this parameter. A blank table is not allowed.
     \*\*kwargs:
-        All other keyword arguments are passed to the DataModel initialiser.
+        All other keyword arguments are passed to the JwstDataModel initialiser.
         See the jwst.datamodels documentation for the meaning of these keywords.
         
     """

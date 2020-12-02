@@ -185,6 +185,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 13 Dec 2019: Modified copy_metadata to prevent DATAMODL, FILETYPE, FILENAME
              and REFTYPE keywords being copied.
 10 Feb 2020: Corrected typo in the list_data_arrays function.
+02 Dec 2020: Update jwst imports that have moved to the stdatamodels package.
+             Remove work-around for the 'SIMPLE' and 'EXTEND' FITS keywords,
+             which are handled correctly by stdatamodels.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -203,9 +206,9 @@ from asdf.tags.core import HistoryEntry
 from  asdf import AsdfFile
 from asdf import schema as asdf_schema
 # Import the STScI base data model and utilities
-import jwst.datamodels.fits_support as mfits
-import jwst.datamodels.schema as mschema
-from jwst.datamodels.model_base import DataModel
+import stdatamodels.fits_support as mfits
+import stdatamodels.schema as mschema
+from jwst.datamodels import JwstDataModel
 
 # Import the MIRI data models and the data model plotter.
 import miri.datamodels
@@ -384,11 +387,11 @@ def _shape_to_string(shape, axes=None):
     return strg
 
 
-class MiriDataModel(DataModel):
+class MiriDataModel(JwstDataModel):
     """
 
     A base data model for MIRI data, with MIRI-specific utilities and
-    add-ons, based on the STScI base model, DataModel. The MiriDataModel
+    add-ons, based on the STScI base model, JwstDataModel. The MiriDataModel
     also includes MIRI-specific additions to the metadata.
 
     :Parameters:
@@ -408,7 +411,7 @@ class MiriDataModel(DataModel):
         An additional descriptive title for the data structure (if the
         default title contained in the schema is too vague).
     \*\*kwargs:
-        All other keyword arguments are passed to the DataModel initialiser.
+        All other keyword arguments are passed to the JwstDataModel initialiser.
         See the jwst.datamodels documentation for the meaning of these keywords.
 
     """
@@ -2079,10 +2082,7 @@ class MiriDataModel(DataModel):
                 return
             if not include_history and keyw == 'HISTORY':
                 return
-            if not include_builtin and mfits._is_builtin_fits_keyword(keyw):
-                return
-            # Work around bug in mfits
-            if not include_builtin and (keyw == 'SIMPLE' or keyw == 'EXTEND'):
+            if not include_builtin and mfits.is_builtin_fits_keyword(keyw):
                 return
             comment = subschema.get('title')
             kw = '.'.join(path)
@@ -2155,10 +2155,7 @@ class MiriDataModel(DataModel):
                 return
             if not include_history and keyw == 'HISTORY':
                 return
-            if not include_builtin and mfits._is_builtin_fits_keyword(keyw):
-                return
-            # Work around bug in mfits
-            if not include_builtin and (keyw == 'SIMPLE' or keyw == 'EXTEND'):
+            if not include_builtin and mfits.is_builtin_fits_keyword(keyw):
                 return
             kw = '.'.join(path)
             if not include_undefined and self[kw] is None:

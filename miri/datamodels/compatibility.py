@@ -22,6 +22,7 @@ old MIRI data model and the new one. The module serves two purposes:
 06 Feb 2013: Most of the contents moved to MiriDataModel.
 09 Jul 2014: field_def changed to dq_def.
 09 Sep 2015: Brought up to date with changes to the dq_def table.
+02 Dec 2020: Removed unused jwst imports.
 
 @author: Steven Beard (UKATC)
 
@@ -31,10 +32,6 @@ import sys, os
 
 import numpy as np
 import numpy.ma as ma
-
-# Import the STScI image model and utilities
-import jwst.datamodels.util as jmutil
-from jwst.datamodels.model_base import DataModel
 
 from miri.datamodels.dqflags import insert_value_column
 
