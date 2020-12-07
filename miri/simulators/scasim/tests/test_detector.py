@@ -35,6 +35,8 @@ should be executed first.
              Import more detector parameters from detector_properties.
 01 Apr 2020: Improve the memory usage by not opening full-sized CDP files
              when running tests on a tiny detector.
+07-Dec-2020: Some tests were still opening full-sized CDP files when not
+             needed. Corrected. This change should reduce memory usage.
 
 @author: Steven Beard (UKATC)
 
@@ -178,6 +180,12 @@ class TestDetectorArray(unittest.TestCase):
                           left_columns=-1, right_columns=-1,
                           bottom_rows=-1, top_rows=-1,
                           well_depth=_FIRST_DETECTOR['WELL_DEPTH'],
+                          simulate_read_noise=False,
+                          simulate_bad_pixels=False,
+                          simulate_dark_current=False,
+                          simulate_flat_field=False,
+                          simulate_gain=False,
+                          simulate_nonlinearity=False,
                           verbose=0, logger=LOGGER)
         # Having no reference pixels at all should be ok
         det = DetectorArray(_KNOWN_DETECTORS[0],
@@ -263,6 +271,12 @@ class TestDetectorArray(unittest.TestCase):
                                       bottom_rows=_FIRST_DETECTOR['BOTTOM_ROWS'],
                                       top_rows=_FIRST_DETECTOR['TOP_ROWS'],
                                       well_depth=_FIRST_DETECTOR['WELL_DEPTH'],
+                                      simulate_read_noise=False,
+                                      simulate_bad_pixels=False,
+                                      simulate_dark_current=False,
+                                      simulate_flat_field=False,
+                                      simulate_gain=False,
+                                      simulate_nonlinearity=False,                                   
                                       verbose=0, logger=LOGGER)
             full_fast_time = miri_detector.frame_time(1, 0)
             self.assertAlmostEqual(full_fast_time, 2.77504, places=5)
