@@ -175,7 +175,7 @@ data/example_filter.fits, example_measurements.fits:
 05 Jan 2018: More version control information added. SVN info dropped.
 15 Nov 2018: Documentation update.
 07 Dec 2020: Add workaround to suppress debug messages from jwst.datamodels
-             in Pipeline build 7.6.
+             in Pipeline build 7.6. Print warning if newer build is detected.
 """
 
 __project__ = 'MIRI Data Model Software'
@@ -191,6 +191,11 @@ try:
     import jwst.datamodels
     jwst.datamodels.util.log.setLevel(logging.INFO)
     jwst.datamodels.fits_support.log.setLevel(logging.INFO)
+
+    # Warn if newer JWST PL build is detected
+    if jwst.__version__ > '0.17.1':
+        print("Warning: miri package found version of 'jwst' newer than 0.17.1 (build 7.6); please remove workaround"
+              "for MIRI-944.")
 except Exception:
     pass
 # MIRI-944: end of workaround.
