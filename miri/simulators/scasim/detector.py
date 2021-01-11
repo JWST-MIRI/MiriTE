@@ -1638,7 +1638,8 @@ class DetectorArray(object):
                 logstrg += " with band=\'%s\'" % miriband
                 alternative = True
             if alternative:
-                logstrg += ". An alternative is being used."
+                logstrg += ". An alternative (%s) is being used." % \
+                    str(flat_model.meta.filename)
             self.logger.warning(logstrg)
                 
         self.flat_map_filename = flat_model.meta.filename
