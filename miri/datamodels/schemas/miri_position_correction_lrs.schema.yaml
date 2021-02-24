@@ -34,4 +34,4 @@ allOf:
         unit: micron
       - name: pos_corr
         datatype: float32
-        shape: [81]
+        ndim: 1

@@ -76,19 +76,19 @@ allOf:
         datatype: [ascii, 15]
       - name: wavelength
         datatype: float32
-        shape: [388]
+        ndim: 1
         unit: micron
       - name: nelem_wl
         datatype: uint16
       - name: size
         datatype: uint8
-        shape: [40]
+        ndim: 1
         unit: pixels
       - name: nelem_size
         datatype: uint8
       - name: apcorr
         datatype: float32
-        shape: [388, 40]
+        ndim: 2
       - name: apcorr_err
         datatype: float32
-        shape: [388, 40]
+        ndim: 2
