@@ -183,7 +183,7 @@ data/example_filter.fits, example_measurements.fits:
 __project__ = 'MIRI Data Model Software'
 __author__ = 'MIRI Software Team'
 __maintainer__ = 'MIRI Software Team: mirisim@roe.ac.uk'
-__copyright__ = '2020, %s' % __author__
+__copyright__ = '2021, %s' % __author__
 
 # MIRI-949: temporary workaround to avoid debug-level log messages from the
 # 'stdatamodels' package in Pipeline build 7.7. This workaround should be

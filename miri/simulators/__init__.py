@@ -53,7 +53,7 @@ data/detector/*.fits
 __project__ = 'MIRI Simulators'
 __author__ = 'MIRI Software Team'
 __maintainer__ = 'MIRI Software Team: mirisim@roe.ac.uk'
-__copyright__ = '2020, %s' % __author__
+__copyright__ = '2021, %s' % __author__
 
 # Import classes that need to be accessible from the miri.simulators level.
 from miri.simulators.integrators import PoissonIntegrator, ImperfectIntegrator

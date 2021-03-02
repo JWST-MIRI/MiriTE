@@ -53,4 +53,4 @@ Data
 __project__ = 'MIRI Tools Software'
 __author__ = 'MIRI Software Team'
 __maintainer__ = 'MIRI Software Team: mirisim@roe.ac.uk'
-__copyright__ = '2020, %s' % __author__
+__copyright__ = '2021, %s' % __author__
