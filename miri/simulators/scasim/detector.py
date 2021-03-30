@@ -1640,7 +1640,10 @@ class DetectorArray(object):
             if alternative:
                 logstrg += ". An alternative (%s) is being used." % \
                     str(flat_model.meta.filename)
-            self.logger.warning(logstrg)
+            if alternative:
+                self.logger.info("*NOTE*: " + logstrg)
+            else:
+                self.logger.warning(logstrg)
                 
         self.flat_map_filename = flat_model.meta.filename
         # Fill the masked parts of the flat-field. Do not reshape the
