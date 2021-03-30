@@ -314,7 +314,7 @@ setup(
     entry_points=entry_points,
     install_requires=[
         'Cython>=0.29.15',
-        'jwst>=0.15.0',
+        'jwst>=0.18.0',
         'matplotlib>=3.1.0',
         'numpy>=1.18.1',
         'parameterized>=0.7.0',

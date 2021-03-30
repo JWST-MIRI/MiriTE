@@ -36,6 +36,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 27 Jun 2018: Added HasDataErrAndGroups class to be used with ramp data.
 12 Mar 2019: Removed use of astropy.extern.six (since Python 2 no longer used).
 12 Feb 2020: Added _check_broadcastable() methods.
+02 Dec 2020: Update import of jwst base model class to JwstDataModel.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -49,7 +50,7 @@ from miri.datamodels.dqflags import master_flags, combine_quality
 
 # Import the STScI image model and utilities
 import jwst.datamodels.util as jmutil
-from jwst.datamodels.model_base import DataModel
+from jwst.datamodels import JwstDataModel
 
 # List all classes and global functions here.
 __all__ = ['are_broadcastable', 'HasMask', 'HasData', 'HasDataErrAndDq']
@@ -186,7 +187,7 @@ class HasMask(object):
             # work provided the two arrays are broadcastable.
             newobject.dq = self.dq | np.asarray(other, dtype=self.dq.dtype)
 
-        elif isinstance(other, DataModel) and hasattr(other, 'dq'):
+        elif isinstance(other, JwstDataModel) and hasattr(other, 'dq'):
             # Two mask data products are being combined together.
             newobject.dq = self.dq | other.dq
 
@@ -223,7 +224,7 @@ class HasMask(object):
             # work provided the two arrays are broadcastable.
             newobject.dq = self.dq ^ np.asarray(other, dtype=self.dq.dtype)
 
-        elif isinstance(other, DataModel) and \
+        elif isinstance(other, JwstDataModel) and \
              hasattr(other, 'dq') and self._isvalid(other.dq):
             # Two mask data products are being combined together.
             newobject.dq = self.dq ^ other.dq
@@ -261,7 +262,7 @@ class HasMask(object):
             # work provided the two arrays are broadcastable.
             newobject.dq = self.dq & np.asarray(other, dtype=self.dq.dtype)
 
-        elif isinstance(other, DataModel) and \
+        elif isinstance(other, JwstDataModel) and \
              hasattr(other, 'dq') and self._isvalid(other.dq):
             # Two mask data products are being combined together.
             newobject.dq = self.dq & other.dq
@@ -358,7 +359,7 @@ class HasData(object):
             # work provided the two arrays are broadcastable.
             newobject.data = self.data + np.asarray(other)
             
-        elif isinstance(other, DataModel):
+        elif isinstance(other, JwstDataModel):
             # Two data products are being added together. Ensure they
             # both have a valid primary data array.
             if hasattr(other, 'data') and self._isvalid(other.data):
@@ -397,7 +398,7 @@ class HasData(object):
             # work provided the two arrays are broadcastable.
             newobject.data = self.data - np.asarray(other)
             
-        elif isinstance(other, DataModel):
+        elif isinstance(other, JwstDataModel):
             # Two data products are being subtracted together. Ensure they
             # both have a valid primary data array.
             if hasattr(other, 'data') and self._isvalid(other.data):
@@ -436,7 +437,7 @@ class HasData(object):
             # work provided the two arrays are broadcastable.
             newobject.data = self.data * np.asarray(other)
             
-        elif isinstance(other, DataModel):
+        elif isinstance(other, JwstDataModel):
             # Two data products are being multiplied together. Ensure they
             # both have a valid primary data array.
             if hasattr(other, 'data') and self._isvalid(other.data):
@@ -480,7 +481,7 @@ class HasData(object):
             # NOTE: Any divide by zero operations will be trapped by numpy.
             newobject.data = self.data / np.asarray(other)
             
-        elif isinstance(other, DataModel):
+        elif isinstance(other, JwstDataModel):
             # The data product is being divided by another. Ensure they
             # both have a valid primary data array.
             # NOTE: Any divide by zero operations will be trapped by numpy.
@@ -927,7 +928,7 @@ class HasDataErrAndDq(HasData):
     def __add__(self, other):
         """
         
-        Add a scalar, an array or another DataModel object to
+        Add a scalar, an array or another JwstDataModel object to
         this MiriMeasuredModel object.
         
         """
@@ -955,7 +956,7 @@ class HasDataErrAndDq(HasData):
                 newobject.err = np.zeros_like(self.err)
             newobject.dq = self.dq
              
-        elif isinstance(other, DataModel):
+        elif isinstance(other, JwstDataModel):
             # Two data products are being added together. Ensure they
             # both have a valid primary data array.
             if hasattr(other, 'data') and self._isvalid(other.data):
@@ -986,7 +987,7 @@ class HasDataErrAndDq(HasData):
     def __sub__(self, other):
         """
         
-        Subtract a scalar, an array or another DataModel object from
+        Subtract a scalar, an array or another JwstDataModel object from
         this MiriMeasuredModel object.
         
         """  
@@ -1014,7 +1015,7 @@ class HasDataErrAndDq(HasData):
                 newobject.err = np.zeros_like(self.err)
             newobject.dq = self.dq
             
-        elif isinstance(other, DataModel):
+        elif isinstance(other, JwstDataModel):
             # Two data products are being subtracted. Ensure they
             # both have a valid primary data array.
             if hasattr(other, 'data') and self._isvalid(other.data):
@@ -1045,7 +1046,7 @@ class HasDataErrAndDq(HasData):
         """
         
         Multiply this MiriMeasuredModel object by a scalar, an array or
-        another DataModel object.
+        another JwstDataModel object.
         
         """  
         # Check this object is capable of mathematical operation.
@@ -1072,7 +1073,7 @@ class HasDataErrAndDq(HasData):
                 newobject.err = np.zeros_like(self.err)
             newobject.dq = self.dq
             
-        elif isinstance(other, DataModel):
+        elif isinstance(other, JwstDataModel):
             # Two data products are being multiplied together. Ensure they
             # both have a valid primary data array.
             if hasattr(other, 'data') and self._isvalid(other.data):
@@ -1104,7 +1105,7 @@ class HasDataErrAndDq(HasData):
         """
         
         Divide this MiriMeasuredModel object by a scalar, an array or
-        another DataModel object.
+        another JwstDataModel object.
         
         """  
         # Check this object is capable of mathematical operation.
@@ -1137,7 +1138,7 @@ class HasDataErrAndDq(HasData):
                 newobject.err = np.zeros_like(self.err)
             newobject.dq = self.dq
             
-        elif isinstance(other, DataModel):
+        elif isinstance(other, JwstDataModel):
             # The data product is being divided by another. Ensure they
             # both have a valid primary data array.
             # NOTE: Any divide by zero operations will be trapped by numpy.
@@ -1244,7 +1245,7 @@ class HasDataErrAndGroups(HasDataErrAndDq):
     def __add__(self, other):
         """
         
-        Add a scalar, an array or another DataModel object to
+        Add a scalar, an array or another JwstDataModel object to
         this MiriMeasuredModel object.
         
         """
@@ -1274,7 +1275,7 @@ class HasDataErrAndGroups(HasDataErrAndDq):
             newobject.pixeldq = self.pixeldq
             newobject.groupdq = self.groupdq
              
-        elif isinstance(other, DataModel):
+        elif isinstance(other, JwstDataModel):
             # Two data products are being added together. Ensure they
             # both have a valid primary data array.
             if hasattr(other, 'data') and self._isvalid(other.data):
@@ -1307,7 +1308,7 @@ class HasDataErrAndGroups(HasDataErrAndDq):
     def __sub__(self, other):
         """
         
-        Subtract a scalar, an array or another DataModel object from
+        Subtract a scalar, an array or another JwstDataModel object from
         this MiriMeasuredModel object.
         
         """  
@@ -1337,7 +1338,7 @@ class HasDataErrAndGroups(HasDataErrAndDq):
             newobject.pixeldq = self.pixeldq
             newobject.groupdq = self.groupdq
             
-        elif isinstance(other, DataModel):
+        elif isinstance(other, JwstDataModel):
             # Two data products are being subtracted. Ensure they
             # both have a valid primary data array.
             if hasattr(other, 'data') and self._isvalid(other.data):
@@ -1370,7 +1371,7 @@ class HasDataErrAndGroups(HasDataErrAndDq):
         """
         
         Multiply this MiriMeasuredModel object by a scalar, an array or
-        another DataModel object.
+        another JwstDataModel object.
         
         """  
         # Check this object is capable of mathematical operation.
@@ -1399,7 +1400,7 @@ class HasDataErrAndGroups(HasDataErrAndDq):
             newobject.pixeldq = self.pixeldq
             newobject.groupdq = self.groupdq
             
-        elif isinstance(other, DataModel):
+        elif isinstance(other, JwstDataModel):
             # Two data products are being multiplied together. Ensure they
             # both have a valid primary data array.
             if hasattr(other, 'data') and self._isvalid(other.data):
@@ -1433,7 +1434,7 @@ class HasDataErrAndGroups(HasDataErrAndDq):
         """
         
         Divide this MiriMeasuredModel object by a scalar, an array or
-        another DataModel object.
+        another JwstDataModel object.
         
         """  
         # Check this object is capable of mathematical operation.
@@ -1468,7 +1469,7 @@ class HasDataErrAndGroups(HasDataErrAndDq):
             newobject.pixeldq = self.pixeldq
             newobject.groupdq = self.groupdq
             
-        elif isinstance(other, DataModel):
+        elif isinstance(other, JwstDataModel):
             # The data product is being divided by another. Ensure they
             # both have a valid primary data array.
             # NOTE: Any divide by zero operations will be trapped by numpy.
