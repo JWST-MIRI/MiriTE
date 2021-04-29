@@ -6,7 +6,7 @@ allOf:
     meta:
       type: object
       properties:
-        fringefreq_table:
+        fringefreq_table_short:
           type: object
           title: Information about the fringe frequencies table
           properties:
@@ -14,35 +14,212 @@ allOf:
               type: string
               title: Column 1 units
               default: ''
-              fits_hdu: FRINGE_FREQ
+              fits_hdu: RFC_FREQ_SHORT
               fits_keyword: TUNIT1
             tunit2:
               type: string
               title: Column 2 units
               default: cm^-1
-              fits_hdu: FRINGE_FREQ
+              fits_hdu: RFC_FREQ_SHORT
               fits_keyword: TUNIT2
             tunit3:
               type: string
               title: Column 3 units
               default: cm^-1
-              fits_hdu: FRINGE_FREQ
+              fits_hdu: RFC_FREQ_SHORT
               fits_keyword: TUNIT3
             tunit4:
               type: string
               title: Column 4 units
               default: ''
-              fits_hdu: FRINGE_FREQ
+              fits_hdu: RFC_FREQ_SHORT
               fits_keyword: TUNIT4
-    fringefreq_table:
-      title: Fringe frequencies table
-      fits_hdu: FRINGE_FREQ
+            tunit5:
+              type: string
+              title: Column 5 units
+              default: ''
+              fits_hdu: RFC_FREQ_SHORT
+              fits_keyword: TUNIT5
+            tunit6:
+              type: string
+              title: Column 6 units
+              default: ''
+              fits_hdu: RFC_FREQ_SHORT
+              fits_keyword: TUNIT6
+            tunit7:
+              type: string
+              title: Column 7 units
+              default: cm^-1
+              fits_hdu: RFC_FREQ_SHORT
+              fits_keyword: TUNIT7
+        fringefreq_table_medium:
+          type: object
+          title: Information about the fringe frequencies table
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: ''
+              fits_hdu: RFC_FREQ_MEDIUM
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: cm^-1
+              fits_hdu: RFC_FREQ_MEDIUM
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: cm^-1
+              fits_hdu: RFC_FREQ_MEDIUM
+              fits_keyword: TUNIT3
+            tunit4:
+              type: string
+              title: Column 4 units
+              default: ''
+              fits_hdu: RFC_FREQ_MEDIUM
+              fits_keyword: TUNIT4
+            tunit5:
+              type: string
+              title: Column 5 units
+              default: ''
+              fits_hdu: RFC_FREQ_MEDIUM
+              fits_keyword: TUNIT5
+            tunit6:
+              type: string
+              title: Column 6 units
+              default: ''
+              fits_hdu: RFC_FREQ_MEDIUM
+              fits_keyword: TUNIT6
+            tunit7:
+              type: string
+              title: Column 7 units
+              default: cm^-1
+              fits_hdu: RFC_FREQ_MEDIUM
+              fits_keyword: TUNIT7
+        fringefreq_table_long:
+          type: object
+          title: Information about the fringe frequencies table
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: ''
+              fits_hdu: RFC_FREQ_LONG
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: cm^-1
+              fits_hdu: RFC_FREQ_LONG
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: cm^-1
+              fits_hdu: RFC_FREQ_LONG
+              fits_keyword: TUNIT3
+            tunit4:
+              type: string
+              title: Column 4 units
+              default: ''
+              fits_hdu: RFC_FREQ_LONG
+              fits_keyword: TUNIT4
+            tunit5:
+              type: string
+              title: Column 5 units
+              default: ''
+              fits_hdu: RFC_FREQ_LONG
+              fits_keyword: TUNIT5
+            tunit6:
+              type: string
+              title: Column 6 units
+              default: ''
+              fits_hdu: RFC_FREQ_LONG
+              fits_keyword: TUNIT6
+            tunit7:
+              type: string
+              title: Column 7 units
+              default: cm^-1
+              fits_hdu: RFC_FREQ_LONG
+              fits_keyword: TUNIT7
+        max_amp:
+          type: object
+          title: Information about the fringe frequencies table
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: micron
+              fits_hdu: MAX_AMP
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: ''
+              fits_hdu: MAX_AMP
+              fits_keyword: TUNIT2
+    fringefreq_table_short:
+      title: Fringe frequencies table for SHORT
+      fits_hdu: RFC_FREQ_SHORT
       datatype:
-      - name: sub_band
-        datatype: [ascii, 16]
-      - name: wavenumber
+      - name: slice
         datatype: float64
-      - name: deltawavenumber
+      - name: ffreq
         datatype: float64
-      - name: maxamplitude
+      - name: dffreq
         datatype: float64
+      - name: min_nfringes
+        datatype: int64
+      - name: max_nfringes
+        datatype: int64
+      - name: min_snr
+        datatype: float64
+      - name: pgram_res
+        datatype: float64
+    fringefreq_table_medium:
+      title: Fringe frequencies table for MEDIUM
+      fits_hdu: RFC_FREQ_MEDIUM
+      datatype:
+      - name: slice
+        datatype: float64
+      - name: ffreq
+        datatype: float64
+      - name: dffreq
+        datatype: float64
+      - name: min_nfringes
+        datatype: int64
+      - name: max_nfringes
+        datatype: int64
+      - name: min_snr
+        datatype: float64
+      - name: pgram_res
+        datatype: float64
+    fringefreq_table_long:
+      title: Fringe frequencies table for LONG
+      fits_hdu: RFC_FREQ_LONG
+      datatype:
+      - name: slice
+        datatype: float64
+      - name: ffreq
+        datatype: float64
+      - name: dffreq
+        datatype: float64
+      - name: min_nfringes
+        datatype: int64
+      - name: max_nfringes
+        datatype: int64
+      - name: min_snr
+        datatype: float64
+      - name: pgram_res
+        datatype: float64
+    max_amp:
+      title: Maximum amplitude of residual fringes
+      fits_hdu: MAX_AMP
+      datatype:
+      - name: Wavelength
+        datatype: float64
+      - name: Amplitude
+        datatype: float64
+
