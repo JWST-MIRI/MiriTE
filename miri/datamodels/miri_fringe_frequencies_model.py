@@ -26,13 +26,18 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              a corresponding model defined in ancestry.py).
 26 Mar 2020: Ensure the model_type remains as originally defined when saving
              to a file.
+29 Apr 2021: Updated to work with the new CDP structure defined in the yaml file.
+             Modified the form of the fringefreq_table parameter, now parsed and
+             assigned to the relevant datamodel attributes, changed the inputs to
+             the small test when run as main to work with new CDP class, updated
+             docstring
 
-@author: Steven Beard (UKATC), Vincent Geers (UKATC)
+@author: Steven Beard (UKATC), Vincent Geers (UKATC), Patrick Kavanagh (DIAS)
 
 """
 
 import warnings
-#import numpy as np
+import numpy as np
 
 # Import the MIRI base data model and utilities.
 from miri.datamodels.ancestry import get_my_model_type
@@ -60,11 +65,14 @@ class MiriMrsFringeFrequenciesModel(MiriDataModel):
         * Readable file object: Initialize from the given file object.
         * pyfits.HDUList: Initialize from the given pyfits.HDUList.
         
-    fringefreq_table: list of tuples or numpy record array (optional)
-        Either: A list of tuples containing columns in the aperture
-        correction table;
+    fringefreq_tables: list of list of tuples or numpy record array (optional)
+        A list of 4 lists or recarrays, the first three containing the fringe
+        frequencies of SHORT, MEDIUM, and LONG, and the fourth containing
+        the maximum residual fringe amplitude array.
+        For each, either: A list of tuples containing columns in the aperture
+        fringe frequency or maximum amplitude tables;
         Or: A numpy record array containing the same information as above.
-        A fringe frequencies table must either be defined in the
+        The tables must either be defined in the
         initializer or in this parameter. A blank table is not allowed.
     \*\*kwargs:
         All other keyword arguments are passed to the DataModel initialiser.
@@ -72,7 +80,7 @@ class MiriMrsFringeFrequenciesModel(MiriDataModel):
         
     """
     schema_url = "miri_fringe_frequencies_mrs.schema"
-    fieldnames = ('sub_band', 'wavenumber', 'deltawavenumber', 'maxamplitude')
+    fieldnames = ('slice', 'ffreq', 'dffreq', 'min_nfringes', 'max_nfringes', 'min_snr', 'pgram_res')
     
     def __init__(self, init=None, fringefreq_table=None, **kwargs):
         """
@@ -93,14 +101,17 @@ class MiriMrsFringeFrequenciesModel(MiriDataModel):
         
         if fringefreq_table is not None:
             try:
-                self.fringefreq_table = fringefreq_table
+                self.fringefreq_table_short = fringefreq_table[0]
+                self.fringefreq_table_medium = fringefreq_table[1]
+                self.fringefreq_table_long = fringefreq_table[2]
+                self.max_amp = fringefreq_table[3]
             except (ValueError, TypeError) as e:
-                strg = "fringefreq_table must be a numpy record array or list of records."
+                strg = "fringefreq_table must be a list of 4 lists or recarrays (SHORT, MEDIUM, LONG, MAX_AMP)"
                 strg += "\n   %s" % str(e)
                 raise TypeError(strg)
          
         # Copy the table column units from the schema, if defined.
-        fringefreq_units = self.set_table_units('fringefreq_table')
+        _ = self.set_table_units('fringefreq_table_short')
 
     def _init_data_type(self):
         # Initialise the data model type
@@ -123,10 +134,23 @@ if __name__ == '__main__':
     PLOTTING = False
     SAVE_FILES = False
 
-    fringefreqdata = [('ANY', 11.0,  0.1, 42.0),
-                      ('ANY', 12.0,  0.2, 22.0),
-                      ('ANY', 13.0,  0.3, 32.0),
-                      ('ANY', 14.0,  0.4, 12.0)]
+    fringefreqentry = [(101.0, np.array([2.9,0]), np.array([0.3,0]), np.array([5,0]),
+                        np.array([30, 0]), np.array([10,0]), np.array([0.005,0])),
+                       (102.0, np.array([2.9, 0]), np.array([0.3, 0]), np.array([5, 0]),
+                        np.array([30, 0]), np.array([10, 0]), np.array([0.005, 0])),
+                       (103.0, np.array([2.9, 0]), np.array([0.3, 0]), np.array([5, 0]),
+                        np.array([30, 0]), np.array([10, 0]), np.array([0.005, 0])),
+                       (104.0, np.array([2.9, 0]), np.array([0.3, 0]), np.array([5, 0]),
+                        np.array([30, 0]), np.array([10, 0]), np.array([0.005, 0]))
+                       ]
+
+    # max_amp arrays
+    wav = np.linspace(4.0, 10.0, 20)
+    amp = np.ones(wav.shape) * 0.2
+    maxampentry = list(zip(wav.tolist(), amp.tolist()))
+
+    # test data
+    fringefreqdata = [fringefreqentry, fringefreqentry, fringefreqentry, maxampentry]
 
     print("\nFringe frequencies with factors derived from list of tuples:")
     with MiriMrsFringeFrequenciesModel( fringefreq_table=fringefreqdata ) as testfringefreq1:
