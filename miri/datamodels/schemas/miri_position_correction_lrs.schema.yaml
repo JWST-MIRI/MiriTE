@@ -14,20 +14,20 @@ allOf:
               type: string
               title: Column 1 units
               default: micron
-              fits_hdu: POS_CORR
+              fits_hdu: POSCORR
               fits_keyword: TUNIT1
             tunit2:
               type: string
               title: Column 2 units
               default: ''
-              fits_hdu: POS_CORR
+              fits_hdu: POSCORR
               fits_keyword: TUNIT2
 
 - type: object
   properties:
     poscorr_table:
       title: Position correction table
-      fits_hdu: POS_CORR
+      fits_hdu: POSCORR
       datatype:
       - name: wavelength
         datatype: float32

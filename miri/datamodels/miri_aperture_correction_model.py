@@ -325,7 +325,7 @@ class MiriLrsPositionCorrectionModel(MiriDataModel):
         super(MiriLrsPositionCorrectionModel, self).__init__(init=init, **kwargs)
 
         # Data type is position correction.
-        self.meta.reftype = 'POS_CORR'
+        self.meta.reftype = 'POSCORR'
         # Initialise the model type
         self._init_data_type()
         # This is a reference data model.
