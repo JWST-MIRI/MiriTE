@@ -164,7 +164,7 @@ allOf:
       title: Fringe frequencies table for SHORT
       fits_hdu: RFC_FREQ_SHORT
       datatype:
-      - name: slice
+      - name: Slice
         datatype: float64
       - name: ffreq
         datatype: float64
@@ -182,7 +182,7 @@ allOf:
       title: Fringe frequencies table for MEDIUM
       fits_hdu: RFC_FREQ_MEDIUM
       datatype:
-      - name: slice
+      - name: Slice
         datatype: float64
       - name: ffreq
         datatype: float64
@@ -200,7 +200,7 @@ allOf:
       title: Fringe frequencies table for LONG
       fits_hdu: RFC_FREQ_LONG
       datatype:
-      - name: slice
+      - name: Slice
         datatype: float64
       - name: ffreq
         datatype: float64
