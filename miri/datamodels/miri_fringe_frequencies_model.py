@@ -80,7 +80,7 @@ class MiriMrsFringeFrequenciesModel(MiriDataModel):
         
     """
     schema_url = "miri_fringe_frequencies_mrs.schema"
-    fieldnames = ('slice', 'ffreq', 'dffreq', 'min_nfringes', 'max_nfringes', 'min_snr', 'pgram_res')
+    fieldnames = ('Slice', 'ffreq', 'dffreq', 'min_nfringes', 'max_nfringes', 'min_snr', 'pgram_res')
     
     def __init__(self, init=None, fringefreq_table=None, **kwargs):
         """
