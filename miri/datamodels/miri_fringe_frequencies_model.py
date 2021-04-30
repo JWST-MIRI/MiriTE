@@ -80,7 +80,7 @@ class MiriMrsFringeFrequenciesModel(MiriDataModel):
         
     """
     schema_url = "miri_fringe_frequencies_mrs.schema"
-    fieldnames = ('Slice', 'ffreq', 'dffreq', 'min_nfringes', 'max_nfringes', 'min_snr', 'pgram_res')
+    fieldnames = ('slice', 'ffreq', 'dffreq', 'min_nfringes', 'max_nfringes', 'min_snr', 'pgram_res')
     
     def __init__(self, init=None, fringefreq_table=None, **kwargs):
         """
@@ -112,6 +112,9 @@ class MiriMrsFringeFrequenciesModel(MiriDataModel):
          
         # Copy the table column units from the schema, if defined.
         _ = self.set_table_units('fringefreq_table_short')
+        _ = self.set_table_units('fringefreq_table_medium')
+        _ = self.set_table_units('fringefreq_table_long')
+        _ = self.set_table_units('max_amp')
 
     def _init_data_type(self):
         # Initialise the data model type
