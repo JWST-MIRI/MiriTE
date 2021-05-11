@@ -264,8 +264,6 @@ class MiriLrsApertureCorrectionModel(MiriDataModel):
             
         # Copy the table column units from the schema, if defined.
         apcorr_units = self.set_table_units('apcorr_table')
-        self.set_fits_keyword("SIZEUNIT", "pixels", "APCORR")
-        self.set_fits_keyword("WAVEUNIT", "micron", "APCORR")
         
     def _init_data_type(self):
         # Initialise the data model type
@@ -361,7 +359,7 @@ if __name__ == '__main__':
     print("Testing the miri_aperture_correction_model module.")
     
     PLOTTING = False
-    SAVE_FILES = False
+    SAVE_FILES = True
 
     apercorrdata = [(5.0, 'nominal', 4.87,  7.76,  8.57, 1.0,  0.0, 42.0, 0.1),
                    (10.0, 'nominal', 5.87,  8.76,  9.57, 1.0,  0.0, 32.0, 0.1),
