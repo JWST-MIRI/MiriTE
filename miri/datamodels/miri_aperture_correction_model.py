@@ -264,8 +264,6 @@ class MiriLrsApertureCorrectionModel(MiriDataModel):
             
         # Copy the table column units from the schema, if defined.
         apcorr_units = self.set_table_units('apcorr_table')
-        self.set_fits_keyword("SIZEUNIT", "pixels", "APCORR")
-        self.set_fits_keyword("WAVEUNIT", "micron", "APCORR")
         
     def _init_data_type(self):
         # Initialise the data model type
@@ -325,7 +323,7 @@ class MiriLrsPositionCorrectionModel(MiriDataModel):
         super(MiriLrsPositionCorrectionModel, self).__init__(init=init, **kwargs)
 
         # Data type is position correction.
-        self.meta.reftype = 'POS_CORR'
+        self.meta.reftype = 'POSCORR'
         # Initialise the model type
         self._init_data_type()
         # This is a reference data model.

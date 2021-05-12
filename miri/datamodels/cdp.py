@@ -79,6 +79,8 @@ http://ssb.stsci.edu/doc/jwst/jwst/introduction.html#crds-reference-files
              straylight model.
 12 Mar 2019: Added 'SPECWCS' as an alias for 'DISTORTION'.
 11 May 2020: CDP-3, CDP-6 and CDP-7 versions of data models removed.
+02 May 2021: Added LRS data models: aperture, position and throughput correction
+             models from module miri_aperture_correction_model.py
 
 @author: Steven Beard (UKATC), Vincent Geers (DIAS)
 
@@ -113,7 +115,8 @@ from miri.datamodels.miri_wavelength_correction_model import \
 from miri.datamodels.miri_spectral_spatial_resolution_model import \
     MiriMrsResolutionModel
 from miri.datamodels.miri_aperture_correction_model import \
-    MiriMrsApertureCorrectionModel
+    MiriMrsApertureCorrectionModel, MiriLrsApertureCorrectionModel, \
+    MiriLrsThroughputCorrectionModel, MiriLrsPositionCorrectionModel
 from miri.datamodels.miri_reset_switch_charge_decay_model import \
     MiriResetSwitchChargeDecayModel
 from miri.datamodels.miri_gain_model import MiriGainModel
@@ -210,6 +213,9 @@ CDP_DICT = { \
             'WAVCORR' : MiriMrsWavelengthCorrectionModel, \
             'RESOL'   : MiriMrsResolutionModel, \
             'APERCORR' : MiriMrsApertureCorrectionModel, \
+            'APCORR' : MiriLrsApertureCorrectionModel, \
+            'THROUGHCORR' : MiriLrsThroughputCorrectionModel, \
+            'POSCORR' : MiriLrsPositionCorrectionModel, \
             # -----------------------------------------------------------
             # Legacy Keywords and Data Products - Backwards Compatibility Only
             # The following section could be removed without affecting the
