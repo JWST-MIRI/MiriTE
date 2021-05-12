@@ -359,7 +359,7 @@ if __name__ == '__main__':
     print("Testing the miri_aperture_correction_model module.")
     
     PLOTTING = False
-    SAVE_FILES = True
+    SAVE_FILES = False
 
     apercorrdata = [(5.0, 'nominal', 4.87,  7.76,  8.57, 1.0,  0.0, 42.0, 0.1),
                    (10.0, 'nominal', 5.87,  8.76,  9.57, 1.0,  0.0, 32.0, 0.1),
