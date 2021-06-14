@@ -159,7 +159,7 @@ CDP_METADATA = [['TELESCOP', 'JWST'],
                 ['SUBARRAY', MIRI_SUBARRAYS + ['FULL', 'GENERIC', 'N/A']],
                 ['FASTAXIS', 1],
                 ['SLOWAXIS', 2],
-                ['PEDIGREE', ['GROUND', 'DUMMY', 'SIMULATION']],
+                ['PEDIGREE', ['FLIGHT', 'GROUND', 'DUMMY', 'SIMULATION']],
                 ['USEAFTER', []],  # Empty list means any value accepted.
                 ['DESCRIP', []],  # Empty list means any value accepted.
                 ['AUTHOR', []],  # Empty list means any value accepted.
