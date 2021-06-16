@@ -79,7 +79,7 @@ allOf:
         ndim: 1
         unit: micron
       - name: nelem_wl
-        datatype: uint16
+        datatype: int16
       - name: size
         datatype: uint8
         ndim: 1
