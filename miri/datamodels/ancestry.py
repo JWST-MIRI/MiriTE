@@ -13,6 +13,7 @@ the DATAMODL metadata.
 22 Mar 2019: Return a blank string when a data model does not have an
              STScI equivalent.
 13 Dec 2019: MIRIRampModel replaced with RampModel.
+05 Aug 2021: JWST PsfMaskModel uncommented.
 
 
 @author: Steven Beard (UKATC)
@@ -25,6 +26,7 @@ the DATAMODL metadata.
 #
 # TODO: The gaps in this mapping need to be filled in.
 #       Uncertain mappings are commented out.
+#       MIRI-only data models are deliberately matched to an empty string.
 #
 PARENT_DICT = {'MiriDataModel' : 'DataModel', \
                'MiriRampModel' : 'RampModel', \
@@ -56,10 +58,10 @@ PARENT_DICT = {'MiriDataModel' : 'DataModel', \
                'MiriPixelAreaModel' : 'PixelAreaModel',
                'MiriPixelSaturationModel' : 'SaturationModel', \
                'MiriReadnoiseModel' : 'ReadnoiseModel', \
-#                'MiriPointSpreadFunctionModel' : 'PsfMaskModel', \
-#                'MiriImagingPointSpreadFunctionModel' : 'PsfMaskModel', \
-#                'MiriLrsPointSpreadFunctionModel' : 'PsfMaskModel', \
-#                'MiriMrsPointSpreadFunctionModel' : 'PsfMaskModel', \
+               'MiriPointSpreadFunctionModel' : 'PsfMaskModel', \
+               'MiriImagingPointSpreadFunctionModel' : 'PsfMaskModel', \
+               'MiriLrsPointSpreadFunctionModel' : 'PsfMaskModel', \
+               'MiriMrsPointSpreadFunctionModel' : 'PsfMaskModel', \
                'MiriResetModel' : 'ResetModel', \
                'MiriResetSwitchChargeDecayModel' : 'RSCDModel', \
                'MiriMrsResolutionModel' : 'MiriResolutionModel', \
