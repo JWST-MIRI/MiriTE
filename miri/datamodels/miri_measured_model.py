@@ -119,6 +119,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              from scratch.
 26 Mar 2020: Ensure the model_type remains as originally defined when saving
              to a file.
+06 Aug 2021: Initialise the model type for MiriSimpleModel and MiriMeasuredModel
+             to a generic JWST data model. This corrects a problem where the
+             DATAMODL keyword was still being set to the MIRI data model name.
 
 @author: Steven Beard (UKATC)
 
@@ -182,11 +185,18 @@ class MiriSimpleModel(MiriDataModel, HasData):
 
         """
         super(MiriSimpleModel, self).__init__(init=init, **kwargs)
-        
+                
         # Update the data array if it has been explicitly provided.
         # Otherwise use the array defined by the init or by the default
         # data object.
         HasData.__init__(self, data)
+
+        # Initialise the model type to a generic type. It can be overriden
+        # by a child data model.
+        if self.data.ndim > 2:
+            self.meta.model_type = "CubeModel"
+        else:
+            self.meta.model_type = "ImageModel"        
 
         # Copy the units of the data array from the schema, if defined.
         dataunits = self.set_data_units('data')
@@ -282,7 +292,7 @@ class MiriMeasuredModel(MiriDataModel, HasDataErrAndDq):
 
         """
         super(MiriMeasuredModel, self).__init__(init=init, **kwargs)
-        
+                        
         # Update the data arrays if they have been explicitly provided.
         # Otherwise use the arrays defined by the init or by the default
         # data object.
@@ -306,6 +316,13 @@ class MiriMeasuredModel(MiriDataModel, HasDataErrAndDq):
         else:
             # Creating a new model.
             self._check_broadcastable()
+
+        # Initialise the model type to a generic type. It can be overriden
+        # by a child data model.
+        if self.data.ndim > 2:
+            self.meta.model_type = "CubeModel"
+        else:
+            self.meta.model_type = "ImageModel"        
 
         # Copy the units of the data array from the schema, if defined.
         # The error array should have the same units as the data array,
