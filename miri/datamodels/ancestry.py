@@ -14,7 +14,14 @@ the DATAMODL metadata.
              STScI equivalent.
 13 Dec 2019: MIRIRampModel replaced with RampModel.
 05 Aug 2021: JWST PsfMaskModel uncommented as experiment, then recommented.
-
+02 Sep 2021: Corrections from ticket jwst #34 (from Misty Cracraft):
+             The MiriFringeFlatfieldModel should map toFringeModel,
+             not FlatModel.
+             MiriMrsApertureCorrectionModel should map to MirMrsApcorrModel.
+             MiriImagingPhotometricModel should be MirImgPhotomModel,
+             not MiriImgPhotomModel (extra i).
+             MiriMrsFluxconversionModel should be MirMrsPhotomModel,
+             not MiriMrsPhotomModel (extra i).
 
 @author: Steven Beard (UKATC)
 
@@ -34,7 +41,7 @@ PARENT_DICT = {'MiriDataModel' : 'DataModel', \
                'MiriSlopeModel' : 'ImageModel', \
                'MiriImagingApertureCorrectionModel' : 'MirImgApcorrModel', \
                'MiriLrsApertureCorrectionModel': 'MirLrsApcorrModel',
-               'MiriMrsApertureCorrectionModel': '',
+               'MiriMrsApertureCorrectionModel': 'MirMrsApcorrModel',
                'MiriBadPixelMaskModel' :    'MaskModel', \
                'MiriDarkReferenceModel' : 'DarkMIRIModel', \
                'MiriImagingDistortionModel' : 'DistortionModel', \
@@ -42,10 +49,10 @@ PARENT_DICT = {'MiriDataModel' : 'DataModel', \
                'MiriMrsDistortionModel34' : 'DistortionMRSModel', \
 #                'MiriDroopModel' : '', \
                'MiriFlatfieldModel' : 'FlatModel', \
-               'MiriFringeFlatfieldModel' : 'FlatModel', \
+               'MiriFringeFlatfieldModel' : 'FringeModel', \
                'MiriSkyFlatfieldModel' : 'FlatModel', \
                'MiriTargetFlatfieldModel' : 'FlatModel', \
-               'MiriMrsFluxconversionModel' : 'MiriMrsPhotomModel', \
+               'MiriMrsFluxconversionModel' : 'MirMrsPhotomModel', \
 #                'MiriMrsFringeFrequenciesModel' : 'FringeModel', \
                'MiriGainModel' : 'GainModel', \
                'MiriIPCModel' : 'IPCModel', \
@@ -54,7 +61,7 @@ PARENT_DICT = {'MiriDataModel' : 'DataModel', \
 #                'MiriLatentDecayModel' : '', \
                'MiriLinearityModel' : 'LinearityModel', \
 #                'MiriPceModel' : 'PhotomModel', \
-               'MiriImagingPhotometricModel' : 'MiriImgPhotomModel', \
+               'MiriImagingPhotometricModel' : 'MirImgPhotomModel', \
                'MiriPixelAreaModel' : 'PixelAreaModel',
                'MiriPixelSaturationModel' : 'SaturationModel', \
                'MiriReadnoiseModel' : 'ReadnoiseModel', \
