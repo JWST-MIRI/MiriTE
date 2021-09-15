@@ -366,9 +366,9 @@ class TestMiriImagingPointSpreadFunctionModel(unittest.TestCase):
 
 
 class TestMiriLrsPointSpreadFunctionModel(unittest.TestCase):
-    
+
     # Test the MiriLrsPointSpreadFunctionModel class.
-    
+
     def setUp(self):
         # Create an LRS 3-D PSF product.
         a1 = [[10,20,30,40], [50,60,70,80], [90,100,110,120]]
@@ -389,7 +389,7 @@ class TestMiriLrsPointSpreadFunctionModel(unittest.TestCase):
                                                group_time=10.0,
                                                reset_time=0, frame_resets=3)
         self.testfile = "MiriMiriLrsPointSpreadFunctionModel_test.fits"
-        
+
     def tearDown(self):
         # Tidy up
         del self.dataproduct
@@ -426,7 +426,7 @@ class TestMiriLrsPointSpreadFunctionModel(unittest.TestCase):
         # FIXME: removed dq_def until data corruption bug fixed. Bug 589
         #                       tables=['dq_def'] )
         del datacopy
-        
+
     def test_fitsio(self):
         # Suppress metadata warnings
         with warnings.catch_warnings():
@@ -456,7 +456,7 @@ class TestMiriLrsPointSpreadFunctionModel(unittest.TestCase):
             testproduct = MiriLrsPointSpreadFunctionModel(data=aa1,
                                 err=b1, dq=c1, psftype='PSF-MONOCHROM')
             testproduct.save(self.testfile, overwrite=True)
-            with MiriImagingPointSpreadFunctionModel(self.testfile) as readback:
+            with MiriLrsPointSpreadFunctionModel(self.testfile) as readback:
                 self.assertEqual(testproduct.meta.reftype,
                                  readback.meta.reftype)
                 assert_products_equal( self, testproduct, readback,
@@ -464,7 +464,7 @@ class TestMiriLrsPointSpreadFunctionModel(unittest.TestCase):
                 # FIXME: removed dq_def until data corruption bug fixed. Bug 589
                 #                       tables=['dq_def',] )
                 del readback
-        
+
     def test_description(self):
         # Test that the querying and description functions work.
         # For the test to pass these need to run without error
@@ -478,7 +478,7 @@ class TestMiriLrsPointSpreadFunctionModel(unittest.TestCase):
         descr = self.dataproduct.stats()
         self.assertIsNotNone(descr)
         del descr
-        
+
         # Attempt to access the SCI, ERR and DQ arrays and WAVELENGTH array
         # through attributes.
         descr = str(self.dataproduct.data)
