@@ -22,6 +22,8 @@ the DATAMODL metadata.
              not MiriImgPhotomModel (extra i).
              MiriMrsFluxconversionModel should be MirMrsPhotomModel,
              not MiriMrsPhotomModel (extra i).
+28 Sep 2021: Added missing MiriLrsPhotometricModel/MirLrsPhotomModel and
+             MiriLrsD2WModel/SpecwcsModel
 
 @author: Steven Beard (UKATC)
 
@@ -45,6 +47,7 @@ PARENT_DICT = {'MiriDataModel' : 'DataModel', \
                'MiriBadPixelMaskModel' :    'MaskModel', \
                'MiriDarkReferenceModel' : 'DarkMIRIModel', \
                'MiriImagingDistortionModel' : 'DistortionModel', \
+               'MiriLrsD2WModel' : 'SpecwcsModel', \
                'MiriMrsDistortionModel12' : 'DistortionMRSModel', \
                'MiriMrsDistortionModel34' : 'DistortionMRSModel', \
 #                'MiriDroopModel' : '', \
@@ -62,6 +65,7 @@ PARENT_DICT = {'MiriDataModel' : 'DataModel', \
                'MiriLinearityModel' : 'LinearityModel', \
 #                'MiriPceModel' : 'PhotomModel', \
                'MiriImagingPhotometricModel' : 'MirImgPhotomModel', \
+               'MiriLrsPhotometricModel' : 'MirLrsPhotomModel', \
                'MiriPixelAreaModel' : 'PixelAreaModel',
                'MiriPixelSaturationModel' : 'SaturationModel', \
                'MiriReadnoiseModel' : 'ReadnoiseModel', \
