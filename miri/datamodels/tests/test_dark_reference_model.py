@@ -39,6 +39,8 @@ in the datamodels.miri_dark_reference_model module.
 15 Nov 2018: Schema switched to use JWST darkMIRI.schema.
 07 Oct 2019: FIXME: dq_def removed from unit tests until data corruption
              bug fixed (Bug 589).
+15 Sep 2021: added dq_def back to unit tests after data corruption bug was
+             fixed (MIRI-1156).
 
 @author: Steven Beard (UKATC)
 
@@ -142,10 +144,7 @@ class TestMiriDarkReferenceModel(unittest.TestCase):
         # Test that a copy can be made of the data product.
         datacopy = self.dataproduct.copy()
         self.assertIsNotNone(datacopy)
-        assert_products_equal( self, self.dataproduct, datacopy,
-                               arrays=['data', 'err', 'dq'])
-        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-        #                       tables='dq_def' )
+        assert_products_equal(self, self.dataproduct, datacopy, arrays=['data', 'err', 'dq'], tables='dq_def')
         del datacopy
         
     def test_fitsio(self):
@@ -157,10 +156,7 @@ class TestMiriDarkReferenceModel(unittest.TestCase):
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
             with MiriDarkReferenceModel(self.testfile) as readback:
-                assert_products_equal( self, self.dataproduct, readback,
-                                       arrays=['data', 'err', 'dq'])
-        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-        #                               tables='dq_def' )
+                assert_products_equal(self, self.dataproduct, readback, arrays=['data', 'err', 'dq'], tables='dq_def')
                 del readback
         
     def test_description(self):
@@ -184,6 +180,7 @@ class TestMiriDarkReferenceModel(unittest.TestCase):
         descr = str(self.dataproduct.dq)
         self.assertIsNotNone(descr)
         del descr
+
 
 # If being run as a main program, run the tests.
 if __name__ == '__main__':

@@ -34,6 +34,8 @@ in the datamodels.miri_fluxconversion_model module.
              when the data model is saved to a file.
 07 Oct 2019: FIXME: dq_def removed from unit tests until data corruption
              bug fixed (Bug 589).
+15 Sep 2021: added dq_def back to unit tests after data corruption bug was
+             fixed (MIRI-1156).
 
 @author: Steven Beard (UKATC)
 
@@ -610,10 +612,7 @@ class TestMiriMrsFluxconversionModel(unittest.TestCase):
                                  readback.meta.reftype)
                 self.assertEqual(self.dataproduct.meta.model_type,
                                  readback.meta.model_type)
-                assert_products_equal( self, self.dataproduct, readback,
-                                       arrays=['data', 'err', 'dq'])
-        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-        #                               tables='dq_def' )
+                assert_products_equal(self, self.dataproduct, readback, arrays=['data', 'err', 'dq'], tables='dq_def')
                 del readback
         
     def test_description(self):

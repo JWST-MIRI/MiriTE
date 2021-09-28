@@ -35,6 +35,8 @@ in the datamodels.miri_flatfield_model module.
              when the data model is saved to a file.
 07 Oct 2019: FIXME: dq_def removed from unit tests until data corruption
              bug fixed (Bug 589).
+15 Sep 2021: added dq_def back to unit tests after data corruption bug was
+             fixed (MIRI-1156).
 
 @author: Steven Beard (UKATC)
 
@@ -139,10 +141,7 @@ class TestMiriFlatfieldModel(unittest.TestCase):
         # Test that a copy can be made of the data product.
         datacopy = self.dataproduct.copy()
         self.assertIsNotNone(datacopy)
-        assert_products_equal( self, self.dataproduct, datacopy,
-                               arrays=['data', 'err', 'dq'])
-        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-        #                       tables='dq_def' )
+        assert_products_equal(self, self.dataproduct, datacopy, arrays=['data', 'err', 'dq'], tables='dq_def')
         del datacopy
         
     def test_fitsio(self):
@@ -158,10 +157,7 @@ class TestMiriFlatfieldModel(unittest.TestCase):
                                  readback.meta.reftype)
                 self.assertEqual(self.dataproduct.meta.model_type,
                                  readback.meta.model_type)
-                assert_products_equal( self, self.dataproduct, readback,
-                                       arrays=['data', 'err', 'dq'])
-        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-        #                               tables='dq_def' )
+                assert_products_equal(self, self.dataproduct, readback, arrays=['data', 'err', 'dq'], tables='dq_def')
                 del readback
         
     def test_description(self):
@@ -276,10 +272,7 @@ class TestMiriSkyFlatfieldModel(unittest.TestCase):
         # Test that a copy can be made of the data product.
         datacopy = self.dataproduct.copy()
         self.assertIsNotNone(datacopy)
-        assert_products_equal( self, self.dataproduct, datacopy,
-                               arrays=['data', 'err', 'dq'])
-        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-        #                       tables='dq_def' )
+        assert_products_equal(self, self.dataproduct, datacopy, arrays=['data', 'err', 'dq'], tables='dq_def')
         del datacopy
         
     def test_fitsio(self):
@@ -295,10 +288,7 @@ class TestMiriSkyFlatfieldModel(unittest.TestCase):
                                  readback.meta.reftype)
                 self.assertEqual(self.dataproduct.meta.model_type,
                                  readback.meta.model_type)
-                assert_products_equal( self, self.dataproduct, readback,
-                                       arrays=['data', 'err', 'dq'])
-                # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-                #                       tables='dq_def' )
+                assert_products_equal(self, self.dataproduct, readback, arrays=['data', 'err', 'dq'], tables='dq_def')
                 del readback
         
     def test_description(self):
@@ -413,10 +403,7 @@ class TestMiriFringeFlatfieldModel(unittest.TestCase):
         # Test that a copy can be made of the data product.
         datacopy = self.dataproduct.copy()
         self.assertIsNotNone(datacopy)
-        assert_products_equal( self, self.dataproduct, datacopy,
-                               arrays=['data', 'err', 'dq'])
-        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-        #                       tables='dq_def' )
+        assert_products_equal(self, self.dataproduct, datacopy, arrays=['data', 'err', 'dq'], tables='dq_def')
         del datacopy
         
     def test_fitsio(self):
@@ -432,10 +419,7 @@ class TestMiriFringeFlatfieldModel(unittest.TestCase):
                                  readback.meta.reftype)
                 self.assertEqual(self.dataproduct.meta.model_type,
                                  readback.meta.model_type)
-                assert_products_equal( self, self.dataproduct, readback,
-                                       arrays=['data', 'err', 'dq'])
-                # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-                #                       tables='dq_def' )
+                assert_products_equal(self, self.dataproduct, readback, arrays=['data', 'err', 'dq'], tables='dq_def')
                 del readback
         
     def test_description(self):
@@ -550,10 +534,7 @@ class TestMiriTargetFlatfieldModel(unittest.TestCase):
         # Test that a copy can be made of the data product.
         datacopy = self.dataproduct.copy()
         self.assertIsNotNone(datacopy)
-        assert_products_equal( self, self.dataproduct, datacopy,
-                               arrays=['data', 'err', 'dq'])
-        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-        #                       tables='dq_def' )
+        assert_products_equal(self, self.dataproduct, datacopy, arrays=['data', 'err', 'dq'], tables='dq_def')
         del datacopy
         
     def test_fitsio(self):
@@ -569,10 +550,7 @@ class TestMiriTargetFlatfieldModel(unittest.TestCase):
                                  readback.meta.reftype)
                 self.assertEqual(self.dataproduct.meta.model_type,
                                  readback.meta.model_type)
-                assert_products_equal( self, self.dataproduct, readback,
-                                       arrays=['data', 'err', 'dq'])
-                # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-                #                       tables='dq_def' )
+                assert_products_equal(self, self.dataproduct, readback, arrays=['data', 'err', 'dq'], tables='dq_def')
                 del readback
         
     def test_description(self):

@@ -14,6 +14,8 @@ Simple tests of the data model utility functions in datamodels/util.py.
 04 Oct 2019: BUG IN DQ_DEF!! Disabled verify_cdp
 07 Oct 2019: FIXME: test_verify_cdp_file removed from unit tests until
              data corruption bug fixed (Bug 589).
+15 Sep 2021: re-instated test_verify_cdp_file after data corruption bug was
+             fixed (MIRI-1156).
 
 @author: Steven Beard (UKATC)
 
@@ -21,7 +23,6 @@ Simple tests of the data model utility functions in datamodels/util.py.
 
 import os
 import unittest
-import numpy as np
 
 import astropy.io.fits as pyfits
 
@@ -30,6 +31,7 @@ import miri.datamodels.cdp as cdp
 import miri.datamodels.sim as sim
 
 KEEPFILES = False
+
 
 class TestFileIO(unittest.TestCase):
     
@@ -135,10 +137,9 @@ class TestFileIO(unittest.TestCase):
     def test_verify_cdp_file(self):
         # Check that the CDP verification function passes the simple
         # files created by this test.
-        print("test_verify_cdp_file disabled due to dq_def corruption bug (589)!")
-        # FIXME: Track down the source of the dq_def corruption bug Bug 589
-        #for (filename, datamodel) in self.cdp_models_to_test:
-        #    util.verify_cdp_file(filename, overwrite=True)
+        for (filename, datamodel) in self.cdp_models_to_test:
+            util.verify_cdp_file(filename, overwrite=True)
+
 
 # If being run as a main program, run the tests.
 if __name__ == '__main__':
