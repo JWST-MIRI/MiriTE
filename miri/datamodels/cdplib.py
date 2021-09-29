@@ -130,6 +130,8 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/introduction.html#reference-
 13 Mar 2019: Test the SSH connection after opening it, to prevent a hidden
              connection issue manifesting as an exception at a later time.
 04 Oct 2019: Removed use of astropy.extern.six (since Python 2 no longer used)
+28 Sep 2021: When a readout pattern FASTR1 or SLOWR1 is requested, look
+             for FAST or SLOW readout patterns.
 
 Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -927,8 +929,17 @@ class MiriCDPFolder(object):
         # The readout pattern is optional, and a CDP valid for any
         # pattern is specified by missing it out completely.
         if (readpatt is not None) and (readpatt != 'ANY') and (readpatt != 'N/A'):
-            match_strings.append(readpatt)
-               
+            # NOTE: There are several variations on the FAST readout pattern
+            # (FAST, FASTR1, FASTGRPAVGn) and SLOW readiout pattern
+            # (SLOW, SLOWR1) but there may not be CDPs corresponding exactly
+            # to these. Look only for CDPS matching the basic readout mode.
+            # TODO: Change this when CDPs become available for all modes.
+            #match_strings.append(readpatt)
+            if readpatt.startswith("FAST"):
+                match_strings.append("FAST")
+            if readpatt.startswith("SLOW"):
+                match_strings.append("SLOW")
+         
         # The filter name is optional, and a CDP valid for any
         # filter is specified by missing it out completely.
         # Specifying 'GENERIC' will avoid CDPs designed for specific filters.
@@ -2320,7 +2331,7 @@ if __name__ == '__main__':
         # Check availability of flat-fields.
         print( "\nFlat-fields available for various combinations" )
         for detector in ('MIRIMAGE', 'MIRIFUSHORT', 'MIRIFULONG'):
-            for readpatt in ('FAST', 'SLOW', 'ANY'):
+            for readpatt in ('FAST', 'FASTR1', 'SLOW', 'SLOWR1', 'ANY'):
                 for subarray in ('FULL', 'BRIGHTSKY'):
                     print(detector, "with READPATT=", readpatt,
                           "and subarray=", subarray)
@@ -2567,7 +2578,12 @@ if __name__ == '__main__':
             if detector:
                 must_contain.append(detector)
             if readpatt:
-                must_contain.append(readpatt)
+                # Look for the basic readout pattern
+                #must_contain.append(readpatt)
+                if readpatt.startswith("FAST"):
+                    must_contain.append("FAST")
+                if readpatt.startswith("SLOW"):
+                    must_contain.append("SLOW")
             if subarray and subarray != 'FULL':
                 must_contain.append(subarray)
             else:
@@ -2611,7 +2627,7 @@ if __name__ == '__main__':
 
         print("Dark maps")
         for detector in ('MIRIMAGE', 'MIRIFUSHORT', 'MIRIFULONG'):
-            for readpatt in ('FAST', 'SLOW'):
+            for readpatt in ('FAST', 'FASTR1', 'SLOW', 'SLOWR1'):
                 for subarray in MIRI_SUBARRAYS:
                     strg = "DARK for detector=%s" % detector
                     strg += " readpatt=%s" % readpatt
