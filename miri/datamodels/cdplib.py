@@ -130,8 +130,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/introduction.html#reference-
 13 Mar 2019: Test the SSH connection after opening it, to prevent a hidden
              connection issue manifesting as an exception at a later time.
 04 Oct 2019: Removed use of astropy.extern.six (since Python 2 no longer used)
-28 Sep 2021: When a readout pattern FASTR1 or SLOWR1 is requested, look
-             for FAST or SLOW readout patterns.
+28 Sep 2021: When a readout pattern FASTR1 or SLOWR1 is requested, also look
+             for FAST or SLOW readout patterns. If needed, remove non-exact
+             matches at the filtering stage.
 
 Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -330,7 +331,7 @@ def get_cdp(cdptype, detector, model='FM', readpatt='ANY', channel='ANY',
         The MIRI model required ('VM', 'FM' or 'JPL').
         Defaults to 'FM'.
     readpatt: str (optional)
-        The MIRI readout pattern required ('FAST', 'SLOW', or 'ANY').
+        The MIRI readout pattern required ('FAST', 'FASTR1', 'SLOW', 'SLOWR1' or 'ANY').
         Defaults to 'ANY', which will match any readout pattern.  
     channel: str (optional)
         The MIRI MRS channel required ('1', '2', '3', '4', '12',
@@ -853,7 +854,7 @@ class MiriCDPFolder(object):
             The MIRI detector required ('MIRIMAGE', 'MIRIFUSHORT',
             'MIRIFULONG' or 'ANY'). By default, matches all detectors.
         readpatt: str (optional)
-            The MIRI readout pattern required ('FAST', 'SLOW' or 'ANY').
+            The MIRI readout pattern required ('FAST', 'FASTR1', 'SLOW', 'SLOWR1' or 'ANY').
             By default, matches all readout patterns.  
         channel: str (optional)
             The MIRI MRS channel required ('1', '2', '3', '4', '12',
@@ -933,8 +934,9 @@ class MiriCDPFolder(object):
             # (FAST, FASTR1, FASTGRPAVGn) and SLOW readiout pattern
             # (SLOW, SLOWR1) but there may not be CDPs corresponding exactly
             # to these. Look only for CDPS matching the basic readout mode.
-            # TODO: Change this when CDPs become available for all modes.
-            #match_strings.append(readpatt)
+            # If more than one match is found, exact matches will be given
+            # priority at the filtering stage.
+            #match_strings.append(readpatt)    # Exact match no longer needed at this point.
             if readpatt.startswith("FAST"):
                 match_strings.append("FAST")
             if readpatt.startswith("SLOW"):
@@ -1137,7 +1139,7 @@ class MiriCDPFolder(object):
             The MIRI detector required ('MIRIMAGE', 'MIRIFUSHORT',
             'MIRIFULONG' or 'ANY'). By default, matches any detector.
         readpatt: str (optional)
-            The MIRI readout pattern required ('FAST', 'SLOW' or 'ANY').
+            The MIRI readout pattern required ('FAST', 'FASTR1', 'SLOW', 'SLOWR1' or 'ANY').
             By default, matches any readout pattern.  
         channel: str (optional)
             The MIRI MRS channel required ('1', '2', '3', '4', '12',
@@ -1205,6 +1207,29 @@ class MiriCDPFolder(object):
         # Otherwise sort the candidates and return the last one.
         if candidates:
             ncandidates = len(candidates)
+            
+            # If there is more than one candidate and some have an exact match
+            # to the readout pattern required, then remove the non-exact ones.
+            if ncandidates > 1:
+                if readpatt and (readpatt != 'ANY') and (readpatt != 'N/A'):
+                    nexact = 0
+                    for candidate in candidates:
+                        if readpatt in candidate:
+                            nexact += 1
+                    if nexact > 0:
+                        for candidate in candidates.copy():
+                            if readpatt not in candidate:
+                                candidates.remove(candidate)
+                        ncandidates = len(candidates)
+                    else:
+                        strg = " There are no CDPs exactly matching a %s readout pattern." % readpatt
+                        self.logger.warning(strg)
+            elif ncandidates == 1:
+                if readpatt and (readpatt != 'ANY') and (readpatt != 'N/A'):
+                    if readpatt not in candidates[0]:
+                        strg = " The matched CDP does not exactly match a %s readout pattern." % readpatt
+                        self.logger.warning(strg)
+ 
             if ncandidates <= 1:
                 return candidates[0]
             else:
@@ -1791,7 +1816,7 @@ class MiriCDPInterface(object, metaclass=Singleton):
             The MIRI detector required ('MIRIMAGE', 'MIRIFUSHORT',
             'MIRIFULONG' or 'ANY'). By default, matches all detectors.
         readpatt: str (optional)
-            The MIRI readout pattern required ('FAST', 'SLOW' or 'ANY').
+            The MIRI readout pattern required ('FAST', 'FASTR1', 'SLOW', 'SLOWR1' or 'ANY').
             By default, matches all readout patterns.  
         channel: str (optional)
             The MIRI MRS channel required ('1', '2', '3', '4', '12',
@@ -1893,7 +1918,7 @@ class MiriCDPInterface(object, metaclass=Singleton):
             The MIRI detector required ('MIRIMAGE', 'MIRIFUSHORT',
             'MIRIFULONG' or 'ANY'). By default, matches any detector.
         readpatt: str (optional)
-            The MIRI readout pattern required ('FAST', 'SLOW' or 'ANY').
+            The MIRI readout pattern required ('FAST', 'FASTR1', 'SLOW', 'SLOWR1' or 'ANY').
             By default, matches any readout pattern.  
         channel: str (optional)
             The MIRI MRS channel required ('1', '2', '3', '4', '12',
@@ -2085,7 +2110,7 @@ class MiriCDPInterface(object, metaclass=Singleton):
             may be used to find CDPs prior to the CDP-3 release.
             By default, matches all detectors.
         readpatt: str (optional)
-            The MIRI readout pattern required ('FAST', 'SLOW' or 'ANY').
+            The MIRI readout pattern required ('FAST', 'FASTR1', 'SLOW', 'SLOWR1' or 'ANY').
             By default, matches all readout patterns.  
         channel: str (optional)
             The MIRI MRS channel required ('1', '2', '3', '4' or 'ANY').
@@ -2305,7 +2330,18 @@ if __name__ == '__main__':
     # Set this variable False to turn off the getting of the files
     # and confine the testing just to pattern matching.
     GET_FILES = True
-    
+
+    # These flags can be used to concentrate the tests on certain kinds of CDP.
+    INCLUDE_MASK = True
+    INCLUDE_DARK = True
+    INCLUDE_GAIN = True
+    INCLUDE_READNOISE = True
+    INCLUDE_FLAT = True
+    INCLUDE_FRINGE = True
+    INCLUDE_DISTORTION = True
+    INCLUDE_PSF = True
+    INCLUDE_PHOTOM = True
+
     # Set this variable False to suppress the plotting
     PLOTTING = False
     # Set these variable False to suppress detailed output
@@ -2329,119 +2365,124 @@ if __name__ == '__main__':
         time.sleep(MEDIUM_DELAY)
                 
         # Check availability of flat-fields.
-        print( "\nFlat-fields available for various combinations" )
-        for detector in ('MIRIMAGE', 'MIRIFUSHORT', 'MIRIFULONG'):
-            for readpatt in ('FAST', 'FASTR1', 'SLOW', 'SLOWR1', 'ANY'):
-                for subarray in ('FULL', 'BRIGHTSKY'):
-                    print(detector, "with READPATT=", readpatt,
-                          "and subarray=", subarray)
-                    (newestflat, ftp_path) = miricdp.match_cdp_latest('FLAT',
-                                                detector=detector,
-                                                readpatt=readpatt,
-                                                subarray=subarray)
-                    if newestflat:
-                        print( newestflat, ftp_path )
-                    else:
-                        print( "<not found>")
-        time.sleep(SHORT_DELAY)
+        if INCLUDE_FLAT:
+            print( "\nFlat-fields available for various combinations" )
+            for detector in ('MIRIMAGE', 'MIRIFUSHORT', 'MIRIFULONG'):
+                for readpatt in ('FASTR1', 'FAST', 'SLOWR1', 'SLOW', 'ANY'):
+                    for subarray in ('FULL', 'BRIGHTSKY'):
+                        print(detector, "with READPATT=", readpatt,
+                              "and subarray=", subarray)
+                        (newestflat, ftp_path) = miricdp.match_cdp_latest('FLAT',
+                                                    detector=detector,
+                                                    readpatt=readpatt,
+                                                    subarray=subarray)
+                        if newestflat:
+                            print( newestflat, ftp_path )
+                        else:
+                            print( "<not found>")
+            time.sleep(SHORT_DELAY)
 
         # Match the single and cross-dichroic fringe flats for the MRS
-        for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
-            print( "\nMRS fringe flats: detector=%s; band=ANY" % detector )
-            (newestfringe, ftp_path) = miricdp.match_cdp_latest('FRINGE',
-                                                    detector=detector,
-                                                    band='ANY')
-            if newestfringe:
-                print( newestfringe, ftp_path )
-            else:
-                print( "<not found>")
-
-            for banda in MIRI_BANDS_SINGLE:
-                print( "\nMRS fringe flats: detector=%s; band=%s" % (detector, banda) )
+        if INCLUDE_FRINGE:
+            for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
+                print( "\nMRS fringe flats: detector=%s; band=ANY" % detector )
                 (newestfringe, ftp_path) = miricdp.match_cdp_latest('FRINGE',
                                                         detector=detector,
-                                                        band=banda)
+                                                        band='ANY')
                 if newestfringe:
                     print( newestfringe, ftp_path )
                 else:
                     print( "<not found>")
-
-                for bandb in MIRI_BANDS_SINGLE:
-                    if bandb != banda:
-                        band = banda + '-' + bandb
-                        print( "\nMRS fringe flats: detector=%s; band=%s" % (detector, band) )
-                        (newestfringe, ftp_path) = miricdp.match_cdp_latest('FRINGE',
-                                                        detector=detector,
-                                                        band=band)
-                        if newestfringe:
-                            print( newestfringe, ftp_path )
-                        else:
-                            print( "<not found>")
-        time.sleep(SHORT_DELAY)
+    
+                for banda in MIRI_BANDS_SINGLE:
+                    print( "\nMRS fringe flats: detector=%s; band=%s" % (detector, banda) )
+                    (newestfringe, ftp_path) = miricdp.match_cdp_latest('FRINGE',
+                                                            detector=detector,
+                                                            band=banda)
+                    if newestfringe:
+                        print( newestfringe, ftp_path )
+                    else:
+                        print( "<not found>")
+    
+                    for bandb in MIRI_BANDS_SINGLE:
+                        if bandb != banda:
+                            band = banda + '-' + bandb
+                            print( "\nMRS fringe flats: detector=%s; band=%s" % (detector, band) )
+                            (newestfringe, ftp_path) = miricdp.match_cdp_latest('FRINGE',
+                                                            detector=detector,
+                                                            band=band)
+                            if newestfringe:
+                                print( newestfringe, ftp_path )
+                            else:
+                                print( "<not found>")
+            time.sleep(SHORT_DELAY)
        
-        # Get a list of bad pixel masks by matching specified criteria.
-        print( "\nFile names of current bad pixel masks for the imager:" )
-        (filenames, folders) = \
-            miricdp.match_cdp_filename('MASK', detector='MIRIMAGE')
-        print( str(filenames) )
-        time.sleep(SHORT_DELAY)
+        if INCLUDE_MASK:
+            # Get a list of bad pixel masks by matching specified criteria.
+            print( "\nFile names of current bad pixel masks for the imager:" )
+            (filenames, folders) = \
+                miricdp.match_cdp_filename('MASK', detector='MIRIMAGE')
+            print( str(filenames) )
+            time.sleep(SHORT_DELAY)
+        
+            # Get the most recent bad pixel mask matching the specified criteria.
+            print( "\nMost recent bad pixel mask for the imager" )
+            (newestbad, ftp_path) = miricdp.match_cdp_latest('MASK',
+                                                             detector='MIRIMAGE')
+            print( newestbad, ftp_path )
+            time.sleep(SHORT_DELAY)
+            if GET_FILES and newestbad:
+                print( "Updating cache with this bad pixel mask..." )
+                last_file = miricdp.update_cache(newestbad, ftp_path=ftp_path)
+                time.sleep(LONG_DELAY)
+        
+            print( "\nMost recent release 5 bad pixel mask for the imager" )
+            (newestbad, ftp_path) = miricdp.match_cdp_latest('MASK',
+                                                detector='MIRIMAGE', cdprelease=5)
+            print( newestbad, ftp_path )
+            time.sleep(SHORT_DELAY)
+            if GET_FILES and newestbad:
+                print( "Updating cache with this bad pixel mask..." )
+                last_file = miricdp.update_cache(newestbad, ftp_path=ftp_path)
+                time.sleep(LONG_DELAY)
     
-        # Get the most recent bad pixel mask matching the specified criteria.
-        print( "\nMost recent bad pixel mask for the imager" )
-        (newestbad, ftp_path) = miricdp.match_cdp_latest('MASK',
-                                                         detector='MIRIMAGE')
-        print( newestbad, ftp_path )
-        time.sleep(SHORT_DELAY)
-        if GET_FILES and newestbad:
-            print( "Updating cache with this bad pixel mask..." )
-            last_file = miricdp.update_cache(newestbad, ftp_path=ftp_path)
-            time.sleep(LONG_DELAY)
-    
-        print( "\nMost recent release 5 bad pixel mask for the imager" )
-        (newestbad, ftp_path) = miricdp.match_cdp_latest('MASK',
-                                            detector='MIRIMAGE', cdprelease=5)
-        print( newestbad, ftp_path )
-        time.sleep(SHORT_DELAY)
-        if GET_FILES and newestbad:
-            print( "Updating cache with this bad pixel mask..." )
-            last_file = miricdp.update_cache(newestbad, ftp_path=ftp_path)
-            time.sleep(LONG_DELAY)
-    
-        print( "\nMost recent dark for the imager." )
-        (newestdark, ftp_path) = miricdp.match_cdp_latest('DARK', detector='MIRIMAGE')
-        print( newestdark, ftp_path )
-        time.sleep(SHORT_DELAY)
+        if INCLUDE_DARK:
+            print( "\nMost recent dark for the imager." )
+            (newestdark, ftp_path) = miricdp.match_cdp_latest('DARK', detector='MIRIMAGE')
+            print( newestdark, ftp_path )
+            time.sleep(SHORT_DELAY)
      
-        print( "\nMost recent dark for the imager for the FAST readout pattern with any subarray mode." )
-        (newestdark, ftp_path) = miricdp.match_cdp_latest('DARK', detector='MIRIMAGE',
-                                            readpatt='FAST', subarray='ANY')
-        print( newestdark, ftp_path )
-        time.sleep(SHORT_DELAY)
+            print( "\nMost recent dark for the imager for the FAST readout pattern with any subarray mode." )
+            (newestdark, ftp_path) = miricdp.match_cdp_latest('DARK', detector='MIRIMAGE',
+                                                readpatt='FAST', subarray='ANY')
+            print( newestdark, ftp_path )
+            time.sleep(SHORT_DELAY)
+         
+            print( "\nMost recent FULL frame dark for the imager for the FAST readout pattern." )
+            (newestdark, ftp_path) = miricdp.match_cdp_latest('DARK', detector='MIRIMAGE',
+                                                readpatt='FAST', subarray='FULL')
+            print( newestdark, ftp_path )
+            time.sleep(SHORT_DELAY)
+         
+            print( "\nMost recent dark for the imager for the MASK1150 subarray." )
+            (newestdark, ftp_path) = miricdp.match_cdp_latest('DARK', detector='MIRIMAGE',
+                                                subarray='MASK1550')
+            print( newestdark, ftp_path )
+            time.sleep(SHORT_DELAY)
      
-        print( "\nMost recent FULL frame dark for the imager for the FAST readout pattern." )
-        (newestdark, ftp_path) = miricdp.match_cdp_latest('DARK', detector='MIRIMAGE',
-                                            readpatt='FAST', subarray='FULL')
-        print( newestdark, ftp_path )
-        time.sleep(SHORT_DELAY)
-     
-        print( "\nMost recent dark for the imager for the MASK1150 subarray." )
-        (newestdark, ftp_path) = miricdp.match_cdp_latest('DARK', detector='MIRIMAGE',
-                                            subarray='MASK1550')
-        print( newestdark, ftp_path )
-        time.sleep(SHORT_DELAY)
-     
-        print( "\nMost recent pixel flat-field for the imager with F770W filter" )
-        (newestflat, ftp_path) = miricdp.match_cdp_latest('FLAT', detector='MIRIMAGE',
-                                            mirifilter='F770W')
-        print( newestflat, ftp_path )
-        time.sleep(SHORT_DELAY)
-     
-        print( "\nMost recent FULL frame pixel flat-field for the imager with F770W filter" )
-        (newestflat, ftp_path) = miricdp.match_cdp_latest('FLAT', detector='MIRIMAGE',
-                                            mirifilter='F770W', subarray='FULL' )
-        print( newestflat, ftp_path )
-        time.sleep(SHORT_DELAY)
-    
+        if INCLUDE_FLAT:
+            print( "\nMost recent pixel flat-field for the imager with F770W filter" )
+            (newestflat, ftp_path) = miricdp.match_cdp_latest('FLAT', detector='MIRIMAGE',
+                                                mirifilter='F770W')
+            print( newestflat, ftp_path )
+            time.sleep(SHORT_DELAY)
+         
+            print( "\nMost recent FULL frame pixel flat-field for the imager with F770W filter" )
+            (newestflat, ftp_path) = miricdp.match_cdp_latest('FLAT', detector='MIRIMAGE',
+                                                mirifilter='F770W', subarray='FULL' )
+            print( newestflat, ftp_path )
+            time.sleep(SHORT_DELAY)
+        
         print( "\nFile names of any CDPs for the SUB64 subarray" )
         (sub64_list, folder_list) = miricdp.match_cdp_filename('ANY', detector='ANY',
                                             subarray='SUB64')
@@ -2458,53 +2499,57 @@ if __name__ == '__main__':
     
     if TEST_GET and GET_FILES:
         print("\nTesting general use of get_cdp")
-        print( "Getting the latest release 6 bad pixel mask for the imager from the CDP repository" )
-        datamodel = get_cdp('MASK', detector='MIRIMAGE', cdprelease=6)
-        if datamodel is not None:
-            if VERBOSE_MODELS:
-                print( datamodel )
-            else:
-                print( datamodel.__class__.__name__, " obtained successfully." )                
-            if PLOTTING:
-                datamodel.plot("Latest release 6 bad pixel mask")
-            del datamodel
-        time.sleep(LONG_DELAY)
+        if INCLUDE_MASK:
+            print( "Getting the latest release 6 bad pixel mask for the imager from the CDP repository" )
+            datamodel = get_cdp('MASK', detector='MIRIMAGE', cdprelease=6)
+            if datamodel is not None:
+                if VERBOSE_MODELS:
+                    print( datamodel )
+                else:
+                    print( datamodel.__class__.__name__, " obtained successfully." )                
+                if PLOTTING:
+                    datamodel.plot("Latest release 6 bad pixel mask")
+                del datamodel
+            time.sleep(LONG_DELAY)
 
-        print( "Getting the latest pixel flats for the imager from the CDP repository" )
-        datamodel = get_cdp('PIXELFLAT', detector='MIRIMAGE')
-        if datamodel is not None:
-            if VERBOSE_MODELS:
-                print( datamodel )
-            else:
-                print( datamodel.__class__.__name__, " obtained successfully." )                
-            if PLOTTING:
-                datamodel.plot("Latest pixel flat")
-            del datamodel
-        time.sleep(LONG_DELAY)
+        if INCLUDE_FLAT:
+            print( "Getting the latest pixel flats for the imager from the CDP repository" )
+            datamodel = get_cdp('PIXELFLAT', detector='MIRIMAGE')
+            if datamodel is not None:
+                if VERBOSE_MODELS:
+                    print( datamodel )
+                else:
+                    print( datamodel.__class__.__name__, " obtained successfully." )                
+                if PLOTTING:
+                    datamodel.plot("Latest pixel flat")
+                del datamodel
+            time.sleep(LONG_DELAY)
 
-        print( "Getting the gain model for the imager from the CDP repository" )
-        datamodel = get_cdp('GAIN', detector='MIRIMAGE')
-        if datamodel is not None:
-            if VERBOSE_MODELS:
-                print( datamodel )
-            else:
-                print( datamodel.__class__.__name__, " obtained successfully." )                
-            if PLOTTING:
-                datamodel.plot("Latest gain map")
-            del datamodel
-        time.sleep(LONG_DELAY)
+        if INCLUDE_GAIN:
+            print( "Getting the gain model for the imager from the CDP repository" )
+            datamodel = get_cdp('GAIN', detector='MIRIMAGE')
+            if datamodel is not None:
+                if VERBOSE_MODELS:
+                    print( datamodel )
+                else:
+                    print( datamodel.__class__.__name__, " obtained successfully." )                
+                if PLOTTING:
+                    datamodel.plot("Latest gain map")
+                del datamodel
+            time.sleep(LONG_DELAY)
   
-        print( "Getting the readnoise model for the imager from the CDP repository" )
-        datamodel = get_cdp('READNOISE', detector='MIRIMAGE')
-        if datamodel is not None:
-            if VERBOSE_MODELS:
-                print( datamodel )
-            else:
-                print( datamodel.__class__.__name__, " obtained successfully." )                
-            if PLOTTING:
-                datamodel.plot("Latest readnoise map")
-            del datamodel
-        time.sleep(LONG_DELAY)
+        if INCLUDE_READNOISE:
+            print( "Getting the readnoise model for the imager from the CDP repository" )
+            datamodel = get_cdp('READNOISE', detector='MIRIMAGE')
+            if datamodel is not None:
+                if VERBOSE_MODELS:
+                    print( datamodel )
+                else:
+                    print( datamodel.__class__.__name__, " obtained successfully." )                
+                if PLOTTING:
+                    datamodel.plot("Latest readnoise map")
+                del datamodel
+            time.sleep(LONG_DELAY)
 
     if TEST_SIM and GET_FILES:
         print("\nTesting use of get_cdp by the simulators")
@@ -2523,41 +2568,43 @@ if __name__ == '__main__':
             time.sleep(MEDIUM_DELAY)
         del miricdp
 
-        print("Bad pixel masks")
-        for detector in ('MIRIMAGE', 'MIRIFUSHORT', 'MIRIFULONG'):
-            strg = "MASK for detector=%s" % detector
-            print("\n" + strg)
-            maskmodel = get_cdp('MASK', detector=detector, ftp_path=FTP_PATH,
-                                ftp_user=FTP_USER, ftp_passwd=FTP_PASS)
-            if maskmodel is not None:
-                cdps_found.append(strg)
-                if VERBOSE_MODELS:
-                    print( maskmodel )
-                if PLOTTING:
-                    maskmodel.plot(strg)
-            else:
-                cdps_not_found.append(strg)
-                print("*** CDP NOT FOUND ***")
-            del maskmodel
-            time.sleep(LONG_DELAY)
+        if INCLUDE_MASK:
+            print("Bad pixel masks")
+            for detector in ('MIRIMAGE', 'MIRIFUSHORT', 'MIRIFULONG'):
+                strg = "MASK for detector=%s" % detector
+                print("\n" + strg)
+                maskmodel = get_cdp('MASK', detector=detector, ftp_path=FTP_PATH,
+                                    ftp_user=FTP_USER, ftp_passwd=FTP_PASS)
+                if maskmodel is not None:
+                    cdps_found.append(strg)
+                    if VERBOSE_MODELS:
+                        print( maskmodel )
+                    if PLOTTING:
+                        maskmodel.plot(strg)
+                else:
+                    cdps_not_found.append(strg)
+                    print("*** CDP NOT FOUND ***")
+                del maskmodel
+                time.sleep(LONG_DELAY)
  
-        print("Gain models")
-        for detector in ('MIRIMAGE', 'MIRIFUSHORT', 'MIRIFULONG'):
-            strg = "GAIN for detector=%s" % detector
-            print("\n" + strg)
-            gainmodel = get_cdp('GAIN', detector=detector, ftp_path=FTP_PATH,
-                                ftp_user=FTP_USER, ftp_passwd=FTP_PASS)
-            if gainmodel is not None:
-                cdps_found.append(strg)
-                if VERBOSE_MODELS:
-                    print( gainmodel )
-                if PLOTTING:
-                    gainmodel.plot(strg)
-            else:
-                cdps_not_found.append(strg)
-                print("*** CDP NOT FOUND ***")
-            del gainmodel
-            time.sleep(LONG_DELAY)
+        if INCLUDE_GAIN:
+            print("Gain models")
+            for detector in ('MIRIMAGE', 'MIRIFUSHORT', 'MIRIFULONG'):
+                strg = "GAIN for detector=%s" % detector
+                print("\n" + strg)
+                gainmodel = get_cdp('GAIN', detector=detector, ftp_path=FTP_PATH,
+                                    ftp_user=FTP_USER, ftp_passwd=FTP_PASS)
+                if gainmodel is not None:
+                    cdps_found.append(strg)
+                    if VERBOSE_MODELS:
+                        print( gainmodel )
+                    if PLOTTING:
+                        gainmodel.plot(strg)
+                else:
+                    cdps_not_found.append(strg)
+                    print("*** CDP NOT FOUND ***")
+                del gainmodel
+                time.sleep(LONG_DELAY)
 
         def find_dark( detector, readpatt, subarray, averaged=False):
             """
@@ -2583,7 +2630,8 @@ if __name__ == '__main__':
                 if readpatt.startswith("FAST"):
                     must_contain.append("FAST")
                 if readpatt.startswith("SLOW"):
-                    must_contain.append("SLOW")
+                    must_contain.append("SLOW")               
+                    
             if subarray and subarray != 'FULL':
                 must_contain.append(subarray)
             else:
@@ -2597,6 +2645,28 @@ if __name__ == '__main__':
             (matched_files, matched_folders) = \
                 miricdp.match_cdp_substrings(mustcontain=must_contain,
                                              mustnotcontain=must_not_contain)
+
+            # If there is more than one candidate and some have an exact match
+            # to the readout pattern required, then remove the non-exact ones.
+            if len(matched_files) > 1:
+                if readpatt and (readpatt != 'ANY') and (readpatt != 'N/A'):
+                    nexact = 0
+                    for candidate in matched_files:
+                        if readpatt in candidate:
+                            nexact += 1
+                    if nexact > 0:
+                        for candidate in matched_files.copy():
+                            if readpatt not in candidate:
+                                matched_files.remove(candidate)
+                        ncandidates = len(matched_files)
+                    else:
+                        strg = " There are no CDPs exactly matching a %s readout pattern." % readpatt
+                        print(strg)
+            elif len(matched_files) == 1:
+                if readpatt and (readpatt != 'ANY') and (readpatt != 'N/A'):
+                    if readpatt not in matched_files[0]:
+                        strg = " The matched CDP does not exactly match a %s readout pattern." % readpatt
+                        print(strg)
 
             if len(matched_files) > 1:
                 # More than one match. Take the last file.
@@ -2625,42 +2695,108 @@ if __name__ == '__main__':
                 dark_model = None
             return dark_model
 
-        print("Dark maps")
-        for detector in ('MIRIMAGE', 'MIRIFUSHORT', 'MIRIFULONG'):
-            for readpatt in ('FAST', 'FASTR1', 'SLOW', 'SLOWR1'):
-                for subarray in MIRI_SUBARRAYS:
-                    strg = "DARK for detector=%s" % detector
+        if INCLUDE_DARK:
+            print("Dark maps")
+            for detector in ('MIRIMAGE', 'MIRIFUSHORT', 'MIRIFULONG'):
+                for readpatt in ('FASTR1', 'FAST', 'SLOW', 'SLOWR1'):
+                    for subarray in MIRI_SUBARRAYS:
+                        strg = "DARK for detector=%s" % detector
+                        strg += " readpatt=%s" % readpatt
+                        strg += " subarray=%s" % subarray
+                        print("\n" + strg)
+                        darkmodel = find_dark( detector, readpatt, subarray,
+                                               averaged=False)
+                        if darkmodel is not None:
+                            cdps_found.append(strg)
+                            if VERBOSE_MODELS:
+                                print( darkmodel )
+                            if PLOTTING:
+                                darkmodel.plot(strg)
+                        else:
+                            cdps_not_found.append(strg)
+                            print("*** CDP NOT FOUND ***")
+                        del darkmodel
+                        time.sleep(LONG_DELAY)
+
+        if INCLUDE_FLAT:
+            print("Pixel flat-fields")
+            detector = 'MIRIMAGE'
+            readpatt = 'SLOW'
+            for detector in ('MIRIMAGE', 'MIRIFUSHORT', 'MIRIFULONG'):
+                for mirifilter in ['ANY'] +  MIRI_FILTERS:
+                    for subarray in ['FULL'] +  MIRI_SUBARRAYS:
+                        strg = "PIXELFLAT for detector=%s" % detector
+                        strg += " readpatt=%s" % readpatt
+                        strg += " filter=%s" % mirifilter
+                        strg += " subarray=%s" % subarray
+                        print("\n" + strg)
+                        flatmodel = get_cdp('PIXELFLAT', detector=detector,
+                                            readpatt=readpatt, mirifilter=mirifilter,
+                                            subarray=subarray,
+                                            ftp_path=FTP_PATH, ftp_user=FTP_USER,
+                                            ftp_passwd=FTP_PASS)
+                        if flatmodel is not None:
+                            cdps_found.append(strg)
+                            if VERBOSE_MODELS:
+                                print( flatmodel )
+                            if PLOTTING:
+                                flatmodel.plot(strg)
+                        else:
+                            cdps_not_found.append(strg)
+                            print("*** CDP NOT FOUND ***")
+                        del flatmodel
+                        time.sleep(LONG_DELAY)
+
+            for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
+                for readpatt in ('ANY', 'FASTR1', 'FAST', 'SLOWR1', 'SLOW'):
+                    strg = "PIXELFLAT for detector=%s" % detector
                     strg += " readpatt=%s" % readpatt
-                    strg += " subarray=%s" % subarray
                     print("\n" + strg)
-                    darkmodel = find_dark( detector, readpatt, subarray,
-                                           averaged=False)
-                    if darkmodel is not None:
+                    flatmodel = get_cdp('PIXELFLAT', detector=detector,
+                                        readpatt=readpatt,
+                                        ftp_path=FTP_PATH, ftp_user=FTP_USER,
+                                        ftp_passwd=FTP_PASS)
+                    if flatmodel is not None:
                         cdps_found.append(strg)
                         if VERBOSE_MODELS:
-                            print( darkmodel )
+                            print( flatmodel )
                         if PLOTTING:
-                            darkmodel.plot(strg)
+                            flatmodel.plot(strg)
                     else:
                         cdps_not_found.append(strg)
                         print("*** CDP NOT FOUND ***")
-                    del darkmodel
+                    del flatmodel
                     time.sleep(LONG_DELAY)
-
-        print("Pixel flat-fields")
-        detector = 'MIRIMAGE'
-        readpatt = 'SLOW'
-        for detector in ('MIRIMAGE', 'MIRIFUSHORT', 'MIRIFULONG'):
+    
+            print("Sky flat-fields")
+            detector = 'MIRIMAGE'
             for mirifilter in ['ANY'] +  MIRI_FILTERS:
-                for subarray in ['FULL'] +  MIRI_SUBARRAYS:
-                    strg = "PIXELFLAT for detector=%s" % detector
-                    strg += " readpatt=%s" % readpatt
-                    strg += " filter=%s" % mirifilter
-                    strg += " subarray=%s" % subarray
+                strg = "SKYFLAT for detector=%s" % detector
+                strg += " filter=%s" % mirifilter
+                print("\n" + strg)
+                flatmodel = get_cdp('SKYFLAT', detector=detector,
+                                    mirifilter=mirifilter,
+                                    ftp_path=FTP_PATH, ftp_user=FTP_USER,
+                                    ftp_passwd=FTP_PASS)
+                if flatmodel is not None:
+                    cdps_found.append(strg)
+                    if VERBOSE_MODELS:
+                        print( flatmodel )
+                    if PLOTTING:
+                        flatmodel.plot(strg)
+                else:
+                    cdps_not_found.append(strg)
+                    print("*** CDP NOT FOUND ***")
+                del flatmodel
+                time.sleep(LONG_DELAY)
+    
+            for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
+                for miriband in ['ANY'] + MIRI_BANDS:
+                    strg = "SKYFLAT for detector=%s" % detector
+                    strg += " band=%s" % miriband
                     print("\n" + strg)
-                    flatmodel = get_cdp('PIXELFLAT', detector=detector,
-                                        readpatt=readpatt, mirifilter=mirifilter,
-                                        subarray=subarray,
+                    flatmodel = get_cdp('SKYFLAT', detector=detector,
+                                        band=miriband,
                                         ftp_path=FTP_PATH, ftp_user=FTP_USER,
                                         ftp_passwd=FTP_PASS)
                     if flatmodel is not None:
@@ -2675,99 +2811,15 @@ if __name__ == '__main__':
                     del flatmodel
                     time.sleep(LONG_DELAY)
 
-        for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
-            for readpatt in ('ANY', 'FAST', 'SLOW'):
-                strg = "PIXELFLAT for detector=%s" % detector
-                strg += " readpatt=%s" % readpatt
-                print("\n" + strg)
-                flatmodel = get_cdp('PIXELFLAT', detector=detector,
-                                    readpatt=readpatt,
-                                    ftp_path=FTP_PATH, ftp_user=FTP_USER,
-                                    ftp_passwd=FTP_PASS)
-                if flatmodel is not None:
-                    cdps_found.append(strg)
-                    if VERBOSE_MODELS:
-                        print( flatmodel )
-                    if PLOTTING:
-                        flatmodel.plot(strg)
-                else:
-                    cdps_not_found.append(strg)
-                    print("*** CDP NOT FOUND ***")
-                del flatmodel
-                time.sleep(LONG_DELAY)
-
-        print("Sky flat-fields")
-        detector = 'MIRIMAGE'
-        for mirifilter in ['ANY'] +  MIRI_FILTERS:
-            strg = "SKYFLAT for detector=%s" % detector
-            strg += " filter=%s" % mirifilter
-            print("\n" + strg)
-            flatmodel = get_cdp('SKYFLAT', detector=detector,
-                                mirifilter=mirifilter,
-                                ftp_path=FTP_PATH, ftp_user=FTP_USER,
-                                ftp_passwd=FTP_PASS)
-            if flatmodel is not None:
-                cdps_found.append(strg)
-                if VERBOSE_MODELS:
-                    print( flatmodel )
-                if PLOTTING:
-                    flatmodel.plot(strg)
-            else:
-                cdps_not_found.append(strg)
-                print("*** CDP NOT FOUND ***")
-            del flatmodel
-            time.sleep(LONG_DELAY)
-
-        for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
-            for miriband in ['ANY'] + MIRI_BANDS:
-                strg = "SKYFLAT for detector=%s" % detector
-                strg += " band=%s" % miriband
-                print("\n" + strg)
-                flatmodel = get_cdp('SKYFLAT', detector=detector,
-                                    band=miriband,
-                                    ftp_path=FTP_PATH, ftp_user=FTP_USER,
-                                    ftp_passwd=FTP_PASS)
-                if flatmodel is not None:
-                    cdps_found.append(strg)
-                    if VERBOSE_MODELS:
-                        print( flatmodel )
-                    if PLOTTING:
-                        flatmodel.plot(strg)
-                else:
-                    cdps_not_found.append(strg)
-                    print("*** CDP NOT FOUND ***")
-                del flatmodel
-                time.sleep(LONG_DELAY)
-
-        print("Fringe flat-fields")
-        detector = 'MIRIMAGE'
-        for mirifilter in ['ANY'] +  MIRI_FILTERS:
-            strg = "FRINGE for detector=%s" % detector
-            strg += " filter=%s" % mirifilter
-            print("\n" + strg)
-            fringemodel = get_cdp('FRINGE', detector=detector,
-                                mirifilter=mirifilter,
-                                ftp_path=FTP_PATH, ftp_user=FTP_USER,
-                                ftp_passwd=FTP_PASS)
-            if fringemodel is not None:
-                cdps_found.append(strg)
-                if VERBOSE_MODELS:
-                    print( fringemodel )
-                if PLOTTING:
-                    fringemodel.plot(strg)
-            else:
-                cdps_not_found.append(strg)
-                print("*** CDP NOT FOUND ***")
-            del fringemodel
-            time.sleep(LONG_DELAY)
-
-        for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
-            for miriband in ['ANY'] + MIRI_BANDS:
+        if INCLUDE_FRINGE:
+            print("Fringe flat-fields")
+            detector = 'MIRIMAGE'
+            for mirifilter in ['ANY'] +  MIRI_FILTERS:
                 strg = "FRINGE for detector=%s" % detector
-                strg += " band=%s" % miriband
+                strg += " filter=%s" % mirifilter
                 print("\n" + strg)
                 fringemodel = get_cdp('FRINGE', detector=detector,
-                                    band=miriband,
+                                    mirifilter=mirifilter,
                                     ftp_path=FTP_PATH, ftp_user=FTP_USER,
                                     ftp_passwd=FTP_PASS)
                 if fringemodel is not None:
@@ -2781,87 +2833,88 @@ if __name__ == '__main__':
                     print("*** CDP NOT FOUND ***")
                 del fringemodel
                 time.sleep(LONG_DELAY)
+    
+            for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
+                for miriband in ['ANY'] + MIRI_BANDS:
+                    strg = "FRINGE for detector=%s" % detector
+                    strg += " band=%s" % miriband
+                    print("\n" + strg)
+                    fringemodel = get_cdp('FRINGE', detector=detector,
+                                        band=miriband,
+                                        ftp_path=FTP_PATH, ftp_user=FTP_USER,
+                                        ftp_passwd=FTP_PASS)
+                    if fringemodel is not None:
+                        cdps_found.append(strg)
+                        if VERBOSE_MODELS:
+                            print( fringemodel )
+                        if PLOTTING:
+                            fringemodel.plot(strg)
+                    else:
+                        cdps_not_found.append(strg)
+                        print("*** CDP NOT FOUND ***")
+                    del fringemodel
+                    time.sleep(LONG_DELAY)
 
-        print("Read noise models")
-        detector = 'MIRIMAGE'
-        for readpatt in ('FAST', 'SLOW'):
-            for subarray in ['FULL'] +  MIRI_SUBARRAYS:
-                strg = "READNOISE for detector=%s" % detector
-                strg += " readpatt=%s" % readpatt
-                strg += " subarray=%s" % subarray
-                print("\n" + strg)
-                noisemodel = get_cdp('READNOISE', detector=detector,
-                                    readpatt=readpatt, subarray=subarray,
-                                    ftp_path=FTP_PATH, ftp_user=FTP_USER,
-                                    ftp_passwd=FTP_PASS)
-                if noisemodel is not None:
-                    cdps_found.append(strg)
-                    if VERBOSE_MODELS:
-                        print( noisemodel )
-                    if PLOTTING:
-                        noisemodel.plot(strg)
-                else:
-                    cdps_not_found.append(strg)
-                    print("*** CDP NOT FOUND ***")
-                del noisemodel
-                time.sleep(LONG_DELAY)
+        if INCLUDE_READNOISE:
+            print("Read noise models")
+            detector = 'MIRIMAGE'
+            for readpatt in ('FASTR1', 'FAST', 'SLOWR1', 'SLOW'):
+                for subarray in ['FULL'] +  MIRI_SUBARRAYS:
+                    strg = "READNOISE for detector=%s" % detector
+                    strg += " readpatt=%s" % readpatt
+                    strg += " subarray=%s" % subarray
+                    print("\n" + strg)
+                    noisemodel = get_cdp('READNOISE', detector=detector,
+                                        readpatt=readpatt, subarray=subarray,
+                                        ftp_path=FTP_PATH, ftp_user=FTP_USER,
+                                        ftp_passwd=FTP_PASS)
+                    if noisemodel is not None:
+                        cdps_found.append(strg)
+                        if VERBOSE_MODELS:
+                            print( noisemodel )
+                        if PLOTTING:
+                            noisemodel.plot(strg)
+                    else:
+                        cdps_not_found.append(strg)
+                        print("*** CDP NOT FOUND ***")
+                    del noisemodel
+                    time.sleep(LONG_DELAY)
 
-        for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
-            for readpatt in ('FAST', 'SLOW'):
-                strg = "READNOISE for detector=%s" % detector
-                strg += " readpatt=%s" % readpatt
-                print("\n" + strg)
-                noisemodel = get_cdp('READNOISE', detector=detector,
-                                    readpatt=readpatt,
-                                    ftp_path=FTP_PATH, ftp_user=FTP_USER,
-                                    ftp_passwd=FTP_PASS)
-                if noisemodel is not None:
-                    cdps_found.append(strg)
-                    if VERBOSE_MODELS:
-                        print( noisemodel )
-                    if PLOTTING:
-                        noisemodel.plot(strg)
-                else:
-                    cdps_not_found.append(strg)
-                    print("*** CDP NOT FOUND ***")
-                del noisemodel
-                time.sleep(LONG_DELAY)
+            for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
+                for readpatt in ('FASTR1', 'FAST', 'SLOWR1', 'SLOW'):
+                    strg = "READNOISE for detector=%s" % detector
+                    strg += " readpatt=%s" % readpatt
+                    print("\n" + strg)
+                    noisemodel = get_cdp('READNOISE', detector=detector,
+                                        readpatt=readpatt,
+                                        ftp_path=FTP_PATH, ftp_user=FTP_USER,
+                                        ftp_passwd=FTP_PASS)
+                    if noisemodel is not None:
+                        cdps_found.append(strg)
+                        if VERBOSE_MODELS:
+                            print( noisemodel )
+                        if PLOTTING:
+                            noisemodel.plot(strg)
+                    else:
+                        cdps_not_found.append(strg)
+                        print("*** CDP NOT FOUND ***")
+                    del noisemodel
+                    time.sleep(LONG_DELAY)
 
-        print("Distortion models")
-        detector = 'MIRIMAGE'
-        for mirifilter in ['ANY'] + MIRI_FILTERS:
-            strg = "DISTORTION for detector=%s" % detector
-            strg += " filter=%s" % mirifilter
-            print("\n" + strg)
-            distmodel = get_cdp('DISTORTION', detector=detector,
-                                mirifilter=mirifilter,
-                                ftp_path=FTP_PATH, ftp_user=FTP_USER,
-                                ftp_passwd=FTP_PASS)
-            if distmodel is not None:
-                cdps_found.append(strg)
-                print( distmodel )
-                if PLOTTING:
-                    distmodel.plot(strg)
-            else:
-                cdps_not_found.append(strg)
-                print("*** CDP NOT FOUND ***")
-            del distmodel
-            time.sleep(LONG_DELAY)
-
-        print("CDP6 variants") # TODO: Eventually remove this test
-        for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
-            for miriband in ['ANY'] + MIRI_BANDS:
+        if INCLUDE_DISTORTION:
+            print("Distortion models")
+            detector = 'MIRIMAGE'
+            for mirifilter in ['ANY'] + MIRI_FILTERS:
                 strg = "DISTORTION for detector=%s" % detector
-                strg += " band=%s" % miriband
+                strg += " filter=%s" % mirifilter
                 print("\n" + strg)
                 distmodel = get_cdp('DISTORTION', detector=detector,
-                                    band=miriband, cdprelease='6', 
+                                    mirifilter=mirifilter,
                                     ftp_path=FTP_PATH, ftp_user=FTP_USER,
                                     ftp_passwd=FTP_PASS)
                 if distmodel is not None:
                     cdps_found.append(strg)
-                    if VERBOSE_MODELS:
-                        print( distmodel )
+                    print( distmodel )
                     if PLOTTING:
                         distmodel.plot(strg)
                 else:
@@ -2869,45 +2922,68 @@ if __name__ == '__main__':
                     print("*** CDP NOT FOUND ***")
                 del distmodel
                 time.sleep(LONG_DELAY)
-        print("CDP7 variants") # TODO: Eventually remove this message
-        for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
-            for miriband in ['ANY'] + MIRI_BANDS:
-                strg = "DISTORTION for detector=%s" % detector
-                strg += " band=%s" % miriband
+    
+            print("CDP6 variants") # TODO: Eventually remove this test
+            for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
+                for miriband in ['ANY'] + MIRI_BANDS:
+                    strg = "DISTORTION for detector=%s" % detector
+                    strg += " band=%s" % miriband
+                    print("\n" + strg)
+                    distmodel = get_cdp('DISTORTION', detector=detector,
+                                        band=miriband, cdprelease='6', 
+                                        ftp_path=FTP_PATH, ftp_user=FTP_USER,
+                                        ftp_passwd=FTP_PASS)
+                    if distmodel is not None:
+                        cdps_found.append(strg)
+                        if VERBOSE_MODELS:
+                            print( distmodel )
+                        if PLOTTING:
+                            distmodel.plot(strg)
+                    else:
+                        cdps_not_found.append(strg)
+                        print("*** CDP NOT FOUND ***")
+                    del distmodel
+                    time.sleep(LONG_DELAY)
+            print("CDP7 variants") # TODO: Eventually remove this message
+            for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
+                for miriband in ['ANY'] + MIRI_BANDS:
+                    strg = "DISTORTION for detector=%s" % detector
+                    strg += " band=%s" % miriband
+                    print("\n" + strg)
+                    distmodel = get_cdp('DISTORTION', detector=detector,
+                                        band=miriband, cdprelease='7',
+                                        ftp_path=FTP_PATH, ftp_user=FTP_USER,
+                                        ftp_passwd=FTP_PASS)
+                    if distmodel is not None:
+                        cdps_found.append(strg)
+                        if VERBOSE_MODELS:
+                            print( distmodel )
+                        if PLOTTING:
+                            distmodel.plot(strg)
+                    else:
+                        cdps_not_found.append(strg)
+                        print("*** CDP NOT FOUND ***")
+                    del distmodel
+                    time.sleep(LONG_DELAY)
+
+        if INCLUDE_PHOTOM:
+            print("Pixel area models")
+            for detector in ('MIRIMAGE', 'MIRIFUSHORT', 'MIRIFULONG'):
+                strg = "AREA for detector=%s" % detector
                 print("\n" + strg)
-                distmodel = get_cdp('DISTORTION', detector=detector,
-                                    band=miriband, cdprelease='7',
-                                    ftp_path=FTP_PATH, ftp_user=FTP_USER,
-                                    ftp_passwd=FTP_PASS)
-                if distmodel is not None:
+                areamodel = get_cdp('AREA', detector=detector, ftp_path=FTP_PATH,
+                                    ftp_user=FTP_USER, ftp_passwd=FTP_PASS)
+                if areamodel is not None:
                     cdps_found.append(strg)
                     if VERBOSE_MODELS:
-                        print( distmodel )
+                        print( areamodel )
                     if PLOTTING:
-                        distmodel.plot(strg)
+                        areamodel.plot(strg)
                 else:
                     cdps_not_found.append(strg)
                     print("*** CDP NOT FOUND ***")
-                del distmodel
+                del areamodel
                 time.sleep(LONG_DELAY)
- 
-        print("Pixel area models")
-        for detector in ('MIRIMAGE', 'MIRIFUSHORT', 'MIRIFULONG'):
-            strg = "AREA for detector=%s" % detector
-            print("\n" + strg)
-            areamodel = get_cdp('AREA', detector=detector, ftp_path=FTP_PATH,
-                                ftp_user=FTP_USER, ftp_passwd=FTP_PASS)
-            if areamodel is not None:
-                cdps_found.append(strg)
-                if VERBOSE_MODELS:
-                    print( areamodel )
-                if PLOTTING:
-                    areamodel.plot(strg)
-            else:
-                cdps_not_found.append(strg)
-                print("*** CDP NOT FOUND ***")
-            del areamodel
-            time.sleep(LONG_DELAY)
 
         print("PSF models")
         detector = 'MIRIMAGE'
@@ -2934,72 +3010,74 @@ if __name__ == '__main__':
                     del psfmodel
                     time.sleep(LONG_DELAY)
 
-        for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
-            for miriband in ('SHORT', 'MEDIUM', 'LONG'):
-                strg = "PSF for detector=%s" % detector
-                strg += " band=%s" % miriband
-                print("\n" + strg)
-                psfmodel = get_cdp('PSF', detector=detector,
-                                    band=miriband,
-                                    ftp_path=FTP_PATH, ftp_user=FTP_USER,
-                                    ftp_passwd=FTP_PASS)
-                if psfmodel is not None:
-                    cdps_found.append(strg)
-                    if VERBOSE_MODELS:
-                        print( psfmodel )
-                    if PLOTTING:
-                        psfmodel.plot(strg)
-                else:
-                    cdps_not_found.append(strg)
-                    print("*** CDP NOT FOUND ***")
-                del psfmodel
-                time.sleep(LONG_DELAY)
+        if INCLUDE_PSF:
+            for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
+                for miriband in ('SHORT', 'MEDIUM', 'LONG'):
+                    strg = "PSF for detector=%s" % detector
+                    strg += " band=%s" % miriband
+                    print("\n" + strg)
+                    psfmodel = get_cdp('PSF', detector=detector,
+                                        band=miriband,
+                                        ftp_path=FTP_PATH, ftp_user=FTP_USER,
+                                        ftp_passwd=FTP_PASS)
+                    if psfmodel is not None:
+                        cdps_found.append(strg)
+                        if VERBOSE_MODELS:
+                            print( psfmodel )
+                        if PLOTTING:
+                            psfmodel.plot(strg)
+                    else:
+                        cdps_not_found.append(strg)
+                        print("*** CDP NOT FOUND ***")
+                    del psfmodel
+                    time.sleep(LONG_DELAY)
 
-        print("Photon Conversion Error (PCE) models")
-        detector = 'MIRIMAGE'
-        for mirifilter in ('ANY', 'P750L', 'F2100W'):
-            for subarray in ('FULL', 'SLITLESSPRISM'):
-                strg = "PCE for detector=%s" % detector
-                strg += " filter=%s" % mirifilter
-                strg += " subarray=%s" % subarray
-                print("\n" + strg)
-                pcemodel = get_cdp('PCE', detector=detector,
-                                    mirifilter=mirifilter,
-                                    subarray=subarray,
-                                    ftp_path=FTP_PATH, ftp_user=FTP_USER,
-                                    ftp_passwd=FTP_PASS)
-                if pcemodel is not None:
-                    cdps_found.append(strg)
-                    if VERBOSE_MODELS:
-                        print( pcemodel )
-                    if PLOTTING:
-                        pcemodel.plot(strg)
-                else:
-                    cdps_not_found.append(strg)
-                    print("*** CDP NOT FOUND ***")
-                del pcemodel
-                time.sleep(SHORT_DELAY)
-
-        for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
-            for miriband in ('SHORT', 'MEDIUM', 'LONG'):
-                strg = "PCE for detector=%s" % detector
-                strg += " band=%s" % miriband
-                print("\n" + strg)
-                pcemodel = get_cdp('PCE', detector=detector,
-                                    band=miriband,
-                                    ftp_path=FTP_PATH, ftp_user=FTP_USER,
-                                    ftp_passwd=FTP_PASS)
-                if pcemodel is not None:
-                    cdps_found.append(strg)
-                    if VERBOSE_MODELS:
-                        print( pcemodel )
-                    if PLOTTING:
-                        pcemodel.plot(strg)
-                else:
-                    cdps_not_found.append(strg)
-                    print("*** CDP NOT FOUND ***")
-                del pcemodel
-                time.sleep(SHORT_DELAY)
+        if INCLUDE_PHOTOM:
+            print("Photon Conversion Error (PCE) models")
+            detector = 'MIRIMAGE'
+            for mirifilter in ('ANY', 'P750L', 'F2100W'):
+                for subarray in ('FULL', 'SLITLESSPRISM'):
+                    strg = "PCE for detector=%s" % detector
+                    strg += " filter=%s" % mirifilter
+                    strg += " subarray=%s" % subarray
+                    print("\n" + strg)
+                    pcemodel = get_cdp('PCE', detector=detector,
+                                        mirifilter=mirifilter,
+                                        subarray=subarray,
+                                        ftp_path=FTP_PATH, ftp_user=FTP_USER,
+                                        ftp_passwd=FTP_PASS)
+                    if pcemodel is not None:
+                        cdps_found.append(strg)
+                        if VERBOSE_MODELS:
+                            print( pcemodel )
+                        if PLOTTING:
+                            pcemodel.plot(strg)
+                    else:
+                        cdps_not_found.append(strg)
+                        print("*** CDP NOT FOUND ***")
+                    del pcemodel
+                    time.sleep(SHORT_DELAY)
+    
+            for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
+                for miriband in ('SHORT', 'MEDIUM', 'LONG'):
+                    strg = "PCE for detector=%s" % detector
+                    strg += " band=%s" % miriband
+                    print("\n" + strg)
+                    pcemodel = get_cdp('PCE', detector=detector,
+                                        band=miriband,
+                                        ftp_path=FTP_PATH, ftp_user=FTP_USER,
+                                        ftp_passwd=FTP_PASS)
+                    if pcemodel is not None:
+                        cdps_found.append(strg)
+                        if VERBOSE_MODELS:
+                            print( pcemodel )
+                        if PLOTTING:
+                            pcemodel.plot(strg)
+                    else:
+                        cdps_not_found.append(strg)
+                        print("*** CDP NOT FOUND ***")
+                    del pcemodel
+                    time.sleep(SHORT_DELAY)
 
         print("The following %d simulator CDPs were successfully found:" % \
               len(cdps_found))
