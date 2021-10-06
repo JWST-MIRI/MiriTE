@@ -10,6 +10,7 @@ Simple tests of classes in "dqflags" module.
 25 Sep 2013: created
 03 Oct 2013: Converted into unit tests.
 06 Aug 2015: Updated following changes to the JWST flag tables.
+28 Sep 2021: Replaced np.bool with np.bool_
 
 @author: Ruyman Azzollini (DIAS), Steven Beard (UKATC)
 
@@ -74,21 +75,21 @@ class TestDqFlagsFunctions(unittest.TestCase):
                                                       zero_three_mask )
         expected = np.array([[0, 0, 0, 0],
                              [0, 1, 0, 0],
-                             [0, 0, 0, 0]], dtype=np.bool)
+                             [0, 0, 0, 0]], dtype=np.bool_)
         self.assertTrue( np.all( data_with_both_flags == expected ) )
 
         data_with_either_flag = dqflags.test_mask_any( self.dqdata,
                                                       zero_three_mask )
         expected = np.array([[0, 0, 1, 1],
                              [1, 1, 0, 0],
-                             [1, 0, 1, 0]], dtype=np.bool)
+                             [1, 0, 1, 0]], dtype=np.bool_)
         self.assertTrue( np.all( data_with_either_flag == expected ) )
 
         data_with_neither_flag = dqflags.test_mask_none( self.dqdata,
                                                       zero_three_mask )
         expected = np.array([[1, 1, 0, 0],
                              [0, 0, 1, 1],
-                             [0, 1, 0, 1]], dtype=np.bool)
+                             [0, 1, 0, 1]], dtype=np.bool_)
         self.assertTrue( np.all( data_with_neither_flag == expected ) )
         
     def test_masking(self):

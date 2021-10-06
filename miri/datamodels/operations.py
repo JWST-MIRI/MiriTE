@@ -37,6 +37,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
 12 Mar 2019: Removed use of astropy.extern.six (since Python 2 no longer used).
 12 Feb 2020: Added _check_broadcastable() methods.
 02 Dec 2020: Update import of jwst base model class to JwstDataModel.
+28 Sep 2021: Replaced np.bool with np.bool_
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -678,7 +679,7 @@ class HasDataErrAndDq(HasData):
 
                 # Start with a zero (False) mask and mask off (set to True)
                 # all the pixels indicated by the DQ array.
-                maskdq = np.zeros(data.shape, dtype=np.bool)
+                maskdq = np.zeros(data.shape, dtype=np.bool_)
                 if bitmask is None:
                     # None means all bits set.
                     bad = np.where(shrunk_dq != 0)
@@ -693,7 +694,7 @@ class HasDataErrAndDq(HasData):
                 datadq = np.zeros(data.shape, dtype=np.uint) + dq
                 # Start with a zero (False) mask and mask off (set to True)
                 # all the pixels indicated by the DQ array.
-                maskdq = np.zeros(data.shape, dtype=np.bool)
+                maskdq = np.zeros(data.shape, dtype=np.bool_)
                 if bitmask is None:
                     # None means all bits set.
                     bad = np.where(datadq != 0)

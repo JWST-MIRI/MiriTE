@@ -156,6 +156,7 @@ effects simulated by SCASim.
              bug worked around on 12 Feb 2016 (Bug 16).
 24 May 2018: Documentation update. Ensure _MAXEXPECTED is an integer.
 04 Jun 2018: anneal function renamed hard_reset.
+28 Sep 2021: Corrected np.int into np.int32.
 
 @author: Steven Beard (UKATC)
 
@@ -1443,7 +1444,7 @@ class ImperfectIntegrator(PoissonIntegrator):
 #                                                   zerolevel=zeropoint)
             
         newdata = zeropoint + newdata
-        return newdata.astype(np.int)
+        return newdata.astype(np.int32)
 
     def _apply_integrator(self, data, flux, time):
         """

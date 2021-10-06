@@ -117,7 +117,7 @@ def condense(spec, chunk, method = "Median", running = True):
     if leng < chunk:
         print("no of elements in spec is smaller than chunk value!")
         raise ValueError
-    no_chunks = np.int(leng/chunk)
+    no_chunks = np.int32(leng/chunk)
     newspec = np.copy(spec)
     if running:
         newspec = np.copy(spec)
