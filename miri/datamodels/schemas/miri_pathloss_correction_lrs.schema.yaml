@@ -1,0 +1,112 @@
+allOf:
+- $ref: miri_core.schema.yaml
+- type: object
+  title: MIRI LRS pathloss correction model
+  properties:
+    meta:
+      type: object
+      properties:
+        pathloss_table:
+          type: object
+          title: correction factors for the flux loss for each position of point sources in the slit area per wavelength
+          properties:
+            tunit1:
+              type: string
+              title: Column 1 units
+              default: micron
+              fits_hdu: PATHLOSS
+              fits_keyword: TUNIT1
+            tunit2:
+              type: string
+              title: Column 2 units
+              default: ''
+              fits_hdu: PATHLOSS
+              fits_keyword: TUNIT2
+            tunit3:
+              type: string
+              title: Column 3 units
+              default: ''
+              fits_hdu: PATHLOSS
+              fits_keyword: TUNIT3
+ 
+- type: object
+  properties:
+    pathloss_table:
+      title: Pathloss correction table
+      fits_hdu: PATHLOSS
+      datatype:
+      - name: wavelength
+        datatype: float32
+        unit: micron
+      - name: pathloss
+        datatype: float32
+        ndim: 2
+      - name: pathloss_err
+        datatype: float32
+        ndim: 2
+    meta:
+      type: object
+      properties:
+        wcsinfo:
+           title: WCS parameters
+           type: object
+           properties:
+             wcsaxes:
+               title: number of World Coordinate System axes
+               type: integer
+               fits_keyword: WCSAXES
+               fits_hdu: PATHLOSS
+             crpix1:
+               title: Axis 1 coordinate of the reference pixel
+               type: number
+               default: 0.0
+               fits_keyword: CRPIX1
+               fits_hdu: PATHLOSS
+             crpix2:
+               title: Axis 2 coordinate of the reference pixel
+               type: number
+               default: 0.0
+               fits_keyword: CRPIX2
+               fits_hdu: PATHLOSS
+             crval1:
+               title: Axis 1 value at the reference pixel
+               type: number
+               fits_keyword: CRVAL1
+               fits_hdu: PATHLOSS
+             crval2:
+               title: Axis 2 value at the reference pixel
+               type: number
+               fits_keyword: CRVAL2
+               fits_hdu: PATHLOSS    
+             cdelt1:
+               title: Axis 1 increment per pixel
+               type: number
+               default: 1.0
+               fits_keyword: CDELT1
+               fits_hdu: PATHLOSS
+             cdelt2:
+               title: Axis 2 increment per pixel
+               type: number
+               default: 1.0
+               fits_keyword: CDELT2
+               fits_hdu: PATHLOSS
+             ctype1:
+               title: Axis 1 coordinate type
+               type: string
+               fits_keyword: CTYPE1
+               fits_hdu: PATHLOSS
+             ctype2:
+               title: Axis 2 coordinate type
+               type: string
+               fits_keyword: CTYPE2
+               fits_hdu: PATHLOSS
+             cunit1:
+               title: Axis 1 units
+               type: string
+               fits_keyword: CUNIT1
+               fits_hdu: PATHLOSS
+             cunit2:
+               title: Axis 2 units
+               type: string
+               fits_keyword: CUNIT2
+               fits_hdu: PATHLOSS            
