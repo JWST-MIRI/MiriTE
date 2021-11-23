@@ -13,6 +13,17 @@ the DATAMODL metadata.
 22 Mar 2019: Return a blank string when a data model does not have an
              STScI equivalent.
 13 Dec 2019: MIRIRampModel replaced with RampModel.
+05 Aug 2021: JWST PsfMaskModel uncommented as experiment, then recommented.
+02 Sep 2021: Corrections from ticket jwst #34 (from Misty Cracraft):
+             The MiriFringeFlatfieldModel should map toFringeModel,
+             not FlatModel.
+             MiriMrsApertureCorrectionModel should map to MirMrsApcorrModel.
+             MiriImagingPhotometricModel should be MirImgPhotomModel,
+             not MiriImgPhotomModel (extra i).
+             MiriMrsFluxconversionModel should be MirMrsPhotomModel,
+             not MiriMrsPhotomModel (extra i).
+28 Sep 2021: Added missing MiriLrsPhotometricModel/MirLrsPhotomModel and
+             MiriLrsD2WModel/SpecwcsModel
 22 Nov 2021: MiriLrsPathlossCorrectionModel added.
 
 @author: Steven Beard (UKATC)
@@ -25,6 +36,7 @@ the DATAMODL metadata.
 #
 # TODO: The gaps in this mapping need to be filled in.
 #       Uncertain mappings are commented out.
+#       MIRI-only data models are deliberately matched to an empty string.
 #
 PARENT_DICT = {'MiriDataModel' : 'DataModel', \
                'MiriRampModel' : 'RampModel', \
@@ -32,19 +44,20 @@ PARENT_DICT = {'MiriDataModel' : 'DataModel', \
                'MiriSlopeModel' : 'ImageModel', \
                'MiriImagingApertureCorrectionModel' : 'MirImgApcorrModel', \
                'MiriLrsApertureCorrectionModel': 'MirLrsApcorrModel',
-               'MiriMrsApertureCorrectionModel': '',
+               'MiriMrsApertureCorrectionModel': 'MirMrsApcorrModel',
 #                'MiriLrsPathlossCorrectionModel': '',
                'MiriBadPixelMaskModel' :    'MaskModel', \
                'MiriDarkReferenceModel' : 'DarkMIRIModel', \
                'MiriImagingDistortionModel' : 'DistortionModel', \
+               'MiriLrsD2WModel' : 'SpecwcsModel', \
                'MiriMrsDistortionModel12' : 'DistortionMRSModel', \
                'MiriMrsDistortionModel34' : 'DistortionMRSModel', \
 #                'MiriDroopModel' : '', \
                'MiriFlatfieldModel' : 'FlatModel', \
-               'MiriFringeFlatfieldModel' : 'FlatModel', \
+               'MiriFringeFlatfieldModel' : 'FringeModel', \
                'MiriSkyFlatfieldModel' : 'FlatModel', \
                'MiriTargetFlatfieldModel' : 'FlatModel', \
-               'MiriMrsFluxconversionModel' : 'MiriMrsPhotomModel', \
+               'MiriMrsFluxconversionModel' : 'MirMrsPhotomModel', \
 #                'MiriMrsFringeFrequenciesModel' : 'FringeModel', \
                'MiriGainModel' : 'GainModel', \
                'MiriIPCModel' : 'IPCModel', \
@@ -53,11 +66,12 @@ PARENT_DICT = {'MiriDataModel' : 'DataModel', \
 #                'MiriLatentDecayModel' : '', \
                'MiriLinearityModel' : 'LinearityModel', \
 #                'MiriPceModel' : 'PhotomModel', \
-               'MiriImagingPhotometricModel' : 'MiriImgPhotomModel', \
+               'MiriImagingPhotometricModel' : 'MirImgPhotomModel', \
+               'MiriLrsPhotometricModel' : 'MirLrsPhotomModel', \
                'MiriPixelAreaModel' : 'PixelAreaModel',
                'MiriPixelSaturationModel' : 'SaturationModel', \
                'MiriReadnoiseModel' : 'ReadnoiseModel', \
-#                'MiriPointSpreadFunctionModel' : 'PsfMaskModel', \
+               'MiriPointSpreadFunctionModel' : 'PsfMaskModel', \
 #                'MiriImagingPointSpreadFunctionModel' : 'PsfMaskModel', \
 #                'MiriLrsPointSpreadFunctionModel' : 'PsfMaskModel', \
 #                'MiriMrsPointSpreadFunctionModel' : 'PsfMaskModel', \

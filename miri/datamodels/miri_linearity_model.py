@@ -68,6 +68,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              names. Removed '.yaml' suffix from schema references.
 26 Mar 2020: Ensure the model_type remains as originally defined when saving
              to a file.
+28 Sep 2021: Changed np.int to np.int32.
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -400,7 +401,7 @@ class MiriLinearityModel(MiriMeasuredModel):
             farray += self.data[icoeff,row,column] * (inarray ** icoeff)
             
         # Convert the output array to integer.
-        outarray = np.floor(farray+0.5).astype(np.int)
+        outarray = np.floor(farray+0.5).astype(np.int32)
         return outarray
 
     def get_reverse_table(self, row, column, max_dn=65535, fill_gaps=True):
@@ -478,7 +479,7 @@ class MiriLinearityModel(MiriMeasuredModel):
                 rarray[max_dn_out-1] = (rarray[max_dn_out-2] + rarray[max_dn_out])/2.0
             
         # Convert the output array to integer.
-        reverse_array = np.floor(rarray+0.5).astype(np.int)
+        reverse_array = np.floor(rarray+0.5).astype(np.int32)
         return reverse_array
 
     # "coeffs" is an alias for the "data" attribute.

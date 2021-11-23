@@ -49,6 +49,8 @@ in the datamodels.miri_psf_model module.
              when the data model is saved to a file.
 07 Oct 2019: FIXME: dq_def removed from unit tests until data corruption
              bug fixed (Bug 589).
+15 Sep 2021: added dq_def back to unit tests after data corruption bug was
+             fixed (MIRI-1156).
 
 @author: Steven Beard (UKATC)
 
@@ -159,10 +161,7 @@ class TestMiriPointSpreadFunctionModel(unittest.TestCase):
         # Test that a copy can be made of the data product.
         datacopy = self.dataproduct.copy()
         self.assertIsNotNone(datacopy)
-        assert_products_equal( self, self.dataproduct, datacopy,
-                               arrays=['data', 'err', 'dq'])
-        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-        #                       tables='dq_def' )
+        assert_products_equal(self, self.dataproduct, datacopy, arrays=['data', 'err', 'dq'], tables='dq_def')
         del datacopy
         
     def test_fitsio(self):
@@ -176,10 +175,7 @@ class TestMiriPointSpreadFunctionModel(unittest.TestCase):
             with MiriPointSpreadFunctionModel(self.testfile) as readback:
                 self.assertEqual(self.dataproduct.meta.reftype,
                                  readback.meta.reftype)
-                assert_products_equal( self, self.dataproduct, readback,
-                                       arrays=['data', 'err', 'dq'])
-                # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-                #                       tables='dq_def' )
+                assert_products_equal(self, self.dataproduct, readback, arrays=['data', 'err', 'dq'], tables='dq_def')
                 del readback
         
     def test_description(self):
@@ -283,11 +279,8 @@ class TestMiriImagingPointSpreadFunctionModel(unittest.TestCase):
         # Test that a copy can be made of the data product.
         datacopy = self.dataproduct.copy()
         self.assertIsNotNone(datacopy)
-        assert_products_equal( self, self.dataproduct, datacopy,
-                               arrays=['data', 'err', 'dq'],
-        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-        #                      tables=['dq_def', 'psf_lut'] )
-                               tables=['psf_lut'] )
+        assert_products_equal(self, self.dataproduct, datacopy, arrays=['data', 'err', 'dq'],
+                              tables=['dq_def', 'psf_lut'])
         del datacopy
         
     def test_fitsio(self):
@@ -303,11 +296,8 @@ class TestMiriImagingPointSpreadFunctionModel(unittest.TestCase):
                                  readback.meta.reftype)
                 self.assertEqual(self.dataproduct.meta.model_type,
                                  readback.meta.model_type)
-                assert_products_equal( self, self.dataproduct, readback,
-                                       arrays=['data', 'err', 'dq'],
-                # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-                #                       tables=['dq_def', 'psf_lut'] )
-                                       tables=['psf_lut'] )
+                assert_products_equal(self, self.dataproduct, readback, arrays=['data', 'err', 'dq'],
+                                      tables=['dq_def', 'psf_lut'])
                 del readback
 
             # Check that other variations of the data product can be
@@ -329,11 +319,8 @@ class TestMiriImagingPointSpreadFunctionModel(unittest.TestCase):
             with MiriImagingPointSpreadFunctionModel(self.testfile) as readback:
                 self.assertEqual(testproduct.meta.reftype,
                                  readback.meta.reftype)
-                assert_products_equal( self, testproduct, readback,
-                                       arrays=['data', 'err', 'dq'],
-                # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-#                                       tables=['dq_def', 'psf_lut'] )
-                                       tables=['psf_lut'] )
+                assert_products_equal(self, testproduct, readback, arrays=['data', 'err', 'dq'],
+                                      tables=['dq_def', 'psf_lut'])
                 del readback
         
     def test_description(self):
@@ -366,9 +353,9 @@ class TestMiriImagingPointSpreadFunctionModel(unittest.TestCase):
 
 
 class TestMiriLrsPointSpreadFunctionModel(unittest.TestCase):
-    
+
     # Test the MiriLrsPointSpreadFunctionModel class.
-    
+
     def setUp(self):
         # Create an LRS 3-D PSF product.
         a1 = [[10,20,30,40], [50,60,70,80], [90,100,110,120]]
@@ -389,7 +376,7 @@ class TestMiriLrsPointSpreadFunctionModel(unittest.TestCase):
                                                group_time=10.0,
                                                reset_time=0, frame_resets=3)
         self.testfile = "MiriMiriLrsPointSpreadFunctionModel_test.fits"
-        
+
     def tearDown(self):
         # Tidy up
         del self.dataproduct
@@ -421,12 +408,9 @@ class TestMiriLrsPointSpreadFunctionModel(unittest.TestCase):
         # Test that a copy can be made of the data product.
         datacopy = self.dataproduct.copy()
         self.assertIsNotNone(datacopy)
-        assert_products_equal( self, self.dataproduct, datacopy,
-                               arrays=['data', 'err', 'dq'])
-        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-        #                       tables=['dq_def'] )
+        assert_products_equal(self, self.dataproduct, datacopy, arrays=['data', 'err', 'dq'], tables=['dq_def'])
         del datacopy
-        
+
     def test_fitsio(self):
         # Suppress metadata warnings
         with warnings.catch_warnings():
@@ -440,10 +424,7 @@ class TestMiriLrsPointSpreadFunctionModel(unittest.TestCase):
                                  readback.meta.reftype)
                 self.assertEqual(self.dataproduct.meta.model_type,
                                  readback.meta.model_type)
-                assert_products_equal( self, self.dataproduct, readback,
-                                       arrays=['data', 'err', 'dq'])
-                # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-                #                       tables=['dq_def'] )
+                assert_products_equal(self, self.dataproduct, readback, arrays=['data', 'err', 'dq'], tables=['dq_def'])
                 del readback
 
             # Check that other variations of the data product can be
@@ -456,15 +437,12 @@ class TestMiriLrsPointSpreadFunctionModel(unittest.TestCase):
             testproduct = MiriLrsPointSpreadFunctionModel(data=aa1,
                                 err=b1, dq=c1, psftype='PSF-MONOCHROM')
             testproduct.save(self.testfile, overwrite=True)
-            with MiriImagingPointSpreadFunctionModel(self.testfile) as readback:
+            with MiriLrsPointSpreadFunctionModel(self.testfile) as readback:
                 self.assertEqual(testproduct.meta.reftype,
                                  readback.meta.reftype)
-                assert_products_equal( self, testproduct, readback,
-                                       arrays=['data', 'err', 'dq'])
-                # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-                #                       tables=['dq_def',] )
+                assert_products_equal(self, testproduct, readback, arrays=['data', 'err', 'dq'], tables=['dq_def'])
                 del readback
-        
+
     def test_description(self):
         # Test that the querying and description functions work.
         # For the test to pass these need to run without error
@@ -478,7 +456,7 @@ class TestMiriLrsPointSpreadFunctionModel(unittest.TestCase):
         descr = self.dataproduct.stats()
         self.assertIsNotNone(descr)
         del descr
-        
+
         # Attempt to access the SCI, ERR and DQ arrays and WAVELENGTH array
         # through attributes.
         descr = str(self.dataproduct.data)
@@ -547,10 +525,7 @@ class TestMiriMrsPointSpreadFunctionModel(unittest.TestCase):
         # Test that a copy can be made of the data product.
         datacopy = self.dataproduct.copy()
         self.assertIsNotNone(datacopy)
-        assert_products_equal( self, self.dataproduct, datacopy,
-                               arrays=['data', 'err', 'dq'])
-        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-        #                       tables=['dq_def'] )
+        assert_products_equal(self, self.dataproduct, datacopy, arrays=['data', 'err', 'dq'], tables=['dq_def'])
         del datacopy
         
     def test_fitsio(self):
@@ -566,10 +541,7 @@ class TestMiriMrsPointSpreadFunctionModel(unittest.TestCase):
                                  readback.meta.reftype)
                 self.assertEqual(self.dataproduct.meta.model_type,
                                  readback.meta.model_type)
-                assert_products_equal( self, self.dataproduct, readback,
-                                       arrays=['data', 'err', 'dq'])
-                # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-                #                       tables=['dq_def'] )
+                assert_products_equal(self, self.dataproduct, readback, arrays=['data', 'err', 'dq'], tables=['dq_def'])
                 del readback
         
     def test_description(self):

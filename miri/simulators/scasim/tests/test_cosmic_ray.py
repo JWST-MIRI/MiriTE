@@ -17,6 +17,7 @@ CosmicRayEnvironment and CosmicRay classes.
              statements updated.
 08 Sep 2015: Make compatible with Python 3
 05 May 2017: Changed permission for nosetests.
+28 Sep 2021: Changed np.int to np.int32.
 
 @author: Steven Beard (UKATC)
 
@@ -199,7 +200,7 @@ class TestCosmicRayEnvironment(unittest.TestCase):
         nevents = len(cosmic_ray_list)
         npossibilities = len(self.energies_lib)
         if nevents > (npossibilities * 10):
-            ecount = np.zeros([len(self.energies_lib)], dtype=np.int)
+            ecount = np.zeros([len(self.energies_lib)], dtype=np.int32)
             for cosmic_ray in cosmic_ray_list:
                 energy = cosmic_ray.get_energy()
                 for ii in range(0,npossibilities):

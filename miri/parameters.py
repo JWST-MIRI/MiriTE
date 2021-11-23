@@ -18,6 +18,8 @@ its capabilities and modes of operation. It exists to ensure the
 15 Nov 2018: Added CDP_USEAFTER_DICT.
 13 Dec 2019: Removed obsolete FASTINTAVG readout mode.
 05 Jun 2020: Reordered the subarray table to match the figure in PASP VIII.
+28 Sep 2021: Added FASTR1, SLOWR1, and FASTGRPAVGn readout modes.
+             Added new USEAFTER dates for specific subarrays.
 
 @author: Steven Beard (UKATC)
 
@@ -55,9 +57,15 @@ its capabilities and modes of operation. It exists to ensure the
 #                              m   p   p   s   p   s   s   s   s
 READOUT_MODE = {}
 READOUT_MODE['SLOW'] =       (8,   1,  3,  1,  0, 10,  1,  1,  1)
+READOUT_MODE['SLOWR1'] =     (8,   1,  3,  1,  0, 10,  1,  1,  1) # With extra reset
 READOUT_MODE['FAST'] =       (1,   0,  3,  1,  0,  1, 10,  1,  1)
+READOUT_MODE['FASTR1'] =     (1,   0,  3,  1,  0,  1, 10,  1,  1) # With extra reset
 #READOUT_MODE['FASTINTAVG'] = (1,   0,  3,  1,  0,  1,  4,  1,  4)
-READOUT_MODE['FASTGRPAVG'] = (1,   0,  3,  1,  0,  4,  1,  4,  1)
+READOUT_MODE['FASTGRPAVG']   = (1,   0,  3,  1,  0,  4,  1,  4,  1)
+READOUT_MODE['FASTGRPAVG8']  = (1,   0,  3,  1,  0,  8,  1,  8,  1)
+READOUT_MODE['FASTGRPAVG16'] = (1,   0,  3,  1,  0, 16,  1, 16,  1)
+READOUT_MODE['FASTGRPAVG32'] = (1,   0,  3,  1,  0, 32,  1, 32,  1)
+READOUT_MODE['FASTGRPAVG64'] = (1,   0,  3,  1,  0, 64,  1, 64,  1)
 # The following four readout modes were used for MIRI testing only, and they
 # will upset the JWST pipeline software if used.
 # READOUT_MODE['SLOWINTAVG'] = (8,   1,  3,  1,  0,  1,  4,  1,  4)
@@ -114,7 +122,9 @@ MIRI_SETTINGS = ['RAL1', 'JPL1', 'JPL2', 'JPL3',
                  'RUN1', 'RUN2', 'RUN3', 'RUN4', 'RUN5', 'RUN6']
 
 # Available MIRI readout modes.
-MIRI_READPATTS = ['SLOW', 'FAST', 'FASTGRPAVG']
+MIRI_READPATTS = ['SLOW', 'SLOWR1', 'FAST', 'FASTR1', 'FASTGRPAVG',
+                  'FASTGRPAVG8', 'FASTGRPAVG16', 'FASTGRPAVG32',
+                  'FASTGRPAVG64']
 
 # Available MIRI subarray modes. Compare with the SUBARRAY dictionary
 # defined above. Also = list(SUBARRAY.keys()) - ['FULL', 'GENERIC']
@@ -194,12 +204,23 @@ CDP_USEAFTER_DICT = {'DEFAULT'   : '2000-01-01T00:00:00',
                      'CV3'       : '2013-09-26T05:00:00',
                      'CV3_BURST' : '2015-08-01T00:00:00',
                      'CDP1'      : '2013-03-01T00:00:00',
+                     'SUB128'    : '2013-09-26T05:00:00',
+                     'SUB64'     : '2013-09-26T05:00:00',
+                     'SLITLESSPRISM' : '2013-09-26T05:00:00',
+                     'MASK1065'  : '2013-09-26T05:00:00',
+                     'MASK1140'  : '2013-09-26T05:00:00',
+                     'MASK1550'  : '2013-09-26T05:00:00',
+                     'MASKLYOT'  : '2013-09-26T05:00:00',
                      'CDP2'      : '2013-11-01T00:00:00',
                      'CDP3'      : '2014-11-01T00:00:00',
                      'CDP4'      : '2015-06-15T00:00:00',
+                     'BRIGHTSKY' : '2015-08-01T00:00:00',
+                     'SUB256'    : '2015-08-01T00:00:00',
                      'CDP5'      : '2015-12-18T00:00:00',
                      'CDP6'      : '2016-06-30T00:00:00',
-                     'CDP7'      : '2018-12-01T00:00:00'
+                     'CDP7'      : '2018-12-01T00:00:00',
+                     'CDP8'      : '2021-08-09T00:00:00',
+                     'CDP9'      : '2022-01-01T00:00:00',
                     }
 
 #

@@ -30,6 +30,8 @@ in the datamodels.miri_telescope_emission_model module.
 12 Jul 2017: Replaced "clobber" parameter with "overwrite".
 07 Oct 2019: FIXME: dq_def removed from unit tests until data corruption
              bug fixed (Bug 589).
+15 Sep 2021: added dq_def back to unit tests after data corruption bug was
+             fixed (MIRI-1156).
 
 @author: Steven Beard (UKATC)
 
@@ -117,10 +119,7 @@ class TestMiriTelescopeEmissionModel(unittest.TestCase):
         # Test that a copy can be made of the data product.
         datacopy = self.dataproduct.copy()
         self.assertIsNotNone(datacopy)
-        assert_products_equal( self, self.dataproduct, datacopy,
-                               arrays=['data', 'err', 'dq'])
-        # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-        #                       tables='dq_def' )
+        assert_products_equal(self, self.dataproduct, datacopy, arrays=['data', 'err', 'dq'], tables='dq_def')
         del datacopy
         
     def test_fitsio(self):
@@ -132,10 +131,7 @@ class TestMiriTelescopeEmissionModel(unittest.TestCase):
             # file and read back again without changing the data.
             self.dataproduct.save(self.testfile, overwrite=True)
             with MiriTelescopeEmissionModel(self.testfile) as readback:
-                assert_products_equal( self, self.dataproduct, readback,
-                                       arrays=['data', 'err', 'dq'])
-                # FIXME: removed dq_def until data corruption bug fixed. Bug 589
-                #                       tables='dq_def' )
+                assert_products_equal(self, self.dataproduct, readback, arrays=['data', 'err', 'dq'], tables='dq_def')
                 del readback
         
     def test_description(self):
