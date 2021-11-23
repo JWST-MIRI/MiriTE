@@ -9,6 +9,7 @@ in the datamodels.miri_aperture_correction_model module.
 :History:
 
 13 Jan 2020: Created 
+22 Nov 2021: TestMiriLrsPathlossCorrectionModel added.
 
 
 @author:  Juergen Schreiber (MPIA), Steven Beard (UKATC)

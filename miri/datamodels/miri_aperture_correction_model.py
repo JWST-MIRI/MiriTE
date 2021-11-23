@@ -25,6 +25,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              a corresponding model defined in ancestry.py).
 26 Mar 2020: Ensure the model_type remains as originally defined when saving
              to a file.
+22 Nov 2021: MiriLrsPathlossCorrectionModel added.
              
 @author: Steven Beard (UKATC), Vincent Geers (UKATC), Juergen Schreiber (MPIA)
 
