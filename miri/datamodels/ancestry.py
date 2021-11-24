@@ -43,9 +43,9 @@ PARENT_DICT = {'MiriDataModel' : 'DataModel', \
                'MiriExposureModel' : 'RampModel', \
                'MiriSlopeModel' : 'ImageModel', \
                'MiriImagingApertureCorrectionModel' : 'MirImgApcorrModel', \
-               'MiriLrsApertureCorrectionModel': 'MirLrsApcorrModel',
-               'MiriMrsApertureCorrectionModel': 'MirMrsApcorrModel',
-               'MiriLrsPathlossCorrectionModel': 'MirLrsPathlossModel',
+               'MiriLrsApertureCorrectionModel': 'MirLrsApcorrModel',\
+               'MiriMrsApertureCorrectionModel': 'MirMrsApcorrModel',\
+               'MiriLrsPathlossCorrectionModel': 'MirLrsPathlossModel',\
                'MiriBadPixelMaskModel' :    'MaskModel', \
                'MiriDarkReferenceModel' : 'DarkMIRIModel', \
                'MiriImagingDistortionModel' : 'DistortionModel', \
