@@ -25,6 +25,7 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/datamodels/index.html
              a corresponding model defined in ancestry.py).
 26 Mar 2020: Ensure the model_type remains as originally defined when saving
              to a file.
+22 Nov 2021: MiriLrsPathlossCorrectionModel added.
              
 @author: Steven Beard (UKATC), Vincent Geers (UKATC), Juergen Schreiber (MPIA)
 
@@ -42,7 +43,8 @@ import numpy as np
 __all__ = ['MiriMrsApertureCorrectionModel',\
            'MiriLrsApertureCorrectionModel',\
            'MiriLrsThroughputCorrectionModel',\
-           'MiriLrsPositionCorrectionModel']
+           'MiriLrsPositionCorrectionModel',\
+           'MiriLrsPathlossCorrectionModel']
 
 
 
@@ -130,7 +132,7 @@ class MiriLrsThroughputCorrectionModel(MiriDataModel):
     The throughput is calculated as the flux loss of the centered PSF due to the
     finite extension of the slit.
 
-    See " " for a detailed description of the data model.
+    See "MIRI-TN-10023-MPI" for a detailed description of the data model.
     
     :Parameters:
     
@@ -205,7 +207,7 @@ class MiriLrsApertureCorrectionModel(MiriDataModel):
     centered PSF in a user given aperture
     to the extension of the complete slit.
 
-    See " " for a detailed description of the data model.
+    See "MIRI-TN-10021-MPI" for a detailed description of the data model.
     
     :Parameters:
     
@@ -284,7 +286,7 @@ class MiriLrsPositionCorrectionModel(MiriDataModel):
     It calculates the flux loss for offsets of the webbPsf in dispersion direction from the slit center in steps 
     of a quarter of a pixel.
 
-    See " " for a detailed description of the data model.
+    See "MIRI-TN-10024-MPI" for a detailed description of the data model.
     
     :Parameters:
     
@@ -350,6 +352,78 @@ class MiriLrsPositionCorrectionModel(MiriDataModel):
         # Re-initialise data type on save
        self._init_data_type()
 
+class MiriLrsPathlossCorrectionModel(MiriDataModel):
+    """
+    
+    A generic data model for a MIRI LRS pathloss correction table,
+    based on the STScI base model, DataModel.
+    It calculates the flux loss for offsets of the webbPsf from the slit center in all directions.
+
+    See "MIRI-TN-10025-MPI" for a detailed description of the data model.
+    
+    :Parameters:
+    
+    init: shape tuple, file path, file object, pyfits.HDUList, numpy array
+        An optional initializer for the data model, which can have one
+        of the following forms:
+        
+        * None: A default data model with no shape.
+        * Shape tuple: Initialize with empty data of the given shape.
+        * File path: Initialize from the given file.
+        * Readable file object: Initialize from the given file object.
+        * pyfits.HDUList: Initialize from the given pyfits.HDUList.
+        
+    pathloss_table: list of tuples or numpy record array (optional)
+        Either: A list of tuples containing columns in the position
+        correction table;
+        Or: A numpy record array containing the same information as above.
+        A position correction table must either be defined in the
+        initializer or in this parameter. A blank table is not allowed.
+    \*\*kwargs:
+        All other keyword arguments are passed to the DataModel initialiser.
+        See the jwst.datamodels documentation for the meaning of these keywords.
+        
+    """
+    schema_url = "miri_pathloss_correction_lrs.schema"
+    fieldnames = ('wavelength', 'pathloss', 'pathloss_err')
+    
+    def __init__(self, init=None, pathloss_table=None, **kwargs):
+        """
+        
+        Initialises the MiriLrsPathlossCorrectionModel class.
+        
+        Parameters: See class doc string.
+
+        """
+        super(MiriLrsPathlossCorrectionModel, self).__init__(init=init, **kwargs)
+
+        # Data type is position correction.
+        self.meta.reftype = 'PATHLOSS'
+        # Initialise the model type
+        self._init_data_type()
+        # This is a reference data model.
+        self._reference_model()
+        
+        if pathloss_table is not None:
+            try:
+                self.pathloss_table = pathloss_table
+            except (ValueError, TypeError) as e:
+                strg = "pathloss_table must be a numpy record array or list of records."
+                strg += "\n   %s" % str(e)
+                raise TypeError(strg)
+        
+        # Copy the table column units from the schema, if defined.
+        poscorr_units = self.set_table_units('pathloss_table')        
+        
+    def _init_data_type(self):
+        # Initialise the data model type
+        model_type = get_my_model_type( self.__class__.__name__ )
+        self.meta.model_type = model_type        
+
+    def on_save(self, path):
+       super(MiriLrsPathlossCorrectionModel, self).on_save(path)
+        # Re-initialise data type on save
+       self._init_data_type()
 
 #
 # A minimal test is run when this file is run as a main program.
@@ -455,4 +529,28 @@ if __name__ == '__main__':
         del apcorr_table
         del testapcorr_lrs
     
+    
+    
+    pathloss = np.zeros([3,40,4])
+    pathloss_err = np.zeros([3,40,4])
+    pathloss_table=[]
+    pathloss_table.append((wave[0], pathloss[0].tolist(), pathloss_err[0].tolist()))
+    pathloss_table.append((wave[1], pathloss[1].tolist(), pathloss_err[1].tolist()))
+    pathloss_table.append((wave[2], pathloss[2].tolist(), pathloss_err[2].tolist()))  
+    print(pathloss_table)
+    
+    with MiriLrsPathlossCorrectionModel( pathloss_table=pathloss_table) as testpathloss_lrs:
+        testpathloss_lrs.set_instrument_metadata(detector='MIRIMAGE', filt='P750L')
+        testpathloss_lrs.set_housekeeping_metadata('MPIA', author='Juergen Schreiber',
+                                           version='1.0', useafter='2019-07-19',
+                                           description='Test data')
+        testpathloss_lrs.set_wcs_metadata(wcsaxes = 2, crpix = [1,1], cdelt = [1,1], crval = [-1, -10])
+        print(testpathloss_lrs)
+        if PLOTTING:
+            testpathloss_lrs.plot(description="testpathloss_lrs")
+        if SAVE_FILES:
+            testpathloss_lrs.save("test_pathloss_model_lrs.fits", overwrite=True)
+        del pathloss_table
+        del testpathloss_lrs
+          
     print("Test finished.")

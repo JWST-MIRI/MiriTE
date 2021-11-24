@@ -116,7 +116,8 @@ from miri.datamodels.miri_spectral_spatial_resolution_model import \
     MiriMrsResolutionModel
 from miri.datamodels.miri_aperture_correction_model import \
     MiriMrsApertureCorrectionModel, MiriLrsApertureCorrectionModel, \
-    MiriLrsThroughputCorrectionModel, MiriLrsPositionCorrectionModel
+    MiriLrsThroughputCorrectionModel, MiriLrsPositionCorrectionModel, \
+    MiriLrsPathlossCorrectionModel
 from miri.datamodels.miri_reset_switch_charge_decay_model import \
     MiriResetSwitchChargeDecayModel
 from miri.datamodels.miri_gain_model import MiriGainModel
@@ -216,6 +217,7 @@ CDP_DICT = { \
             'APCORR' : MiriLrsApertureCorrectionModel, \
             'THROUGHCORR' : MiriLrsThroughputCorrectionModel, \
             'POSCORR' : MiriLrsPositionCorrectionModel, \
+            'PATHLOSS': MiriLrsPathlossCorrectionModel,\
             # -----------------------------------------------------------
             # Legacy Keywords and Data Products - Backwards Compatibility Only
             # The following section could be removed without affecting the

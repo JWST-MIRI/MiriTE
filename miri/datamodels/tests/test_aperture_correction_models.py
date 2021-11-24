@@ -9,6 +9,7 @@ in the datamodels.miri_aperture_correction_model module.
 :History:
 
 13 Jan 2020: Created 
+22 Nov 2021: TestMiriLrsPathlossCorrectionModel added.
 
 
 @author:  Juergen Schreiber (MPIA), Steven Beard (UKATC)
@@ -22,7 +23,8 @@ import warnings
 import numpy as np
 
 from miri.datamodels.miri_aperture_correction_model import \
-    MiriMrsApertureCorrectionModel, MiriLrsApertureCorrectionModel, MiriLrsThroughputCorrectionModel, MiriLrsPositionCorrectionModel
+    MiriMrsApertureCorrectionModel, MiriLrsApertureCorrectionModel,\
+    MiriLrsThroughputCorrectionModel, MiriLrsPositionCorrectionModel, MiriLrsPathlossCorrectionModel
 from miri.datamodels.tests.util import assert_recarray_equal, \
     assert_products_equal
 
@@ -481,6 +483,121 @@ class TestMiriLrsPositionCorrectionModel(unittest.TestCase):
         descr = str(self.dataproduct.poscorr_table)
         self.assertIsNotNone(descr)
         del descr
+
+
+class TestMiriLrsPathlossCorrectionModel(unittest.TestCase):
+    
+    # Test the MiriLrsPathlossCorrectionModel class.    
+    def setUp(self):
+        wave = [5.,8.,11.]
+        pathloss = np.zeros([3,40,4])
+        pathloss_err = np.zeros([3,40,4])
+        pathloss_table=[]
+        pathloss_table.append((wave[0], pathloss[0].tolist(), pathloss_err[0].tolist()))
+        pathloss_table.append((wave[1], pathloss[1].tolist(), pathloss_err[1].tolist()))
+        pathloss_table.append((wave[2], pathloss[2].tolist(), pathloss_err[2].tolist()))  
+            
+        self.pathloss_table = pathloss_table
+
+        self.dataproduct = MiriLrsPathlossCorrectionModel( pathloss_table=self.pathloss_table)
+        self.testfile = "MiriLrsPathlossCorr_test.fits"
+        
+    def tearDown(self):
+        # Tidy up
+        del self.dataproduct
+        del self.pathloss_table
+        # Remove temporary file, if able to.
+        if os.path.isfile(self.testfile):
+            try:
+                os.remove(self.testfile)
+            except Exception as e:
+                strg = "Could not remove temporary file, " + self.testfile + \
+                    "\n   " + str(e)
+                warnings.warn(strg)
+
+    def test_referencefile(self):
+        # Check that the data product contains the standard
+        # reference file metadata.
+        type1 = self.dataproduct.meta.model_type
+        type2 = self.dataproduct.meta.reftype
+        self.assertIsNotNone(type1)
+        self.assertIsNotNone(type2)
+        pedigree = self.dataproduct.meta.pedigree
+        self.assertIsNotNone(pedigree)
+
+    def test_creation(self):
+        # Check that the field names in the class variable are the same
+        # as the ones declared in the schema.
+        class_names = list(MiriLrsPathlossCorrectionModel.fieldnames)
+        schema_names = list(self.dataproduct.get_field_names('pathloss_table'))
+        self.assertEqual(class_names, schema_names,
+                         "'fieldnames' class variable does not match schema")
+
+        # It must be possible to create an empty data product and fill
+        # in its contents later. This will generate a warning.
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            nulldp = MiriLrsPathlossCorrectionModel( )
+        descr1 = str(nulldp)
+        self.assertIsNotNone(descr1)
+        nulldp.pathloss_table = self.pathloss_table
+        self.assertIsNotNone(nulldp.pathloss_table)
+        descr2 = str(nulldp)
+        self.assertIsNotNone(descr2)
+        del nulldp, descr1, descr2    
+
+    def test_copy(self):
+        # Test that a copy can be made of the data product.
+        # This will generate a warning.
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            datacopy = self.dataproduct.copy()
+        self.assertIsNotNone(datacopy.pathloss_table)
+        self.assertEqual( len(self.dataproduct.pathloss_table),
+                          len(datacopy.pathloss_table) )
+        table1 = np.asarray(self.dataproduct.pathloss_table)
+        table2 = np.asarray(datacopy.pathloss_table)
+        assert_recarray_equal(table1, table2)
+        del datacopy
+                
+    def test_fitsio(self):
+        # Suppress metadata warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+
+            # Check that the data product can be written to a FITS
+            # file and read back again without changing the data.
+            self.dataproduct.save(self.testfile, overwrite=True)
+            with MiriLrsPathlossCorrectionModel(self.testfile) as readback:
+                self.assertEqual(self.dataproduct.meta.reftype,
+                                 readback.meta.reftype)
+                self.assertEqual(self.dataproduct.meta.model_type,
+                                 readback.meta.model_type)
+                self.assertIsNotNone(readback.pathloss_table)
+                self.assertEqual( len(self.dataproduct.pathloss_table),
+                                  len(readback.pathloss_table) )
+                original = np.asarray(self.dataproduct.pathloss_table)
+                duplicate = np.asarray(readback.pathloss_table)
+                assert_recarray_equal(original, duplicate)
+                del readback
+        
+    def test_description(self):
+        # Test that the querying and description functions work.
+        # For the test to pass these need to run without error
+        # and generate non-null strings.
+        descr = str(self.dataproduct)
+        self.assertIsNotNone(descr)
+        del descr
+        descr = repr(self.dataproduct)
+        self.assertIsNotNone(descr)
+        del descr
+        
+        # Attempt to access the flux table pathloss attributes.
+        descr = str(self.dataproduct.pathloss_table)
+        self.assertIsNotNone(descr)
+        del descr
+
+
 
 # If being run as a main program, run the tests.
 if __name__ == '__main__':

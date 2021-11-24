@@ -24,6 +24,7 @@ the DATAMODL metadata.
              not MiriMrsPhotomModel (extra i).
 28 Sep 2021: Added missing MiriLrsPhotometricModel/MirLrsPhotomModel and
              MiriLrsD2WModel/SpecwcsModel
+22 Nov 2021: MiriLrsPathlossCorrectionModel added.
 
 @author: Steven Beard (UKATC)
 
@@ -42,8 +43,9 @@ PARENT_DICT = {'MiriDataModel' : 'DataModel', \
                'MiriExposureModel' : 'RampModel', \
                'MiriSlopeModel' : 'ImageModel', \
                'MiriImagingApertureCorrectionModel' : 'MirImgApcorrModel', \
-               'MiriLrsApertureCorrectionModel': 'MirLrsApcorrModel',
-               'MiriMrsApertureCorrectionModel': 'MirMrsApcorrModel',
+               'MiriLrsApertureCorrectionModel': 'MirLrsApcorrModel',\
+               'MiriMrsApertureCorrectionModel': 'MirMrsApcorrModel',\
+               'MiriLrsPathlossCorrectionModel': 'MirLrsPathlossModel',\
                'MiriBadPixelMaskModel' :    'MaskModel', \
                'MiriDarkReferenceModel' : 'DarkMIRIModel', \
                'MiriImagingDistortionModel' : 'DistortionModel', \
