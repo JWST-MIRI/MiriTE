@@ -1,4 +1,4 @@
-from parameterized import parameterized
+import pytest
 
 from miri.apt_parser.utils import read_fake_xml, get_namespace
 from miri.apt_parser.dithering import parse_dither
@@ -42,7 +42,7 @@ testdata = [
 ]
 
 
-@parameterized(testdata)
+@pytest.mark.parametrize("sample_xml, expected", testdata)
 def test_dithering(sample_xml, expected):
     """
     Test of dithering

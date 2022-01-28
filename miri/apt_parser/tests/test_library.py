@@ -1,4 +1,4 @@
-from parameterized import parameterized
+import pytest
 import numpy.testing as npt
 from miri.apt_parser import library
 from miri.apt_parser.utils import assert_dict_equal, read_fake_xml
@@ -106,7 +106,7 @@ def test_get_simplified_tag():
     assert output == expected
 
 
-@parameterized(testtarget)
+@pytest.mark.parametrize("sample_xml, expected", testtarget)
 def test_get_target(sample_xml, expected):
     """
     From Proposal ID 1024 (1st target)
@@ -136,7 +136,7 @@ test_prediction = [
 ]
 
 
-@parameterized(test_prediction)
+@pytest.mark.parametrize("input, expected", test_prediction)
 def test_get_prediction(input, expected):
     (ref_ram, ref_time, ref_exps) = expected
 
