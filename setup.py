@@ -321,6 +321,7 @@ setup(
         'paramiko==2.6.0',
         'pysftp==0.2.9',
         'scipy>=1.4.1',
+        'pytest>=6.2.0',
     ],
 )
 
