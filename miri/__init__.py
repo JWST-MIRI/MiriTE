@@ -48,6 +48,7 @@ miri.simulators
 23 Mar 2019: Modified data models for JWST build 7.3 and Python 3.7 (V7.4)
 15 Sep 2021: Various updates for compatibility with newer JWST builds, now
              up-to-date with JWST B7.8.
+15 Sep 2021: Minor update for compatibility with latest JWST build 7.9.
 
 @author: MIRI Software Team
 
@@ -55,5 +56,5 @@ miri.simulators
 __project__ = 'MIRI Tool and Environment Software'
 __author__ = 'MIRI Software Team'
 __maintainer__ = 'MIRI Software Team: mirisim@roe.ac.uk'
-__copyright__ = '2021, %s' % __author__
-__version__ = '7.8'
+__copyright__ = '2022, %s' % __author__
+__version__ = '7.9'

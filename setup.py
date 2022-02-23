@@ -36,6 +36,7 @@ Setup file for installing the MiriTE software
              Do not install old and rarely used scrupts.
 18 Jun 2020: Removed "numba" from dependencies due to issues with Numba,
              see MIRI-749.
+01 Feb 2022: Restrict version of Cython dependency to avoid issue with conda.
 
 @author: MIRI Software Team
 
@@ -313,7 +314,7 @@ setup(
     data_files=[('', ['LICENCE', 'README'])],
     entry_points=entry_points,
     install_requires=[
-        'Cython>=0.29.15',
+        'Cython>=0.29.15,<=0.29.25',
         'jwst>=0.18.0',
         'matplotlib>=3.1.0',
         'numpy>=1.18.1',
@@ -321,6 +322,7 @@ setup(
         'paramiko==2.6.0',
         'pysftp==0.2.9',
         'scipy>=1.4.1',
+        'pytest>=6.2.0',
     ],
 )
 
