@@ -146,7 +146,7 @@ import copy
 
 # Python utilities for accessing the sftp repository.
 import pysftp
-from paramiko import SSHException
+from paramiko import SSHException # paramiko.buffered_pipe.PipeTimeout
 
 # Python logging facility.
 import logging
@@ -1223,12 +1223,12 @@ class MiriCDPFolder(object):
                         ncandidates = len(candidates)
                     else:
                         strg = " There are no CDPs exactly matching a %s readout pattern." % readpatt
-                        self.logger.warning(strg)
+                        self.logger.info("*NOTE*" + strg)
             elif ncandidates == 1:
                 if readpatt and (readpatt != 'ANY') and (readpatt != 'N/A'):
                     if readpatt not in candidates[0]:
                         strg = " The matched CDP does not exactly match a %s readout pattern." % readpatt
-                        self.logger.warning(strg)
+                        self.logger.info("*NOTE*" + strg)
  
             if ncandidates <= 1:
                 return candidates[0]
@@ -2062,6 +2062,7 @@ class MiriCDPInterface(object, metaclass=Singleton):
                         self.sftp.get(cdp_file, localpath=new_local_filename)
                         self.sftp.chdir('/')
                         # TODO: Check the integrity of the copied file using a checksum.
+                        # TODO: Check for an exception and remove a partly copied file
                     else:
                         strg = " Cached CDP file \'%s\' has been removed!" % local_filename
                         strg += " It cannot be retrieved from LOCAL."
@@ -2625,7 +2626,7 @@ if __name__ == '__main__':
             if detector:
                 must_contain.append(detector)
             if readpatt:
-                # Look for the basic readout pattern
+                # Search for an exact or a generic readout pattern.
                 #must_contain.append(readpatt)
                 if readpatt.startswith("FAST"):
                     must_contain.append("FAST")
