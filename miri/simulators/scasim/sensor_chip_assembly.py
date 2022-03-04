@@ -5342,9 +5342,9 @@ if __name__ == '__main__':
     test_output_stub = './data/SCATestOutput'
 
     # Which tests to run?
-    TEST_MODELS = False
-    TEST_BANDS = False
-    TEST_SUBARRAYS = False
+    TEST_MODELS = True
+    TEST_BANDS = True
+    TEST_SUBARRAYS = True
     TEST_READOUTS = True
     
     # Which simulations to include?
