@@ -199,7 +199,7 @@ properties:
       readpatt:
         type: string
         title: Readout pattern
-        enum: [FAST, FASTGRPAVG, FASTINTAVG, SLOW, ANY, N/A]
+        enum: [FAST, FASTR1, FASTGRPAVG, FASTINTAVG, SLOW, SLOWR1, ANY, N/A]
         fits_keyword: READPATT
       nframes:
         type: integer
