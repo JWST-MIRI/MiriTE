@@ -238,6 +238,10 @@ Calibration Data Products (CDPs).
              electrons.
 05 Mar 2020: Added print statements to debug readnoise variation.
 16 Apr 2020: Removed references to obsolete amplifier class.
+03 Mar 2022: When a readout pattern FASTR1 or SLOWR1 is requested, also look
+             for FAST or SLOW readout patterns. If needed, remove non-exact
+             matches at the filtering stage. (Implementing change made to
+             cdplib.py on 28 Sep 2021.)
 
 @author: Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -1314,7 +1318,11 @@ class DetectorArray(object):
             self.dark_averaged = averaged
             self.mean_dark = 0.0
             return
- 
+
+        strg = "Find a DARK for detector=%s, readpatt=%s, subarray=%s" % \
+            (detector, str(readpatt), str(subarray))
+        self.logger.debug(strg)
+         
 #         # Get the required CDP version numbers
 #         (cdprelease, cdpversion, cdpsubversion) = cdp_version_decode( cdp_version )
          
@@ -1339,7 +1347,13 @@ class DetectorArray(object):
         if detector:
             must_contain.append(detector)
         if readpatt:
-            must_contain.append(readpatt)
+            # Search for an exact or a generic readout pattern.
+            #must_contain.append(readpatt)
+            if readpatt.startswith("FAST"):
+                must_contain.append("FAST")
+            if readpatt.startswith("SLOW"):
+                must_contain.append("SLOW")               
+
         if subarray and subarray != 'FULL':
             must_contain.append(subarray)
         else:
@@ -1355,6 +1369,34 @@ class DetectorArray(object):
         (matched_files, matched_folders) = \
             CDPInterface.match_cdp_substrings(mustcontain=must_contain,
                                               mustnotcontain=must_not_contain)
+        #self.logger.debug( "%d files matched: %s." % \
+        #                  (len(matched_files), str(matched_files)))
+
+        # If there is more than one candidate and some have an exact match
+        # to the readout pattern required, then remove the non-exact ones.
+        if len(matched_files) > 1:
+            if readpatt and (readpatt != 'ANY') and (readpatt != 'N/A'):
+                nexact = 0
+                for candidate in matched_files:
+                    if readpatt in candidate:
+                        #self.logger.debug("Exact match for readpatt=%s" % readpatt)
+                        nexact += 1
+                if nexact > 0:
+                    for candidate in matched_files.copy():
+                        if readpatt not in candidate:
+                            #self.logger.debug("Removing readpatt=%s" % readpatt)
+                            # Remove both the file name and its folder
+                            findex = matched_files.index(candidate)
+                            matched_files.remove(candidate)
+                            matched_folders.remove(matched_folders[findex])
+                else:
+                    logstrg = "There are no CDPs exactly matching a %s readout pattern." % readpatt
+                    self.logger.info("*NOTE*: " + logstrg)
+        elif len(matched_files) == 1:
+            if readpatt and (readpatt != 'ANY') and (readpatt != 'N/A'):
+                if readpatt not in matched_files[0]:
+                    logstrg = "The matched CDP does not exactly match a %s readout pattern." % readpatt
+                    self.logger.info("*NOTE*: " + logstrg)
          
         if len(matched_files) > 1:
             # More than one match. Take the last file.

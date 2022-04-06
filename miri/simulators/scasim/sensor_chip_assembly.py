@@ -355,7 +355,8 @@ Calibration Data Products (CDPs).
 30 Jun 2020: Oversized illumination maps which exactly match the size of
              an array containing reference columns are truncated by
              removing reference columns.
-
+03 Mar 2022: Removed obsolete code which replaced any readout mode starting
+             with "SLOW" with "SLOW" (to account for SLOWR1).
 
 @author: Steven Beard
 
@@ -1822,10 +1823,14 @@ class SensorChipAssembly(object):
             # Clear the old detector object and create a new one.
             if self.detector is not None:
                 del self.detector
-            if 'SLOW' in self.readout_mode:
-                readpatt = 'SLOW'
-            else:
-                readpatt = 'FAST'
+            # The management of the CDPs for different readout modes is now
+            # handled in the self.detector.add_dark_map_cdp and
+            # self.detector.add_flat_map functions.
+            #if 'SLOW' in self.readout_mode:
+            #    readpatt = 'SLOW'
+            #else:
+            #    readpatt = 'FAST'
+            readpatt = self.readout_mode
             self.detector = DetectorArray(
                                 self.detectorid,
                                 self.shape[0], self.shape[1],
@@ -1862,10 +1867,14 @@ class SensorChipAssembly(object):
         # needs to be updated.
         elif (self.subarray_str != self.subarray_previous) or \
              (self.readout_mode != self.readout_mode_previous):
-            if 'SLOW' in self.readout_mode:
-                readpatt = 'SLOW'
-            else:
-                readpatt = 'FAST'
+            # The management of the CDPs for different readout modes is now
+            # handled in the self.detector.add_dark_map_cdp and
+            # self.detector.add_flat_map functions.
+            #if 'SLOW' in self.readout_mode:
+            #    readpatt = 'SLOW'
+            #else:
+            #    readpatt = 'FAST'
+            readpatt = self.readout_mode
             self.detector.simulate_poisson_noise=self.simulate_poisson_noise
             self.detector.simulate_read_noise=self.simulate_read_noise
             self.detector.simulate_bad_pixels=self.simulate_bad_pixels
@@ -5375,7 +5384,7 @@ if __name__ == '__main__':
             print( illumination_map )
         sca = SensorChipAssembly3()
         exposure_map = sca.simulate_pipe(illumination_map, scale=10.0,
-                            readout_mode='SLOW', nints=1, ngroups=10,
+                            readout_mode='SLOWR1', nints=1, ngroups=10,
                             start_time=42.0, makeplot=PLOTTING,
                             cosmic_ray_mode='NONE',
                             include_pixeldq=INCLUDE_PIXELDQ, qe_adjust=QE_ADJUST,
@@ -5408,7 +5417,7 @@ if __name__ == '__main__':
         if VERBOSE > 1:
             print( illumination_map )
         exposure_map = sca.simulate_pipe(illumination_map, scale=10.0,
-                            readout_mode='SLOW', nints=1, ngroups=10,
+                            readout_mode='SLOWR1', nints=1, ngroups=10,
                             makeplot=PLOTTING, cosmic_ray_mode='NONE',
                             include_pixeldq=INCLUDE_PIXELDQ,
                             qe_adjust=QE_ADJUST,
@@ -5450,6 +5459,7 @@ if __name__ == '__main__':
         # for convenience of testing.
         for detector in ['MIRIFUSHORT', 'MIRIFULONG']:
             for band in ['SHORT', 'MEDIUM', 'LONG']:
+                print( 40 * "-" )
                 print( "MRS %s band %s." % (detector, band) )
                 test_output_file_name = "%s_%s_%s_%d.fits" % \
                         (test_output_stub, detector, band, ii)
@@ -5503,6 +5513,7 @@ if __name__ == '__main__':
         random.shuffle(random_list)
         random_list = ['FULL'] + random_list
         for subarray in random_list:
+            print( 40 * "-" )
             print( "Subarray mode FULL->%s." % subarray )
             test_output_file_name = "%s_%s_%d.fits" % \
                     (test_output_stub, subarray, ii)
@@ -5549,6 +5560,7 @@ if __name__ == '__main__':
         random.shuffle(random_list)
         random_list = ['FULL'] + random_list
         for subarray in random_list:
+            print( 40 * "-" )
             print( "Subarray mode %s->FULL." % subarray )
             test_output_file_name = "%s_%s_FULL_%d.fits" % \
                     (test_output_stub, subarray, ii)
@@ -5599,16 +5611,22 @@ if __name__ == '__main__':
         # Try all possible readout modes
         mode = 'SLOW'
         inttime = 60.0
+        try:
+           del sca
+        except:
+           pass
+        sca = SensorChipAssembly1()
         print("\nTesting simulate_files with all readout modes...\n" + (50 * "*"))
         for mode in list(detector_properties['READOUT_MODE'].keys()):    
             # Use a longer integration time for SLOW mode.
-            if mode == 'SLOW':
+            if mode.startswith('SLOW'):
                 inttime = 60.0
             else:
                 inttime = 10.0
                 
             # Case 1: Specify the integration time and let the simulator
             # calculate the number of groups.
+            print( 40 * "-" )
             print( "Readout mode %s with time --> ngroups." % mode )
             test_output_file_name = "%s_%s_TIME.fits" % (test_output_stub, mode)
             sca.simulate_files(test_input_file_name, test_output_file_name,
