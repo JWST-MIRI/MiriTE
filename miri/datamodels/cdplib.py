@@ -2610,15 +2610,125 @@ if __name__ == '__main__':
                 del gainmodel
                 time.sleep(LONG_DELAY)
 
+        def find_dark( detector, readpatt, subarray, averaged=False):
+            """
+            
+            Helper function to find a DARK CDP in the same way as is
+            done within SCASim.
+            
+            """
+            from miri.datamodels.cdp import MiriDarkReferenceModel
+            miricdp = MiriCDPInterface(ftp_path=FTP_PATH,
+                                       ftp_user=FTP_USER,
+                                       ftp_passwd=FTP_PASS)
+            miricdp.refresh(ftp_path=FTP_PATH,
+                            ftp_user=FTP_USER, 
+                            ftp_passwd=FTP_PASS)
+            must_contain = []
+            must_not_contain = []
+            if detector:
+                must_contain.append(detector)
+            if readpatt:
+                # Search for an exact or a generic readout pattern.
+                #must_contain.append(readpatt)
+                if readpatt.startswith("FAST"):
+                    must_contain.append("FAST")
+                if readpatt.startswith("SLOW"):
+                    must_contain.append("SLOW")               
+                    
+            if subarray and subarray != 'FULL':
+                must_contain.append(subarray)
+            else:
+                for suba in MIRI_SUBARRAYS:
+                    must_not_contain.append(suba)                      
+            must_contain.append('DARK')
+            if averaged:
+                must_contain.append('averaged')
+            else:
+                must_not_contain.append('averaged')
+            (matched_files, matched_folders) = \
+                miricdp.match_cdp_substrings(mustcontain=must_contain,
+                                             mustnotcontain=must_not_contain)
+
+            # If there is more than one candidate and some have an exact match
+            # to the readout pattern required, then remove the non-exact ones.
+            if len(matched_files) > 1:
+                if readpatt and (readpatt != 'ANY') and (readpatt != 'N/A'):
+                    nexact = 0
+                    for candidate in matched_files:
+                        if readpatt in candidate:
+                            nexact += 1
+                    if nexact > 0:
+                        for candidate in matched_files.copy():
+                            if readpatt not in candidate:
+                                matched_files.remove(candidate)
+                        ncandidates = len(matched_files)
+                    else:
+                        strg = " There are no CDPs exactly matching a %s readout pattern." % readpatt
+                        print(strg)
+            elif len(matched_files) == 1:
+                if readpatt and (readpatt != 'ANY') and (readpatt != 'N/A'):
+                    if readpatt not in matched_files[0]:
+                        strg = " The matched CDP does not exactly match a %s readout pattern." % readpatt
+                        print(strg)
+
+            if len(matched_files) > 1:
+                # More than one match. Take the last file.
+                filename = matched_files[-1]
+                ftp_path = matched_folders[-1]
+            elif len(matched_files) > 0:
+                # Exactly one match. Take the first (and only) file.
+                filename = matched_files[0]
+                ftp_path = matched_folders[0]
+            else:
+                # No CDPs were matched
+                filename = None
+
+            if filename:
+                print("Matched %s at ftp_path=%s" % (filename, ftp_path))
+                # Update the local CDP cache to make sure it contains the specified file,
+                # and obtain the local file path and name.
+                local_filename = miricdp.update_cache(filename, ftp_path)
+                if averaged:
+                    strg = "Reading averaged DARK model from \'%s\'" % local_filename
+                else:
+                    strg = "Reading DARK model from \'%s\'" % local_filename
+                print(strg)
+                dark_model = MiriDarkReferenceModel( init=local_filename )
+            else:
+                dark_model = None
+            return dark_model
+
+        if INCLUDE_DARK:
+            print("Dark maps")
+            for detector in ('MIRIMAGE', 'MIRIFUSHORT', 'MIRIFULONG'):
+                for readpatt in ('FASTR1', 'FAST', 'SLOW', 'SLOWR1'):
+                    for subarray in MIRI_SUBARRAYS:
+                        strg = "DARK for detector=%s" % detector
+                        strg += " readpatt=%s" % readpatt
+                        strg += " subarray=%s" % subarray
+                        print("\n" + strg)
+                        darkmodel = find_dark( detector, readpatt, subarray,
+                                               averaged=False)
+                        if darkmodel is not None:
+                            cdps_found.append(strg)
+                            if VERBOSE_MODELS:
+                                print( darkmodel )
+                            if PLOTTING:
+                                darkmodel.plot(strg)
+                        else:
+                            cdps_not_found.append(strg)
+                            print("*** CDP NOT FOUND ***")
+                        del darkmodel
+                        time.sleep(LONG_DELAY)
+
         if INCLUDE_FLAT:
             print("Pixel flat-fields")
             detector = 'MIRIMAGE'
             readpatt = 'SLOW'
             for detector in ('MIRIMAGE', 'MIRIFUSHORT', 'MIRIFULONG'):
                 for mirifilter in ['ANY'] +  MIRI_FILTERS:
-                    # There are currently no PIXELFLATs for individual subarrays.
-                    # Skip this loop to speed up the test.
-                    for subarray in ['FULL']: # +  MIRI_SUBARRAYS:
+                    for subarray in ['FULL'] +  MIRI_SUBARRAYS:
                         strg = "PIXELFLAT for detector=%s" % detector
                         strg += " readpatt=%s" % readpatt
                         strg += " filter=%s" % mirifilter
@@ -2798,16 +2908,14 @@ if __name__ == '__main__':
         if INCLUDE_DISTORTION:
             print("Distortion models")
             detector = 'MIRIMAGE'
-            # There are no separate DISTORTION CDPs per filter, so skip
-            # this loop to speed up the testing.
-            for mirifilter in ['ANY']: # + MIRI_FILTERS:
+            for mirifilter in ['ANY'] + MIRI_FILTERS:
                 strg = "DISTORTION for detector=%s" % detector
                 strg += " filter=%s" % mirifilter
                 print("\n" + strg)
                 distmodel = get_cdp('DISTORTION', detector=detector,
                                     mirifilter=mirifilter,
                                     ftp_path=FTP_PATH, ftp_user=FTP_USER,
-                                    ftp_passwd=FTP_PASS, cdprelease=7)
+                                    ftp_passwd=FTP_PASS)
                 if distmodel is not None:
                     cdps_found.append(strg)
                     print( distmodel )
@@ -2819,27 +2927,27 @@ if __name__ == '__main__':
                 del distmodel
                 time.sleep(LONG_DELAY)
     
-#            print("CDP6 variants") # TODO: Eventually remove this test
-#            for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
-#                for miriband in ['ANY'] + MIRI_BANDS:
-#                    strg = "DISTORTION for detector=%s" % detector
-#                    strg += " band=%s" % miriband
-#                    print("\n" + strg)
-#                    distmodel = get_cdp('DISTORTION', detector=detector,
-#                                        band=miriband, cdprelease='6', 
-#                                        ftp_path=FTP_PATH, ftp_user=FTP_USER,
-#                                        ftp_passwd=FTP_PASS)
-#                    if distmodel is not None:
-#                        cdps_found.append(strg)
-#                        if VERBOSE_MODELS:
-#                            print( distmodel )
-#                        if PLOTTING:
-#                            distmodel.plot(strg)
-#                    else:
-#                        cdps_not_found.append(strg)
-#                        print("*** CDP NOT FOUND ***")
-#                    del distmodel
-#                    time.sleep(LONG_DELAY)
+            print("CDP6 variants") # TODO: Eventually remove this test
+            for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
+                for miriband in ['ANY'] + MIRI_BANDS:
+                    strg = "DISTORTION for detector=%s" % detector
+                    strg += " band=%s" % miriband
+                    print("\n" + strg)
+                    distmodel = get_cdp('DISTORTION', detector=detector,
+                                        band=miriband, cdprelease='6', 
+                                        ftp_path=FTP_PATH, ftp_user=FTP_USER,
+                                        ftp_passwd=FTP_PASS)
+                    if distmodel is not None:
+                        cdps_found.append(strg)
+                        if VERBOSE_MODELS:
+                            print( distmodel )
+                        if PLOTTING:
+                            distmodel.plot(strg)
+                    else:
+                        cdps_not_found.append(strg)
+                        print("*** CDP NOT FOUND ***")
+                    del distmodel
+                    time.sleep(LONG_DELAY)
             print("CDP7 variants") # TODO: Eventually remove this message
             for detector in ('MIRIFUSHORT', 'MIRIFULONG'):
                 for miriband in ['ANY'] + MIRI_BANDS:
@@ -2974,119 +3082,6 @@ if __name__ == '__main__':
                         print("*** CDP NOT FOUND ***")
                     del pcemodel
                     time.sleep(SHORT_DELAY)
-
-
-        def find_dark( detector, readpatt, subarray, averaged=False):
-            """
-            
-            Helper function to find a DARK CDP in the same way as is
-            done within SCASim.
-            
-            """
-            from miri.datamodels.cdp import MiriDarkReferenceModel
-            miricdp = MiriCDPInterface(ftp_path=FTP_PATH,
-                                       ftp_user=FTP_USER,
-                                       ftp_passwd=FTP_PASS)
-            miricdp.refresh(ftp_path=FTP_PATH,
-                            ftp_user=FTP_USER, 
-                            ftp_passwd=FTP_PASS)
-            must_contain = []
-            must_not_contain = []
-            if detector:
-                must_contain.append(detector)
-            if readpatt:
-                # Search for an exact or a generic readout pattern.
-                #must_contain.append(readpatt)
-                if readpatt.startswith("FAST"):
-                    must_contain.append("FAST")
-                if readpatt.startswith("SLOW"):
-                    must_contain.append("SLOW")               
-                    
-            if subarray and subarray != 'FULL':
-                must_contain.append(subarray)
-            else:
-                for suba in MIRI_SUBARRAYS:
-                    must_not_contain.append(suba)                      
-            must_contain.append('DARK')
-            if averaged:
-                must_contain.append('averaged')
-            else:
-                must_not_contain.append('averaged')
-            (matched_files, matched_folders) = \
-                miricdp.match_cdp_substrings(mustcontain=must_contain,
-                                             mustnotcontain=must_not_contain)
-
-            # If there is more than one candidate and some have an exact match
-            # to the readout pattern required, then remove the non-exact ones.
-            if len(matched_files) > 1:
-                if readpatt and (readpatt != 'ANY') and (readpatt != 'N/A'):
-                    nexact = 0
-                    for candidate in matched_files:
-                        if readpatt in candidate:
-                            nexact += 1
-                    if nexact > 0:
-                        for candidate in matched_files.copy():
-                            if readpatt not in candidate:
-                                matched_files.remove(candidate)
-                        ncandidates = len(matched_files)
-                    else:
-                        strg = " There are no CDPs exactly matching a %s readout pattern." % readpatt
-                        print(strg)
-            elif len(matched_files) == 1:
-                if readpatt and (readpatt != 'ANY') and (readpatt != 'N/A'):
-                    if readpatt not in matched_files[0]:
-                        strg = " The matched CDP does not exactly match a %s readout pattern." % readpatt
-                        print(strg)
-
-            if len(matched_files) > 1:
-                # More than one match. Take the last file.
-                filename = matched_files[-1]
-                ftp_path = matched_folders[-1]
-            elif len(matched_files) > 0:
-                # Exactly one match. Take the first (and only) file.
-                filename = matched_files[0]
-                ftp_path = matched_folders[0]
-            else:
-                # No CDPs were matched
-                filename = None
-
-            if filename:
-                print("Matched %s at ftp_path=%s" % (filename, ftp_path))
-                # Update the local CDP cache to make sure it contains the specified file,
-                # and obtain the local file path and name.
-                local_filename = miricdp.update_cache(filename, ftp_path)
-                if averaged:
-                    strg = "Reading averaged DARK model from \'%s\'" % local_filename
-                else:
-                    strg = "Reading DARK model from \'%s\'" % local_filename
-                print(strg)
-                dark_model = MiriDarkReferenceModel( init=local_filename )
-            else:
-                dark_model = None
-            return dark_model
-
-        if INCLUDE_DARK:
-            print("Dark maps")
-            for detector in ('MIRIMAGE', 'MIRIFUSHORT', 'MIRIFULONG'):
-                for readpatt in ('FASTR1', 'FAST', 'SLOW', 'SLOWR1'):
-                    for subarray in MIRI_SUBARRAYS:
-                        strg = "DARK for detector=%s" % detector
-                        strg += " readpatt=%s" % readpatt
-                        strg += " subarray=%s" % subarray
-                        print("\n" + strg)
-                        darkmodel = find_dark( detector, readpatt, subarray,
-                                               averaged=False)
-                        if darkmodel is not None:
-                            cdps_found.append(strg)
-                            if VERBOSE_MODELS:
-                                print( darkmodel )
-                            if PLOTTING:
-                                darkmodel.plot(strg)
-                        else:
-                            cdps_not_found.append(strg)
-                            print("*** CDP NOT FOUND ***")
-                        del darkmodel
-                        time.sleep(LONG_DELAY)
 
         print("The following %d simulator CDPs were successfully found:" % \
               len(cdps_found))
