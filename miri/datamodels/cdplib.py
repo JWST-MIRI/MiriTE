@@ -133,6 +133,9 @@ https://jwst-pipeline.readthedocs.io/en/latest/jwst/introduction.html#reference-
 28 Sep 2021: When a readout pattern FASTR1 or SLOWR1 is requested, also look
              for FAST or SLOW readout patterns. If needed, remove non-exact
              matches at the filtering stage.
+25 Mar 2022: Delimit cdptype strings with a "_" on both sides to prevent
+             confusion between similar types. Test the DARK CDPs last because
+             they are more likely to exceed the memory limit on some machines.
 
 Steven Beard (UKATC), Vincent Geers (UKATC)
 
@@ -990,9 +993,9 @@ class MiriCDPFolder(object):
             for sarray in MIRI_SUBARRAYS:
                 avoid_strings.append(sarray)
             
-        # The file name always contains the CDP type. A "_" is appended
-        # to the match string to prevent cdptype "MASK" from matching the
-        # coronographic MASK filters.
+        # The file name always contains the CDP type. The match string is
+        # delimited by "_" to prevent cdptype "MASK" from matching the
+        # coronographic MASK filters, or 'PSF-OOF' from matching 'PSF', etc...
         if (cdptype is not None) and (cdptype != 'ANY'):
             if cdptype == 'PIXELFLAT' or cdptype == 'FLAT':
                 # Special case. If the cdptype is 'PIXELFLAT' or 'FLAT' then
@@ -1002,7 +1005,7 @@ class MiriCDPFolder(object):
                 avoid_strings.append("FRINGE")
             else:
                 # Match any other CDP
-                match_strings.append(cdptype + "_")
+                match_strings.append("_" + cdptype + "_")
                      
         # An integration number is optional, but is always explicitly
         # included.  
