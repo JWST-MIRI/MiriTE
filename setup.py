@@ -319,7 +319,7 @@ setup(
         'matplotlib>=3.1.0',
         'numpy>=1.18.1',
         'parameterized>=0.7.0',
-        'paramiko==2.10.1',
+        'paramiko==3.4.0',
         'pysftp==0.2.9',
         'scipy>=1.4.1',
         'pytest>=6.2.0',
